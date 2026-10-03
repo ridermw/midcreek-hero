@@ -1,0 +1,26 @@
+{
+  "rendered_at": "2026-10-03T17:25:46.302555+00:00",
+  "size": "1280x720",
+  "quality": "high",
+  "deployment": "gpt-image-2.5-sunburst",
+  "model_name": "gpt-image-2.5-sunburst",
+  "model_version": "default",
+  "account": "mwilliams-imggen-eus2",
+  "prompt_char_count": 1403,
+  "prompt": "## MOCK SPEC\nCreate a transparent SIDE-VIEW pixel-art equipment layer for Midcreek, a bright\ndata-centre side-scrolling game. Orthographic side elevation, NOT isometric.\nSix recognizable white full-height server cabinets in a row, each with\nprecise dark rack-unit slots and small teal status indicators. Include one\nnarrow cooling distribution cabinet. Cabinets have tops around y=240 and\nbases exactly y=580, leaving transparent overhead and floor space.\nAbove them: yellow ladder tray above black wire-mesh basket above a dark\ncoolant manifold. On a distinct service-side cabinet group, thick charcoal\nhoses hang in lazy loops, ending in brass connectors with small green/teal\ncollars. Hose bodies are black, not colored. Keep the other rack fronts\nclean without hoses crossing them. A thin yellow containment kerb at each\ngroup's base, not a giant raised platform. Rack detail is legible, not noise.\nLeft and right edges end in repeatable rack-bay boundaries with small gaps.\nClean white/light-cool-blue palette, dark stepped pixel contours, detailed\npixel clusters approximately 2x2 pixels, short hard-edged shade ramps.\nNo smooth illustration, 3D render, gradients, photographic realism or grunge.\nACTUAL transparent RGBA outside equipment, including behind hoses and gaps.\nNo checkerboard, walls, floor, shadows on a floor, people, text, logos, UI,\nnumerals, labels, watermark or decorative frame.",
+  "background": "transparent",
+  "output_format": "png",
+  "usage": {
+    "input_tokens": 311,
+    "input_tokens_details": {
+      "image_tokens": 0,
+      "text_tokens": 311
+    },
+    "output_tokens": 947,
+    "output_tokens_details": {
+      "image_tokens": 947,
+      "text_tokens": 0
+    },
+    "total_tokens": 1258
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "rendered_at": "2026-10-03T17:26:31.546361+00:00",
+  "size": "1536x512",
+  "quality": "high",
+  "deployment": "gpt-image-2.5-sunburst",
+  "model_name": "gpt-image-2.5-sunburst",
+  "model_version": "default",
+  "account": "mwilliams-imggen-eus2",
+  "prompt_char_count": 746,
+  "prompt": "## MOCK SPEC\nCreate a horizontally seamless pixel-art FLOOR strip for the Midcreek\nside-scrolling data hall. Plain light cool-grey polished concrete, no tiles,\nno raised perforated floor, no grit or scratches. A single thin signature\nyellow painted safety line runs horizontally across the full width near\nthe upper quarter, perfectly aligned at both edges. Subtle two-tone concrete\nbands provide depth but stay clean and quiet behind character boots.\nOrthographic game art, no perspective vanishing point. Deliberate square\npixel clusters and short flat shade ramps matching detailed RPG pixel sprites,\nnot a photograph or smooth vector painting. Opaque. No props, people, racks,\nlettering, logos, arrows, symbols, checkerboard, UI or watermark.",
+  "output_format": "png",
+  "usage": {
+    "input_tokens": 159,
+    "input_tokens_details": {
+      "image_tokens": 0,
+      "text_tokens": 159
+    },
+    "output_tokens": 535,
+    "output_tokens_details": {
+      "image_tokens": 535,
+      "text_tokens": 0
+    },
+    "total_tokens": 694
+  }
+}
