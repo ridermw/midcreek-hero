@@ -73,6 +73,9 @@ All animation prompts use the existing idle/walk geometry: 512x512 source
 cells, a boot baseline at y=448, and a standing height of approximately 270
 pixels. Keep this geometry when generating the remaining clips. The
 normalizer uses one fixed 512-to-171 scale and writes 208x208 frames.
+Ponytail guidance applies only to the woman. The normalizer checks all frame
+hashes before it writes files, so duplicate artwork cannot overwrite prior
+frames or previews.
 After generating and normalizing all clips, run:
 
 ```sh
@@ -82,9 +85,16 @@ godot --headless --path . --script tests/world_test.gd
 ```
 
 Both runtime JSON manifests are included explicitly in Web exports.
+Generated source sheets and previews are excluded from Web exports.
+Local primary and diagnostic actions face the rack when it is in range.
 Run the asset-pipeline regression checks with:
 
 ```sh
 python3 -m unittest discover -s tests -p 'test_*.py'
 godot --headless --path . --script tests/environment_test.gd
+godot --headless --path . --script tests/local_action_test.gd
 ```
+
+CI also opens the exported resource pack from outside the project directory.
+It checks that runtime textures remain available and source-art directories
+are absent.

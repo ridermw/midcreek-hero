@@ -14,7 +14,7 @@ Never switch to smooth cel illustration, vector art, a 3D render or painted conc
 MAN: clean-shaven, short dark hair below blue hard hat; long slate sleeves to wrists, roomy straight blue jeans. No beard or moustache.
 Both: blue hard hat/ear defenders, lime hi-vis vest, orange trim, broad silver
 bands, slate shirt, blue denim, brown boots and tool belt. Outfit and character
-size must remain IDENTICAL across frames. Ponytail mass stays consistent.
+size must remain IDENTICAL across frames.
 NORMAL REAL-WORLD technician: ordinary hand tools only. NO sword, shield, rack panel, magic, spell, glowing trail or combat armor.
 
 EXACT GRID: 4 columns by 2 rows, read left-to-right then top-to-bottom.

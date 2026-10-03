@@ -82,16 +82,18 @@ func perform_action(clip: StringName) -> void:
 	_cancel_repair()
 	_held_keys.clear()
 	hero.set_motion(0.0, false)
-	if clip == &"primary" and rack.is_in_range(hero.global_position) and not rack.repaired:
+	var in_range := rack.is_in_range(hero.global_position)
+	if in_range and (clip == &"primary" or clip == &"secondary"):
+		hero.sprite.flip_h = hero.global_position.x > rack.global_position.x
+	if clip == &"primary" and in_range and not rack.repaired:
 		repairing_hero = hero
 		repair_elapsed = 0.0
-		hero.sprite.flip_h = hero.global_position.x > rack.global_position.x
 		hero.start_action(clip, true)
 		_set_feedback("R12: tightening service coupling...", FaultRack.REPAIR_SECONDS)
 	else:
 		hero.start_action(clip)
 		if clip == &"primary" or clip == &"secondary":
-			if not rack.is_in_range(hero.global_position):
+			if not in_range:
 				_set_feedback("No rack in reach. Move beside R12 for a local check.")
 			elif rack.repaired:
 				_set_feedback("R12: coupling secure. Status green; no further repair needed.")

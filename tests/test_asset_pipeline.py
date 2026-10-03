@@ -5,6 +5,7 @@ import json
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 from PIL import Image
 
@@ -20,6 +21,28 @@ class AssetPipelineTest(unittest.TestCase):
         includes = presets["preset.0"]["include_filter"].strip('"').split(",")
         self.assertIn("art/cel-shift/sprites/manifest.json", includes)
         self.assertIn("art/cel-shift/animations/manifest.json", includes)
+
+    def test_export_excludes_source_artwork_not_runtime_artwork(self):
+        presets = configparser.ConfigParser()
+        presets.read(ROOT / "export_presets.cfg")
+        excludes = presets["preset.0"]["exclude_filter"].strip('"').split(",")
+        for directory in (
+            "art/cel-shift/animations/generated",
+            "art/cel-shift/animations/previews",
+            "art/cel-shift/environment/generated",
+        ):
+            with self.subTest(directory=directory):
+                self.assertIn(directory + "/*", excludes)
+        self.assertNotIn("art/cel-shift/animations/frames/*", excludes)
+        self.assertNotIn("art/cel-shift/environment/layers/*", excludes)
+
+    def test_ponytail_guidance_is_woman_specific(self):
+        for clip in animation_assets.CLIPS:
+            with self.subTest(clip=clip):
+                man = animation_assets.prompt_text("man-midcreek", clip)
+                woman = animation_assets.prompt_text("woman-midcreek", clip)
+                self.assertNotIn("ponytail", man.lower())
+                self.assertIn("Ponytail mass stays consistent.", woman)
 
     def test_every_clip_uses_existing_geometry(self):
         geometry = (
@@ -97,6 +120,62 @@ class AssetPipelineTest(unittest.TestCase):
         for path in (environment_assets.ART / "generated").glob("*.metadata.json"):
             with self.subTest(path=path.name):
                 self.assertNotIn("account", json.loads(path.read_text()))
+
+    def test_duplicate_animation_rejection_preserves_outputs(self):
+        for existing in (False, True):
+            with self.subTest(existing=existing), tempfile.TemporaryDirectory() as directory:
+                art = Path(directory)
+                generated = art / "generated/man-midcreek"
+                generated.mkdir(parents=True)
+                count, columns, size = animation_assets.configuration("man-midcreek", "idle")
+                sheet = Image.new("RGBA", size)
+                for index in range(count):
+                    x, y = (index % columns) * 512, (index // columns) * 512
+                    sheet.paste((40, 80, 120, 255), (x + 192, y + 128, x + 320, y + 448))
+                sheet.save(generated / "idle.png")
+                output = art / "frames/man-midcreek/idle"
+                previews = art / "previews/man-midcreek"
+                previous = {}
+                if existing:
+                    output.mkdir(parents=True)
+                    previews.mkdir(parents=True)
+                    for index in range(count):
+                        path = output / f"{index:02d}.png"
+                        previous[path] = f"previous-frame-{index}".encode()
+                    for extension in ("png", "gif"):
+                        previous[previews / f"idle.{extension}"] = b"previous-preview"
+                    for path, content in previous.items():
+                        path.write_bytes(content)
+                with patch.object(animation_assets, "ART", art):
+                    with self.assertRaisesRegex(ValueError, "duplicate authored frames"):
+                        animation_assets.normalize("man-midcreek", "idle")
+                if existing:
+                    for path, content in previous.items():
+                        self.assertEqual(path.read_bytes(), content)
+                else:
+                    self.assertFalse(output.exists())
+                    self.assertFalse(previews.exists())
+
+    def test_unique_animation_writes_frames_and_previews(self):
+        with tempfile.TemporaryDirectory() as directory:
+            art = Path(directory)
+            generated = art / "generated/man-midcreek"
+            generated.mkdir(parents=True)
+            source = animation_assets.ART / "generated/man-midcreek/idle.png"
+            (generated / "idle.png").write_bytes(source.read_bytes())
+            with patch.object(animation_assets, "ART", art):
+                animation_assets.normalize("man-midcreek", "idle")
+            frames = sorted((art / "frames/man-midcreek/idle").glob("*.png"))
+            self.assertEqual(len(frames), 6)
+            pixels = []
+            for path in frames:
+                with Image.open(path) as frame:
+                    self.assertEqual(frame.size, (208, 208))
+                    self.assertEqual(set(frame.getchannel("A").tobytes()), {0, 255})
+                    pixels.append(frame.tobytes())
+            self.assertEqual(len(set(pixels)), 6)
+            for extension in ("png", "gif"):
+                self.assertTrue((art / "previews/man-midcreek" / f"idle.{extension}").is_file())
 
 
 if __name__ == "__main__":

@@ -66,6 +66,12 @@ jobs:
           grep -F 'ENVIRONMENT_TEST_COMPLETE: 44 checks, 0 failures' "$RUNNER_TEMP/environment-test.log"
           ! grep -E '^(SCRIPT ERROR|ERROR|USER ERROR|Parse Error)' "$RUNNER_TEMP/environment-test.log"
 
+      - name: Check local tool action direction
+        run: |
+          timeout 120s godot --headless --path . --script tests/local_action_test.gd 2>&1 | tee "$RUNNER_TEMP/local-action-test.log"
+          grep -F 'LOCAL_ACTION_TEST_COMPLETE: 68 checks, 0 failures' "$RUNNER_TEMP/local-action-test.log"
+          ! grep -E '^(SCRIPT ERROR|ERROR|USER ERROR|Parse Error)' "$RUNNER_TEMP/local-action-test.log"
+
       - name: Export single-threaded web build
         run: |
           mkdir -p build/web
@@ -75,6 +81,14 @@ jobs:
           test -s build/web/index.pck
           test -s build/web/index.wasm
           touch build/web/.nojekyll
+
+      - name: Check exported runtime resources
+        run: |
+          timeout 120s godot --headless --path "$RUNNER_TEMP" \
+            --main-pack "$GITHUB_WORKSPACE/build/web/index.pck" \
+            --script "$GITHUB_WORKSPACE/tests/export_test.gd" 2>&1 | tee "$RUNNER_TEMP/export-test.log"
+          grep -F 'EXPORT_TEST_COMPLETE: 9 checks, 0 failures' "$RUNNER_TEMP/export-test.log"
+          ! grep -E '^(SCRIPT ERROR|ERROR|USER ERROR|Parse Error)' "$RUNNER_TEMP/export-test.log"
 
       - name: Upload Pages artifact
         if: github.ref == 'refs/heads/main'

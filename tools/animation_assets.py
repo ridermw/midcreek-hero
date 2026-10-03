@@ -40,6 +40,7 @@ def prompt_text(variant, clip):
         "MAN: clean-shaven, short dark hair below blue hard hat; long slate sleeves to wrists, roomy straight blue jeans. No beard or moustache."
     )
     phases = NORMAL_POSES[clip]
+    hair_guidance = " Ponytail mass stays consistent." if woman else ""
     mode = "NORMAL REAL-WORLD technician: ordinary hand tools only. NO sword, shield, rack panel, magic, spell, glowing trail or combat armor."
     return f"""---
 name: {variant}-{clip}-animation
@@ -57,7 +58,7 @@ Never switch to smooth cel illustration, vector art, a 3D render or painted conc
 {identity}
 Both: blue hard hat/ear defenders, lime hi-vis vest, orange trim, broad silver
 bands, slate shirt, blue denim, brown boots and tool belt. Outfit and character
-size must remain IDENTICAL across frames. Ponytail mass stays consistent.
+size must remain IDENTICAL across frames.{hair_guidance}
 {mode}
 
 EXACT GRID: {columns} columns by 2 rows, read left-to-right then top-to-bottom.
@@ -156,19 +157,22 @@ def normalize(variant, clip):
     palette_source.putdata(samples)
     palette = palette_source.quantize(colors=96, method=Image.Quantize.MEDIANCUT,
                                       dither=Image.Dither.NONE)
-    output = ART / "frames" / variant / clip
-    output.mkdir(parents=True, exist_ok=True)
-    paths, hashes = [], []
-    for index, frame in enumerate(frames):
+    results, hashes = [], []
+    for frame in frames:
         result = frame.convert("RGB").quantize(palette=palette, dither=Image.Dither.NONE).convert("RGBA")
         result.putalpha(frame.getchannel("A"))
         result.paste((0, 0, 0, 0), mask=frame.getchannel("A").point(lambda value: 255 if not value else 0))
-        path = output / f"{index:02d}.png"
-        result.save(path)
-        paths.append(path.relative_to(ART).as_posix())
+        results.append(result)
         hashes.append(hashlib.sha256(result.tobytes()).hexdigest())
     if len(set(hashes)) != count:
         raise ValueError(f"{source}: duplicate authored frames")
+    output = ART / "frames" / variant / clip
+    output.mkdir(parents=True, exist_ok=True)
+    paths = []
+    for index, result in enumerate(results):
+        path = output / f"{index:02d}.png"
+        result.save(path)
+        paths.append(path.relative_to(ART).as_posix())
     preview = Image.new("RGB", (columns * 208, 2 * 208), "#d9dde4")
     for index, path in enumerate(paths):
         frame = Image.open(ART / path)
