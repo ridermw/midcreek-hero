@@ -1,0 +1,42 @@
+{
+  "rendered_at": "2026-10-03T13:06:44.158089+00:00",
+  "size": "1536x1024",
+  "quality": "high",
+  "deployment": "gpt-image-2.5-flare",
+  "model_name": "gpt-image-2.5-flare",
+  "model_version": "default",
+  "prompt_char_count": 3817,
+  "prompt": "\nCharacter action-pose sheet for a video game. Not a scene, not a user\ninterface, and not pixel art.\n\nEDIT INPUT IMAGE 1 by replacing its entire three-row sprite sheet with one\nclean horizontal row of exactly six Cel Shift male technician figures. Keep\nthe six top-row pose silhouettes and replace all original character design,\ncostume, props, effects, pixel rendering, and background.\n\nSTRICT REFERENCE ADHERENCE — INPUT IMAGE 1 is the RPG sprite sheet. Use input\nimage 1 for the exact six body poses, silhouettes, facing directions, gesture\narcs, ordering, and spacing. INPUT IMAGE 2 is the canonical Cel Shift male\ntechnician sheet. Use input image 2 for the character's identity, proportions,\nPPE, palette, and rendering style. Preserve the heroic sword-and-shield\nreadability, but redesign every object as original Midcreek industrial\nequipment rather than copying the fantasy character or heraldry.\n\nLAYOUT — exactly six separate full-body figures in one evenly spaced horizontal\nrow, left to right:\n\n1. Neutral ready stance holding a long insulated service blade/tool low in the\n   right hand and a compact rack-door shield on the left arm.\n2. Wide planted stance making a powerful horizontal sweep with the service\n   blade/tool, with one clean amber motion arc.\n3. Wide stance with the left hand extended, releasing a circular teal\n   diagnostic pulse made from cable and network motifs.\n4. Crouched braced stance behind the rack-door shield as a bright contact spark\n   hits its edge.\n5. Full running stride toward the right with the cloak-free hi-vis silhouette\n   and tool belt trailing naturally.\n6. Upright heroic signal pose with the service blade/tool raised high overhead\n   and the rack-door shield held at the side.\n\nHYBRID EQUIPMENT — the sword silhouette becomes an original long insulated\nbusbar extraction tool: straight steel-grey working edge, safety-orange grip,\nindustrial fasteners, and no medieval ornament. The shield silhouette becomes\na compact oval or round-cornered rack access panel with perforated metal,\nyellow hazard edging, a central service latch, and a forearm brace. Effects\nlook like graphic diagnostic energy and electrical contact, not supernatural\nmagic. No crests, fleurs-de-lis, runes, gems, heraldry, or recognizable fantasy\nweapon design.\n\nTHE CHARACTER — the canonical Cel Shift man technician, identical across all\nsix poses. Adult proportions, roughly six-and-a-half heads tall, average build,\n1.73 m, clean-shaven with no beard, moustache, or stubble. Short dark hair\nunder a blue hard hat with ear defenders. Lime yellow-green hi-vis vest with\norange trim and broad silver retroreflective bands over a long-sleeved slate\nwork shirt. Blue straight-cut denim jeans, brown work boots, tool belt, and\ncorded orange ear plugs.\n\nSTYLE — Cel Shift. Large flat unbroken colour areas, at most one hard-edged\ncool shadow tone, and thick confident uniform-weight dark outlines around\nsilhouettes and major internal forms. Clear adult anatomy, dynamic readable\nposes, and a light airy palette. Plain warm off-white studio background with no\nscenery, grid, or labels. Small flat ground ellipses are allowed.\n\nPalette: background #F0EDE4, hi-vis lime #C8D94A, orange trim #E8763A,\nretroreflective silver #D6DBE0, slate shirt #55707F, denim #4A6485, boots\n#3A3128, hard hat #2C6FB8, steel #AEB8C2, teal diagnostic accent #2FB8A8,\nwarning yellow #FFC93C, amber effect #F5A623, ink outline #23282D.\n\nCONSTRAINTS — exactly six figures and no extras. No overlapping figures. No\nlettering, numerals, words, logos, watermark, signature, decorative frame, or\ninterface. No photorealism, gradients, ambient occlusion, texture, grain, glow\nbloom, depth of field, motion blur, cute proportions, chibi style, medieval\narmor, conventional sword or shield, spell runes, foliage, or flames.",
+  "operation": "edit",
+  "source_image": "https://developers.openai.com/images/image-gallery-sunburst/sprites.webp",
+  "reference_images": [
+    "midcreek-concept/themes/cel-shift/masters/character-man/01-sheet.png"
+  ],
+  "mask": null,
+  "inputs": [
+    {
+      "role": "source",
+      "path": "https://developers.openai.com/images/image-gallery-sunburst/sprites.webp",
+      "sha256": "993f55fbbb2b02347b76f29a98a4669beb5a51c650448f8b58a38925d6168c6f"
+    },
+    {
+      "role": "reference",
+      "path": "midcreek-concept/themes/cel-shift/masters/character-man/01-sheet.png",
+      "sha256": "3639bc2b326a3e5884bbf18b9fd5f8737343dd8a1f3914c10594ac369bdef729"
+    }
+  ],
+  "output_format": "png",
+  "usage": {
+    "input_tokens": 3980,
+    "input_tokens_details": {
+      "image_tokens": 3072,
+      "text_tokens": 908
+    },
+    "output_tokens": 1372,
+    "output_tokens_details": {
+      "image_tokens": 1372,
+      "text_tokens": 0
+    },
+    "total_tokens": 5352
+  }
+}

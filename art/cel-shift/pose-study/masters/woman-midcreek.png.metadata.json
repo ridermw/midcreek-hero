@@ -1,0 +1,42 @@
+{
+  "rendered_at": "2026-10-03T13:05:27.014529+00:00",
+  "size": "1536x1024",
+  "quality": "high",
+  "deployment": "gpt-image-2.5-flare",
+  "model_name": "gpt-image-2.5-flare",
+  "model_version": "default",
+  "prompt_char_count": 3607,
+  "prompt": "\nCharacter action-pose sheet for a video game. Not a scene, not a user\ninterface, and not pixel art.\n\nSTRICT REFERENCE ADHERENCE — INPUT IMAGE 1 is the RPG sprite sheet. Use input\nimage 1 only for the six body poses, silhouettes, facing directions, gesture\narcs, ordering, and spacing. INPUT IMAGE 2 is the canonical Cel Shift woman\ntechnician sheet. Use input image 2 for the character's identity, proportions,\nclothing, ponytail, palette, and rendering style. Do not copy the RPG\ncharacter, costume, sword, shield, or pixel-art treatment.\n\nLAYOUT — exactly six separate full-body figures in one evenly spaced horizontal\nrow, left to right, matching the top row of the pose reference:\n\n1. Neutral ready stance, weight balanced, right-hand tool held low, left arm\n   carrying equipment close to the body.\n2. Wide planted stance making a powerful horizontal two-handed sweep.\n3. Wide stance with the left hand extended outward to trigger a diagnostic\n   effect.\n4. Crouched braced stance behind a protective object as sparks strike it.\n5. Full running stride toward the right, both feet clearly separated.\n6. Upright victory or signal pose with one tool raised high overhead.\n\nMIDCREEK TRANSLATION — preserve those poses but replace every fantasy object\nwith credible data-centre work equipment. Use a rugged handheld diagnostic\nscanner or insulated service tool in the ready pose; a long torque wrench or\nbreaker bar in the sweeping pose; a coiled service cable and restrained teal\ndiagnostic pulse in the casting pose; a removable perforated rack door or\nequipment access panel in the blocking pose; no carried object while running;\nand an insulated service tool raised overhead in the final pose. Effects are\nsmall, graphic indicators of cable motion, signal flow, electrical contact, or\ndiagnostic status. No magic, leaves, runes, fantasy weapons, heraldry, or\ncombat armor.\n\nTHE CHARACTER — the canonical Cel Shift woman technician, the same\nrecognizable person in all six poses. Adult proportions, roughly six-and-a-half\nheads tall, average build, 1.58 m. Long dark hair tied securely in one clear\nponytail gathered at the nape and falling outside the vest; the ponytail swings\nnaturally with each action and remains the same length and mass in every pose.\nBlue hard hat with ear defenders. Lime yellow-green hi-vis vest with orange\ntrim and broad silver retroreflective bands over a short-sleeved slate work\nshirt with bare forearms. Slim tapered blue denim jeans, brown work boots, tool\nbelt, and corded orange ear plugs. Practical workwear, never sexualized.\n\nSTYLE — Cel Shift. Clean cel-shaded production art with large flat colour\nareas, at most one hard-edged cool shadow tone, and thick confident\nuniform-weight dark outlines around silhouettes and major internal forms.\nClear adult anatomy and strong readable silhouettes. Plain warm off-white\nstudio background with no scenery, no grid, and no labels. Small flat ground\nellipses are allowed.\n\nPalette: background #F0EDE4, hi-vis lime #C8D94A, orange trim #E8763A,\nretroreflective silver #D6DBE0, slate shirt #55707F, denim #4A6485, boots\n#3A3128, hard hat #2C6FB8, hair #2B2320, teal diagnostic accent #2FB8A8,\nwarning yellow #FFC93C, ink outline #23282D.\n\nCONSTRAINTS — exactly six figures and no extras. No overlapping figures. No\nlettering, numerals, words, logos, badges, watermark, signature, decorative\nframe, or interface. No photorealism, gradients, ambient occlusion, texture,\ngrain, glow bloom, depth of field, motion blur, cute proportions, chibi style,\nloose hair, fantasy costume, sword, shield, spell circle, foliage, or flames.",
+  "operation": "edit",
+  "source_image": "https://developers.openai.com/images/image-gallery-sunburst/sprites.webp",
+  "reference_images": [
+    "midcreek-concept/themes/cel-shift/masters/character-woman/01-sheet.png"
+  ],
+  "mask": null,
+  "inputs": [
+    {
+      "role": "source",
+      "path": "https://developers.openai.com/images/image-gallery-sunburst/sprites.webp",
+      "sha256": "993f55fbbb2b02347b76f29a98a4669beb5a51c650448f8b58a38925d6168c6f"
+    },
+    {
+      "role": "reference",
+      "path": "midcreek-concept/themes/cel-shift/masters/character-woman/01-sheet.png",
+      "sha256": "e410cda945fa084f43c72a097dcada9db315993a2ce697985f951f38fd9f68c3"
+    }
+  ],
+  "output_format": "png",
+  "usage": {
+    "input_tokens": 3936,
+    "input_tokens_details": {
+      "image_tokens": 3072,
+      "text_tokens": 864
+    },
+    "output_tokens": 1372,
+    "output_tokens_details": {
+      "image_tokens": 1372,
+      "text_tokens": 0
+    },
+    "total_tokens": 5308
+  }
+}
