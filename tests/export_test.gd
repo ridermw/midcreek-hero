@@ -1,0 +1,37 @@
+extends SceneTree
+
+const SOURCE_DIRECTORIES: Array[String] = [
+	"res://art/cel-shift/animations/generated",
+	"res://art/cel-shift/animations/previews",
+	"res://art/cel-shift/environment/generated",
+]
+const RUNTIME_TEXTURES: Array[String] = [
+	"res://art/cel-shift/animations/frames/man-midcreek/idle/00.png",
+	"res://art/cel-shift/animations/frames/man-midcreek/walk/00.png",
+	"res://art/cel-shift/environment/layers/far.png",
+	"res://art/cel-shift/environment/layers/equipment.png",
+	"res://art/cel-shift/environment/layers/floor.png",
+]
+
+var checks: int = 0
+var failures: int = 0
+
+
+func _initialize() -> void:
+	for path: String in SOURCE_DIRECTORIES:
+		check(not DirAccess.dir_exists_absolute(path), "Source artwork is excluded: " + path)
+	for path: String in RUNTIME_TEXTURES:
+		check(ResourceLoader.exists(path), "Runtime texture is included: " + path)
+	check(
+		FileAccess.file_exists("res://art/cel-shift/sprites/manifest.json"),
+		"Runtime sprite manifest is included.",
+	)
+	print("EXPORT_TEST_COMPLETE: %d checks, %d failures" % [checks, failures])
+	quit(1 if failures else 0)
+
+
+func check(condition: bool, message: String) -> void:
+	checks += 1
+	if not condition:
+		failures += 1
+		push_error(message)

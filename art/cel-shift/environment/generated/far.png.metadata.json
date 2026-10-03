@@ -1,0 +1,24 @@
+{
+  "rendered_at": "2026-10-03T17:25:43.648866+00:00",
+  "size": "1280x720",
+  "quality": "high",
+  "deployment": "gpt-image-2.5-sunburst",
+  "model_name": "gpt-image-2.5-sunburst",
+  "model_version": "default",
+  "prompt_char_count": 1073,
+  "prompt": "## MOCK SPEC\nCreate a tileable SIDE-VIEW pixel-art background layer for a bright data-centre\nside-scrolling game. Strict side-on orthographic elevation, NOT isometric.\nThe approved world is Midcreek: airy cool-white industrial architecture,\nclean white walls, structural columns, upper clerestory light panels and a\nfew tidy overhead yellow ladder trays with black mesh cable baskets below.\nThis is ONLY the distant architecture: leave the central wall quiet and open\nfor a separate rack/equipment layer. No foreground racks, characters or props.\nLower 150 pixels are pale polished concrete; no square tiles or raised floor.\nHorizontal seams must match perfectly at left/right edges for repetition.\nFlat cool pale whites/blues, selective dark pixel outlines, short stepped\nshading ramps, deliberate square pixel clusters at approximately 2x2 pixels.\nMatch detailed RPG sprite backgrounds, not smooth cel-shaded illustration.\nBright even lighting, no grunge, no neon darkness, no atmospheric blur.\nOpaque background, no text, words, numerals, logos, UI, watermark or border.",
+  "output_format": "png",
+  "usage": {
+    "input_tokens": 225,
+    "input_tokens_details": {
+      "image_tokens": 0,
+      "text_tokens": 225
+    },
+    "output_tokens": 947,
+    "output_tokens_details": {
+      "image_tokens": 947,
+      "text_tokens": 0
+    },
+    "total_tokens": 1172
+  }
+}

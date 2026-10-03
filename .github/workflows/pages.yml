@@ -23,6 +23,11 @@ jobs:
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
 
+      - name: Check asset pipeline contracts
+        run: |
+          python3 -m pip install -r tools/requirements.txt
+          python3 -m unittest discover -s tests -p 'test_*.py'
+
       - name: Install official Godot and web export templates
         shell: bash
         run: |
@@ -55,6 +60,18 @@ jobs:
           grep -F 'VIEWER_TEST_COMPLETE: 149 checks, 0 failures' "$RUNNER_TEMP/test.log"
           ! grep -E '^(SCRIPT ERROR|ERROR|USER ERROR|Parse Error)' "$RUNNER_TEMP/test.log"
 
+      - name: Check normalized environment loading
+        run: |
+          timeout 120s godot --headless --path . --script tests/environment_test.gd 2>&1 | tee "$RUNNER_TEMP/environment-test.log"
+          grep -F 'ENVIRONMENT_TEST_COMPLETE: 44 checks, 0 failures' "$RUNNER_TEMP/environment-test.log"
+          ! grep -E '^(SCRIPT ERROR|ERROR|USER ERROR|Parse Error)' "$RUNNER_TEMP/environment-test.log"
+
+      - name: Check local tool action direction
+        run: |
+          timeout 120s godot --headless --path . --script tests/local_action_test.gd 2>&1 | tee "$RUNNER_TEMP/local-action-test.log"
+          grep -F 'LOCAL_ACTION_TEST_COMPLETE: 68 checks, 0 failures' "$RUNNER_TEMP/local-action-test.log"
+          ! grep -E '^(SCRIPT ERROR|ERROR|USER ERROR|Parse Error)' "$RUNNER_TEMP/local-action-test.log"
+
       - name: Export single-threaded web build
         run: |
           mkdir -p build/web
@@ -64,6 +81,14 @@ jobs:
           test -s build/web/index.pck
           test -s build/web/index.wasm
           touch build/web/.nojekyll
+
+      - name: Check exported runtime resources
+        run: |
+          timeout 120s godot --headless --path "$RUNNER_TEMP" \
+            --main-pack "$GITHUB_WORKSPACE/build/web/index.pck" \
+            --script "$GITHUB_WORKSPACE/tests/export_test.gd" 2>&1 | tee "$RUNNER_TEMP/export-test.log"
+          grep -F 'EXPORT_TEST_COMPLETE: 9 checks, 0 failures' "$RUNNER_TEMP/export-test.log"
+          ! grep -E '^(SCRIPT ERROR|ERROR|USER ERROR|Parse Error)' "$RUNNER_TEMP/export-test.log"
 
       - name: Upload Pages artifact
         if: github.ref == 'refs/heads/main'
