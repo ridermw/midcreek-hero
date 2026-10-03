@@ -1,0 +1,872 @@
+{
+  "status": "sprite concepts; not a continuous animation or engine-tested asset",
+  "cell_size": [
+    208,
+    208
+  ],
+  "pivot_pixels": [
+    104,
+    184
+  ],
+  "filter": "nearest",
+  "alpha": "binary: 0 or 255",
+  "palette_limit": 96,
+  "source_scale": 0.5,
+  "source_foot_baseline": 430,
+  "source_anchor_x": [
+    126,
+    400,
+    654,
+    904,
+    1190,
+    1428
+  ],
+  "variants": {
+    "man-midcreek": {
+      "sheet": "sheets/man-midcreek.png",
+      "source": "generated/man-midcreek.png",
+      "source_sha256": "20f8de046eba7fc8b5070a8acd6c753fea3d1a7b6c0efcc79b9e14d28b7b29e6",
+      "frames": [
+        {
+          "name": "ready",
+          "file": "individual/man-midcreek/01-ready.png",
+          "frame": {
+            "x": 0,
+            "y": 0,
+            "w": 208,
+            "h": 208
+          },
+          "pivot_pixels": [
+            104,
+            184
+          ]
+        },
+        {
+          "name": "reach",
+          "file": "individual/man-midcreek/02-reach.png",
+          "frame": {
+            "x": 208,
+            "y": 0,
+            "w": 208,
+            "h": 208
+          },
+          "pivot_pixels": [
+            104,
+            184
+          ]
+        },
+        {
+          "name": "testing",
+          "file": "individual/man-midcreek/03-testing.png",
+          "frame": {
+            "x": 416,
+            "y": 0,
+            "w": 208,
+            "h": 208
+          },
+          "pivot_pixels": [
+            104,
+            184
+          ]
+        },
+        {
+          "name": "reaction",
+          "file": "individual/man-midcreek/04-reaction.png",
+          "frame": {
+            "x": 624,
+            "y": 0,
+            "w": 208,
+            "h": 208
+          },
+          "pivot_pixels": [
+            104,
+            184
+          ]
+        },
+        {
+          "name": "running",
+          "file": "individual/man-midcreek/05-running.png",
+          "frame": {
+            "x": 832,
+            "y": 0,
+            "w": 208,
+            "h": 208
+          },
+          "pivot_pixels": [
+            104,
+            184
+          ]
+        },
+        {
+          "name": "signal",
+          "file": "individual/man-midcreek/06-signal.png",
+          "frame": {
+            "x": 1040,
+            "y": 0,
+            "w": 208,
+            "h": 208
+          },
+          "pivot_pixels": [
+            104,
+            184
+          ]
+        }
+      ]
+    },
+    "woman-midcreek": {
+      "sheet": "sheets/woman-midcreek.png",
+      "source": "generated/woman-midcreek.png",
+      "source_sha256": "fc2d0801115ea8721bcc6a8e4eee881208976b057522eed1fe4381c6d82b845b",
+      "frames": [
+        {
+          "name": "ready",
+          "file": "individual/woman-midcreek/01-ready.png",
+          "frame": {
+            "x": 0,
+            "y": 0,
+            "w": 208,
+            "h": 208
+          },
+          "pivot_pixels": [
+            104,
+            184
+          ]
+        },
+        {
+          "name": "reach",
+          "file": "individual/woman-midcreek/02-reach.png",
+          "frame": {
+            "x": 208,
+            "y": 0,
+            "w": 208,
+            "h": 208
+          },
+          "pivot_pixels": [
+            104,
+            184
+          ]
+        },
+        {
+          "name": "testing",
+          "file": "individual/woman-midcreek/03-testing.png",
+          "frame": {
+            "x": 416,
+            "y": 0,
+            "w": 208,
+            "h": 208
+          },
+          "pivot_pixels": [
+            104,
+            184
+          ]
+        },
+        {
+          "name": "reaction",
+          "file": "individual/woman-midcreek/04-reaction.png",
+          "frame": {
+            "x": 624,
+            "y": 0,
+            "w": 208,
+            "h": 208
+          },
+          "pivot_pixels": [
+            104,
+            184
+          ]
+        },
+        {
+          "name": "running",
+          "file": "individual/woman-midcreek/05-running.png",
+          "frame": {
+            "x": 832,
+            "y": 0,
+            "w": 208,
+            "h": 208
+          },
+          "pivot_pixels": [
+            104,
+            184
+          ]
+        },
+        {
+          "name": "signal",
+          "file": "individual/woman-midcreek/06-signal.png",
+          "frame": {
+            "x": 1040,
+            "y": 0,
+            "w": 208,
+            "h": 208
+          },
+          "pivot_pixels": [
+            104,
+            184
+          ]
+        }
+      ]
+    },
+    "man-hybrid": {
+      "sheet": "sheets/man-hybrid.png",
+      "source": "generated/man-hybrid.png",
+      "source_sha256": "b04d971af15ac906cb7c04bbab19bc1f26a7f6e3fcfb88dd715352b5ec83512a",
+      "frames": [
+        {
+          "name": "ready",
+          "file": "individual/man-hybrid/01-ready.png",
+          "frame": {
+            "x": 0,
+            "y": 0,
+            "w": 208,
+            "h": 208
+          },
+          "pivot_pixels": [
+            104,
+            184
+          ]
+        },
+        {
+          "name": "slash",
+          "file": "individual/man-hybrid/02-slash.png",
+          "frame": {
+            "x": 208,
+            "y": 0,
+            "w": 208,
+            "h": 208
+          },
+          "pivot_pixels": [
+            104,
+            184
+          ]
+        },
+        {
+          "name": "diagnostic-effect",
+          "file": "individual/man-hybrid/03-diagnostic-effect.png",
+          "frame": {
+            "x": 416,
+            "y": 0,
+            "w": 208,
+            "h": 208
+          },
+          "pivot_pixels": [
+            104,
+            184
+          ]
+        },
+        {
+          "name": "block",
+          "file": "individual/man-hybrid/04-block.png",
+          "frame": {
+            "x": 624,
+            "y": 0,
+            "w": 208,
+            "h": 208
+          },
+          "pivot_pixels": [
+            104,
+            184
+          ]
+        },
+        {
+          "name": "running",
+          "file": "individual/man-hybrid/05-running.png",
+          "frame": {
+            "x": 832,
+            "y": 0,
+            "w": 208,
+            "h": 208
+          },
+          "pivot_pixels": [
+            104,
+            184
+          ]
+        },
+        {
+          "name": "triumph",
+          "file": "individual/man-hybrid/06-triumph.png",
+          "frame": {
+            "x": 1040,
+            "y": 0,
+            "w": 208,
+            "h": 208
+          },
+          "pivot_pixels": [
+            104,
+            184
+          ]
+        }
+      ]
+    },
+    "woman-hybrid": {
+      "sheet": "sheets/woman-hybrid.png",
+      "source": "generated/woman-hybrid.png",
+      "source_sha256": "2597b8dc6f9ecac785d468f37226124fd1fdf467b341bb96b15f93b0282c4c8f",
+      "frames": [
+        {
+          "name": "ready",
+          "file": "individual/woman-hybrid/01-ready.png",
+          "frame": {
+            "x": 0,
+            "y": 0,
+            "w": 208,
+            "h": 208
+          },
+          "pivot_pixels": [
+            104,
+            184
+          ]
+        },
+        {
+          "name": "slash",
+          "file": "individual/woman-hybrid/02-slash.png",
+          "frame": {
+            "x": 208,
+            "y": 0,
+            "w": 208,
+            "h": 208
+          },
+          "pivot_pixels": [
+            104,
+            184
+          ]
+        },
+        {
+          "name": "diagnostic-effect",
+          "file": "individual/woman-hybrid/03-diagnostic-effect.png",
+          "frame": {
+            "x": 416,
+            "y": 0,
+            "w": 208,
+            "h": 208
+          },
+          "pivot_pixels": [
+            104,
+            184
+          ]
+        },
+        {
+          "name": "block",
+          "file": "individual/woman-hybrid/04-block.png",
+          "frame": {
+            "x": 624,
+            "y": 0,
+            "w": 208,
+            "h": 208
+          },
+          "pivot_pixels": [
+            104,
+            184
+          ]
+        },
+        {
+          "name": "running",
+          "file": "individual/woman-hybrid/05-running.png",
+          "frame": {
+            "x": 832,
+            "y": 0,
+            "w": 208,
+            "h": 208
+          },
+          "pivot_pixels": [
+            104,
+            184
+          ]
+        },
+        {
+          "name": "triumph",
+          "file": "individual/woman-hybrid/06-triumph.png",
+          "frame": {
+            "x": 1040,
+            "y": 0,
+            "w": 208,
+            "h": 208
+          },
+          "pivot_pixels": [
+            104,
+            184
+          ]
+        }
+      ]
+    }
+  },
+  "palette_rgb": [
+    [
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      2
+    ],
+    [
+      0,
+      2,
+      9
+    ],
+    [
+      1,
+      2,
+      0
+    ],
+    [
+      3,
+      1,
+      0
+    ],
+    [
+      3,
+      1,
+      2
+    ],
+    [
+      3,
+      4,
+      10
+    ],
+    [
+      7,
+      2,
+      2
+    ],
+    [
+      7,
+      6,
+      8
+    ],
+    [
+      9,
+      131,
+      141
+    ],
+    [
+      10,
+      18,
+      35
+    ],
+    [
+      11,
+      5,
+      5
+    ],
+    [
+      12,
+      13,
+      15
+    ],
+    [
+      16,
+      91,
+      100
+    ],
+    [
+      20,
+      6,
+      5
+    ],
+    [
+      20,
+      34,
+      60
+    ],
+    [
+      24,
+      14,
+      11
+    ],
+    [
+      25,
+      57,
+      116
+    ],
+    [
+      26,
+      67,
+      141
+    ],
+    [
+      27,
+      22,
+      24
+    ],
+    [
+      27,
+      26,
+      29
+    ],
+    [
+      27,
+      44,
+      69
+    ],
+    [
+      28,
+      32,
+      35
+    ],
+    [
+      30,
+      20,
+      14
+    ],
+    [
+      32,
+      54,
+      77
+    ],
+    [
+      34,
+      81,
+      166
+    ],
+    [
+      38,
+      96,
+      196
+    ],
+    [
+      42,
+      65,
+      93
+    ],
+    [
+      42,
+      65,
+      99
+    ],
+    [
+      43,
+      55,
+      72
+    ],
+    [
+      44,
+      21,
+      14
+    ],
+    [
+      44,
+      63,
+      84
+    ],
+    [
+      45,
+      31,
+      27
+    ],
+    [
+      45,
+      70,
+      99
+    ],
+    [
+      45,
+      76,
+      106
+    ],
+    [
+      46,
+      30,
+      20
+    ],
+    [
+      46,
+      71,
+      106
+    ],
+    [
+      47,
+      42,
+      42
+    ],
+    [
+      47,
+      99,
+      194
+    ],
+    [
+      49,
+      37,
+      29
+    ],
+    [
+      52,
+      76,
+      104
+    ],
+    [
+      52,
+      77,
+      113
+    ],
+    [
+      54,
+      81,
+      113
+    ],
+    [
+      56,
+      84,
+      115
+    ],
+    [
+      56,
+      85,
+      124
+    ],
+    [
+      58,
+      92,
+      131
+    ],
+    [
+      62,
+      88,
+      120
+    ],
+    [
+      62,
+      92,
+      133
+    ],
+    [
+      63,
+      30,
+      18
+    ],
+    [
+      63,
+      94,
+      126
+    ],
+    [
+      63,
+      96,
+      136
+    ],
+    [
+      64,
+      95,
+      132
+    ],
+    [
+      65,
+      41,
+      28
+    ],
+    [
+      67,
+      96,
+      137
+    ],
+    [
+      69,
+      46,
+      33
+    ],
+    [
+      69,
+      100,
+      139
+    ],
+    [
+      70,
+      52,
+      40
+    ],
+    [
+      70,
+      62,
+      57
+    ],
+    [
+      74,
+      97,
+      122
+    ],
+    [
+      83,
+      84,
+      86
+    ],
+    [
+      86,
+      46,
+      28
+    ],
+    [
+      89,
+      65,
+      49
+    ],
+    [
+      90,
+      59,
+      36
+    ],
+    [
+      102,
+      189,
+      140
+    ],
+    [
+      103,
+      54,
+      30
+    ],
+    [
+      104,
+      119,
+      137
+    ],
+    [
+      105,
+      69,
+      45
+    ],
+    [
+      119,
+      77,
+      47
+    ],
+    [
+      121,
+      58,
+      28
+    ],
+    [
+      125,
+      91,
+      62
+    ],
+    [
+      141,
+      135,
+      118
+    ],
+    [
+      152,
+      117,
+      80
+    ],
+    [
+      152,
+      154,
+      91
+    ],
+    [
+      159,
+      157,
+      158
+    ],
+    [
+      161,
+      92,
+      44
+    ],
+    [
+      184,
+      183,
+      172
+    ],
+    [
+      186,
+      207,
+      83
+    ],
+    [
+      191,
+      54,
+      10
+    ],
+    [
+      198,
+      122,
+      59
+    ],
+    [
+      198,
+      196,
+      201
+    ],
+    [
+      203,
+      214,
+      59
+    ],
+    [
+      212,
+      185,
+      97
+    ],
+    [
+      212,
+      213,
+      216
+    ],
+    [
+      216,
+      152,
+      72
+    ],
+    [
+      220,
+      91,
+      12
+    ],
+    [
+      231,
+      134,
+      42
+    ],
+    [
+      235,
+      118,
+      16
+    ],
+    [
+      243,
+      164,
+      75
+    ],
+    [
+      244,
+      150,
+      37
+    ],
+    [
+      247,
+      177,
+      80
+    ],
+    [
+      247,
+      178,
+      123
+    ],
+    [
+      250,
+      185,
+      126
+    ],
+    [
+      250,
+      196,
+      135
+    ],
+    [
+      250,
+      197,
+      61
+    ],
+    [
+      251,
+      230,
+      129
+    ],
+    [
+      251,
+      248,
+      239
+    ]
+  ]
+}

@@ -1,5 +1,9 @@
 # Cel Shift six-pose study
 
+**Rejected / superseded.** These smooth, opaque illustrations failed the
+pixel-art and transparency requirements. Use the [pixel sprites](../sprites/README.md)
+instead. Retained only as historical evidence.
+
 This study applies the six silhouettes from an RPG sprite-sheet reference to
 the canonical Cel Shift man and woman technicians.
 

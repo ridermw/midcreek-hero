@@ -2,10 +2,19 @@
 
 Pixel-art and character-direction experiments for Midcreek.
 
-## Cel Shift pose study
+## Cel Shift pixel sprites
 
-Four strict-reference pose sheets translate a six-pose RPG silhouette set into
-the canonical Cel Shift technicians:
+The current [sprite set](art/cel-shift/sprites/README.md) contains normal and
+hybrid male/female variants, four transparent sheets, and 24 individual sprites.
+Normal technicians use real tools without fantasy effects. Hybrids retain the
+industrial sword/shield silhouettes and effects.
+
+![Current sprite comparison](art/cel-shift/sprites/preview.png)
+
+## Earlier pose study (rejected)
+
+The earlier smooth, opaque drawings below were rejected: they did not match
+the requested pixel-art sprite style. They remain here as historical evidence.
 
 | Character | Midcreek equipment | Industrial-fantasy hybrid |
 |---|---|---|

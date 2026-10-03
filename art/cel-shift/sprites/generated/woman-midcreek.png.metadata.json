@@ -1,0 +1,36 @@
+{
+  "rendered_at": "2026-10-03T13:24:52.975530+00:00",
+  "size": "1536x512",
+  "quality": "high",
+  "deployment": "gpt-image-2.5-sunburst",
+  "model_name": "gpt-image-2.5-sunburst",
+  "model_version": "default",
+  "prompt_char_count": 3499,
+  "prompt": "\nEdit image 1, the approved female HYBRID pixel sprite strip, into the NORMAL\nreal-world technician variant. Keep the artwork, female identity, proportions,\ncostume, pixel density, six-column composition and broad body gestures.\nChange ONLY equipment, hand actions and effects to be physically grounded.\nThis is detailed PIXEL ART, never a smooth cartoon or concept illustration.\n\nREMOVE EVERY blade, sword, shield, held rack panel, spell spiral, floating\ncable, glowing particle, impact starburst and sweeping attack trail.\nDo not just rename or recolour those objects. They must be absent.\nNothing on this sheet is magical, medieval or a weapon.\n\nPreserve the same recognizable woman: dark ponytail tied below a blue hard\nhat with ear defenders, lime vest with orange trim and broad silver bands,\nSHORT slate sleeves with bare forearms, tapered blue jeans, brown boots,\ntool belt and orange earplug cord. Same compact adult RPG sprite proportions,\nface, stepped outlines and rich pixel shading as image 1. Consistent ponytail\nlength and mass; it reacts naturally to motion.\n\nExactly six separated full-body sprites in one row, ordered as before:\n1. READY: front three-quarter planted stance. A normal short screwdriver\n   held down in her right hand, LEFT HAND EMPTY and relaxed by the hip.\n   The screwdriver has a narrow shaft and ordinary orange handle, no guard,\n   pointy blade or oversized silhouette. It is shorter than her forearm.\n2. WORKING REACH: broad stance and right arm extended toward screen left,\n   using an ordinary short ratchet wrench at shoulder level. Left hand\n   naturally near the torso. A maintenance reach, not a weapon attack.\n   No swing arc, speed lines or effect.\n3. TESTING: wide stance, left hand extends a small electrical test probe\n   toward screen right; right hand holds a compact rugged multimeter by the\n   waist. A thin red/black insulated lead connects probe to meter and hangs\n   DOWN in one slack curve under gravity. No loops above the hand, floating\n   objects, teal glow or hologram. Blank dark screen, no lettering.\n4. BRACED REACTION: both feet planted, bent knees, body low facing screen\n   right, left forearm raised in front of the face as a startled protective\n   gesture, right hand close to torso. EMPTY HANDS. No shield or held panel,\n   no spark effects. Preserve the original crouched body's silhouette.\n5. RUNNING: preserve the same exaggerated running leap toward screen right,\n   front leg extended and rear leg folded back, arms opposing, hands empty,\n   ponytail trailing behind.\n6. SIGNALING: planted front three-quarter stance, right arm raised high on\n   screen left with an EMPTY OPEN HAND signaling to a coworker. Left hand\n   relaxed at side. No raised tool, blade, shield, flag, or magic.\n\nKeep six distinct poses and generous transparent separation between figures.\nNo extra row, environment, rack, workbench or unrequested person. Keep boots\nat the source baseline and all tools fully within their sprite's space.\nPreserve image 1's crisp angular pixel clusters, dark stair-step contours,\nshort colour ramps, tiny pixel highlights, blue/lime/orange workwear.\nNo smooth anti-aliasing, gradients, glow, airbrush, blur, vector outlines,\nphotorealism or 3D render. Pixel artwork, not merely pixelated smooth art.\n\nOUTPUT actual transparent RGBA PNG. Alpha zero outside the figures and\nthrough empty gaps. No painted checkerboard, solid background, floor,\nground shadow, text, label, logo, border, watermark or decorative effect.",
+  "operation": "edit",
+  "source_image": "art/cel-shift/sprites/generated/woman-hybrid.png",
+  "reference_images": [],
+  "mask": null,
+  "inputs": [
+    {
+      "role": "source",
+      "path": "reference:woman-hybrid.png",
+      "sha256": "2597b8dc6f9ecac785d468f37226124fd1fdf467b341bb96b15f93b0282c4c8f"
+    }
+  ],
+  "background": "transparent",
+  "output_format": "png",
+  "usage": {
+    "input_tokens": 1541,
+    "input_tokens_details": {
+      "image_tokens": 768,
+      "text_tokens": 773
+    },
+    "output_tokens": 535,
+    "output_tokens_details": {
+      "image_tokens": 535,
+      "text_tokens": 0
+    },
+    "total_tokens": 2076
+  }
+}

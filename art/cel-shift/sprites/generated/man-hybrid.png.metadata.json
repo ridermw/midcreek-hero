@@ -1,0 +1,43 @@
+{
+  "rendered_at": "2026-10-03T13:15:39.333776+00:00",
+  "size": "1536x512",
+  "quality": "high",
+  "deployment": "gpt-image-2.5-sunburst",
+  "model_name": "gpt-image-2.5-sunburst",
+  "model_version": "default",
+  "prompt_char_count": 3903,
+  "prompt": "\nEdit image 1 into a transparent PIXEL ART game sprite strip. Exactly six\nseparate sprites. This is a reference-faithful sprite reskin, not an\nillustration, concept-art sheet, smooth cartoon, or cel-shaded vector drawing.\n\nImage 1 is the PRIMARY ARTWORK STYLE AND POSE MASTER: the cropped top row of\nthe supplied RPG sprite sheet. Keep its compact RPG proportions, face scale,\ndark stepped pixel outlines, small angular pixel clusters, rich pixel-shaded\nmaterial ramps, chunky boots/hands, lively expressions, and exact action\nsilhouettes. Match its pixel-art craftsmanship very closely.\nImage 2 is ONLY the male technician's face/hair and clothing reference.\nDo NOT transfer image 2's smooth edges, tall anatomy, flat cel shading,\nbackground, model-sheet layout, or poses. Translate his identity into the\npixel-art drawing system of image 1.\n\nCHANGE ONLY: reskin the adventurer as the Cel Shift male technician; replace\nfantasy equipment with industrial equivalents; remove the source background\nand cloak. Keep pose, facing, composition, pixel density, and drawing style.\nHe has short dark brown hair, a clean-shaven face, blue hard hat with dark ear\ndefenders, lime vest with orange trim and broad silver bands, LONG slate\nsleeves to the wrists, roomy blue jeans, brown work boots, orange earplug cord,\nand a tool belt. No beard, no moustache, no armor, no cape.\n\nEquipment: a long flat silver busbar extraction tool with an orange insulated\ngrip takes the sword's narrow silhouette. A compact oval perforated steel\naccess-panel shield with yellow rim takes the wooden shield's silhouette.\nConsistent equipment size and appearance across all applicable poses.\n\nSix fixed equal 256x512 cells in ONE horizontal row. No cell lines or labels.\nUse a single consistent character scale. Neutral character roughly 300 pixels\ntall, boots near y=464. Keep every sprite and its effects wholly within its\nown cell, leaving at least 8 transparent pixels at each cell edge.\n\nLEFT TO RIGHT, trace the body language of image 1:\n1. Front three-quarter idle, feet planted, right-hand tool down on screen left,\n   left-arm oval panel on screen right. Not a profile view.\n2. Broad planted slash, right arm extended to screen left holding the tool\n   ONE-HANDED, left arm still carrying panel on screen right, sweeping pale\n   amber pixel crescent across the front. NOT a two-handed baseball swing.\n3. Front three-quarter wide stance, left hand reaching screen right, right\n   hand near belt; a vivid looping teal cable/status effect spirals upward\n   with small discrete pixel particles. Keep the source's expressive gesture.\n4. Low braced shield block toward screen right, BOTH feet planted and both\n   knees bent; orange starburst striking panel edge. NO kneeling on the floor.\n5. Exaggerated running leap toward screen right: front leg extended forward,\n   rear leg folded behind, opposing bent arms; hands empty. Not jogging in place.\n6. Front three-quarter triumph, right hand with tool high overhead on screen\n   left, left-arm panel at side on screen right, feet firmly planted.\n\nDeliberate visible square pixels, approximately 2x2 source-pixel clusters.\nHard stair-step contours, selective dark outline, crisp stepped highlights,\nwarm skin ramps, cool denim ramps, bright lime/blue/orange accents. Not merely\nflat cel art with a pixelation filter. No smooth anti-aliased contours,\nairbrush, gradients, soft lighting, photorealism, 3D render, or huge blank area.\nEffects must also be sharp pixel clusters, not fine vector circles.\n\nOUTPUT: true transparent RGBA PNG. Empty space is alpha zero, including gaps\nbetween limbs and effects. REMOVE the grey/white checkerboard in image 1;\nnever paint a checkerboard, white, beige, or any other background. No ground\nshadow, scenery, floor, caption, lettering, logo, frame, watermark, or extra\nfigures. These are six standalone action sprites, not animation in-betweens.",
+  "operation": "edit",
+  "source_image": "reference:rpg-six-pose-reference.png",
+  "reference_images": [
+    "reference:man-identity-reference.png"
+  ],
+  "mask": null,
+  "inputs": [
+    {
+      "role": "source",
+      "path": "reference:rpg-six-pose-reference.png",
+      "sha256": "6669758d6d10f38766d8de7f56b76c22a9f38b818d214a0b64591991b6025795"
+    },
+    {
+      "role": "reference",
+      "path": "reference:man-identity-reference.png",
+      "sha256": "62333fc03b2461da8a5b05a1c34366ee256c7ba982bfea03646700972a7c8ba9"
+    }
+  ],
+  "background": "transparent",
+  "output_format": "png",
+  "usage": {
+    "input_tokens": 1931,
+    "input_tokens_details": {
+      "image_tokens": 1041,
+      "text_tokens": 890
+    },
+    "output_tokens": 535,
+    "output_tokens_details": {
+      "image_tokens": 535,
+      "text_tokens": 0
+    },
+    "total_tokens": 2466
+  }
+}
