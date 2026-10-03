@@ -1,25 +1,25 @@
-# Midcreek Hero: data center side scroller — design
+# Midcreek Hero: data center side scroller design
 
 Date: 2026-10-03
 Status: approved in brainstorming, awaiting spec review
 
 ## Goal
 
-Build a fast side-scrolling platformer in the existing Cel Shift pixel-art
+Build a fast side scrolling platformer in the existing Cel Shift pixel art
 style. The player is a data center technician. The player runs and jumps
 through the data hall, avoids hazards, and completes work orders before the
-service-level agreement (SLA) timer expires. The game has music, a health bar,
+service level agreement (SLA) timer expires. The game has music, a health bar,
 tasks, and 5 levels. An autopilot agent delivers it in milestone pull requests.
 
 ## Constraints
 
-- Engine: Godot 4.7.2, GDScript, Compatibility renderer, single-threaded Web
+- Engine: Godot 4.7.2, GDScript, Compatibility renderer, single threaded Web
   export. Keep the current `export_presets.cfg` and Pages workflow.
-- Art: Cel Shift style. Nearest-neighbor sampling. Binary alpha. Shared
+- Art: Cel Shift style. Nearest neighbor sampling. Binary alpha. Shared
   palette. Technician frames are 208x208 with the pivot at (104, 184).
 - All new art is generated with MockUI through the existing asset pipeline.
   The game is not done until all clips, tiles, hazards, props, backgrounds,
-  and UI art exist. Static-pose fallbacks do not count as done.
+  and UI art exist. Fallbacks to static poses do not count as done.
 - Audio: CC0 tracks and SFX only, with recorded provenance.
 - Target: web build on GitHub Pages. Keyboard and gamepad. Progress saved in
   browser storage.
@@ -31,9 +31,12 @@ tasks, and 5 levels. An autopilot agent delivers it in milestone pull requests.
 - One technician. The player selects man or woman on the start screen.
   Both use the normal (`*-midcreek`) variant with real tools. Hybrid variants
   are not used.
-- Moves: run, jump (variable height), wall-slide, slide under cable trays.
+- Moves: run, jump (variable height), wall slide with wall jump, slide under
+  cable trays, climb ladders.
 - Actions: primary = repair (hold), secondary = diagnose (multimeter).
-- Game-feel aids: coyote time 0.1 s, jump buffer 0.1 s.
+- Control aids: coyote time 0.1 s (the player can jump for 0.1 s after
+  leaving a ledge) and jump buffer 0.1 s (a jump pressed up to 0.1 s before
+  landing still happens).
 
 ### Health
 
@@ -44,7 +47,7 @@ tasks, and 5 levels. An autopilot agent delivers it in milestone pull requests.
 
 ### Tasks (work orders)
 
-Each level has 3–6 work orders. A task panel in the HUD lists them.
+Each level has 3 to 6 work orders. A task panel in the HUD lists them.
 
 | Task type | Player action |
 |---|---|
@@ -54,8 +57,9 @@ Each level has 3–6 work orders. A task panel in the HUD lists them.
 | Reseat cable | Press the prompted button within a 1.0 s window, 3 times |
 | Reboot switch | Activate 3 switch panels in the displayed order |
 
-The exit door opens when all required tasks are complete. Optional tasks add
-score but do not block the exit.
+The exit door opens when all required tasks are complete. Optional tasks do
+not block the exit. The results screen and the save file record how many
+optional tasks the player completed (best value per level).
 
 ### Failure, checkpoints, and score
 
@@ -69,13 +73,13 @@ score but do not block the exit.
 
 ### Levels
 
-Target length: 2–4 minutes at par time.
+Target length: 2 to 4 minutes at par time.
 
 | # | Name | New mechanics | Hazards | Tasks |
 |---|---|---|---|---|
-| 1 | Cold Aisle Onboarding | Run, jump, repair; on-screen prompts | Floor cable snags (static) | Repair rack ×3 |
+| 1 | Cold Aisle Onboarding | Run, jump, repair; prompts on screen | Floor cable snags (static) | Repair rack ×3 |
 | 2 | Hot Aisle | Fetch part | Heat vents (periodic damage zones) | Repair, fetch part, diagnose then repair |
-| 3 | Cable Jungle | Overhead trays, slide, wall-slide | Moving cable snags | Reseat cable, fetch part, repair |
+| 3 | Cable Jungle | Overhead trays, slide, wall slide | Moving cable snags | Reseat cable, fetch part, repair |
 | 4 | Power Room | Moving lifts | Spark arcs (timed) | Reboot switch, diagnose then repair, repair |
 | 5 | Outage Night | Flickering lights, short SLA | Patrol drones, all prior hazards | All types; final task repairs 4 racks in one row |
 
@@ -97,8 +101,9 @@ Each unit has one purpose and its own headless test.
 | File | Purpose | Depends on |
 |---|---|---|
 | `game/player.gd` | Movement, jump, slide, actions, health hooks. Evolves from `hero.gd`. | animation library, input map |
-| `game/level_loader.gd` | Parse a `.level` file into a `TileMapLayer` and entity nodes | tileset, entity scenes |
-| `game/task_system.gd` | Work-order state machine; emits `task_completed`, `all_required_done` | none |
+| `game/level_parser.gd` | Parse and validate `.level` text into plain data | none |
+| `game/level_builder.gd` | Build a `TileMapLayer` and entity nodes from parsed data | tileset, entity scenes |
+| `game/task_system.gd` | Work order state machine; emits `task_completed`, `all_required_done` | none |
 | `game/health.gd` | Segments, damage, invulnerability, healing; emits `died` | none |
 | `game/sla_timer.gd` | Countdown, checkpoint snapshot; emits `expired` | none |
 | `game/checkpoint_manager.gd` | Store and restore player position, timer, task state | task system, SLA timer |
@@ -149,7 +154,7 @@ manifest. Only normalized outputs ship in the Web export.
 
 | Asset group | Contents |
 |---|---|
-| Technician clips | idle, walk, run, jump, primary, secondary, reaction for man and woman (14 clips), existing 512→208 geometry |
+| Technician clips | idle, walk, run, jump, slide, primary, secondary, reaction, signal for man and woman (18 clips; man idle and walk exist), existing 512 to 208 geometry |
 | Tileset | Floor, raised floor tile, platform, cable tray, ladder, rack face (OK and fault), exit door, checkpoint beacon |
 | Hazards | Heat vent, spark arc, cable snag, patrol drone (animated frames) |
 | Props and pickups | PSU, DIMM, coolant, switch panel, cable port |
@@ -171,7 +176,7 @@ manifest. Only normalized outputs ship in the Web export.
 - The level loader rejects a level with an unknown legend character, a task
   that references a missing anchor, no player start, or no exit. It reports
   the file and line.
-- Missing animation clips or textures stop the level with an on-screen error,
+- Missing animation clips or textures stop the level with an error on screen,
   as the current world scene does. There is no silent fallback.
 - A corrupt save file is renamed to `save.corrupt.json` and a new save starts.
 
@@ -186,7 +191,7 @@ manifest. Only normalized outputs ship in the Web export.
 | Audio provenance: every audio file has a license entry | Python `unittest` |
 | Export check: runtime manifests, levels, and audio are in the pack | existing `tests/export_test.gd`, extended |
 
-Godot exits 0 on parse errors and on runtime script errors. Each test runner
+Godot can exit 0 on parse errors and on runtime script errors. Each test runner
 must fail on `ERROR`, `SCRIPT ERROR`, or `Parse Error` in output, and each
 test must set a completion flag that the runner checks.
 
@@ -198,11 +203,11 @@ push often. Update the README after each milestone.
 
 | Milestone | Scope |
 |---|---|
-| M0 Core | Player controller, level loader, health, SLA timer, checkpoints, HUD, gray-box test level, unit tests |
+| M0 Core | Player controller, level parser and builder, health, SLA timer, checkpoints, HUD, gray box test level, unit tests |
 | M1 Art base | 14 technician clips, tileset, Level 1 background, UI art |
 | M2 Level 1 and flow | Level 1, menus, results, save store, audio director, first music and SFX |
 | M3 Level 2 | Heat vents, fetch part, Level 2 background and music |
-| M4 Level 3 | Cable trays, slide, wall-slide, reseat cable, Level 3 assets |
+| M4 Level 3 | Cable trays, ladders, slide, wall slide, wall jump, reseat cable, Level 3 assets |
 | M5 Level 4 | Spark arcs, lifts, reboot switch, Level 4 assets |
 | M6 Level 5 | Drones, flicker, final task, Level 5 assets |
 | M7 Polish | Screen shake, balance pass, playthrough recordings, README, Pages deploy |
