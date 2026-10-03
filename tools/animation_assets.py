@@ -63,8 +63,8 @@ size must remain IDENTICAL across frames. Ponytail mass stays consistent.
 EXACT GRID: {columns} columns by 2 rows, read left-to-right then top-to-bottom.
 Exactly {count} figures, one per equal 512x512 cell. No drawn grid, numbers or labels.
 Each cell uses local coordinates: body centered near x=256, BOOT CONTACT BASELINE
-y=480, standing figure including hat approximately 400 pixels tall. All painted
-pixels, including tools/hair, must remain inside x=32..480 and y=32..496.
+y=448, standing figure including hat approximately 270 pixels tall. All painted
+pixels, including effects/tools/hair, must remain inside x=64..448 and y=96..480.
 Character anatomy is drawn at the SAME scale in every frame; don't resize each pose
 to fill the cell. Foot position may change through stride but the floor is fixed.
 Camera/facing stays consistent. Right-facing profile for locomotion; do not

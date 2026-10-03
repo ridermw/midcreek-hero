@@ -46,3 +46,45 @@ Normal technicians use real tools without fantasy effects. Hybrids retain the
 industrial sword/shield silhouettes and effects.
 
 ![Current sprite comparison](art/cel-shift/sprites/preview.png)
+
+## Animated data hall checkpoint
+
+The `game/world.tscn` scene adds two technicians, local rack repair, camera
+tracking, and three environment layers. It requires all seven authored
+animation clips for each technician. Only the man's idle and walk clips are
+complete. The scene reports missing artwork instead of using static sprites.
+The sprite viewer remains the main scene.
+
+Install the asset-tool dependency and normalize the checked-in environment
+sources:
+
+```sh
+python3 -m pip install -r tools/requirements.txt
+python3 tools/environment_assets.py normalize
+```
+
+Use `--layer far`, `--layer equipment`, or `--layer floor` to normalize one
+layer. The command writes `environment/layers/` under `art/cel-shift/`.
+It uses nearest-neighbor sampling. Far and equipment layers become 640x360.
+The floor strip becomes 640x96. The equipment layer uses binary alpha.
+Source dimensions and transparency must match the layer contract.
+
+All animation prompts use the existing idle/walk geometry: 512x512 source
+cells, a boot baseline at y=448, and a standing height of approximately 270
+pixels. Keep this geometry when generating the remaining clips. The
+normalizer uses one fixed 512-to-171 scale and writes 208x208 frames.
+After generating and normalizing all clips, run:
+
+```sh
+python3 tools/animation_assets.py manifest
+godot --headless --editor --path . --import
+godot --headless --path . --script tests/world_test.gd
+```
+
+Both runtime JSON manifests are included explicitly in Web exports.
+Run the asset-pipeline regression checks with:
+
+```sh
+python3 -m unittest discover -s tests -p 'test_*.py'
+godot --headless --path . --script tests/environment_test.gd
+```
