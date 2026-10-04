@@ -43,6 +43,7 @@ func run() -> void:
 			var demo: Dictionary = browser["help"]["demo"]
 			check(not demo["steps"].is_empty() and not demo["images"].is_empty(), "Phone task page carries a real looping hero/prop demo.")
 			check(not browser["help"]["instructions"].is_empty(), "Phone has equivalent ordered task instructions.")
+			check(main.help_view.demo.texture_filter == CanvasItem.TEXTURE_FILTER_NEAREST, "Native help preserves pixel edges when it scales hero and prop art.")
 			var native: Dictionary = main.help_view.demo.snapshot(0.0)
 			var looped: Dictionary = main.help_view.demo.snapshot(main.help_view.demo.duration())
 			check(native == looped, "Task demonstration loops predictably.")

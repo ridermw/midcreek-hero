@@ -17,6 +17,7 @@ func configure(page: Dictionary, owner_main: Node) -> void:
 	control_display = owner_main.control_display()
 	custom_minimum_size = Vector2(520, 190)
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
+	texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	if OS.has_feature("web"):
 		reduced_motion = bool(JavaScriptBridge.eval("window.matchMedia('(prefers-reduced-motion: reduce)').matches"))
 
