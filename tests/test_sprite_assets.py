@@ -108,6 +108,45 @@ class SpriteAssetsTest(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "wrong size"):
                 sprite_assets.normalize("a", art)
 
+    def test_normalize_rejects_frames_that_disappear_when_resized(self):
+        for fit in ("canvas", "fill", "top", "bottom", "center"):
+            with self.subTest(fit=fit), tempfile.TemporaryDirectory() as directory:
+                art = Path(directory)
+                write_catalog(art, [{"name": "sparse", "group": "props", "cell": [16, 16],
+                                     "frames": 1, "fps": 1, "fit": fit, "prompt": "x"}])
+                grid = sprite_assets.layout((16, 16), 1)
+                image = Image.new("RGBA", (grid["width"], grid["height"]), (0, 0, 0, 0))
+                image.putpixel((0, 0), (90, 100, 110, 255))
+                image.putpixel((image.width - 1, image.height - 1), (90, 100, 110, 255))
+                (art / "props/generated").mkdir(parents=True)
+                image.save(art / "props/generated/sparse.png")
+                with self.assertRaisesRegex(ValueError, "sparse frame 0 is blank"):
+                    sprite_assets.normalize("sparse", art)
+                self.assertFalse((art / "props/frames/sparse/00.png").exists())
+
+    def test_failed_normalization_preserves_previous_frames(self):
+        with tempfile.TemporaryDirectory() as directory:
+            art = Path(directory)
+            write_catalog(art, [{"name": "saved", "group": "props", "cell": [16, 16],
+                                 "frames": 2, "fps": 1, "fit": "canvas", "prompt": "x"}])
+            grid = sprite_assets.layout((16, 16), 2)
+            image = Image.new("RGBA", (grid["width"], grid["height"]), (0, 0, 0, 0))
+            slot_w = grid["width"] // grid["cols"]
+            slot_h = grid["height"] // grid["rows"]
+            image.paste((90, 100, 110, 255), (0, 0, slot_w, slot_h))
+            image.putpixel((slot_w if grid["cols"] > 1 else 0,
+                            0 if grid["cols"] > 1 else slot_h), (90, 100, 110, 255))
+            (art / "props/generated").mkdir(parents=True)
+            image.save(art / "props/generated/saved.png")
+            output = art / "props/frames/saved"
+            output.mkdir(parents=True)
+            for index in range(2):
+                Image.new("RGBA", (16, 16), (index, 50, 60, 255)).save(output / f"{index:02d}.png")
+            previous = {path.name: path.read_bytes() for path in output.glob("*.png")}
+            with self.assertRaisesRegex(ValueError, "saved frame 1 is blank"):
+                sprite_assets.normalize("saved", art)
+            self.assertEqual({path.name: path.read_bytes() for path in output.glob("*.png")}, previous)
+
     def test_group_palette_and_manifest(self):
         with tempfile.TemporaryDirectory() as directory:
             art = Path(directory)

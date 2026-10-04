@@ -42,6 +42,12 @@ func run() -> void:
 	check(level.player.position == Vector2(16, 96) and level.timer.remaining == 120.0, "Player and timer start.")
 	check(level.player.sprite.sprite_frames != null, "The player has animation frames.")
 	check(level.entities["racks"][0].art != null, "Entities draw generated art.")
+	var floor_tiles := level.solids.get_child(0).get_child(1) as TextureRect
+	check(
+		floor_tiles.size.x > floor_tiles.texture.get_width()
+		and floor_tiles.texture_repeat == CanvasItem.TEXTURE_REPEAT_ENABLED,
+		"Wide solid rows repeat their tile texture.",
+	)
 	check(level.get_node("World/Far").modulate.v < 0.7, "The far background is darker than gameplay objects.")
 	at(Vector2i(9, 2))
 	level.step(DT)
