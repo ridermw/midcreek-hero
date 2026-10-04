@@ -1,0 +1,116 @@
+"""Check the generic sprite pipeline contracts without generating artwork."""
+
+import json
+import tempfile
+import unittest
+from pathlib import Path
+
+from PIL import Image
+
+from tools import sprite_assets
+
+
+def write_catalog(art, assets):
+    catalog = {"version": 1, "assets": assets}
+    (art / "catalog.json").write_text(json.dumps(catalog))
+
+
+class SpriteAssetsTest(unittest.TestCase):
+    def test_source_size_fits_limits_and_grid(self):
+        for cell, frames in (((32, 32), 1), ((12, 12), 1), ((32, 96), 1), ((32, 64), 4), ((480, 120), 1)):
+            with self.subTest(cell=cell, frames=frames):
+                width, height, scale = sprite_assets.source_size(cell, frames)
+                self.assertLessEqual(max(width, height), 2048)
+                self.assertEqual(width % 16, 0)
+                self.assertEqual(height % 16, 0)
+                self.assertEqual(width, cell[0] * frames * scale)
+                self.assertEqual(height, cell[1] * scale)
+
+    def test_normalize_writes_binary_alpha_frames(self):
+        with tempfile.TemporaryDirectory() as directory:
+            art = Path(directory)
+            asset = {"name": "spark", "group": "hazards", "cell": [16, 8], "frames": 2, "fps": 8, "prompt": "x"}
+            write_catalog(art, [asset])
+            width, height, scale = sprite_assets.source_size((16, 8), 2)
+            image = Image.new("RGBA", (width, height), (0, 0, 0, 0))
+            image.paste((200, 40, 40, 255), (0, 0, width // 2, height))
+            image.paste((40, 200, 40, 100), (width // 2, 0, width, height))
+            image.paste((40, 40, 200, 255), (width // 2, 0, width // 2 + scale * 4, height))
+            source = art / "hazards/generated/spark.png"
+            source.parent.mkdir(parents=True)
+            image.save(source)
+            paths = sprite_assets.normalize("spark", art)
+            self.assertEqual(paths, ["frames/spark/00.png", "frames/spark/01.png"])
+            for index, path in enumerate(paths):
+                with Image.open(art / "hazards" / path) as frame:
+                    self.assertEqual(frame.size, (16, 8))
+                    self.assertTrue(set(frame.getchannel("A").tobytes()) <= {0, 255})
+            with Image.open(art / "hazards/frames/spark/01.png") as frame:
+                self.assertEqual(frame.getpixel((0, 0))[3], 255)
+                self.assertEqual(frame.getpixel((15, 0))[3], 0)
+
+    def test_normalize_rejects_wrong_size(self):
+        with tempfile.TemporaryDirectory() as directory:
+            art = Path(directory)
+            write_catalog(art, [{"name": "a", "group": "ui", "cell": [12, 12], "frames": 1, "fps": 1, "prompt": "x"}])
+            (art / "ui/generated").mkdir(parents=True)
+            Image.new("RGBA", (10, 10)).save(art / "ui/generated/a.png")
+            with self.assertRaisesRegex(ValueError, "wrong size"):
+                sprite_assets.normalize("a", art)
+
+    def test_group_palette_and_manifest(self):
+        with tempfile.TemporaryDirectory() as directory:
+            art = Path(directory)
+            assets = [
+                {"name": "a", "group": "props", "cell": [8, 8], "frames": 1, "fps": 1, "prompt": "x"},
+                {"name": "b", "group": "props", "cell": [8, 8], "frames": 1, "fps": 1, "prompt": "x"},
+            ]
+            write_catalog(art, assets)
+            for offset, asset in enumerate(assets):
+                frame_dir = art / "props/frames" / asset["name"]
+                frame_dir.mkdir(parents=True)
+                frame = Image.new("RGBA", (8, 8), (0, 0, 0, 0))
+                for x in range(8):
+                    for y in range(8):
+                        frame.putpixel((x, y), (x * 30 + offset, y * 30, 120 + offset, 255))
+                frame.putpixel((0, 0), (0, 0, 0, 0))
+                frame.save(frame_dir / "00.png")
+            sprite_assets.apply_group_palette("props", art, colors=16)
+            self.assertLessEqual(len(sprite_assets.group_colors("props", art)), 16)
+            with Image.open(art / "props/frames/a/00.png") as frame:
+                self.assertEqual(frame.getpixel((0, 0)), (0, 0, 0, 0))
+            manifest = sprite_assets.write_manifest("props", art)
+            self.assertEqual(manifest["assets"]["a"], {"cell": [8, 8], "fps": 1, "frames": ["frames/a/00.png"]})
+            written = json.loads((art / "props/manifest.json").read_text())
+            self.assertEqual(written, manifest)
+
+    def test_manifest_requires_every_frame(self):
+        with tempfile.TemporaryDirectory() as directory:
+            art = Path(directory)
+            write_catalog(art, [{"name": "a", "group": "ui", "cell": [8, 8], "frames": 2, "fps": 1, "prompt": "x"}])
+            (art / "ui/frames/a").mkdir(parents=True)
+            Image.new("RGBA", (8, 8)).save(art / "ui/frames/a/00.png")
+            with self.assertRaisesRegex(ValueError, "missing frame"):
+                sprite_assets.write_manifest("ui", art)
+
+
+class ShippedSpriteAssetsTest(unittest.TestCase):
+    def test_every_catalog_asset_is_shipped_with_group_palette(self):
+        catalog = sprite_assets.load_catalog(sprite_assets.ART)
+        groups = sorted({asset["group"] for asset in catalog["assets"]})
+        self.assertTrue(groups)
+        for group in groups:
+            with self.subTest(group=group):
+                manifest = json.loads((sprite_assets.ART / group / "manifest.json").read_text())
+                names = {a["name"] for a in catalog["assets"] if a["group"] == group}
+                self.assertEqual(set(manifest["assets"]), names)
+                for name, entry in manifest["assets"].items():
+                    for path in entry["frames"]:
+                        with Image.open(sprite_assets.ART / group / path) as frame:
+                            self.assertEqual(list(frame.size), entry["cell"])
+                            self.assertTrue(set(frame.getchannel("A").tobytes()) <= {0, 255})
+                self.assertLessEqual(len(sprite_assets.group_colors(group, sprite_assets.ART)), 96)
+
+
+if __name__ == "__main__":
+    unittest.main()

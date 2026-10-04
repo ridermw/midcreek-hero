@@ -1,0 +1,236 @@
+{
+  "version": 1,
+  "assets": [
+    {
+      "name": "floor",
+      "group": "tiles",
+      "cell": [
+        32,
+        32
+      ],
+      "frames": 1,
+      "fps": 1,
+      "prompt": "One square data center floor tile seen from the side for a 2D platformer: top edge is a light grey steel lip, body is dark slate concrete with small rivets. Fully opaque, fills the whole square edge to edge so it tiles seamlessly left and right."
+    },
+    {
+      "name": "raised-floor",
+      "group": "tiles",
+      "cell": [
+        32,
+        32
+      ],
+      "frames": 1,
+      "fps": 1,
+      "prompt": "One square raised access floor tile seen from the side: perforated light grey panel on top with a row of small vent holes, dark pedestal struts below. Fully opaque, fills the whole square and tiles seamlessly left and right."
+    },
+    {
+      "name": "platform",
+      "group": "tiles",
+      "cell": [
+        32,
+        32
+      ],
+      "frames": 1,
+      "fps": 1,
+      "prompt": "One square segment of a steel catwalk platform seen from the side: yellow and black safety stripe on the top edge, grey grating below, only the top third of the square is filled, the rest transparent. Tiles seamlessly left and right."
+    },
+    {
+      "name": "tray",
+      "group": "tiles",
+      "cell": [
+        32,
+        32
+      ],
+      "frames": 1,
+      "fps": 1,
+      "prompt": "One square segment of an overhead yellow ladder style cable tray seen from the side, with bundled blue and orange network cables lying in it. Only the top half of the square is filled, bottom half transparent. Tiles seamlessly left and right."
+    },
+    {
+      "name": "ladder",
+      "group": "tiles",
+      "cell": [
+        32,
+        32
+      ],
+      "frames": 1,
+      "fps": 1,
+      "prompt": "One square segment of a vertical grey steel ladder seen from the front: two side rails and two rungs. Transparent between rails. Tiles seamlessly up and down."
+    },
+    {
+      "name": "rack-ok",
+      "group": "tiles",
+      "cell": [
+        32,
+        96
+      ],
+      "frames": 1,
+      "fps": 1,
+      "prompt": "One tall server rack front, narrow and tall, dark charcoal frame, stacked 1U servers with small green status LEDs, perforated door edge. Healthy and online. Fills the full height."
+    },
+    {
+      "name": "rack-fault",
+      "group": "tiles",
+      "cell": [
+        32,
+        96
+      ],
+      "frames": 1,
+      "fps": 1,
+      "prompt": "The same tall server rack front, dark charcoal frame, stacked 1U servers, one server pulled slightly out with a bright red fault LED and a loose cable. Fills the full height."
+    },
+    {
+      "name": "exit-closed",
+      "group": "tiles",
+      "cell": [
+        64,
+        96
+      ],
+      "frames": 1,
+      "fps": 1,
+      "prompt": "A data hall exit door seen from the front, grey steel double door with a small window, closed, red status light above the frame. Fills the full canvas."
+    },
+    {
+      "name": "exit-open",
+      "group": "tiles",
+      "cell": [
+        64,
+        96
+      ],
+      "frames": 1,
+      "fps": 1,
+      "prompt": "The same data hall exit door seen from the front, slid open showing a bright corridor beyond, green status light above the frame. Fills the full canvas."
+    },
+    {
+      "name": "checkpoint-off",
+      "group": "tiles",
+      "cell": [
+        32,
+        64
+      ],
+      "frames": 1,
+      "fps": 1,
+      "prompt": "A slim network status beacon on a pole, grey housing with an unlit round lamp on top. Narrow, centered, standing on the bottom edge."
+    },
+    {
+      "name": "checkpoint-on",
+      "group": "tiles",
+      "cell": [
+        32,
+        64
+      ],
+      "frames": 4,
+      "fps": 8,
+      "prompt": "The same slim network status beacon on a pole with its round lamp lit bright green and pulsing: frames go from dim green glow to bright glow and back."
+    },
+    {
+      "name": "cable-snag",
+      "group": "hazards",
+      "cell": [
+        32,
+        16
+      ],
+      "frames": 2,
+      "fps": 4,
+      "prompt": "A tangled loop of loose orange and blue network cable lying on the floor as a trip hazard, low and wide, touching the bottom edge. Frame 2 shows the loop shifted slightly."
+    },
+    {
+      "name": "coolant",
+      "group": "props",
+      "cell": [
+        16,
+        16
+      ],
+      "frames": 4,
+      "fps": 8,
+      "prompt": "A small blue coolant canister with a white cross label, a health pickup. Frames bob the canister up and down by a small amount with a soft highlight moving across it."
+    },
+    {
+      "name": "health-full",
+      "group": "ui",
+      "cell": [
+        12,
+        12
+      ],
+      "frames": 1,
+      "fps": 1,
+      "prompt": "A small bright red heart shaped health segment icon with a dark outline."
+    },
+    {
+      "name": "health-empty",
+      "group": "ui",
+      "cell": [
+        12,
+        12
+      ],
+      "frames": 1,
+      "fps": 1,
+      "prompt": "The same small heart shaped health segment icon but empty, dark grey with a dark outline."
+    },
+    {
+      "name": "task-open",
+      "group": "ui",
+      "cell": [
+        12,
+        12
+      ],
+      "frames": 1,
+      "fps": 1,
+      "prompt": "A small empty checkbox icon, light grey square with dark outline."
+    },
+    {
+      "name": "task-done",
+      "group": "ui",
+      "cell": [
+        12,
+        12
+      ],
+      "frames": 1,
+      "fps": 1,
+      "prompt": "A small checkbox icon with a bright green check mark, dark outline."
+    },
+    {
+      "name": "star-on",
+      "group": "ui",
+      "cell": [
+        24,
+        24
+      ],
+      "frames": 1,
+      "fps": 1,
+      "prompt": "A gold five pointed star icon with a dark outline and a small shine."
+    },
+    {
+      "name": "star-off",
+      "group": "ui",
+      "cell": [
+        24,
+        24
+      ],
+      "frames": 1,
+      "fps": 1,
+      "prompt": "An empty grey five pointed star icon with a dark outline."
+    },
+    {
+      "name": "title",
+      "group": "ui",
+      "cell": [
+        480,
+        120
+      ],
+      "frames": 1,
+      "fps": 1,
+      "prompt": "Game title logo text reading MIDCREEK HERO in bold chunky pixel letters, lime and orange hi vis colors with dark outline, a small blue hard hat above the first letter, a thin server rack silhouette band behind the text. The text must be spelled exactly MIDCREEK HERO."
+    },
+    {
+      "name": "button",
+      "group": "ui",
+      "cell": [
+        160,
+        32
+      ],
+      "frames": 1,
+      "fps": 1,
+      "prompt": "A wide rectangular menu button frame, dark slate fill with a lime green beveled border, empty center with no text."
+    }
+  ]
+}
