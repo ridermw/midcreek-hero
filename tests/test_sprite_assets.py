@@ -201,6 +201,18 @@ class SpriteAssetsTest(unittest.TestCase):
             self.assertGreater(red[0], 180)
             self.assertLess(red[1], 90)
 
+    def test_tiny_palettes_do_not_crash(self):
+        samples = [(i * 10, 255 - i * 10, 40) for i in range(20)]
+        for colors in (1, 2, 3):
+            with self.subTest(colors=colors):
+                palette = sprite_assets._build_palette(samples, colors)
+                entries = palette.getpalette()
+                distinct = {tuple(entries[i:i + 3]) for i in range(0, len(entries), 3)}
+                self.assertLessEqual(len(distinct), colors)
+        few = sprite_assets._build_palette(samples[:3], 16)
+        entries = few.getpalette()
+        self.assertEqual(len({tuple(entries[i:i + 3]) for i in range(0, len(entries), 3)}), 3)
+
     def test_manifest_requires_every_frame(self):
         with tempfile.TemporaryDirectory() as directory:
             art = Path(directory)

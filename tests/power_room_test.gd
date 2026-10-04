@@ -100,6 +100,20 @@ func run() -> void:
 	level.step(DT)
 	check(panels()[0].on and not panels()[1].on, "A respawn keeps switches thrown before the checkpoint only.")
 
+	load_fixture()
+	var rack_near: Node2D = null
+	for rack in level.entities["racks"]:
+		if rack.task_id == "r2":
+			rack_near = rack
+	rack_near.position = panels()[2].position + Vector2(30, 0)
+	at(Vector2i(14, 4))
+	level.player.position.x += 20.0
+	level.action_override = {&"repair": true}
+	for i: int in range(130):
+		level.step(DT)
+	level.action_override = {}
+	check(level.tasks.is_done("r2"), "A rack next to an unfinished switch panel can still be repaired.")
+
 	load_fixture(true)
 	level.player.use_override = true
 	var lift: Node2D = level.entities["lifts"][0]

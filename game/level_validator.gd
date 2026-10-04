@@ -77,7 +77,9 @@ func _neighbors(level: Dictionary, cell: Vector2i) -> Array[Vector2i]:
 			if next != cell and next.x >= 0 and next.x < width and is_standable(level, next):
 				result.append(next)
 	if cell in level["lifts"]:
-		result.append(cell - LIFT_RISE)
+		var top := cell - LIFT_RISE
+		if top.y >= 0 and not level["solids"].has(top) and not level["solids"].has(top + Vector2i.DOWN):
+			result.append(top)
 	if cell in level["ladders"]:
 		for step: Vector2i in [Vector2i.UP, Vector2i.DOWN]:
 			if is_standable(level, cell + step):

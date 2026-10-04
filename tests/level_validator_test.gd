@@ -54,10 +54,12 @@ func run() -> void:
 	check(validator.validate(parse_text(text)).is_empty(), "The controller fixture is valid.")
 	var lifted := text.replace(
 		"---\n..............................\n..............................\n",
-		"---\n..........................E...\n......................#####...\n"
+		"---\n...........................E..\n.........................#####\n"
 		+ "..............................\n..............................\n",
 	).replace("..F..E\n", "..F...\n").replace("..C..F", "..Cl.F")
 	check(errors_of(lifted).is_empty(), "A lift reaches a ledge 3 tiles up.")
+	var blocked := lifted.replace(".........................#####\n", "......................#####...\n").replace("...........................E..\n", "........................E.....\n")
+	check(not errors_of(blocked).is_empty(), "A lift top inside a solid is not reachable.")
 	var two_checkpoints := text.replace("..C..F..E", ".....F..E")
 	check(
 		errors_of(two_checkpoints).contains("Level needs exactly 3 checkpoints, found 2."),

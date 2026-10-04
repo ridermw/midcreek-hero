@@ -198,6 +198,7 @@ func step(delta: float) -> void:
 	player.on_ladder = cell in level["ladders"]
 	if not _update_switches(feet) and not _update_ports(delta, feet):
 		_update_repair(delta, feet)
+	_show_switch_prompt(feet)
 	var door = entities["exit"]
 	if tasks.required_done() and not door.open:
 		sound.emit("door_open")
@@ -275,9 +276,8 @@ func _update_switches(feet: Vector2) -> bool:
 	for other in group:
 		if other.on:
 			next = maxi(next, other.order + 1)
-	hud.set_prompt("Throw switch %d: press E or X%s" % [panel.order, "" if not panel.on else " (already on)"])
 	if not _action_pressed(&"repair") or panel.on:
-		return true
+		return false
 	if panel.order != next:
 		for other in group:
 			other.set_on(false)
@@ -290,6 +290,15 @@ func _update_switches(feet: Vector2) -> bool:
 		tasks.complete(panel.task_id)
 		sound.emit("repair_done")
 	return true
+
+
+func _show_switch_prompt(feet: Vector2) -> void:
+	if player.locked:
+		return
+	for panel in entities["switches"]:
+		if not tasks.is_done(panel.task_id) and panel.in_range(feet) and not panel.on:
+			hud.set_prompt("Throw switch %d: press E or X" % panel.order)
+			return
 
 
 func _update_ports(delta: float, feet: Vector2) -> bool:
