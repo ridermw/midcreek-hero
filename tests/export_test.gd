@@ -41,6 +41,7 @@ func _initialize() -> void:
 	check(FileAccess.file_exists("res://levels/routes/01-cold-aisle.route.json"), "The level 1 route is included.")
 	check(ResourceLoader.exists("res://game/main.tscn"), "The main scene is included.")
 	check(ResourceLoader.exists("res://audio/music/level1.ogg"), "Level 1 music is included.")
+	check(FileAccess.file_exists("res://audio/sources.json"), "Audio provenance is included.")
 	check(ResourceLoader.exists("res://audio/sfx/jump.wav") or ResourceLoader.exists("res://audio/sfx/jump.ogg"), "The jump sound is included.")
 	for group: String in ["tiles", "hazards", "props", "ui"]:
 		check(

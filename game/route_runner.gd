@@ -98,15 +98,32 @@ func _set_input(level: Object, held: Array, press_jump: bool) -> void:
 func _validate(step: Variant) -> String:
 	if not step is Dictionary:
 		return "must be an object."
+	var kinds := 0
+	for kind: String in ["hold", "tap", "wait"]:
+		if step.has(kind):
+			kinds += 1
+	if kinds != 1:
+		return "needs exactly one of hold, tap, or wait."
 	if step.has("tap"):
-		return "" if String(step["tap"]) in ACTIONS else "unknown tap action."
+		return "" if step["tap"] is String and String(step["tap"]) in ACTIONS else "unknown tap action."
 	if step.has("wait"):
-		return "" if step["wait"] is float or step["wait"] is int else "wait needs seconds."
-	if not step.get("hold") is Array:
-		return "needs hold, tap, or wait."
+		return "" if _is_duration(step["wait"]) else "wait needs a finite duration of 0 or more."
+	if not step["hold"] is Array:
+		return "hold needs an action list."
 	for action: Variant in step["hold"]:
-		if String(action) not in ACTIONS:
+		if not action is String or String(action) not in ACTIONS:
 			return "unknown action '%s'." % action
 	if step.has("until_x"):
-		return "" if step.has("max_seconds") else "until_x needs max_seconds."
-	return "" if step.has("seconds") else "hold needs seconds or until_x."
+		var value: Variant = step["until_x"]
+		if not ((value is float or value is int) and is_finite(float(value))):
+			return "until_x must be a finite number."
+		if not _is_duration(step.get("max_seconds")) or float(step["max_seconds"]) <= 0.0:
+			return "until_x needs a positive max_seconds."
+		if ("move_left" in step["hold"]) == ("move_right" in step["hold"]):
+			return "until_x needs exactly one of move_left or move_right."
+		return ""
+	return "" if _is_duration(step.get("seconds")) else "hold needs seconds of 0 or more, or until_x."
+
+
+static func _is_duration(value: Variant) -> bool:
+	return (value is float or value is int) and is_finite(float(value)) and float(value) >= 0.0

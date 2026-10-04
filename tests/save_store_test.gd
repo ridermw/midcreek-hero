@@ -47,6 +47,23 @@ func run() -> void:
 	broken.load_data()
 	check(FileAccess.file_exists("user://test-save.corrupt.json"), "A corrupt save is renamed.")
 	check(broken.is_unlocked("01") and not broken.is_unlocked("02"), "A corrupt save starts fresh.")
+	for bad: String in [
+		'{"version": 1, "character": "robot"}',
+		'{"version": 1, "unlocked": ["01", "99"]}',
+		'{"version": 1, "levels": {"01": {"stars": 7}}}',
+		'{"version": 1, "settings": {"music_volume": "loud"}}',
+	]:
+		if FileAccess.file_exists("user://test-save.corrupt.json"):
+			DirAccess.remove_absolute("user://test-save.corrupt.json")
+		var bad_file := FileAccess.open(PATH, FileAccess.WRITE)
+		bad_file.store_string(bad)
+		bad_file.close()
+		var invalid := SaveStore.new(PATH)
+		invalid.load_data()
+		check(
+			FileAccess.file_exists("user://test-save.corrupt.json") and invalid.character == "man" and not invalid.is_unlocked("02"),
+			"Invalid content resets the save: " + bad,
+		)
 	check(SaveStore.next_level_id("01") == "02" and SaveStore.next_level_id("05") == "", "next_level_id follows the level order.")
 	clear()
 	print("SAVE_STORE_TEST_COMPLETE: %d checks, %d failures" % [checks, failures])

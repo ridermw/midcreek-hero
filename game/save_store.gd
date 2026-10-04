@@ -28,18 +28,22 @@ func load_data() -> void:
 	var json := JSON.new()
 	var parsed := json.parse(FileAccess.get_file_as_string(path)) == OK
 	var data: Variant = json.data if parsed else null
-	if not data is Dictionary or data.get("version") != 1.0:
+	if not _is_valid(data):
 		DirAccess.rename_absolute(path, path.get_basename() + ".corrupt.json")
 		return
 	character = String(data.get("character", "man"))
-	if data.get("levels") is Dictionary:
-		levels = data["levels"]
-	if data.get("unlocked") is Array:
-		for level_id: Variant in data["unlocked"]:
-			if String(level_id) not in unlocked:
-				unlocked.append(String(level_id))
-	if data.get("settings") is Dictionary:
-		settings.merge(data["settings"], true)
+	for level_id: String in data.get("levels", {}):
+		var entry: Dictionary = data["levels"][level_id]
+		levels[level_id] = {
+			"stars": int(entry.get("stars", 0)),
+			"best_seconds": float(entry.get("best_seconds", INF)),
+			"best_optional": int(entry.get("best_optional", 0)),
+		}
+	for level_id: Variant in data.get("unlocked", []):
+		if String(level_id) not in unlocked:
+			unlocked.append(String(level_id))
+	for key: String in data.get("settings", {}):
+		settings[key] = clampf(float(data["settings"][key]), 0.0, 1.0)
 
 
 func save() -> bool:
@@ -88,6 +92,44 @@ func best_seconds(level_id: String) -> float:
 
 func best_optional(level_id: String) -> int:
 	return int(levels.get(level_id, {}).get("best_optional", 0))
+
+
+static func _is_number(value: Variant) -> bool:
+	return (value is float or value is int) and is_finite(float(value))
+
+
+func _is_valid(data: Variant) -> bool:
+	if not data is Dictionary or data.get("version") != 1.0:
+		return false
+	if data.has("character") and String(data["character"]) not in ["man", "woman"]:
+		return false
+	if data.has("unlocked"):
+		if not data["unlocked"] is Array:
+			return false
+		for level_id: Variant in data["unlocked"]:
+			if not level_id is String or level_id not in LEVEL_IDS:
+				return false
+	if data.has("levels"):
+		if not data["levels"] is Dictionary:
+			return false
+		for level_id: Variant in data["levels"]:
+			var entry: Variant = data["levels"][level_id]
+			if level_id not in LEVEL_IDS or not entry is Dictionary:
+				return false
+			var earned: Variant = entry.get("stars", 0)
+			if not _is_number(earned) or int(earned) < 0 or int(earned) > 3:
+				return false
+			if entry.has("best_seconds") and not (_is_number(entry["best_seconds"]) and float(entry["best_seconds"]) >= 0.0):
+				return false
+			if entry.has("best_optional") and not (_is_number(entry["best_optional"]) and int(entry["best_optional"]) >= 0):
+				return false
+	if data.has("settings"):
+		if not data["settings"] is Dictionary:
+			return false
+		for key: Variant in data["settings"]:
+			if key not in DEFAULT_SETTINGS or not _is_number(data["settings"][key]):
+				return false
+	return true
 
 
 func _reset() -> void:

@@ -61,6 +61,16 @@ func run() -> void:
 		stuck.apply(level, DT)
 	check(stuck.failed and stuck.error_message.contains("step 1"), "until_x fails after max_seconds.")
 	check(not RouteRunner.new([{"dance": 1}]).error_message.is_empty(), "Unknown step kinds are rejected.")
+	for bad: Dictionary in [
+		{"hold": ["move_right"], "seconds": -1},
+		{"hold": ["move_right"], "seconds": "2"},
+		{"hold": ["move_right"], "until_x": 10, "max_seconds": 0},
+		{"hold": ["jump"], "until_x": 10, "max_seconds": 1},
+		{"hold": ["move_left", "move_right"], "until_x": 10, "max_seconds": 1},
+		{"wait": -0.5},
+		{"tap": "jump", "wait": 1},
+	]:
+		check(not RouteRunner.new([bad]).error_message.is_empty(), "Malformed step is rejected: %s" % bad)
 	print("ROUTE_RUNNER_TEST_COMPLETE: %d checks, %d failures" % [checks, failures])
 	quit(1 if failures else 0)
 
