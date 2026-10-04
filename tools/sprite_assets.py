@@ -56,7 +56,11 @@ def prompt_text(asset):
         )
     else:
         layout = f"One object filling the {width}x{height} canvas."
-    return f"{STYLE}\n\n{layout}\n\nOBJECT: {asset['prompt']}"
+    return (
+        "Edit image 1: replace its entire content with a new isolated game sprite described below. "
+        "Keep unchanged from image 1: the pixel art style, the color palette, the outline treatment "
+        f"and the lighting direction.\n\n{STYLE}\n\n{layout}\n\nOBJECT: {asset['prompt']}"
+    )
 
 
 def render(name, art=ART):
@@ -100,16 +104,42 @@ def normalize(name, art=ART):
     for old in output.glob("*.png"):
         old.unlink()
     paths = []
-    for index in range(frames):
-        crop = image.crop((index * cell_w * scale, 0, (index + 1) * cell_w * scale, height))
-        frame = crop.resize((cell_w, cell_h), Image.Resampling.BOX)
+    crops = [image.crop((index * cell_w * scale, 0, (index + 1) * cell_w * scale, height))
+             for index in range(frames)]
+    fit = asset.get("fit", "canvas")
+    if fit != "canvas":
+        boxes = [crop.getchannel("A").point(lambda value: 255 if value >= 128 else 0).getbbox()
+                 for crop in crops]
+        boxes = [box for box in boxes if box]
+        if not boxes:
+            raise ValueError(f"{source}: no opaque pixels")
+        union = (min(b[0] for b in boxes), min(b[1] for b in boxes),
+                 max(b[2] for b in boxes), max(b[3] for b in boxes))
+        crops = [crop.crop(union) for crop in crops]
+    for crop in crops:
+        frame = _fit(crop, (cell_w, cell_h), fit)
         alpha = frame.getchannel("A").point(lambda value: 255 if value >= 128 else 0)
         frame.putalpha(alpha)
         frame.paste((0, 0, 0, 0), mask=alpha.point(lambda value: 255 if value == 0 else 0))
-        path = output / f"{index:02d}.png"
+        path = output / f"{len(paths):02d}.png"
         frame.save(path)
         paths.append(path.relative_to(art / asset["group"]).as_posix())
     return paths
+
+
+def _fit(crop, cell, fit):
+    if fit in ("canvas", "fill"):
+        return crop.resize(cell, Image.Resampling.BOX)
+    if fit not in ("top", "bottom", "center"):
+        raise ValueError(f"Unknown fit mode: {fit}")
+    factor = min(cell[0] / crop.width, cell[1] / crop.height)
+    size = (max(1, round(crop.width * factor)), max(1, round(crop.height * factor)))
+    scaled = crop.resize(size, Image.Resampling.BOX)
+    x = (cell[0] - size[0]) // 2
+    y = {"top": 0, "bottom": cell[1] - size[1], "center": (cell[1] - size[1]) // 2}[fit]
+    frame = Image.new("RGBA", cell, (0, 0, 0, 0))
+    frame.paste(scaled, (x, y))
+    return frame
 
 
 def group_frames(group, art=ART):

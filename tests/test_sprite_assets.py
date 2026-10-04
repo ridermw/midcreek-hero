@@ -49,6 +49,22 @@ class SpriteAssetsTest(unittest.TestCase):
                 self.assertEqual(frame.getpixel((0, 0))[3], 255)
                 self.assertEqual(frame.getpixel((15, 0))[3], 0)
 
+    def test_fit_modes_place_the_drawn_object(self):
+        for fit, opaque_top, opaque_bottom in (("fill", 0, 15), ("top", 0, 3), ("bottom", 12, 15), ("center", 6, 9)):
+            with self.subTest(fit=fit), tempfile.TemporaryDirectory() as directory:
+                art = Path(directory)
+                write_catalog(art, [{"name": "t", "group": "tiles", "cell": [16, 16], "frames": 1,
+                                     "fps": 1, "fit": fit, "prompt": "x"}])
+                width, height, scale = sprite_assets.source_size((16, 16), 1)
+                image = Image.new("RGBA", (width, height), (0, 0, 0, 0))
+                image.paste((90, 100, 110, 255), (0, height // 2, width, height * 3 // 4))
+                (art / "tiles/generated").mkdir(parents=True)
+                image.save(art / "tiles/generated/t.png")
+                sprite_assets.normalize("t", art)
+                with Image.open(art / "tiles/frames/t/00.png") as frame:
+                    rows = [y for y in range(16) if frame.getpixel((8, y))[3]]
+                    self.assertEqual((rows[0], rows[-1]), (opaque_top, opaque_bottom))
+
     def test_normalize_rejects_wrong_size(self):
         with tempfile.TemporaryDirectory() as directory:
             art = Path(directory)

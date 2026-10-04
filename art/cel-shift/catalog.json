@@ -10,7 +10,8 @@
       ],
       "frames": 1,
       "fps": 1,
-      "prompt": "One square data center floor tile seen from the side for a 2D platformer: top edge is a light grey steel lip, body is dark slate concrete with small rivets. Fully opaque, fills the whole square edge to edge so it tiles seamlessly left and right."
+      "prompt": "One square data center floor tile seen from the side for a 2D platformer: top edge is a light grey steel lip, body is dark slate concrete with small rivets. Fully opaque, fills the whole square edge to edge so it tiles seamlessly left and right.",
+      "fit": "fill"
     },
     {
       "name": "raised-floor",
@@ -21,7 +22,8 @@
       ],
       "frames": 1,
       "fps": 1,
-      "prompt": "One square raised access floor tile seen from the side: perforated light grey panel on top with a row of small vent holes, dark pedestal struts below. Fully opaque, fills the whole square and tiles seamlessly left and right."
+      "prompt": "One square raised access floor tile seen from the side: perforated light grey panel on top with a row of small vent holes, dark pedestal struts below. Fully opaque, fills the whole square and tiles seamlessly left and right.",
+      "fit": "fill"
     },
     {
       "name": "platform",
@@ -32,7 +34,8 @@
       ],
       "frames": 1,
       "fps": 1,
-      "prompt": "One square segment of a steel catwalk platform seen from the side: yellow and black safety stripe on the top edge, grey grating below, only the top third of the square is filled, the rest transparent. Tiles seamlessly left and right."
+      "prompt": "One square segment of a steel catwalk platform seen from the side: yellow and black safety stripe on the top edge, grey grating below, only the top third of the square is filled, the rest transparent. Tiles seamlessly left and right.",
+      "fit": "top"
     },
     {
       "name": "tray",
@@ -43,7 +46,8 @@
       ],
       "frames": 1,
       "fps": 1,
-      "prompt": "One square segment of an overhead yellow ladder style cable tray seen from the side, with bundled blue and orange network cables lying in it. Only the top half of the square is filled, bottom half transparent. Tiles seamlessly left and right."
+      "prompt": "One square segment of an overhead yellow ladder style cable tray seen from the side, with bundled blue and orange network cables lying in it. Only the top half of the square is filled, bottom half transparent. Tiles seamlessly left and right.",
+      "fit": "top"
     },
     {
       "name": "ladder",
@@ -54,7 +58,8 @@
       ],
       "frames": 1,
       "fps": 1,
-      "prompt": "One square segment of a vertical grey steel ladder seen from the front: two side rails and two rungs. Transparent between rails. Tiles seamlessly up and down."
+      "prompt": "One square segment of a vertical grey steel ladder seen from the front: two side rails and two rungs. Transparent between rails. Tiles seamlessly up and down.",
+      "fit": "fill"
     },
     {
       "name": "rack-ok",
@@ -65,7 +70,8 @@
       ],
       "frames": 1,
       "fps": 1,
-      "prompt": "One tall server rack front, narrow and tall, dark charcoal frame, stacked 1U servers with small green status LEDs, perforated door edge. Healthy and online. Fills the full height."
+      "prompt": "One tall server rack front, narrow and tall, dark charcoal frame, stacked 1U servers with small green status LEDs, perforated door edge. Healthy and online. Fills the full height.",
+      "fit": "fill"
     },
     {
       "name": "rack-fault",
@@ -76,7 +82,8 @@
       ],
       "frames": 1,
       "fps": 1,
-      "prompt": "The same tall server rack front, dark charcoal frame, stacked 1U servers, one server pulled slightly out with a bright red fault LED and a loose cable. Fills the full height."
+      "prompt": "The same tall server rack front, dark charcoal frame, stacked 1U servers, one server pulled slightly out with a bright red fault LED and a loose cable. Fills the full height.",
+      "fit": "fill"
     },
     {
       "name": "exit-closed",
@@ -87,7 +94,8 @@
       ],
       "frames": 1,
       "fps": 1,
-      "prompt": "A data hall exit door seen from the front, grey steel double door with a small window, closed, red status light above the frame. Fills the full canvas."
+      "prompt": "A data hall exit door seen from the front, grey steel double door with a small window, closed, red status light above the frame. Fills the full canvas.",
+      "fit": "fill"
     },
     {
       "name": "exit-open",
@@ -98,7 +106,8 @@
       ],
       "frames": 1,
       "fps": 1,
-      "prompt": "The same data hall exit door seen from the front, slid open showing a bright corridor beyond, green status light above the frame. Fills the full canvas."
+      "prompt": "The same data hall exit door seen from the front, slid open showing a bright corridor beyond, green status light above the frame. Fills the full canvas.",
+      "fit": "fill"
     },
     {
       "name": "checkpoint-off",
@@ -109,7 +118,8 @@
       ],
       "frames": 1,
       "fps": 1,
-      "prompt": "A slim network status beacon on a pole, grey housing with an unlit round lamp on top. Narrow, centered, standing on the bottom edge."
+      "prompt": "A slim network status beacon on a pole, grey housing with an unlit round lamp on top. Narrow, centered, standing on the bottom edge.",
+      "fit": "bottom"
     },
     {
       "name": "checkpoint-on",
@@ -120,7 +130,8 @@
       ],
       "frames": 4,
       "fps": 8,
-      "prompt": "The same slim network status beacon on a pole with its round lamp lit bright green and pulsing: frames go from dim green glow to bright glow and back."
+      "prompt": "The same slim network status beacon on a pole with its round lamp lit bright green and pulsing: frames go from dim green glow to bright glow and back.",
+      "fit": "bottom"
     },
     {
       "name": "cable-snag",
@@ -131,7 +142,8 @@
       ],
       "frames": 2,
       "fps": 4,
-      "prompt": "A tangled loop of loose orange and blue network cable lying on the floor as a trip hazard, low and wide, touching the bottom edge. Frame 2 shows the loop shifted slightly."
+      "prompt": "A tangled loop of loose orange and blue network cable lying on the floor as a trip hazard, low and wide, touching the bottom edge. Frame 2 shows the loop shifted slightly.",
+      "fit": "bottom"
     },
     {
       "name": "coolant",
@@ -142,7 +154,8 @@
       ],
       "frames": 4,
       "fps": 8,
-      "prompt": "A small blue coolant canister with a white cross label, a health pickup. Frames bob the canister up and down by a small amount with a soft highlight moving across it."
+      "prompt": "A small blue coolant canister with a white cross label, a health pickup. Frames bob the canister up and down by a small amount with a soft highlight moving across it.",
+      "fit": "center"
     },
     {
       "name": "health-full",
@@ -153,7 +166,8 @@
       ],
       "frames": 1,
       "fps": 1,
-      "prompt": "A small bright red heart shaped health segment icon with a dark outline."
+      "prompt": "A small bright red heart shaped health segment icon with a dark outline.",
+      "fit": "center"
     },
     {
       "name": "health-empty",
@@ -164,7 +178,8 @@
       ],
       "frames": 1,
       "fps": 1,
-      "prompt": "The same small heart shaped health segment icon but empty, dark grey with a dark outline."
+      "prompt": "The same small heart shaped health segment icon but empty, dark grey with a dark outline.",
+      "fit": "center"
     },
     {
       "name": "task-open",
@@ -175,7 +190,8 @@
       ],
       "frames": 1,
       "fps": 1,
-      "prompt": "A small empty checkbox icon, light grey square with dark outline."
+      "prompt": "A small empty checkbox icon, light grey square with dark outline.",
+      "fit": "center"
     },
     {
       "name": "task-done",
@@ -186,7 +202,8 @@
       ],
       "frames": 1,
       "fps": 1,
-      "prompt": "A small checkbox icon with a bright green check mark, dark outline."
+      "prompt": "A small checkbox icon with a bright green check mark, dark outline.",
+      "fit": "center"
     },
     {
       "name": "star-on",
@@ -197,7 +214,8 @@
       ],
       "frames": 1,
       "fps": 1,
-      "prompt": "A gold five pointed star icon with a dark outline and a small shine."
+      "prompt": "A gold five pointed star icon with a dark outline and a small shine.",
+      "fit": "center"
     },
     {
       "name": "star-off",
@@ -208,7 +226,8 @@
       ],
       "frames": 1,
       "fps": 1,
-      "prompt": "An empty grey five pointed star icon with a dark outline."
+      "prompt": "An empty grey five pointed star icon with a dark outline.",
+      "fit": "center"
     },
     {
       "name": "title",
@@ -219,7 +238,8 @@
       ],
       "frames": 1,
       "fps": 1,
-      "prompt": "Game title logo text reading MIDCREEK HERO in bold chunky pixel letters, lime and orange hi vis colors with dark outline, a small blue hard hat above the first letter, a thin server rack silhouette band behind the text. The text must be spelled exactly MIDCREEK HERO."
+      "prompt": "Game title logo with the visible text \"MIDCREEK HERO\" in bold chunky pixel letters, lime and orange hi vis colors with dark outline, a small blue hard hat above the first letter, a thin server rack silhouette band behind the text. The visible text must be exactly \"MIDCREEK HERO\" with no other words.",
+      "fit": "center"
     },
     {
       "name": "button",
@@ -230,7 +250,8 @@
       ],
       "frames": 1,
       "fps": 1,
-      "prompt": "A wide rectangular menu button frame, dark slate fill with a lime green beveled border, empty center with no text."
+      "prompt": "A wide rectangular menu button frame, dark slate fill with a lime green beveled border, empty center with no text.",
+      "fit": "fill"
     }
   ]
 }
