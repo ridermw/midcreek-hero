@@ -96,7 +96,9 @@ hashes, and missing license table rows cause a nonzero exit.
 It downloads each distinct archive once per run, reads only the selected ZIP
 member, converts if required, and verifies the final file hash before replacing
 anything. A failed file leaves the current copy untouched; later entries still
-run. Failures are printed per file and produce a nonzero exit. The license table
+run. A failed archive request is remembered for the rest of the run, so entries
+sharing its URL do not repeat the request and retries. Failures are printed
+per file and produce a nonzero exit. The license table
 is regenerated. Downloads and conversion files live inside an automatically
 cleaned `.fetch-*` directory under the selected audio directory.
 
