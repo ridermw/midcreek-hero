@@ -35,37 +35,57 @@ def asset_entry(name, art=ART):
     raise KeyError(f"Unknown asset: {name}")
 
 
-def source_size(cell, frames):
-    """Return (width, height, scale) for a one-row source sheet that fits MockUI limits."""
+def layout(cell, frames):
+    """Return the MockUI source sheet grid for an asset.
+
+    MockUI accepts edges up to 2048 pixels and aspect ratios up to 3:1. Wide cells get a
+    taller slot so a single cell stays within 3:1. The largest scale wins, then fewer rows.
+    """
     width, height = cell
-    for scale in range(MAX_EDGE // min(width, height), 0, -1):
-        w, h = width * frames * scale, height * scale
-        if w <= MAX_EDGE and h <= MAX_EDGE and (width * scale) % 16 == 0 and (height * scale) % 16 == 0:
-            return w, h, scale
-    raise ValueError(f"No valid source size for cell {cell} with {frames} frames")
+    slot_height = -(-max(height, -(-width // 3)) // 4) * 4
+    best = None
+    for rows in range(1, frames + 1):
+        cols = -(-frames // rows)
+        for scale in range(MAX_EDGE // min(width, slot_height), 0, -1):
+            w, h = cols * width * scale, rows * slot_height * scale
+            if (
+                w <= MAX_EDGE and h <= MAX_EDGE
+                and (width * scale) % 16 == 0 and (slot_height * scale) % 16 == 0
+                and max(w / h, h / w) <= 3.0
+            ):
+                if best is None or scale > best["scale"]:
+                    best = {"width": w, "height": h, "scale": scale, "cols": cols, "rows": rows,
+                            "slot_height": slot_height}
+                break
+    if best is None:
+        raise ValueError(f"No valid source layout for cell {cell} with {frames} frames")
+    return best
 
 
 def prompt_text(asset):
-    width, height, _ = source_size(asset["cell"], asset["frames"])
+    grid = layout(asset["cell"], asset["frames"])
+    width, height = grid["width"], grid["height"]
     frames = asset["frames"]
     if frames > 1:
-        layout = (
-            f"EXACT GRID: {frames} equal cells in one row, read left to right, each "
-            f"{width // frames}x{height}. One animation frame per cell at the same scale and "
-            "position. Every frame differs. No drawn grid lines or numbers."
+        arrangement = (
+            f"EXACT GRID: {grid['cols']} columns by {grid['rows']} rows of equal cells, each "
+            f"{width // grid['cols']}x{height // grid['rows']}, read left to right then top to "
+            f"bottom. Exactly {frames} animation frames, one per cell, at the same scale and "
+            "position. Every frame differs. Leave any extra cells empty. No drawn grid lines or numbers."
         )
     else:
-        layout = f"One object filling the {width}x{height} canvas."
+        arrangement = f"One object centered in the {width}x{height} canvas, as large as fits."
     return (
         "Edit image 1: replace its entire content with a new isolated game sprite described below. "
         "Keep unchanged from image 1: the pixel art style, the color palette, the outline treatment "
-        f"and the lighting direction.\n\n{STYLE}\n\n{layout}\n\nOBJECT: {asset['prompt']}"
+        f"and the lighting direction.\n\n{STYLE}\n\n{arrangement}\n\nOBJECT: {asset['prompt']}"
     )
 
 
 def render(name, art=ART):
     asset = asset_entry(name, art)
-    width, height, _ = source_size(asset["cell"], asset["frames"])
+    grid = layout(asset["cell"], asset["frames"])
+    width, height = grid["width"], grid["height"]
     reference = ROOT / asset.get("reference", "art/cel-shift/environment/layers/equipment.png")
     prompt_dir = art / asset["group"] / "prompts"
     prompt_dir.mkdir(parents=True, exist_ok=True)
@@ -94,7 +114,10 @@ def normalize(name, art=ART):
     asset = asset_entry(name, art)
     cell_w, cell_h = asset["cell"]
     frames = asset["frames"]
-    width, height, scale = source_size((cell_w, cell_h), frames)
+    grid = layout((cell_w, cell_h), frames)
+    width, height, scale = grid["width"], grid["height"], grid["scale"]
+    slot_h = grid["slot_height"] * scale
+    pad = (grid["slot_height"] - cell_h) * scale // 2
     source = art / asset["group"] / "generated" / f"{name}.png"
     image = Image.open(source).convert("RGBA")
     if image.size != (width, height):
@@ -104,8 +127,14 @@ def normalize(name, art=ART):
     for old in output.glob("*.png"):
         old.unlink()
     paths = []
-    crops = [image.crop((index * cell_w * scale, 0, (index + 1) * cell_w * scale, height))
-             for index in range(frames)]
+    crops = []
+    for index in range(frames):
+        x = (index % grid["cols"]) * cell_w * scale
+        y = (index // grid["cols"]) * slot_h
+        crop = image.crop((x, y, x + cell_w * scale, y + slot_h))
+        if asset.get("fit", "canvas") == "canvas":
+            crop = crop.crop((0, pad, cell_w * scale, pad + cell_h * scale))
+        crops.append(crop)
     fit = asset.get("fit", "canvas")
     if fit != "canvas":
         boxes = [crop.getchannel("A").point(lambda value: 255 if value >= 128 else 0).getbbox()

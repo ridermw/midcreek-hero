@@ -16,38 +16,58 @@ def write_catalog(art, assets):
 
 
 class SpriteAssetsTest(unittest.TestCase):
-    def test_source_size_fits_limits_and_grid(self):
-        for cell, frames in (((32, 32), 1), ((12, 12), 1), ((32, 96), 1), ((32, 64), 4), ((480, 120), 1)):
+    def test_layout_fits_limits_and_aspect(self):
+        for cell, frames in (((32, 32), 1), ((12, 12), 1), ((32, 96), 1), ((32, 64), 4),
+                             ((480, 120), 1), ((160, 32), 1), ((16, 16), 4), ((32, 16), 2)):
             with self.subTest(cell=cell, frames=frames):
-                width, height, scale = sprite_assets.source_size(cell, frames)
+                grid = sprite_assets.layout(cell, frames)
+                width, height = grid["width"], grid["height"]
                 self.assertLessEqual(max(width, height), 2048)
+                self.assertLessEqual(max(width / height, height / width), 3.0)
                 self.assertEqual(width % 16, 0)
                 self.assertEqual(height % 16, 0)
-                self.assertEqual(width, cell[0] * frames * scale)
-                self.assertEqual(height, cell[1] * scale)
+                self.assertGreaterEqual(grid["cols"] * grid["rows"], frames)
+                self.assertEqual(width, grid["cols"] * cell[0] * grid["scale"])
+                self.assertEqual(height, grid["rows"] * grid["slot_height"] * grid["scale"])
+                self.assertGreaterEqual(grid["slot_height"], cell[1])
+
+    def paint_frames(self, grid, colors):
+        image = Image.new("RGBA", (grid["width"], grid["height"]), (0, 0, 0, 0))
+        slot_w = grid["width"] // grid["cols"]
+        slot_h = grid["height"] // grid["rows"]
+        for index, painter in enumerate(colors):
+            x, y = (index % grid["cols"]) * slot_w, (index // grid["cols"]) * slot_h
+            painter(image, x, y, slot_w, slot_h)
+        return image
 
     def test_normalize_writes_binary_alpha_frames(self):
         with tempfile.TemporaryDirectory() as directory:
             art = Path(directory)
             asset = {"name": "spark", "group": "hazards", "cell": [16, 8], "frames": 2, "fps": 8, "prompt": "x"}
             write_catalog(art, [asset])
-            width, height, scale = sprite_assets.source_size((16, 8), 2)
-            image = Image.new("RGBA", (width, height), (0, 0, 0, 0))
-            image.paste((200, 40, 40, 255), (0, 0, width // 2, height))
-            image.paste((40, 200, 40, 100), (width // 2, 0, width, height))
-            image.paste((40, 40, 200, 255), (width // 2, 0, width // 2 + scale * 4, height))
+            grid = sprite_assets.layout((16, 8), 2)
+            scale = grid["scale"]
+
+            def solid(image, x, y, w, h):
+                image.paste((200, 40, 40, 255), (x, y, x + w, y + h))
+
+            def strip(image, x, y, w, h):
+                image.paste((40, 200, 40, 100), (x, y, x + w, y + h))
+                image.paste((40, 40, 200, 255), (x, y, x + scale * 4, y + h))
+
+            image = self.paint_frames(grid, [solid, strip])
             source = art / "hazards/generated/spark.png"
             source.parent.mkdir(parents=True)
             image.save(source)
             paths = sprite_assets.normalize("spark", art)
             self.assertEqual(paths, ["frames/spark/00.png", "frames/spark/01.png"])
-            for index, path in enumerate(paths):
+            for path in paths:
                 with Image.open(art / "hazards" / path) as frame:
                     self.assertEqual(frame.size, (16, 8))
                     self.assertTrue(set(frame.getchannel("A").tobytes()) <= {0, 255})
             with Image.open(art / "hazards/frames/spark/01.png") as frame:
-                self.assertEqual(frame.getpixel((0, 0))[3], 255)
-                self.assertEqual(frame.getpixel((15, 0))[3], 0)
+                self.assertEqual(frame.getpixel((0, 4))[3], 255)
+                self.assertEqual(frame.getpixel((15, 4))[3], 0)
 
     def test_fit_modes_place_the_drawn_object(self):
         for fit, opaque_top, opaque_bottom in (("fill", 0, 15), ("top", 0, 3), ("bottom", 12, 15), ("center", 6, 9)):
@@ -55,7 +75,8 @@ class SpriteAssetsTest(unittest.TestCase):
                 art = Path(directory)
                 write_catalog(art, [{"name": "t", "group": "tiles", "cell": [16, 16], "frames": 1,
                                      "fps": 1, "fit": fit, "prompt": "x"}])
-                width, height, scale = sprite_assets.source_size((16, 16), 1)
+                grid = sprite_assets.layout((16, 16), 1)
+                width, height = grid["width"], grid["height"]
                 image = Image.new("RGBA", (width, height), (0, 0, 0, 0))
                 image.paste((90, 100, 110, 255), (0, height // 2, width, height * 3 // 4))
                 (art / "tiles/generated").mkdir(parents=True)
