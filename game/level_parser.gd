@@ -139,6 +139,7 @@ func _check_grid(level: Dictionary) -> String:
 func _check_tasks(level: Dictionary) -> String:
 	var anchors: Dictionary = level["anchors"]
 	var used := {}
+	var task_ids := {}
 	var required := 0
 	for task: Variant in level["header"]["tasks"]:
 		if not task is Dictionary:
@@ -154,6 +155,13 @@ func _check_tasks(level: Dictionary) -> String:
 			or at.is_empty()
 		):
 			return "Each task needs string id, string type, bool required, and a non-empty 'at' array."
+		if id.is_empty():
+			return "Task id must not be empty."
+		if task_ids.has(id):
+			return "Duplicate task id: " + id
+		task_ids[id] = true
+		if task.has("label") and not task["label"] is String:
+			return "Task '%s' label must be a string." % id
 		if type not in TaskSystem.TYPES:
 			return "Task '%s' has unknown type '%s'." % [id, type]
 		var references: Array = at.duplicate()

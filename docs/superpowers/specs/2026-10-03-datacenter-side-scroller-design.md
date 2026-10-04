@@ -128,7 +128,7 @@ Path: `levels/0N-<slug>.level`. Tile size: 32x32 pixels.
   "music": "level1",
   "background": "cold-aisle",
   "tasks": [
-    {"id": "r1", "type": "repair", "at": "A", "required": true}
+    {"id": "r1", "type": "repair", "at": ["A"], "required": true}
   ]
 }
 ---

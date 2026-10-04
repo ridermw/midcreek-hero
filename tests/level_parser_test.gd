@@ -116,6 +116,34 @@ func run() -> void:
 		level_text(task_header({"id": "b1", "type": "reboot", "at": ["A"], "required": true}), VALID_GRID),
 		"Reboot task 'b1' needs 3 'at' anchors.",
 	)
+	expect_error(
+		level_text(task_header({"id": "", "type": "repair", "at": ["A"], "required": true}), VALID_GRID),
+		"Task id must not be empty.",
+	)
+	expect_error(
+		level_text(task_header({"id": "f1", "type": "repair", "at": ["A"], "required": true}), VALID_GRID),
+		"Duplicate task id: f1",
+	)
+	var duplicate_optional: Dictionary = VALID_HEADER.duplicate(true)
+	duplicate_optional["tasks"][2]["id"] = "r1"
+	expect_error(level_text(duplicate_optional, VALID_GRID), "Duplicate task id: r1")
+	for invalid_label: Variant in [null, 42, true, [], {}]:
+		var task: Dictionary = VALID_HEADER["tasks"][0].duplicate(true)
+		task["label"] = invalid_label
+		expect_error(level_text(task_header(task), VALID_GRID), "Task 'r1' label must be a string.")
+	for label: String in ["", "Repair the first rack"]:
+		var task: Dictionary = VALID_HEADER["tasks"][0].duplicate(true)
+		task["label"] = label
+		var labeled_level := parser.parse(level_text(task_header(task), VALID_GRID), "fixture.level")
+		check(not labeled_level.is_empty(), "String task labels remain valid.")
+		if not labeled_level.is_empty():
+			check(labeled_level["header"]["tasks"][0]["label"] == label, "Task label is preserved.")
+	var spec := FileAccess.get_file_as_string(
+		"res://docs/superpowers/specs/2026-10-03-datacenter-side-scroller-design.md",
+	)
+	var example := spec.get_slice("### Level file format\n", 1).get_slice("```text\n", 1).get_slice("```", 0)
+	var example_level := parser.parse(example, "spec example")
+	check(not example_level.is_empty(), "Spec level example parses: " + parser.error_message)
 	print("LEVEL_PARSER_TEST_COMPLETE: %d checks, %d failures" % [checks, failures])
 	quit(1 if failures else 0)
 
