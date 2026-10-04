@@ -147,6 +147,7 @@ func respawn(at: Vector2) -> void:
 	motor.reset()
 	hurt_remaining = 0.0
 	sliding = false
+	on_ladder = false
 	if _shape != null:
 		_set_body_height(BODY_SIZE.y)
 	_suppress_landing = true

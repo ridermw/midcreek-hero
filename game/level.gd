@@ -337,8 +337,10 @@ func _update_ports(delta: float, feet: Vector2) -> bool:
 		return true
 	player.locked = true
 	player.action = &"primary"
+	var consumed_button := false
 	for button: StringName in CablePort.BUTTONS:
 		if _action_pressed(button):
+			consumed_button = true
 			var result: String = port.press(button)
 			if result == "done":
 				tasks.complete(port.task_id)
@@ -350,7 +352,7 @@ func _update_ports(delta: float, feet: Vector2) -> bool:
 				player.locked = false
 				player.action = &""
 			break
-	if port.state == "active" and port.advance(delta):
+	if not consumed_button and port.state == "active" and port.advance(delta):
 		sound.emit("timer_warning")
 		player.locked = false
 		player.action = &""
