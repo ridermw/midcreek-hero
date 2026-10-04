@@ -113,6 +113,56 @@
         "frames/checkpoint-on/02.png",
         "frames/checkpoint-on/03.png"
       ]
+    },
+    "cable-port": {
+      "cell": [
+        32,
+        32
+      ],
+      "fps": 1,
+      "frames": [
+        "frames/cable-port/00.png"
+      ]
+    },
+    "spark-emitter": {
+      "cell": [
+        32,
+        32
+      ],
+      "fps": 1,
+      "frames": [
+        "frames/spark-emitter/00.png"
+      ]
+    },
+    "lift": {
+      "cell": [
+        64,
+        16
+      ],
+      "fps": 1,
+      "frames": [
+        "frames/lift/00.png"
+      ]
+    },
+    "switch-off": {
+      "cell": [
+        32,
+        48
+      ],
+      "fps": 1,
+      "frames": [
+        "frames/switch-off/00.png"
+      ]
+    },
+    "switch-on": {
+      "cell": [
+        32,
+        48
+      ],
+      "fps": 1,
+      "frames": [
+        "frames/switch-on/00.png"
+      ]
     }
   }
 }
