@@ -9,10 +9,6 @@ const CHECKPOINTS := 3
 
 func validate(level: Dictionary) -> Array[String]:
 	var errors: Array[String] = []
-	if "tray" in level["solids"].values():
-		errors.append("Terrain 'tray' is not built yet.")
-	if not level["ladders"].is_empty():
-		errors.append("Terrain 'ladder' is not built yet.")
 	if not level["lifts"].is_empty():
 		errors.append("Terrain 'lift' is not built yet.")
 	if not errors.is_empty():

@@ -52,7 +52,7 @@ func reach_level(platform_row: int, platform_x: int) -> Dictionary:
 func run() -> void:
 	var text := fixture_text()
 	check(validator.validate(parse_text(text)).is_empty(), "The controller fixture is valid.")
-	var unsupported_terrain := {"T": "tray", "|": "ladder", "l": "lift"}
+	var unsupported_terrain := {"l": "lift"}
 	for symbol: String in unsupported_terrain:
 		var terrain_text := text.replace("---\n.", "---\n" + symbol)
 		check(

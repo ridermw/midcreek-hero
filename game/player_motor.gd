@@ -54,7 +54,7 @@ func step(input: Dictionary, context: Variant, delta: float) -> Vector2:
 	if not climbing and ctx.get("on_ladder", false) and vertical != 0.0 and not sliding:
 		climbing = true
 	if climbing:
-		velocity = Vector2(0.0, vertical * CLIMB_SPEED)
+		velocity = Vector2(direction * CLIMB_SPEED, vertical * CLIMB_SPEED)
 		return velocity
 	if sliding:
 		_slide_remaining -= delta

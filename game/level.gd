@@ -6,6 +6,7 @@ signal sound(sound_name: String)
 const REPAIR_TICK_SECONDS := 0.4
 const DIAGNOSE_SECONDS := 0.8
 const PART_LABELS := {"psu": "PSU", "dimm": "DIMM"}
+const BUTTON_LABELS := {&"repair": "E / X", &"diagnose": "Q / Y", &"jump": "Space / A"}
 
 const Health = preload("res://game/health.gd")
 const SlaTimer = preload("res://game/sla_timer.gd")
@@ -18,6 +19,7 @@ const InputSetup = preload("res://game/input_setup.gd")
 const Score = preload("res://game/score.gd")
 const Player = preload("res://game/player.gd")
 const Hud = preload("res://game/hud.gd")
+const CablePort = preload("res://game/entities/cable_port.gd")
 const SpriteLibrary = preload("res://game/sprite_library.gd")
 const HeroAnimations = preload("res://game/animation_library.gd")
 const BACKGROUNDS := {
@@ -192,7 +194,10 @@ func step(delta: float) -> void:
 			carried_part = part.task_id
 			hud.set_carry("Carrying " + PART_LABELS[part.kind])
 			sound.emit("pickup")
-	_update_repair(delta, feet)
+	var cell := Vector2i(floori(feet.x / LevelBuilder.TILE), floori((feet.y - 1.0) / LevelBuilder.TILE))
+	player.on_ladder = cell in level["ladders"]
+	if not _update_ports(delta, feet):
+		_update_repair(delta, feet)
 	var door = entities["exit"]
 	if tasks.required_done() and not door.open:
 		sound.emit("door_open")
@@ -213,7 +218,7 @@ func _out_of_bounds() -> bool:
 
 func capture_state() -> Dictionary:
 	var state := {"carried_part": carried_part}
-	for group: String in ["racks", "parts", "coolant"]:
+	for group: String in ["racks", "parts", "ports", "coolant"]:
 		var states: Array = []
 		for node in entities[group]:
 			states.append(node.capture_state())
@@ -231,7 +236,7 @@ func restore_state(state: Dictionary) -> void:
 			label = "Carrying " + PART_LABELS[part.kind]
 	hud.set_carry(label)
 	_diagnose_remaining = 0.0
-	for group: String in ["racks", "parts", "coolant"]:
+	for group: String in ["racks", "parts", "ports", "coolant"]:
 		for i: int in range(entities[group].size()):
 			entities[group][i].restore_state(state[group][i])
 
@@ -243,7 +248,7 @@ func _action_held(action: StringName) -> bool:
 
 
 func _sample_actions() -> void:
-	for action: StringName in [&"repair", &"diagnose"]:
+	for action: StringName in [&"repair", &"diagnose", &"jump"]:
 		var held := _action_held(action)
 		_pressed_actions[action] = held and not _previous_actions.get(action, false)
 		_previous_actions[action] = held
@@ -253,6 +258,55 @@ func _action_pressed(action: StringName) -> bool:
 	if use_action_override:
 		return _pressed_actions.get(action, false)
 	return Input.is_action_just_pressed(action)
+
+
+func _update_ports(delta: float, feet: Vector2) -> bool:
+	var port = null
+	for candidate in entities["ports"]:
+		if not candidate.done and (candidate.state == "active" or candidate.in_range(feet)):
+			port = candidate
+			break
+	if port == null:
+		return false
+	if port.state == "idle":
+		if not port.in_range(feet):
+			return false
+		player.locked = false
+		player.action = &""
+		hud.set_prompt("Press E or X to reseat the cable")
+		if _action_pressed(&"repair"):
+			port.begin()
+			player.locked = true
+			player.action = &"primary"
+			hud.set_prompt("Press " + BUTTON_LABELS[port.current_button()])
+			sound.emit("menu_move")
+		return true
+	player.locked = true
+	player.action = &"primary"
+	for button: StringName in CablePort.BUTTONS:
+		if _action_pressed(button):
+			var result: String = port.press(button)
+			if result == "done":
+				tasks.complete(port.task_id)
+				sound.emit("repair_done")
+				player.locked = false
+				player.action = &""
+			elif result == "ok":
+				sound.emit("repair_tick")
+			else:
+				sound.emit("timer_warning")
+				player.locked = false
+				player.action = &""
+			break
+	if port.state == "active" and port.advance(delta):
+		sound.emit("timer_warning")
+		player.locked = false
+		player.action = &""
+	if port.state == "active":
+		hud.set_prompt("Press %s  (%d of 3)" % [BUTTON_LABELS[port.current_button()], port.step + 1])
+	elif not port.done:
+		hud.set_prompt("Press E or X to reseat the cable")
+	return true
 
 
 func _part_label(rack) -> String:
