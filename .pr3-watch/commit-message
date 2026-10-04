@@ -1,0 +1,9 @@
+fix: reject unsupported terrain and align gameplay examples
+
+Reject trays, ladders, and lifts before level construction until their
+runtime mechanics exist. Validate the playable spec example and update the
+plan to restore failed steps before level interactions.
+
+Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>
+Copilot-Session: 1b77d3de-02ba-445d-8d3d-a88988f6baba
+Co-authored-by: Copilot App <223556219+Copilot@users.noreply.github.com>

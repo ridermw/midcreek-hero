@@ -1,0 +1,169 @@
+{
+  "pr": {
+    "owner": "ridermw",
+    "repo": "midcreek-hero",
+    "number": 3,
+    "url": "https://github.com/ridermw/midcreek-hero/pull/3"
+  },
+  "head_sha": "ff583c2f6caba33837ef64e563a54adfed787053",
+  "tick": 5,
+  "state_created_at": "2026-10-04T01:02:06.121665+00:00",
+  "started_at": "2026-10-04T01:02:06.121665+00:00",
+  "invocation_id": "882bf0d5cb334f31a82339af69a3e83b",
+  "invocation_budget_seconds": 1800.0,
+  "last_activity_at": "2026-10-04T01:22:39.376471+00:00",
+  "dead_time_seconds": 0.0,
+  "invocation_backstop_seconds": 259200,
+  "checks": {
+    "Godot web viewer/build": {
+      "name": "build",
+      "status": "COMPLETED",
+      "conclusion": "SUCCESS",
+      "head_sha": "ff583c2f6caba33837ef64e563a54adfed787053",
+      "details_url": "https://github.com/ridermw/midcreek-hero/actions/runs/37167779589/job/111334258403",
+      "created_at": null,
+      "started_at": "2026-10-04T01:21:50Z",
+      "completed_at": "2026-10-04T01:22:31Z"
+    },
+    "Godot web viewer/deploy": {
+      "name": "deploy",
+      "status": "COMPLETED",
+      "conclusion": "SKIPPED",
+      "head_sha": "ff583c2f6caba33837ef64e563a54adfed787053",
+      "details_url": "https://github.com/ridermw/midcreek-hero/actions/runs/37167779589/job/111334370254",
+      "created_at": null,
+      "started_at": "2026-10-04T01:22:32Z",
+      "completed_at": "2026-10-04T01:22:31Z"
+    }
+  },
+  "threads": {},
+  "ci_dispatched": {},
+  "human_decisions": [],
+  "answered_human_decisions": [],
+  "review_decision": null,
+  "mergeable": "MERGEABLE",
+  "merge_state_status": "CLEAN",
+  "blocked_external_head_sha": null,
+  "blocked_external_first_seen_at": null,
+  "feedback_candidate_changed_at": null,
+  "feedback_candidate_ids": [],
+  "blocked_external_review_last_activity_at": null,
+  "pr_chain": {
+    "manager_status": "absent",
+    "manager_source": null,
+    "relationship_status": "independent",
+    "trunk": null,
+    "default_branch": "main",
+    "current_branch": null,
+    "target_position": null,
+    "target_needs_rebase": null,
+    "upstack_needs_rebase": [],
+    "entries": [],
+    "parent_prs": [],
+    "dependent_prs": []
+  },
+  "base": {
+    "host": "github.com",
+    "repository": "ridermw/midcreek-hero",
+    "ref": "main",
+    "oid": "3c1c07f63175cf34381005a7b89e3e7eef430c7c",
+    "graphql_oid": "3c1c07f63175cf34381005a7b89e3e7eef430c7c",
+    "historical_oid": "3c1c07f63175cf34381005a7b89e3e7eef430c7c",
+    "merge_commit_oid": "d5bdff3f6d6a7c64b49d9825ce61cd6488226adf",
+    "merge_parent_oids": [
+      "3c1c07f63175cf34381005a7b89e3e7eef430c7c",
+      "ff583c2f6caba33837ef64e563a54adfed787053"
+    ],
+    "identity": "current"
+  },
+  "branch_currency_state": {
+    "current_key": null,
+    "items": {},
+    "semantic_parks": {},
+    "head_sha": "ff583c2f6caba33837ef64e563a54adfed787053"
+  },
+  "last_change_at": "2026-10-04T01:22:39.376471+00:00",
+  "last_action": "dispatched comment IC_kwDOU6KOFs8AAAABZCigXA",
+  "stop_reason": null,
+  "watch_generation": "f1c7784d1ddd4e7281aec63ab78dd8c6",
+  "watch_pid": 26832,
+  "watch_process_identity": "Sat Oct  3 21:22:36 2026     /Users/mattheww/.pyenv/versions/3.14.7/bin/python3 /Users/mattheww/.copilot/skills/ce-babysit-pr/scripts/pr-snapshot watch --pr 3 --repo github.com/ridermw/midcreek-hero --state-dir .pr3-watch --interval 180 --invocation-id 882bf0d5cb334f31a82339af69a3e83b --session-started-at 2026-10-04T01:02:06.121665+00:00 --invocation-budget-seconds 1800",
+  "trajectory": {
+    "check_history": {
+      "Godot web viewer/build": {
+        "state": "clear",
+        "last_head": "ff583c2f6caba33837ef64e563a54adfed787053",
+        "recur": 0,
+        "seen_tick": 5
+      },
+      "Godot web viewer/deploy": {
+        "state": "clear",
+        "last_head": "ff583c2f6caba33837ef64e563a54adfed787053",
+        "recur": 0,
+        "seen_tick": 5
+      }
+    },
+    "seen_threads": {},
+    "unresolved_series": [
+      0,
+      2,
+      0,
+      1,
+      0
+    ],
+    "stream_series": [
+      "review",
+      "review",
+      "review"
+    ],
+    "problem_keys": [
+      "m:IC_kwDOU6KOFs8AAAABZCigXA"
+    ],
+    "min_open_problems": 0,
+    "heads_since_progress": 0,
+    "last_head": "ff583c2f6caba33837ef64e563a54adfed787053",
+    "invariant_heads": {
+      "parser-task-metadata": [
+        "2bda668a4710b9f28e15fe5975f6c600dcce3cf3"
+      ],
+      "spec-level-example": [
+        "2bda668a4710b9f28e15fe5975f6c600dcce3cf3"
+      ],
+      "unsupported-runtime-terrain": [
+        "bdd53d511a0d541b380debc99426f2839ec0b6a6"
+      ],
+      "playable-doc-examples": [
+        "bdd53d511a0d541b380debc99426f2839ec0b6a6"
+      ]
+    }
+  },
+  "stale_merge_computation": null,
+  "feedback": {
+    "IC_kwDOU6KOFs8AAAABZCigXA": {
+      "id": "IC_kwDOU6KOFs8AAAABZCigXA",
+      "kind": "comment",
+      "author": "ridermw",
+      "edit_id": "6c18ae2d95e64094",
+      "disposition": "dispatched"
+    },
+    "PRR_kwDOU6KOFs8AAAABQhXXfg": {
+      "id": "PRR_kwDOU6KOFs8AAAABQhXXfg",
+      "kind": "review",
+      "author": "copilot-pull-request-reviewer",
+      "state": "COMMENTED",
+      "edit_id": "7b37f1866c86bd06",
+      "disposition": "dispatched"
+    },
+    "PRR_kwDOU6KOFs8AAAABQhZd6Q": {
+      "id": "PRR_kwDOU6KOFs8AAAABQhZd6Q",
+      "kind": "review",
+      "author": "copilot-pull-request-reviewer",
+      "state": "COMMENTED",
+      "edit_id": "669c91022a47137f",
+      "disposition": "dispatched"
+    }
+  },
+  "awaiting_approval": 0,
+  "unrequested_base_merge": null,
+  "unrequested_base_merge_pending": null
+}
