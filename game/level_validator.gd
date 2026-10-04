@@ -10,8 +10,6 @@ const CHECKPOINTS := 3
 
 func validate(level: Dictionary) -> Array[String]:
 	var errors: Array[String] = []
-	if not errors.is_empty():
-		return errors
 	var task_count: int = level["header"]["tasks"].size()
 	if task_count < MIN_TASKS or task_count > MAX_TASKS:
 		errors.append("Level needs %d to %d tasks, found %d." % [MIN_TASKS, MAX_TASKS, task_count])
