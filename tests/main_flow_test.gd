@@ -56,8 +56,10 @@ func run() -> void:
 	main.toggle_pause()
 	check(not paused and not main.pause_menu.visible, "Pause again resumes.")
 	var pause_buttons: Array[Node] = main.pause_menu.find_children("*", "Button", true, false)
-	check(pause_buttons.size() == 3, "The pause menu has three actions.")
+	check(pause_buttons.size() == 4, "The pause menu includes help alongside its existing actions.")
 	for button: Button in pause_buttons:
+		if button.text == "How to Play":
+			continue
 		main.toggle_pause()
 		main.last_sfx = ""
 		button.pressed.emit()

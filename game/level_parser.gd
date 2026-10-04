@@ -1,6 +1,7 @@
 extends RefCounted
 
 const TaskSystem = preload("res://game/task_system.gd")
+const ControlPrompt = preload("res://game/control_prompt.gd")
 
 const SOLIDS := {"#": "floor", "=": "platform", "T": "tray"}
 const HAZARDS := {
@@ -112,6 +113,10 @@ func _check_prompts(header: Dictionary, width: int) -> String:
 			return "Each prompt needs an integer x and a text string."
 		if int(prompt["x"]) < 0 or int(prompt["x"]) >= width:
 			return "Prompt column %d is outside the grid." % int(prompt["x"])
+		if not ControlPrompt.valid(prompt):
+			return "Each prompt needs a known action, press/hold intent, text and separate status."
+		if prompt.has("task") and (not prompt["task"] is String or not header["tasks"].any(func(task: Variant) -> bool: return task is Dictionary and task.get("id") == prompt["task"])):
+			return "Prompt task must name an existing task."
 	return ""
 
 

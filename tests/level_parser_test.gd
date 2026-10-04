@@ -61,6 +61,10 @@ func expect_error(text: String, needle: String) -> void:
 
 
 func run() -> void:
+	var malformed := VALID_HEADER.duplicate(true)
+	malformed["tasks"].push_front(false)
+	malformed["prompts"] = [{"x": 1, "task": "r1", "action": "repair", "intent": "hold", "text": "repair", "status": ""}]
+	expect_error(level_text(malformed, VALID_GRID), "Each task must be an object.")
 	var level := parser.parse(level_text(VALID_HEADER, VALID_GRID), "fixture.level")
 	check(not level.is_empty() and parser.error_message.is_empty(), "Valid level parses.")
 	check(level.get("width") == 12 and level.get("height") == 4, "Width and height match the grid.")
@@ -150,7 +154,7 @@ func run() -> void:
 		check(example_errors.is_empty(), "Spec level example is playable: " + str(example_errors))
 	expect_error(level_text(header_with("prompts", [{"x": 99, "text": "Hi"}]), VALID_GRID), "Prompt column 99 is outside the grid.")
 	expect_error(level_text(header_with("prompts", [{"x": 1}]), VALID_GRID), "Each prompt needs an integer x and a text string.")
-	check(not parser.parse(level_text(header_with("prompts", [{"x": 1, "text": "Hi"}]), VALID_GRID), "p.level").is_empty(), "Valid prompts parse.")
+	check(not parser.parse(level_text(header_with("prompts", [{"x": 1, "action": "", "intent": "", "text": "", "status": "Hi"}]), VALID_GRID), "p.level").is_empty(), "Valid prompts parse.")
 	expect_error(
 		level_text(task_header({"id": "f9", "type": "fetch", "at": ["A"], "part_at": "Z", "part": "psu", "required": true}), VALID_GRID),
 		"references missing anchor 'Z'",

@@ -18,5 +18,8 @@ func build(owner_main: Node) -> void:
 	settings.name = "Settings"
 	settings.pressed.connect(func() -> void: main.go_to("settings"))
 	box.add_child(settings)
+	var help := UiKit.button("How to Play", main.art)
+	help.pressed.connect(main.open_help)
+	box.add_child(help)
 	box.add_child(UiKit.label("Press any key or button", 18, UiKit.MUTED_COLOR))
-	UiKit.link_focus([start, settings])
+	UiKit.link_focus([start, settings, help])

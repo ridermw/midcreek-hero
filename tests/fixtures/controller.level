@@ -4,7 +4,7 @@
   "par_seconds": 60,
   "music": "level1",
   "background": "cold-aisle",
-  "prompts": [{"x": 1, "text": "Run right"}],
+  "prompts": [{"x": 1, "action": "move_right", "intent": "hold", "text": "run right", "status": ""}],
   "tasks": [
     {"id": "r1", "type": "repair", "at": ["A"], "required": true},
     {"id": "r2", "type": "repair", "at": ["B", "D"], "required": true, "label": "Repair row B"},

@@ -3,6 +3,7 @@ extends Control
 const UiKit = preload("res://game/menus/ui_kit.gd")
 
 var main: Node
+var choices: Dictionary = {}
 
 
 func build(owner_main: Node) -> void:
@@ -25,6 +26,15 @@ func build(owner_main: Node) -> void:
 		slider.value_changed.connect(func(value: float) -> void: main.set_volume(key, value))
 		box.add_child(slider)
 		focusables.append(slider)
+	box.add_child(UiKit.label("Control display (all inputs still work)", 20, UiKit.MUTED_COLOR))
+	for display: String in ["keyboard", "gamepad", "touch"]:
+		var choice := UiKit.button(display.capitalize(), main.art)
+		choice.custom_minimum_size.y = 44
+		choice.pressed.connect(func() -> void: main.set_control_display(display))
+		choices[display] = choice
+		box.add_child(choice)
+		focusables.append(choice)
+	refresh_choices()
 	var back := UiKit.button("Back", main.art)
 	back.pressed.connect(func() -> void: main.go_to("title"))
 	box.add_child(back)
@@ -34,3 +44,8 @@ func build(owner_main: Node) -> void:
 		current.focus_neighbor_top = current.get_path_to(focusables[(i - 1 + focusables.size()) % focusables.size()])
 		current.focus_neighbor_bottom = current.get_path_to(focusables[(i + 1) % focusables.size()])
 	(focusables[0] as Control).grab_focus.call_deferred()
+
+
+func refresh_choices() -> void:
+	for display: String in choices:
+		choices[display].text = display.capitalize() + (" (selected)" if main.control_display() == display else "")

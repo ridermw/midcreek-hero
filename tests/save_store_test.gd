@@ -54,6 +54,24 @@ func run() -> void:
 		"Saving and loading a partial entry preserves progress.",
 	)
 	check(not FileAccess.file_exists("user://test-save.corrupt.json"), "A valid partial save is not treated as corrupt.")
+	check(not partial_reloaded.settings.has("control_display"), "Legacy saves retain an absent display choice.")
+	for display: String in ["keyboard", "gamepad", "touch"]:
+		partial_reloaded.settings["control_display"] = display
+		check(partial_reloaded.save(), "Display choice writes.")
+		var preference := SaveStore.new(PATH)
+		preference.load_data()
+		check(preference.settings.get("control_display") == display, "Display preference round trips: " + display)
+		check(preference.stars("01") == 2 and preference.is_unlocked("02"), "Display choice does not reset progress.")
+	if FileAccess.file_exists("user://test-save.corrupt.json"):
+		DirAccess.remove_absolute("user://test-save.corrupt.json")
+	var cosmetic_file := FileAccess.open(PATH, FileAccess.WRITE)
+	cosmetic_file.store_string('{"version":1,"character":"woman","levels":{"01":{"stars":2,"best_seconds":42}},"unlocked":["01","02"],"settings":{"control_display":{"bad":true},"music_volume":0.4}}')
+	cosmetic_file.close()
+	var cosmetic := SaveStore.new(PATH)
+	cosmetic.load_data()
+	check(cosmetic.stars("01") == 2 and cosmetic.best_seconds("01") == 42.0 and cosmetic.is_unlocked("02"), "Invalid cosmetic preference preserves gameplay progress.")
+	check(not cosmetic.settings.has("control_display") and cosmetic.get("warning_message") is String and not String(cosmetic.get("warning_message")).is_empty(), "Invalid cosmetic preference resets only itself with a warning.")
+	check(not FileAccess.file_exists("user://test-save.corrupt.json"), "Invalid cosmetic preference does not quarantine valid progress.")
 	partial_reloaded.record("01", 3, 40.0, 1)
 	check(partial_reloaded.best_seconds("01") == 40.0, "A real completion establishes the missing best time.")
 	var file := FileAccess.open(PATH, FileAccess.WRITE)

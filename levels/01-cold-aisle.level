@@ -7,35 +7,60 @@
   "prompts": [
     {
       "x": 1,
-      "text": "Run: A / D or arrows. Pad: left stick"
+      "action": "move_right",
+      "intent": "hold",
+      "text": "run right",
+      "status": ""
     },
     {
       "x": 6,
-      "text": "Jump cables: Space. Pad: A"
+      "action": "jump",
+      "intent": "press",
+      "text": "jump cables",
+      "status": ""
     },
     {
       "x": 13,
-      "text": "Repair red racks: hold E. Pad: hold X"
+      "task": "r1",
+      "action": "repair",
+      "intent": "hold",
+      "text": "repair red racks",
+      "status": ""
     },
     {
       "x": 20,
-      "text": "Jump the open floor tiles"
+      "action": "jump",
+      "intent": "press",
+      "text": "jump the open floor tiles",
+      "status": ""
     },
     {
       "x": 34,
-      "text": "Climb the catwalks"
+      "action": "move_up",
+      "intent": "hold",
+      "text": "climb the catwalks",
+      "status": ""
     },
     {
       "x": 69,
-      "text": "Optional: a rack up high needs tuning"
+      "action": "",
+      "intent": "",
+      "text": "",
+      "status": "Optional: a rack up high needs tuning"
     },
     {
       "x": 176,
-      "text": "Climb the stacked catwalks to rack H30"
+      "action": "move_up",
+      "intent": "hold",
+      "text": "climb the stacked catwalks to rack H30",
+      "status": ""
     },
     {
       "x": 430,
-      "text": "Reach the exit when every required task is done"
+      "action": "",
+      "intent": "",
+      "text": "",
+      "status": "Reach the exit when every required task is done"
     }
   ],
   "tasks": [

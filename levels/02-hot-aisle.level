@@ -7,27 +7,47 @@
   "prompts": [
     {
       "x": 2,
-      "text": "Heat vents blast on a cycle. Jump them or wait"
+      "action": "jump",
+      "intent": "press",
+      "text": "jump the vents",
+      "status": "Heat vents blast on a cycle. Wait for a safe opening."
     },
     {
       "x": 12,
-      "text": "Run over the spare PSU to pick it up"
+      "action": "move_right",
+      "intent": "hold",
+      "text": "run over the spare PSU to pick it up",
+      "status": ""
     },
     {
       "x": 24,
-      "text": "Hold E at the rack to install the PSU"
+      "task": "f1",
+      "action": "repair",
+      "intent": "hold",
+      "text": "install the PSU at the rack",
+      "status": ""
     },
     {
       "x": 49,
-      "text": "Press Q to diagnose, then hold E to repair"
+      "task": "d1",
+      "action": "diagnose",
+      "intent": "press",
+      "text": "diagnose the rack",
+      "status": "Diagnose before repairing."
     },
     {
       "x": 84,
-      "text": "A spare DIMM waits on the catwalk"
+      "action": "",
+      "intent": "",
+      "text": "",
+      "status": "A spare DIMM waits on the catwalk"
     },
     {
       "x": 155,
-      "text": "Optional: diagnose the rack on the catwalk"
+      "action": "",
+      "intent": "",
+      "text": "",
+      "status": "Optional: diagnose the rack on the catwalk"
     }
   ],
   "tasks": [
