@@ -72,6 +72,18 @@ func run() -> void:
 	check(level.hud.prompt_label.text.contains("switch 2"), "The HUD names the panel number.")
 	tap(&"repair")
 	check(not panels()[1].on and "timer_warning" in sounds, "A switch out of order resets the panels.")
+	check(level.hud.prompt_label.text.contains("Wrong order"), "The switch error survives the input frame.")
+	for i: int in range(30):
+		level.step(DT)
+	check(level.hud.prompt_label.text.contains("Wrong order"), "The switch error remains readable after releasing the button.")
+	for i: int in range(90):
+		level.step(DT)
+	check(level.hud.prompt_label.text.contains("Throw switch 2"), "The normal switch prompt returns after the error.")
+	tap(&"repair")
+	at(Vector2i(2, 4))
+	for i: int in range(90):
+		level.step(DT)
+	check(not level.hud.prompt_label.text.contains("Wrong order"), "Leaving the switch clears its expired error feedback.")
 	for cell: Vector2i in [Vector2i(10, 4), Vector2i(12, 4)]:
 		at(cell)
 		level.step(DT)
@@ -85,6 +97,19 @@ func run() -> void:
 	level.step(DT)
 	tap(&"repair")
 	check(level.tasks.is_done("b1"), "The third switch in order reboots the switch.")
+	load_fixture()
+	at(Vector2i(12, 4))
+	tap(&"repair")
+	at(Vector2i(10, 4))
+	tap(&"repair")
+	check(panels()[0].on and not level.hud.prompt_label.text.contains("Wrong order"), "A successful switch clears stale error feedback.")
+	at(Vector2i(14, 4))
+	tap(&"repair")
+	for i: int in range(5):
+		level.health.damage()
+		level.health.tick(1.0)
+	level.step(DT)
+	check(not level.hud.prompt_label.text.contains("Wrong order"), "Respawning clears stale switch feedback.")
 	load_fixture()
 	at(Vector2i(10, 4))
 	level.step(DT)
