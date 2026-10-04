@@ -32,6 +32,7 @@ var audio: AudioDirector
 var last_sfx: String = ""
 var route_runner: RouteRunner
 var smoke: bool = false
+var _smoke_report: float = 0.0
 var _level_files: Dictionary = {}
 var _level_names: Dictionary = {}
 
@@ -100,9 +101,22 @@ func set_volume(key: String, value: float) -> void:
 	save.save()
 
 
+func smoke_status() -> String:
+	if route_runner == null or screen_name != "level" or not is_instance_valid(screen):
+		return "MIDCREEK SMOKE %s idle" % current_level_id
+	return "MIDCREEK SMOKE %s step=%d/%d x=%d respawns=%d t=%.0f" % [
+		current_level_id, route_runner.index + 1, route_runner.steps.size(),
+		int(screen.player.position.x), int(screen.respawns), screen.timer.elapsed,
+	]
+
+
 func _physics_process(delta: float) -> void:
 	if route_runner != null and screen_name == "level" and is_instance_valid(screen):
 		route_runner.apply(screen, delta)
+		_smoke_report += delta
+		if OS.has_feature("web") and _smoke_report >= 1.0:
+			_smoke_report = 0.0
+			JavaScriptBridge.eval("document.title = %s" % JSON.stringify(smoke_status()))
 
 
 func music_name() -> String:
