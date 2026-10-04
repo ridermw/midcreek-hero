@@ -60,12 +60,12 @@ func run() -> void:
 	check(checkpoint_x == expected_x, "Checkpoints are sorted from left to right.")
 	check(built["exit"].position == Vector2(944, 96), "Exit stands at E.")
 	var unsupported := load_level("res://tests/fixtures/controller.level")
-	unsupported["header"]["tasks"][2]["type"] = "reboot"
+	unsupported["header"]["tasks"][2]["type"] = "dance"
 	var other := Node2D.new()
 	root.add_child(other)
 	check(
 		builder.build_entities(unsupported, other).is_empty()
-		and builder.error_message == "Task type 'reboot' is not built yet.",
+		and builder.error_message == "Task type 'dance' is not built yet.",
 		"Unsupported task types are reported.",
 	)
 	for node: Node in [solids, graybox_solids, entities, other]:

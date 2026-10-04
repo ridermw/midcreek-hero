@@ -1,36 +1,36 @@
 {
-  "rendered_at": "2026-10-04T02:31:50.755750+00:00",
+  "rendered_at": "2026-10-04T03:02:49.033409+00:00",
   "size": "1344x2016",
   "quality": "high",
   "deployment": "gpt-image-2.5-sunburst",
   "model_name": "gpt-image-2.5-sunburst",
   "model_version": "default",
-  "prompt_char_count": 807,
-  "prompt": "Edit image 1: replace its entire content with a new isolated game sprite described below. Keep unchanged from image 1: the pixel art style, the color palette, the outline treatment and the lighting direction.\n\nTRUE PIXEL ART game sprite in the same Cel Shift style as image 1: dark stepped pixel contours, small square color clusters, shaded material ramps, cool data center palette. Never smooth illustration, vector art, 3D render or painted concept art. Use actual TRANSPARENT RGBA output around the object. No checkerboard, backdrop, ground shadow, scenery, text, labels, logos or watermark unless the prompt asks for text.\n\nOne object centered in the 1344x2016 canvas, as large as fits.\n\nOBJECT: The same network switch control panel with a large green lit push button and a bright green status screen.",
+  "prompt_char_count": 373,
+  "prompt": "Edit image 1, a pixel art game sprite. Keep the same object, its shape, framing, size, position, pixel art style, palette and outlines exactly as they are. Keep the transparent background. One object centered in the 1344x2016 canvas, as large as fits.\n\nChange only: Light the large push button bright green and make the small status screen glow green. Nothing else changes.",
   "operation": "edit",
-  "source_image": "art/cel-shift/environment/layers/equipment.png",
+  "source_image": "art/cel-shift/tiles/generated/switch-off.png",
   "reference_images": [],
   "mask": null,
   "inputs": [
     {
       "role": "source",
-      "path": "art/cel-shift/environment/layers/equipment.png",
-      "sha256": "a09f7c4cccba50034b119c18b75921c347a5687fe959d7aa1b82314192992e26"
+      "path": "art/cel-shift/tiles/generated/switch-off.png",
+      "sha256": "1f7758ea23f3cad0b16de586ca8d96d39a849f7e0b14327103a9fd44faa43eac"
     }
   ],
   "background": "transparent",
   "output_format": "png",
   "usage": {
-    "input_tokens": 763,
+    "input_tokens": 1636,
     "input_tokens_details": {
-      "image_tokens": 576,
-      "text_tokens": 187
+      "image_tokens": 1536,
+      "text_tokens": 100
     },
     "output_tokens": 1809,
     "output_tokens_details": {
       "image_tokens": 1809,
       "text_tokens": 0
     },
-    "total_tokens": 2572
+    "total_tokens": 3445
   }
 }

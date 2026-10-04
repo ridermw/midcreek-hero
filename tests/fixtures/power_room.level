@@ -1,0 +1,42 @@
+{
+  "name": "Power Fixture",
+  "sla_seconds": 120,
+  "par_seconds": 60,
+  "music": "level4",
+  "background": "power-room",
+  "tasks": [
+    {
+      "id": "b1",
+      "type": "reboot",
+      "at": [
+        "X",
+        "Y",
+        "Z"
+      ],
+      "required": true
+    },
+    {
+      "id": "r1",
+      "type": "repair",
+      "at": [
+        "G"
+      ],
+      "required": true
+    },
+    {
+      "id": "r2",
+      "type": "repair",
+      "at": [
+        "B"
+      ],
+      "required": true
+    }
+  ]
+}
+---
+..............................
+.......................G......
+......................===.....
+..............................
+P...k..C..X.Y.Z..C..l....CB.E.
+##############################

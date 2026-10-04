@@ -52,13 +52,12 @@ func reach_level(platform_row: int, platform_x: int) -> Dictionary:
 func run() -> void:
 	var text := fixture_text()
 	check(validator.validate(parse_text(text)).is_empty(), "The controller fixture is valid.")
-	var unsupported_terrain := {"l": "lift"}
-	for symbol: String in unsupported_terrain:
-		var terrain_text := text.replace("---\n.", "---\n" + symbol)
-		check(
-			errors_of(terrain_text).contains("Terrain '%s' is not built yet." % unsupported_terrain[symbol]),
-			"Unsupported terrain '%s' is rejected before level construction." % symbol,
-		)
+	var lifted := text.replace(
+		"---\n..............................\n..............................\n",
+		"---\n..........................E...\n......................#####...\n"
+		+ "..............................\n..............................\n",
+	).replace("..F..E\n", "..F...\n").replace("..C..F", "..Cl.F")
+	check(errors_of(lifted).is_empty(), "A lift reaches a ledge 3 tiles up.")
 	var two_checkpoints := text.replace("..C..F..E", ".....F..E")
 	check(
 		errors_of(two_checkpoints).contains("Level needs exactly 3 checkpoints, found 2."),

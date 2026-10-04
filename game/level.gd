@@ -196,7 +196,7 @@ func step(delta: float) -> void:
 			sound.emit("pickup")
 	var cell := Vector2i(floori(feet.x / LevelBuilder.TILE), floori((feet.y - 1.0) / LevelBuilder.TILE))
 	player.on_ladder = cell in level["ladders"]
-	if not _update_ports(delta, feet):
+	if not _update_switches(feet) and not _update_ports(delta, feet):
 		_update_repair(delta, feet)
 	var door = entities["exit"]
 	if tasks.required_done() and not door.open:
@@ -218,7 +218,7 @@ func _out_of_bounds() -> bool:
 
 func capture_state() -> Dictionary:
 	var state := {"carried_part": carried_part}
-	for group: String in ["racks", "parts", "ports", "coolant"]:
+	for group: String in ["racks", "parts", "ports", "switches", "coolant"]:
 		var states: Array = []
 		for node in entities[group]:
 			states.append(node.capture_state())
@@ -236,7 +236,7 @@ func restore_state(state: Dictionary) -> void:
 			label = "Carrying " + PART_LABELS[part.kind]
 	hud.set_carry(label)
 	_diagnose_remaining = 0.0
-	for group: String in ["racks", "parts", "ports", "coolant"]:
+	for group: String in ["racks", "parts", "ports", "switches", "coolant"]:
 		for i: int in range(entities[group].size()):
 			entities[group][i].restore_state(state[group][i])
 
@@ -258,6 +258,38 @@ func _action_pressed(action: StringName) -> bool:
 	if use_action_override:
 		return _pressed_actions.get(action, false)
 	return Input.is_action_just_pressed(action)
+
+
+func _update_switches(feet: Vector2) -> bool:
+	var panel = null
+	for candidate in entities["switches"]:
+		if not tasks.is_done(candidate.task_id) and candidate.in_range(feet):
+			panel = candidate
+			break
+	if panel == null:
+		return false
+	player.locked = false
+	player.action = &""
+	var group: Array = entities["switches"].filter(func(p) -> bool: return p.task_id == panel.task_id)
+	var next := 1
+	for other in group:
+		if other.on:
+			next = maxi(next, other.order + 1)
+	hud.set_prompt("Throw switch %d: press E or X%s" % [panel.order, "" if not panel.on else " (already on)"])
+	if not _action_pressed(&"repair") or panel.on:
+		return true
+	if panel.order != next:
+		for other in group:
+			other.set_on(false)
+		sound.emit("timer_warning")
+		hud.set_prompt("Wrong order. Start again at switch 1")
+		return true
+	panel.set_on(true)
+	sound.emit("switch")
+	if next == group.size():
+		tasks.complete(panel.task_id)
+		sound.emit("repair_done")
+	return true
 
 
 func _update_ports(delta: float, feet: Vector2) -> bool:
