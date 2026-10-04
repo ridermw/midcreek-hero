@@ -51,7 +51,7 @@ func step(input: Dictionary, context: Variant, delta: float) -> Vector2:
 			_coyote = 0.0
 			velocity = Vector2(direction * RUN_SPEED, -JUMP_VELOCITY)
 			return velocity
-	if not climbing and ctx.get("on_ladder", false) and vertical != 0.0 and not sliding:
+	if not climbing and ctx.get("on_ladder", false) and vertical != 0.0 and not sliding and _wall_lock <= 0.0:
 		climbing = true
 	if climbing:
 		velocity = Vector2(direction * CLIMB_SPEED, vertical * CLIMB_SPEED)
@@ -72,18 +72,19 @@ func step(input: Dictionary, context: Variant, delta: float) -> Vector2:
 		facing = signf(direction)
 	if _wall_lock <= 0.0:
 		velocity.x = move_toward(velocity.x, direction * RUN_SPEED, ACCELERATION * delta)
-	if _buffer > 0.0 and _coyote > 0.0:
-		velocity.y = -JUMP_VELOCITY
-		_buffer = 0.0
-		_coyote = 0.0
-		return velocity
 	var normal := float(ctx.get("wall_normal_x", 0.0))
 	var pressing_wall: bool = not on_floor and ctx.get("on_wall", false) and normal != 0.0 and direction == -signf(normal)
 	if pressing_wall and _buffer > 0.0:
 		_buffer = 0.0
+		_coyote = 0.0
 		_wall_lock = WALL_JUMP_LOCK_SECONDS
 		facing = signf(normal)
 		velocity = Vector2(normal * WALL_JUMP_PUSH, -WALL_JUMP_VELOCITY)
+		return velocity
+	if _buffer > 0.0 and _coyote > 0.0:
+		velocity.y = -JUMP_VELOCITY
+		_buffer = 0.0
+		_coyote = 0.0
 		return velocity
 	if on_floor:
 		velocity.y = 0.0

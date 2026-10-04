@@ -98,6 +98,15 @@ func run() -> void:
 	var away := PlayerMotor.new()
 	away.velocity.y = 400.0
 	check(away.step({"direction": -1.0}, {"on_wall": true, "wall_normal_x": -1.0}, DT).y > PlayerMotor.WALL_SLIDE_SPEED, "No wall slide without pressing into the wall.")
+	var edge := PlayerMotor.new()
+	edge.step({"direction": 1.0}, {"on_floor": true}, DT)
+	var coyote_kick := edge.step({"direction": 1.0, "jump_pressed": true, "jump_held": true}, {"on_wall": true, "wall_normal_x": -1.0}, DT)
+	check(coyote_kick.x < 0.0 and edge.facing == -1.0, "A wall jump wins over coyote time at a wall.")
+	var locked := PlayerMotor.new()
+	locked.velocity.y = 200.0
+	locked.step({"direction": 1.0, "jump_pressed": true}, {"on_wall": true, "wall_normal_x": -1.0}, DT)
+	locked.step({"vertical": -1.0}, {"on_ladder": true}, DT)
+	check(not locked.climbing, "A ladder does not catch the player during the wall jump lock.")
 	var climber := PlayerMotor.new()
 	var climb := climber.step({"vertical": -1.0}, {"on_ladder": true}, DT)
 	check(climber.climbing and climb == Vector2(0, -PlayerMotor.CLIMB_SPEED), "Up on a ladder climbs at 90 px/s.")
