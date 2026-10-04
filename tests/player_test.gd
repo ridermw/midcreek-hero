@@ -72,13 +72,17 @@ func run() -> void:
 	await frames(3)
 	check(not player.is_on_floor(), "The player is airborne before the checkpoint respawn.")
 	player_sounds.clear()
+	player.on_ladder = true
+	player.motor.climbing = true
+	player.input_override = {"vertical": -1.0}
 	player.respawn(Vector2(40, 320))
+	check(not player.on_ladder and not player.motor.climbing, "A respawn clears transient ladder contact and climbing state.")
 	check(
 		player.position == Vector2(40, 320) and player.velocity == Vector2.ZERO and player.motor.velocity == Vector2.ZERO,
 		"respawn moves the player and clears velocity.",
 	)
 	await frames(3)
-	check(player.is_on_floor() and player_sounds.is_empty(), "A checkpoint respawn on the floor does not play landing audio.")
+	check(player.is_on_floor() and player_sounds.is_empty(), "A checkpoint respawn while holding climb stays grounded and does not play landing audio.")
 	check(Player.choose_clip(true, Vector2.ZERO, false, true, &"primary") == &"reaction", "Hurt shows reaction.")
 	check(Player.choose_clip(true, Vector2.ZERO, false, false, &"primary") == &"primary", "Actions show their clip.")
 	check(Player.choose_clip(true, Vector2(200, 0), true, false, &"") == &"slide", "Sliding shows slide.")
@@ -113,6 +117,14 @@ func run() -> void:
 	player.action = &""
 	player.update_animation()
 	check(player.sprite.animation != &"primary", "Releasing repair exits its animation.")
+	player.motor.climbing = true
+	for motion: Vector2 in [Vector2(90, 0), Vector2(-90, 0), Vector2(0, -90), Vector2(0, 90)]:
+		player.velocity = motion
+		player.update_animation()
+		check(player.sprite.animation == &"walk", "Ladder movement animates in every direction: %s" % motion)
+	player.velocity = Vector2.ZERO
+	player.update_animation()
+	check(player.sprite.animation == &"idle", "A stationary climber uses the idle animation.")
 	player.queue_free()
 	floor_body.queue_free()
 	await process_frame

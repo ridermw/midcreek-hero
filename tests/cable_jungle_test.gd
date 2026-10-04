@@ -100,8 +100,17 @@ func run() -> void:
 	tap(&"repair")
 	check(level.entities["ports"][0].state == "active" and level.player.locked, "Pressing repair starts the sequence and locks the player.")
 	check(level.hud.prompt_label.text.contains(KEYS[sequence[0]]), "The HUD shows the next button.")
-	for button: StringName in sequence:
-		tap(button)
+	for i: int in range(sequence.size()):
+		level.action_override = {sequence[i]: true}
+		level.step(DT)
+		level.action_override = {}
+		if i < 2:
+			check(is_equal_approx(level.entities["ports"][0].window_remaining, 1.0), "Each accepted button starts a full second for the next input.")
+			for frame: int in range(59):
+				level.step(DT)
+			check(level.entities["ports"][0].state == "active", "The next reseat window remains open until a full second has elapsed.")
+		else:
+			level.step(DT)
 	check(level.tasks.is_done("c1") and "repair_done" in sounds and not level.player.locked, "The right sequence completes the reseat task.")
 	load_fixture()
 	at(Vector2i(15, 4))

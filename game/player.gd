@@ -125,7 +125,7 @@ func update_animation() -> void:
 		return
 	var clip := choose_clip(is_on_floor(), velocity, sliding, hurt_remaining > 0.0, action)
 	if motor.climbing and hurt_remaining <= 0.0 and action.is_empty():
-		clip = &"walk" if velocity.y != 0.0 else &"idle"
+		clip = &"walk" if velocity != Vector2.ZERO else &"idle"
 	if sprite.animation != clip:
 		sprite.play(clip)
 	elif clip == action and not sprite.is_playing():
@@ -150,6 +150,7 @@ func respawn(at: Vector2) -> void:
 	motor.reset()
 	hurt_remaining = 0.0
 	sliding = false
+	on_ladder = false
 	if _shape != null:
 		_set_body_height(BODY_SIZE.y)
 	_suppress_landing = true

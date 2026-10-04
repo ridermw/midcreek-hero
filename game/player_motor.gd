@@ -52,12 +52,16 @@ func step(input: Dictionary, context: Variant, delta: float) -> Vector2:
 		if _buffer > 0.0:
 			_buffer = 0.0
 			_coyote = 0.0
+			if direction != 0.0:
+				facing = signf(direction)
 			velocity = Vector2(direction * RUN_SPEED, -JUMP_VELOCITY)
 			jumped = true
 			return velocity
 	if not climbing and ctx.get("on_ladder", false) and vertical != 0.0 and not sliding and _wall_lock <= 0.0:
 		climbing = true
 	if climbing:
+		if direction != 0.0:
+			facing = signf(direction)
 		velocity = Vector2(direction * CLIMB_SPEED, vertical * CLIMB_SPEED)
 		return velocity
 	if sliding:

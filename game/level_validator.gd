@@ -10,8 +10,6 @@ const CHECKPOINTS := 3
 
 func validate(level: Dictionary) -> Array[String]:
 	var errors: Array[String] = []
-	if not errors.is_empty():
-		return errors
 	var task_count: int = level["header"]["tasks"].size()
 	if task_count < MIN_TASKS or task_count > MAX_TASKS:
 		errors.append("Level needs %d to %d tasks, found %d." % [MIN_TASKS, MAX_TASKS, task_count])
@@ -19,6 +17,9 @@ func validate(level: Dictionary) -> Array[String]:
 		errors.append(
 			"Level needs exactly %d checkpoints, found %d." % [CHECKPOINTS, level["checkpoints"].size()]
 		)
+	for lift: Vector2i in level["lifts"]:
+		if not _lift_shaft_clear(level, lift):
+			errors.append("Lift at column %d, row %d needs a clear shaft within the level." % [lift.x + 1, lift.y + 1])
 	var targets := {"player start": level["player_start"], "exit": level["exit"]}
 	for anchor: String in level["anchors"]:
 		targets["anchor " + anchor] = level["anchors"][anchor]
@@ -35,6 +36,16 @@ func validate(level: Dictionary) -> Array[String]:
 		elif not reachable.has(cell):
 			errors.append(where + " is not reachable.")
 	return errors
+
+
+func _lift_shaft_clear(level: Dictionary, base: Vector2i) -> bool:
+	var top := base - LIFT_RISE
+	if top.y < 0:
+		return false
+	for y: int in range(top.y, base.y + 1):
+		if level["solids"].has(Vector2i(base.x, y)):
+			return false
+	return true
 
 
 func is_standable(level: Dictionary, cell: Vector2i) -> bool:
@@ -80,15 +91,8 @@ func _neighbors(level: Dictionary, cell: Vector2i) -> Array[Vector2i]:
 					continue
 			if next != cell and next.x >= 0 and next.x < width and is_standable(level, next):
 				result.append(next)
-	if cell in level["lifts"]:
-		var top := cell - LIFT_RISE
-		var clear := top.y >= 0
-		for y: int in range(top.y, cell.y + 1):
-			if level["solids"].has(Vector2i(cell.x, y)):
-				clear = false
-				break
-		if clear:
-			result.append(top)
+	if cell in level["lifts"] and _lift_shaft_clear(level, cell):
+		result.append(cell - LIFT_RISE)
 	if cell in level["ladders"]:
 		for step: Vector2i in [Vector2i.UP, Vector2i.DOWN]:
 			if is_standable(level, cell + step):

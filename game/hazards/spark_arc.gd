@@ -19,6 +19,7 @@ var active: bool = false
 var art: RefCounted
 var _time: float = 0.0
 var _frame: int = -1
+var _started: bool = false
 var sparks := CPUParticles2D.new()
 
 
@@ -41,6 +42,10 @@ func _init() -> void:
 
 
 func advance(delta: float) -> void:
+	if not _started:
+		_started = true
+		if active:
+			sparked.emit()
 	_time += delta
 	_update_state()
 	var frame := int(_time * 12.0) % 4
@@ -64,7 +69,7 @@ func _update_state() -> void:
 	if next != state:
 		state = next
 		queue_redraw()
-		if active:
+		if active and _started:
 			sparked.emit()
 	sparks.emitting = active
 

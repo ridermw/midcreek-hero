@@ -131,7 +131,7 @@ reaches zero, then reach the exit door.
 | 2 | Hot Aisle | Fetch a PSU or DIMM, diagnose then repair | Heat vents (1.5 s off, 0.4 s warning, 1.0 s on) |
 | 3 | Cable Jungle | Slide under trays, ladders, wall jump, reseat a cable | Moving cable snags |
 | 4 | Power Room | Ride lifts, reboot a switch in order | Spark arcs (1.4 s off, 0.5 s flicker, 0.6 s on) |
-| 5 | Outage Night | Darkness with a flashlight, every task type, a 4 rack row | Patrol drones (slide under them), all earlier hazards |
+| 5 | Outage Night | Darkness with a flashlight, every task type, a row of 4 racks | Patrol drones (slide under them), all earlier hazards |
 
 Work order types: hold E to repair a red rack. For a fetch order, run over the
 spare part, then hold E at the rack that shows the part icon. For a diagnose
