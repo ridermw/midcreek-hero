@@ -45,6 +45,9 @@ func run() -> void:
 	var schedule: Array = level.flicker_schedule(3)
 	check(schedule.size() == 3 and schedule[0] >= 6.0 and schedule[0] <= 9.0, "The first flicker comes 6 to 9 s in.")
 	check(schedule == level.flicker_schedule(3), "The flicker schedule is deterministic.")
+	var long_schedule: Array = level.flicker_schedule(80)
+	check(long_schedule.size() == 80 and long_schedule.slice(0, 3) == schedule, "The flicker schedule extends without changing its start.")
+	check(level.flicker_active_at(long_schedule[60] + 0.5), "Flickers keep coming long after the SLA length.")
 	var saw_flicker := false
 	var saw_normal_after := false
 	for i: int in range(int((schedule[0] + 1.5) * 60.0)):

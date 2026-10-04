@@ -162,19 +162,25 @@ func _build_darkness() -> void:
 	light.energy = 1.1
 	light.position = Vector2(0, -40)
 	player.add_child(light)
-	_flicker_times = flicker_schedule(int(float(level["header"]["sla_seconds"]) / 6.0) + 2)
+	_flicker_times = flicker_schedule(4)
+
+
+func flicker_active_at(time: float) -> bool:
+	while _flicker_times.is_empty() or _flicker_times.back() < time:
+		_flicker_times = flicker_schedule(_flicker_times.size() + 8)
+	for start: float in _flicker_times:
+		if start > time:
+			return false
+		if time < start + FLICKER_SECONDS:
+			return true
+	return false
 
 
 func _update_darkness(delta: float) -> void:
 	if darkness == null:
 		return
 	_clock += delta
-	var flickering := false
-	for time: float in _flicker_times:
-		if _clock >= time and _clock < time + FLICKER_SECONDS:
-			flickering = true
-			break
-	darkness.color = FLICKER_COLOR if flickering else DARK_COLOR
+	darkness.color = FLICKER_COLOR if flicker_active_at(_clock) else DARK_COLOR
 
 
 func _build_background(background: String) -> bool:
