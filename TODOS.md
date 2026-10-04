@@ -293,6 +293,31 @@ missing physical device evidence as unresolved.
 capture can start with existing content. Final calibration follows the selected
 geometry, hazards, and tasks; it must not block separating the code contracts.
 
+### Verified increment: independent route timing
+
+- [x] Remove the Python par formula and the Godot formula and par range gates.
+  Keep all five authored par and SLA values unchanged.
+- [x] Use `tests/route_budgets.json` for independent automated timing limits.
+  Each route has a 110 second budget, compared with measured completion times
+  of 93.17, 95.73, 96.22, 97.20, and 99.87 seconds.
+- [x] Require CI completion before the SLA and within the route budget, with
+  no hits, respawns, or runtime errors. Reject missing, duplicate, or invalid
+  completion records. Accept all three ratings independently of route timing.
+- [x] Prove the separation with real physics. Level 3 with a test only par of
+  1 second finishes in 96.22 seconds with one star and no hits. It failed the
+  old formula and range checks, then passed the independent route check.
+- [x] Preserve earned stars and keep score boundary checks separate.
+- [ ] Collect player observations before changing human difficulty targets.
+- [ ] Verify the updated browser smoke assertion in an exported browser.
+
+All five routes passed both the Godot route gate and the full main scene smoke
+checker. The Node touch checks pass. Browser smoke execution and physical device
+measurements remain unresolved; syntax checks do not replace those observations.
+The exported resource check caught diagnostic traces entering the download.
+An explicit `docs/evidence/*` exclusion removed 917752 bytes from the debug
+resource pack. All 46 resource checks now pass. This is not a production
+download budget or a device performance result.
+
 ## NOT in scope
 
 - Reimplementing completed milestones or the delivered guidance and branding.

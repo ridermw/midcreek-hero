@@ -173,13 +173,6 @@ class Layout:
         (root / "levels" / "routes" / f"{slug}.route.json").write_text(route)
 
 
-def par_and_sla(route_seconds, sla_factor=1.6):
-    """The plan's balance rule: par is the route time plus 25 percent, rounded up to 5 s."""
-    par = -(-route_seconds * 1.25 // 5) * 5
-    sla = -(-par * sla_factor // 5) * 5
-    return int(par), int(sla)
-
-
 # Set pieces. Each starts on the floor at column `x` and returns the first free
 # floor column after it, so pieces can be chained without overlapping.
 

@@ -9,6 +9,7 @@ const DT := 1.0 / 60.0
 var checks: int = 0
 var failures: int = 0
 var trace: bool = OS.get_environment("ROUTE_TRACE") == "1"
+var budgets: Dictionary = {}
 
 
 func _initialize() -> void:
@@ -16,6 +17,13 @@ func _initialize() -> void:
 
 
 func run() -> void:
+	var json := JSON.new()
+	var parsed := json.parse(FileAccess.get_file_as_string("res://tests/route_budgets.json")) == OK
+	check(parsed and json.data is Dictionary, "Independent route budgets load.")
+	if not parsed or not json.data is Dictionary:
+		quit(1)
+		return
+	budgets = json.data
 	var files: Array[String] = []
 	for file_name: String in DirAccess.get_files_at(ROUTES):
 		var only := OS.get_environment("ROUTE_ONLY")
@@ -38,6 +46,15 @@ func play(file_name: String) -> void:
 	level.level_path = level_path
 	root.add_child(level)
 	check(level.error_message.is_empty(), file_name + ": " + level.error_message)
+	var par_override := OS.get_environment("ROUTE_PAR_SECONDS")
+	if not par_override.is_empty():
+		var valid := par_override.is_valid_float() and is_finite(float(par_override)) and float(par_override) > 0.0
+		check(valid, "Route par override must be finite and positive.")
+		if not valid:
+			level.queue_free()
+			await process_frame
+			return
+		level.level["header"]["par_seconds"] = float(par_override)
 	if file_name == "01-cold-aisle.route.json":
 		var prompts: Array = level.level["header"]["prompts"]
 		for i: int in range(3):
@@ -46,10 +63,16 @@ func play(file_name: String) -> void:
 	var results: Array[Dictionary] = []
 	level.finished.connect(func(result: Dictionary) -> void: results.append(result))
 	var sla := float(level.level["header"]["sla_seconds"])
+	var budget: Variant = budgets.get(file_name.substr(0, 2))
+	if not (budget is float or budget is int) or not is_finite(float(budget)) or float(budget) <= 0.0:
+		check(false, "Missing or invalid route budget for " + file_name)
+		level.queue_free()
+		await process_frame
+		return
 	var last_hits := 0
 	var last_respawns := 0
 	var frames := 0
-	while results.is_empty() and not runner.failed and frames < int(sla * 60.0) + 600:
+	while results.is_empty() and not runner.failed and frames < int(minf(sla, float(budget)) * 60.0) + 2:
 		var step_index := runner.index
 		runner.apply(level, DT)
 		await physics_frame
@@ -64,19 +87,14 @@ func play(file_name: String) -> void:
 		if runner.done() and frames % 30 == 0 and trace:
 			print("TRACE idle pos=%s" % level.player.position.round())
 	check(not runner.failed, file_name + ": " + runner.error_message)
-	check(results.size() == 1, "%s finishes (stopped at step %d, x=%.0f)." % [file_name, runner.index + 1, level.player.position.x])
+	check(results.size() == 1, "%s finishes before SLA %.2fs and within route budget %.2fs (stopped at step %d, x=%.0f)." % [
+		file_name, sla, float(budget), runner.index + 1, level.player.position.x,
+	])
 	if results.size() == 1:
 		var result := results[0]
 		check(result["respawns"] == 0, "%s finishes without a respawn." % file_name)
 		check(result["elapsed"] < sla, "%s finishes inside the SLA." % file_name)
-		var header: Dictionary = level.level["header"]
-		var par := float(header["par_seconds"])
-		var expected_par := ceilf(float(result["elapsed"]) * 1.25 / 5.0) * 5.0
-		var factor := 1.35 if file_name.begins_with("05-") else 1.6
-		var expected_sla := ceilf(expected_par * factor / 5.0) * 5.0
-		check(par == expected_par, "%s par %.0f follows the rule (expected %.0f)." % [file_name, par, expected_par])
-		check(sla == expected_sla, "%s SLA %.0f follows the rule (expected %.0f)." % [file_name, sla, expected_sla])
-		check(par >= 120.0 and par <= 240.0, "%s par %.0f s is 2 to 4 minutes." % [file_name, par])
+		check(result["elapsed"] <= float(budget), "%s finishes inside its independent route budget." % file_name)
 		check(result["hits"] == 0, "%s finishes without damage." % file_name)
 		print("ROUTE %s elapsed=%.2f hits=%d stars=%d optional=%d/%d" % [
 			file_name, result["elapsed"], result["hits"], result["stars"],

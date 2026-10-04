@@ -252,8 +252,8 @@ repository root to rewrite its files, then run the route test:
     python3 -m tools.levels.level3
     tools/godot_test.sh tests/route_test.gd ROUTE_TEST
 
-Each level has 3 checkpoints, 3 to 6 work orders, and a par of 2 to 4 minutes.
-`tests/route_test.gd` enforces the par range and the par and SLA rule:
+Each level has 3 checkpoints and 3 to 6 work orders. Par and SLA are authored
+human difficulty targets. Their current values remain unchanged:
 
 | Level | Route time | Par | SLA |
 |---|---|---|---|
@@ -264,9 +264,26 @@ Each level has 3 checkpoints, 3 to 6 work orders, and a par of 2 to 4 minutes.
 | 5 Outage Night | 99.9 s | 125 s | 170 s |
 
 `tests/test_level_layouts.py` checks that the scripts reproduce the shipped
-files exactly. Par and SLA follow `layout.par_and_sla`: par is the route time
-plus 25 percent, rounded up to 5 s, and the SLA is par times 1.6 (1.35 for
-level 5).
+files exactly. Change par or SLA only after collecting player observations.
+Changing these targets does not recalculate earned stars.
+
+Automated route timing is separate. `tests/route_budgets.json` assigns each
+route a 110 second completion budget. The baseline routes take 93.17 to
+99.87 seconds, leaving at least 10 seconds of timing margin.
+These budgets are not player targets or device performance measurements.
+Review a budget change when intended geometry or task changes alter a route.
+
+Both the Godot route test and CI require completion within the independent
+budget and before the authored SLA, with no hits, respawns, or runtime errors.
+The smoke checker accepts all three star ratings. Star boundary tests remain
+separate in `tests/sla_timer_test.gd`.
+`tools/check_route_result.py <level-id> <smoke-log>` applies the CI check.
+To verify that par no longer determines route acceptance without changing any
+level file, run:
+
+```sh
+ROUTE_ONLY=03 ROUTE_PAR_SECONDS=1 tools/godot_test.sh tests/route_test.gd ROUTE_TEST
+```
 
 ## Core platformer
 

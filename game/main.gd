@@ -345,7 +345,11 @@ func _on_level_finished(result: Dictionary) -> void:
 
 func _show_results(result: Dictionary) -> void:
 	if smoke:
-		print("SMOKE_RESULT %s stars=%d respawns=%d elapsed=%.2f" % [current_level_id, int(result["stars"]), int(result["respawns"]), float(result["elapsed"])])
+		print("SMOKE_RESULT %s stars=%d respawns=%d elapsed=%.2f hits=%d sla=%.2f" % [
+			current_level_id, int(result["stars"]), int(result["respawns"]),
+			float(result["elapsed"]), int(result["hits"]),
+			float(result["sla_seconds"]),
+		])
 		if quit_after_smoke and not OS.has_feature("web"):
 			_quit_smoke.call_deferred()
 	if smoke and OS.has_feature("web"):
