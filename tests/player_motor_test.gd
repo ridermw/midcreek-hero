@@ -101,6 +101,23 @@ func run() -> void:
 	for i: int in range(40):
 		late.step({}, {"on_floor": true}, DT)
 	check(not late.sliding, "An early press does not extend a slide.")
+	var lander := PlayerMotor.new()
+	lander.step({"slide_pressed": true}, {"on_floor": false}, DT)
+	lander.step({}, {"on_floor": true}, DT)
+	check(not lander.sliding, "A slide pressed in the air does not fire on landing.")
+	var ladder_slider := PlayerMotor.new()
+	ladder_slider.climbing = true
+	ladder_slider.step({"slide_pressed": true}, {"on_floor": false, "on_ladder": true}, DT)
+	ladder_slider.step({}, {"on_floor": true, "on_ladder": false}, DT)
+	check(not ladder_slider.sliding, "A slide pressed while climbing does not fire after the ladder.")
+	var held := PlayerMotor.new()
+	held.step({"slide_pressed": true}, {"on_floor": true}, DT)
+	for i: int in range(24):
+		held.step({}, {"on_floor": true}, DT)
+	held.step({"slide_pressed": true}, {"on_floor": true}, DT)
+	for i: int in range(8):
+		held.step({}, {"on_floor": true, "locked": true}, DT)
+	check(not held.sliding and held.velocity.x == 0.0, "A locked player does not start a chained slide.")
 	var air := PlayerMotor.new()
 	check(not air.step({"slide_pressed": true}, {"on_floor": false}, DT).x == PlayerMotor.SLIDE_SPEED and not air.sliding, "Slide needs the floor.")
 	var wall := PlayerMotor.new()
