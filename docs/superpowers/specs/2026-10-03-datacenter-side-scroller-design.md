@@ -128,14 +128,16 @@ Path: `levels/0N-<slug>.level`. Tile size: 32x32 pixels.
   "music": "level1",
   "background": "cold-aisle",
   "tasks": [
-    {"id": "r1", "type": "repair", "at": ["A"], "required": true}
+    {"id": "r1", "type": "repair", "at": ["A"], "required": true},
+    {"id": "r2", "type": "repair", "at": ["B", "D"], "required": true},
+    {"id": "o1", "type": "repair", "at": ["F"], "required": false}
   ]
 }
 ---
-....................................
-..................A.................
-P.......====..........C.........E...
-####################################
+..............................
+..............................
+P..A..C..s..h..C..B.D..C..F..E
+##############################
 ```
 
 The JSON header comes first, then a `---` line, then the tile grid.

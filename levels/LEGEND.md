@@ -30,3 +30,7 @@ Header keys: `name`, `music`, `background` (strings); `sla_seconds`, `par_second
 `at` (array of anchors), optional `label`, and `part_at` for `fetch`.
 Each task `id` must be a unique string that is not empty. A supplied `label`
 must be a string; an omitted or empty label uses the default task label.
+
+The parser recognizes future terrain symbols, but M0 level validation rejects
+trays (`T`), ladders (`|`), and lifts (`l`) before construction. Their runtime
+mechanics arrive in the milestones listed above.

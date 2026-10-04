@@ -1,6 +1,7 @@
 extends SceneTree
 
 const LevelParser = preload("res://game/level_parser.gd")
+const LevelValidator = preload("res://game/level_validator.gd")
 const VALID_HEADER := {
 	"name": "Fixture",
 	"sla_seconds": 120,
@@ -144,6 +145,9 @@ func run() -> void:
 	var example := spec.get_slice("### Level file format\n", 1).get_slice("```text\n", 1).get_slice("```", 0)
 	var example_level := parser.parse(example, "spec example")
 	check(not example_level.is_empty(), "Spec level example parses: " + parser.error_message)
+	if not example_level.is_empty():
+		var example_errors := LevelValidator.new().validate(example_level)
+		check(example_errors.is_empty(), "Spec level example is playable: " + str(example_errors))
 	print("LEVEL_PARSER_TEST_COMPLETE: %d checks, %d failures" % [checks, failures])
 	quit(1 if failures else 0)
 
