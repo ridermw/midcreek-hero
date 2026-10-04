@@ -161,6 +161,8 @@ func run() -> void:
 	var gpu_header: Dictionary = VALID_HEADER.duplicate(true)
 	gpu_header["tasks"][1]["part"] = "gpu"
 	expect_error(level_text(gpu_header, VALID_GRID), "Fetch task 'f1' part must be psu or dimm.")
+	expect_error(level_text(header_with("darkness", "false"), VALID_GRID), "Header key 'darkness' must be true or false.")
+	check(not parser.parse(level_text(header_with("darkness", false), VALID_GRID), "d.level").is_empty(), "darkness false parses.")
 	print("LEVEL_PARSER_TEST_COMPLETE: %d checks, %d failures" % [checks, failures])
 	quit(1 if failures else 0)
 

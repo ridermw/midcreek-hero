@@ -68,6 +68,12 @@ func play(file_name: String) -> void:
 		var result := results[0]
 		check(result["respawns"] == 0, "%s finishes without a respawn." % file_name)
 		check(result["elapsed"] < sla, "%s finishes inside the SLA." % file_name)
+		if file_name == "05-outage-night.route.json":
+			check(result["hits"] == 0, "The Outage Night route avoids damage with real slide press edges.")
+			var expected_par := ceili(float(result["elapsed"]) * 1.25 / 5.0) * 5
+			var expected_sla := ceili(float(expected_par) * 1.35 / 5.0) * 5
+			check(level.level["header"]["par_seconds"] == expected_par, "Outage Night par follows the measured route formula: %d s." % expected_par)
+			check(sla == expected_sla, "Outage Night SLA follows the measured par formula: %d s." % expected_sla)
 		print("ROUTE %s elapsed=%.2f hits=%d stars=%d optional=%d/%d" % [
 			file_name, result["elapsed"], result["hits"], result["stars"],
 			result["optional_done"], result["optional_total"]

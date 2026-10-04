@@ -31,9 +31,12 @@ Header keys: `name`, `music`, `background` (strings); `sla_seconds`, `par_second
 Each task `id` must be a unique string that is not empty. A supplied `label`
 must be a string; an omitted or empty label uses the default task label.
 
-The parser recognizes future terrain symbols, but M0 level validation rejects
-trays (`T`), ladders (`|`), and lifts (`l`) before construction. Their runtime
-mechanics arrive in the milestones listed above.
+Optional header key `darkness`: a boolean, default `false`. Set it to `true`
+to darken the level, add a flashlight around the player, and briefly dim the
+ambient light during periodic flickers. The HUD stays readable.
+
+Trays (`T`), ladders (`|`), and lifts (`l`) are supported by the parser,
+validation, and runtime.
 
 Optional header key `prompts`: an array of `{"x": <column>, "text": "<hint>"}`.
 The HUD shows the text while the player is within 3 columns of `x`.

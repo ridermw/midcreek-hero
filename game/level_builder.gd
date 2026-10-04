@@ -11,6 +11,7 @@ const CablePort = preload("res://game/entities/cable_port.gd")
 const SparkArc = preload("res://game/hazards/spark_arc.gd")
 const Lift = preload("res://game/entities/lift.gd")
 const SwitchPanel = preload("res://game/entities/switch_panel.gd")
+const Drone = preload("res://game/hazards/drone.gd")
 const Part = preload("res://game/entities/part.gd")
 const RACK_TASKS: Array[String] = ["repair", "diagnose_repair", "fetch"]
 const DELIVER_SECONDS := 0.5
@@ -22,7 +23,7 @@ const SOLID_COLORS := {
 	"platform": Color(0.36, 0.42, 0.47),
 	"tray": Color(0.55, 0.45, 0.2),
 }
-const HAZARD_SCRIPTS := {"cable_snag": CableSnag, "heat_vent": HeatVent, "moving_snag": MovingSnag, "spark_arc": SparkArc}
+const HAZARD_SCRIPTS := {"cable_snag": CableSnag, "heat_vent": HeatVent, "moving_snag": MovingSnag, "spark_arc": SparkArc, "drone": Drone}
 
 var error_message: String = ""
 var art: RefCounted

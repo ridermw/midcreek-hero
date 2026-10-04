@@ -81,6 +81,8 @@ func parse(text: String, source: String) -> Dictionary:
 
 
 func _check_header(header: Dictionary) -> String:
+	if header.has("darkness") and not header["darkness"] is bool:
+		return "Header key 'darkness' must be true or false."
 	for key: String in HEADER_STRINGS:
 		if not header.get(key) is String or String(header[key]).is_empty():
 			return "Header key '%s' must be a non-empty string." % key

@@ -1,0 +1,45 @@
+{
+  "name": "Outage Fixture",
+  "sla_seconds": 120,
+  "par_seconds": 60,
+  "music": "level5",
+  "background": "outage-night",
+  "darkness": true,
+  "tasks": [
+    {
+      "id": "row",
+      "type": "repair",
+      "at": [
+        "A",
+        "B",
+        "D",
+        "F"
+      ],
+      "required": true,
+      "label": "Restore row 9"
+    },
+    {
+      "id": "r1",
+      "type": "repair",
+      "at": [
+        "G"
+      ],
+      "required": true
+    },
+    {
+      "id": "r2",
+      "type": "repair",
+      "at": [
+        "H"
+      ],
+      "required": true
+    }
+  ]
+}
+---
+..............................
+..............................
+..............................
+..............................
+P..C....d...G..C.A.B.D.F.CH.E.
+##############################
