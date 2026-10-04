@@ -159,6 +159,11 @@ def normalize(variant, clip):
         if bounds is None or position[1] + bounds[1] < 1 or position[1] + bounds[3] >= 208:
             raise ValueError(f"{source}: frame {index} cannot fit without clipping")
         frame.alpha_composite(scaled, position)
+        if clip == "climb":
+            try:
+                frame = align_climb(frame)
+            except ValueError as error:
+                raise ValueError(f"{source}: frame {index}: {error}") from error
         frames.append(frame)
     samples = [pixel[:3] for frame in frames for pixel in frame.getdata() if pixel[3]]
     palette_source = Image.new("RGB", (256, (len(samples) + 255) // 256), samples[0])
@@ -174,6 +179,47 @@ def normalize(variant, clip):
         hashes.append(hashlib.sha256(result.tobytes()).hexdigest())
     if len(set(hashes)) != count:
         raise ValueError(f"{source}: duplicate authored frames")
+    write_frames(variant, clip, results)
+    print(f"Normalized {variant}/{clip}: {count} distinct transparent frames")
+
+
+def align_climb(frame):
+    # The fixed blue hard hat anchors the ladder pose; raised arms change its full bounds.
+    blue = set()
+    for y in range(85):
+        for x in range(frame.width):
+            r, g, b, a = frame.getpixel((x, y))
+            if a and b > 110 and b > r * 2 and b - g > 60:
+                blue.add((x, y))
+    regions = []
+    while blue:
+        pending = [blue.pop()]
+        region = []
+        while pending:
+            x, y = pending.pop()
+            region.append((x, y))
+            for dx, dy in ((-1, 0), (1, 0), (0, -1), (0, 1)):
+                neighbor = (x + dx, y + dy)
+                if neighbor in blue:
+                    blue.remove(neighbor)
+                    pending.append(neighbor)
+        if len(region) >= 16:
+            regions.append(region)
+    if not regions:
+        raise ValueError("Climb frame has no visible blue hard hat alignment anchor")
+    region = min(regions, key=lambda points: min(y for _, y in points))
+    hat = [x for x, _ in region]
+    offset = 104 - sorted(hat)[len(hat) // 2]
+    left, _, right, _ = frame.getbbox()
+    if left + offset < 0 or right + offset > frame.width:
+        raise ValueError("Climb frame cannot align without clipping")
+    aligned = Image.new("RGBA", frame.size)
+    aligned.paste(frame, (offset, 0))
+    return aligned
+
+
+def write_frames(variant, clip, results):
+    _, columns, _ = configuration(variant, clip)
     output = ART / "frames" / variant / clip
     output.mkdir(parents=True, exist_ok=True)
     paths = []
@@ -196,7 +242,6 @@ def normalize(variant, clip):
         animated.append(background.resize((416, 416), Image.Resampling.NEAREST).convert("RGB"))
     animated[0].save(preview_dir / f"{clip}.gif", save_all=True, append_images=animated[1:],
                      duration=round(1000 / FPS[CLIPS.index(clip)]), loop=0)
-    print(f"Normalized {variant}/{clip}: {count} distinct transparent frames")
 
 
 def manifest():
