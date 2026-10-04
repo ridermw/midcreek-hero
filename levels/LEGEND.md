@@ -28,3 +28,5 @@ directly above a solid cell. A rack drawn at an anchor stands behind the player.
 Header keys: `name`, `music`, `background` (strings); `sla_seconds`, `par_seconds`
 (numbers, `0 < par < sla`); `tasks` (array). Task keys: `id`, `type`, `required`,
 `at` (array of anchors), optional `label`, and `part_at` for `fetch`.
+Each task `id` must be a unique string that is not empty. A supplied `label`
+must be a string; an omitted or empty label uses the default task label.
