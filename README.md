@@ -212,7 +212,9 @@ including sparse artwork that disappears when its alpha is thresholded.
 It validates the entire sequence before replacing previously normalized frames.
 
 Technician clips: idle, walk, run, jump, slide, primary, secondary, reaction,
-and signal for the man and the woman.
+signal, and climb for the man and the woman. Climb is drawn from behind with
+alternating hands and feet; it plays while the technician moves on a ladder and
+holds its pose while the technician stops on one.
 
     python3 tools/animation_assets.py render --variant woman-midcreek --clip jump
     python3 tools/animation_assets.py normalize --variant woman-midcreek --clip jump

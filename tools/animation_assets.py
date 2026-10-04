@@ -11,9 +11,10 @@ from PIL import Image
 ROOT = Path(__file__).resolve().parents[1]
 ART = ROOT / "art/cel-shift/animations"
 VARIANTS = ("man-midcreek", "woman-midcreek")
-CLIPS = ("idle", "walk", "run", "jump", "slide", "primary", "secondary", "reaction", "signal")
-FPS = (6, 10, 14, 10, 12, 10, 10, 10, 8)
-NORMAL_COUNTS = (6, 8, 8, 6, 4, 6, 8, 4, 6)
+CLIPS = ("idle", "walk", "run", "jump", "slide", "primary", "secondary", "reaction", "signal", "climb")
+LOOPING = ("idle", "walk", "run", "climb")
+FPS = (6, 10, 14, 10, 12, 10, 10, 10, 8, 8)
+NORMAL_COUNTS = (6, 8, 8, 6, 4, 6, 8, 4, 6, 6)
 NORMAL_POSES = {
     "idle": "Small breathing loop, hands relaxed or resting near tool belt. Six phases: neutral, inhale begins, chest rises, inhale peak, exhale, near-neutral returning seamlessly to first. Keep planted feet absolutely stationary.",
     "walk": "Eight-frame RIGHT-FACING PROFILE walk loop: 1 left leg forward/right back contact, 2 weight sinks onto left heel, 3 right leg passes under hips while left supports, 4 rise over left toe/right reaches forward, 5 right forward/left back contact, 6 sink on right heel, 7 left passes under hips while right supports, 8 rise over right toe/left reaches forward. Arms swing opposite legs. Feet alternate, torso remains stable. Every phase differs. Hands empty, tools on belt.",
@@ -23,6 +24,7 @@ NORMAL_POSES = {
     "primary": "Six-frame RIGHT-FACING working reach with short real ratchet: 1 hand goes to belt, 2 lifts small ratchet, 3 extends arm toward imaginary fastener at chest height, 4 tightens through short arc, 5 eases back, 6 returns near belt. Other hand steadies naturally. No rack in sprite. Tool shorter than forearm; no blades, shields or trails.",
     "secondary": "Eight-frame RIGHT-FACING multimeter test: 1 take compact meter from belt, 2 hold meter at waist, 3 extend test probe toward right, 4 contact/hold, 5 look down at meter, 6 lift probe clear, 7 retract lead, 8 lower meter. Thin red/black test cable hangs DOWN under gravity. Blank tiny screen. No glow, spell, floating cable or UI.",
     "reaction": "Four-frame RIGHT-FACING startled braced reaction: 1 surprise/flinch, 2 knees bend and forearm raises to protect face, 3 hold low with both feet planted, 4 relax back. Empty hands, no shield or panel, no sparks. Never kneel.",
+    "climb": "Six-frame BACK VIEW ladder climb loop: the character is seen from directly behind, facing away from the viewer, climbing an invisible vertical ladder. Back of the hard hat, back of the hi-vis vest with its silver bands, tool belt at the waist. 1 right hand reaches high and left knee lifts, 2 right hand grips while the body rises, 3 hands level at shoulder height with feet together, 4 left hand reaches high and right knee lifts, 5 left hand grips while the body rises, 6 hands level again with feet together. Hands and feet alternate. Arms bent at the elbows, palms gripping empty air where rungs would be. Do not draw the ladder, rungs or rails. Body centered, not leaning sideways. The lowest boot stays on the baseline.",
     "signal": "Six-frame coworker signal: 1 neutral, 2 right elbow lifts, 3 right hand reaches overhead open palm, 4 small wave, 5 hand lowers, 6 back to neutral. Empty raised hand. No raised tool or weapon.",
 }
 
@@ -42,6 +44,11 @@ def prompt_text(variant, clip):
         "MAN: clean-shaven, short dark hair below blue hard hat; long slate sleeves to wrists, roomy straight blue jeans. No beard or moustache."
     )
     phases = NORMAL_POSES[clip]
+    facing = (
+        "Camera/facing stays consistent. BACK VIEW in every frame, seen from directly\nbehind; do not turn the character to the side or toward the viewer."
+        if clip == "climb" else
+        "Camera/facing stays consistent. Right-facing profile for locomotion; do not\nalternate front and back views or rotate the character through the cycle."
+    )
     hair_guidance = " Ponytail mass stays consistent." if woman else ""
     mode = "NORMAL REAL-WORLD technician: ordinary hand tools only. NO sword, shield, rack panel, magic, spell, glowing trail or combat armor."
     return f"""---
@@ -70,8 +77,7 @@ y=448, standing figure including hat approximately 270 pixels tall. All painted
 pixels, including effects/tools/hair, must remain inside x=64..448 and y=96..480.
 Character anatomy is drawn at the SAME scale in every frame; don't resize each pose
 to fill the cell. Foot position may change through stride but the floor is fixed.
-Camera/facing stays consistent. Right-facing profile for locomotion; do not
-alternate front and back views or rotate the character through the cycle.
+{facing}
 
 FRAME BREAKDOWN:
 {phases}
@@ -202,7 +208,7 @@ def manifest():
             paths = [f"frames/{variant}/{clip}/{n:02d}.png" for n in range(count)]
             if not all((ART / p).is_file() for p in paths):
                 continue
-            animations[clip] = {"fps": FPS[i], "loop": clip in ("idle", "walk", "run"), "frames": paths}
+            animations[clip] = {"fps": FPS[i], "loop": clip in LOOPING, "frames": paths}
         if animations:
             result["variants"][variant] = {"animations": animations}
     (ART / "manifest.json").write_text(json.dumps(result, indent=2) + "\n")

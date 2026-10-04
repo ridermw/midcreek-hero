@@ -46,13 +46,16 @@ class AssetPipelineTest(unittest.TestCase):
         self.assertNotIn("art/cel-shift/environment/layers/*", excludes)
 
     def test_clip_tables_cover_platformer_moves(self):
-        expected = ("idle", "walk", "run", "jump", "slide", "primary", "secondary", "reaction", "signal")
+        expected = ("idle", "walk", "run", "jump", "slide", "primary", "secondary", "reaction", "signal", "climb")
         self.assertEqual(animation_assets.CLIPS, expected)
-        self.assertEqual(animation_assets.NORMAL_COUNTS, (6, 8, 8, 6, 4, 6, 8, 4, 6))
+        self.assertEqual(animation_assets.NORMAL_COUNTS, (6, 8, 8, 6, 4, 6, 8, 4, 6, 6))
+        self.assertEqual(animation_assets.LOOPING, ("idle", "walk", "run", "climb"))
+        self.assertIn("BACK VIEW", animation_assets.NORMAL_POSES["climb"])
         self.assertEqual(len(animation_assets.FPS), len(expected))
         self.assertEqual(set(animation_assets.NORMAL_POSES), set(expected))
         library = (ROOT / "game/animation_library.gd").read_text()
-        self.assertIn("const FRAME_COUNTS: Array[int] = [6, 8, 8, 6, 4, 6, 8, 4, 6]", library)
+        self.assertIn("const FRAME_COUNTS: Array[int] = [6, 8, 8, 6, 4, 6, 8, 4, 6, 6]", library)
+        self.assertIn('const LOOPING: Array[StringName] = [&"idle", &"walk", &"run", &"climb"]', library)
         for clip in expected:
             self.assertIn(f'\t&"{clip}",', library)
 

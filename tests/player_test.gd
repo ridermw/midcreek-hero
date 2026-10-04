@@ -90,6 +90,24 @@ func run() -> void:
 	check(Player.choose_clip(true, Vector2(180, 0), false, false, &"") == &"run", "Full speed shows run.")
 	check(Player.choose_clip(true, Vector2(60, 0), false, false, &"") == &"walk", "Low speed shows walk.")
 	check(Player.choose_clip(true, Vector2(5, 0), false, false, &"") == &"idle", "Standing shows idle.")
+	check(Player.choose_clip(false, Vector2(0, -90), false, false, &"", true) == &"climb", "Climbing shows climb.")
+	check(Player.choose_clip(false, Vector2.ZERO, false, false, &"", true) == &"climb", "Holding a ladder still shows climb.")
+	check(Player.choose_clip(false, Vector2(0, -90), false, true, &"", true) == &"reaction", "A hit on a ladder shows reaction.")
+	var library := preload("res://game/animation_library.gd").new()
+	if library.load_manifest():
+		player.configure(library)
+		player.motor.climbing = true
+		player.velocity = Vector2(0, -90)
+		player.motor.facing = -1.0
+		player.update_animation()
+		check(player.sprite.animation == &"climb" and player.sprite.is_playing(), "Moving on a ladder plays the climb clip.")
+		check(not player.sprite.flip_h, "The climb clip never mirrors.")
+		player.velocity = Vector2.ZERO
+		player.update_animation()
+		check(player.sprite.animation == &"climb" and not player.sprite.is_playing(), "A still climber holds the climb pose.")
+		player.motor.climbing = false
+	else:
+		check(false, "Animation manifest loads: " + library.error_message)
 	player.hurt()
 	check(player.hurt_remaining > 0.0, "hurt starts the reaction timer.")
 	check(player.has_node("Sprite") and not player.has_node("Body"), "The player draws an animated sprite.")
@@ -121,10 +139,10 @@ func run() -> void:
 	for motion: Vector2 in [Vector2(90, 0), Vector2(-90, 0), Vector2(0, -90), Vector2(0, 90)]:
 		player.velocity = motion
 		player.update_animation()
-		check(player.sprite.animation == &"walk", "Ladder movement animates in every direction: %s" % motion)
+		check(player.sprite.animation == &"climb" and player.sprite.is_playing(), "Ladder movement plays the climb clip in every direction: %s" % motion)
 	player.velocity = Vector2.ZERO
 	player.update_animation()
-	check(player.sprite.animation == &"idle", "A stationary climber uses the idle animation.")
+	check(player.sprite.animation == &"climb" and not player.sprite.is_playing(), "A stationary climber holds the climb pose.")
 	player.queue_free()
 	floor_body.queue_free()
 	await process_frame
