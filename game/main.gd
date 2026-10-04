@@ -5,6 +5,7 @@ const SaveStore = preload("res://game/save_store.gd")
 const SpriteLibrary = preload("res://game/sprite_library.gd")
 const HeroAnimations = preload("res://game/animation_library.gd")
 const UiKit = preload("res://game/menus/ui_kit.gd")
+const AudioDirector = preload("res://game/audio_director.gd")
 const LEVEL_SCENE := preload("res://game/level.tscn")
 const LEVEL_DIR := "res://levels/"
 const SCREENS := {
@@ -25,6 +26,8 @@ var current_level_id: String = ""
 var pause_menu: CanvasLayer
 var _pause_first: Button
 var error_message: String = ""
+var audio: AudioDirector
+var last_sfx: String = ""
 var _level_files: Dictionary = {}
 var _level_names: Dictionary = {}
 
@@ -34,6 +37,12 @@ func _ready() -> void:
 	InputSetup.install()
 	save = SaveStore.new(save_path)
 	save.load_data()
+	audio = AudioDirector.new()
+	audio.name = "Audio"
+	add_child(audio)
+	audio.set_bus_volume("Music", float(save.settings["music_volume"]))
+	audio.set_bus_volume("SFX", float(save.settings["sfx_volume"]))
+	get_viewport().gui_focus_changed.connect(func(_control: Control) -> void: play_sfx("menu_move"))
 	if not art.load_all() or not animations.load_manifest():
 		error_message = art.error_message if not art.error_message.is_empty() else animations.error_message
 		add_child(UiKit.label(error_message, 20))
@@ -41,6 +50,15 @@ func _ready() -> void:
 	_scan_levels()
 	_build_pause_menu()
 	go_to("title")
+
+
+func music_name() -> String:
+	return audio.current_music if audio.unlocked else audio.pending_music
+
+
+func play_sfx(sound_name: String) -> void:
+	last_sfx = sound_name
+	audio.play_sfx(sound_name)
 
 
 func level_ids() -> Array[String]:
@@ -82,6 +100,7 @@ func go_to(target: String, data: Dictionary = {}) -> void:
 		level.character = save.character
 		level.process_mode = Node.PROCESS_MODE_PAUSABLE
 		level.finished.connect(_on_level_finished)
+		level.sound.connect(play_sfx)
 		screen = level
 	else:
 		var control := Control.new()
@@ -91,8 +110,15 @@ func go_to(target: String, data: Dictionary = {}) -> void:
 	move_child(screen, 0)
 	if target == "results":
 		screen.build(self, data)
-	elif target != "level":
+		audio.play_music("results")
+	elif target == "level":
+		if screen.error_message.is_empty():
+			audio.play_music(String(screen.level["header"]["music"]))
+	else:
 		screen.build(self)
+		audio.play_music("title")
+	for button: Node in screen.find_children("*", "Button", true, false):
+		(button as Button).pressed.connect(play_sfx.bind("menu_select"))
 
 
 func choose_character(character: String) -> void:

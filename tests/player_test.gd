@@ -45,13 +45,17 @@ func run() -> void:
 	player.input_override = {"direction": 1.0}
 	await frames(30)
 	check(player.position.x > 150.0, "Player runs right.")
+	var player_sounds: Array[String] = []
+	player.sound.connect(func(sound_name: String) -> void: player_sounds.append(sound_name))
 	player.input_override = {"direction": 1.0, "jump_pressed": true, "jump_held": true}
 	await frames(5)
+	check(player_sounds == ["jump"], "Jumping plays the jump sound.")
 	check(player.position.y < 300.0 and not player.is_on_floor(), "Player jumps.")
 	check(not player.input_override.has("jump_pressed"), "jump_pressed lasts one frame.")
 	player.input_override = {}
 	await frames(90)
 	check(player.is_on_floor(), "Player lands after the jump.")
+	check("land" in player_sounds, "Landing plays the land sound.")
 	player.input_override = {"direction": 1.0}
 	player.locked = true
 	await frames(20)

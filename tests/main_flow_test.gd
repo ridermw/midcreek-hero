@@ -20,6 +20,8 @@ func run() -> void:
 	await process_frame
 	check(InputMap.has_action(&"jump") and InputMap.has_action(&"pause"), "main installs input actions.")
 	check(main.screen_name == "title", "The game starts on the title screen.")
+	check(main.audio != null and main.audio.get_parent() == main, "main owns one audio director.")
+	check(main.music_name() == "title", "The title screen asks for title music.")
 	check(main.get_viewport().gui_get_focus_owner() != null, "The title screen focuses a button.")
 	main.go_to("character_select")
 	await process_frame
@@ -35,6 +37,9 @@ func run() -> void:
 	main.start_level("01")
 	await process_frame
 	check(main.screen_name == "level", "Starting a level opens it.")
+	check(main.music_name() == "level1", "The level asks for its own music.")
+	main.screen.sound.emit("jump")
+	check(main.last_sfx == "jump", "Level sounds reach the audio director.")
 	check(main.screen.level_path.ends_with("01-cold-aisle.level") and main.screen.character == "woman", "The level gets its file and character.")
 	main.toggle_pause()
 	check(paused and main.pause_menu.visible, "Pause stops the tree and shows the menu.")
@@ -43,6 +48,7 @@ func run() -> void:
 	main.screen.finished.emit({"elapsed": 40.0, "hits": 0, "respawns": 0, "stars": 3, "optional_done": 1, "optional_total": 1})
 	await process_frame
 	check(main.screen_name == "results", "Finishing a level opens results.")
+	check(main.music_name() == "results", "Results ask for results music.")
 	check(main.save.stars("01") == 3 and main.save.is_unlocked("02"), "Results are saved and unlock the next level.")
 	check(main.screen.stars == 3, "Results show the earned stars.")
 	var reloaded := preload("res://game/save_store.gd").new(SAVE_PATH)
@@ -52,7 +58,8 @@ func run() -> void:
 	await process_frame
 	check(main.screen_name == "level_select", "Results return to level select.")
 	main.queue_free()
-	await process_frame
+	for i: int in range(4):
+		await process_frame
 	DirAccess.remove_absolute(SAVE_PATH)
 	print("MAIN_FLOW_TEST_COMPLETE: %d checks, %d failures" % [checks, failures])
 	quit(1 if failures else 0)

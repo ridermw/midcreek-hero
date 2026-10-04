@@ -38,6 +38,8 @@ func run() -> void:
 	level.use_action_override = true
 	var results: Array[Dictionary] = []
 	level.finished.connect(func(result: Dictionary) -> void: results.append(result))
+	var sounds: Array[String] = []
+	level.sound.connect(func(sound_name: String) -> void: sounds.append(sound_name))
 	check(level.error_message.is_empty() and level.tasks.entries().size() == 3, "Fixture loads.")
 	check(level.player.position == Vector2(16, 96) and level.timer.remaining == 120.0, "Player and timer start.")
 	check(level.player.sprite.sprite_frames != null, "The player has animation frames.")
@@ -50,6 +52,7 @@ func run() -> void:
 	level.step(DT)
 	check(level.hud.prompt_label.text == "", "Level prompts hide away from their column.")
 	check(level.health.segments == 4 and level.health.hits_taken == 1, "A cable snag removes 1 segment.")
+	check("hit" in sounds, "A hit plays the hit sound.")
 	at(Vector2i(12, 2))
 	level.step(DT)
 	check(level.health.segments == 5 and level.entities["coolant"][0].taken, "Coolant restores 1 segment.")
@@ -59,12 +62,14 @@ func run() -> void:
 	check(level.player.locked and level.player.action == &"primary", "Holding repair locks the player.")
 	run_for(2.1)
 	check(level.tasks.is_done("r1"), "2 s of repair completes the task.")
+	check("repair_tick" in sounds and "repair_done" in sounds, "Repair plays tick and done sounds.")
 	level.action_override = {}
 	level.step(DT)
 	check(not level.player.locked, "Releasing repair unlocks the player.")
 	at(Vector2i(6, 2))
 	level.step(DT)
 	check(level.checkpoints.index == 0 and level.entities["checkpoints"][0].reached, "Checkpoint 1 activates.")
+	check("checkpoint" in sounds, "A checkpoint plays its sound.")
 	at(Vector2i(15, 2))
 	level.step(DT)
 	check(level.checkpoints.index == 1, "Checkpoint 2 activates.")
@@ -96,6 +101,7 @@ func run() -> void:
 	at(Vector2i(29, 2))
 	level.step(DT)
 	check(level.completed and results.size() == 1, "Standing at the open exit finishes the level.")
+	check("door_open" in sounds and "win" in sounds and "fail" in sounds and "heal" in sounds, "Exit, win, fail, and heal sounds play.")
 	check(
 		results[0]["stars"] == 2 and results[0]["respawns"] == 2 and results[0]["hits"] == 6,
 		"Under par with 6 hits gives 2 stars.",

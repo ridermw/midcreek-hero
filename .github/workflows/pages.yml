@@ -27,6 +27,7 @@ jobs:
         run: |
           python3 -m pip install -r tools/requirements.txt
           python3 -m unittest discover -s tests -p 'test_*.py'
+          python3 tools/audio_assets.py check
 
       - name: Install official Godot and web export templates
         shell: bash
