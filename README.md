@@ -19,6 +19,7 @@ Open `project.godot` in Godot and press F5, or export and preview in a browser:
 godot --headless --editor --path . --import
 mkdir -p build/web
 godot --headless --path . --export-release Web build/web/index.html
+cp web/mobile.js web/mobile.css build/web/
 python3 -m http.server 18765 --bind 127.0.0.1 --directory build/web
 ```
 
@@ -122,6 +123,52 @@ reaches zero, then reach the exit door.
 | Repair (hold) | E | X |
 | Diagnose | Q | Y |
 | Pause | Escape or P | Start |
+
+### Phone touchscreen
+
+The web build adds touch controls on phones with a coarse pointer and touch
+support. Detection uses the screen size, not the browser name. The short
+screen edge must be at most 600 CSS pixels. The long edge must be at most
+1000 CSS pixels. Desktop windows and touch laptops keep the existing interface.
+Detection runs at page load.
+
+Menus and volume sliders work in either orientation. Rotate the phone to
+landscape for gameplay. Use Left and Right to run, Up and Down to climb, and
+Jump and Slide for movement. Hold Repair at a rack. Use Diagnose when prompted.
+Cable sequences show Repair, Diagnose, or Jump. Use Repair at each numbered
+switch in order. Multiple fingers can hold different controls at the same time.
+
+Controls stay outside the game image and inside the screen safe area.
+Pause shows the work order list, Resume, Restart work order, and Quit to level
+select. Portrait rotation and loss of browser focus pause gameplay. Resume
+explicitly after returning to landscape. Cancellation and screen changes clear
+touch input without releasing physical keyboard input.
+Screen reader activation toggles held movement and Repair. Activate the same
+control again to release it. Other actions remain single presses.
+
+Run the touch regression tests:
+
+```sh
+node --test tests/mobile_web_test.cjs
+tools/godot_test.sh tests/mobile_input_test.gd MOBILE_INPUT_TEST
+tools/godot_test.sh tests/mobile_bridge_test.gd MOBILE_BRIDGE_TEST
+```
+
+For rendered browser checks, open the local export in a dedicated
+`agent-browser` session. Get that session's endpoint with
+`agent-browser get cdp-url`. The test uses Chrome DevTools Protocol (CDP) to
+send touch events through that same browser. It also checks desktop detection
+and captures desktop keyboard gameplay. Supply an evidence directory:
+
+```sh
+node tests/mobile_browser_test.mjs <cdp-websocket-url> http://127.0.0.1:18765/ <evidence-directory>
+```
+
+Add `--smoke` to play the first recorded route through the exported game and
+check the mobile results screen. This adds about 100 seconds.
+
+This is emulated phone testing. It does not replace physical iPhone or Android
+testing. Native mobile exports are not part of this feature.
 
 ## Levels
 

@@ -1,5 +1,7 @@
 extends Node2D
 
+var mobile_input: RefCounted
+
 signal finished(result: Dictionary)
 signal sound(sound_name: String)
 
@@ -78,6 +80,7 @@ var _clock: float = 0.0
 
 
 func _ready() -> void:
+	player.mobile_input = mobile_input
 	InputSetup.install()
 	if not load_level(level_path):
 		hud.show_message(error_message)
@@ -352,7 +355,7 @@ func restore_state(state: Dictionary) -> void:
 func _action_held(action: StringName) -> bool:
 	if use_action_override:
 		return bool(action_override.get(action, false))
-	return Input.is_action_pressed(action)
+	return Input.is_action_pressed(action) or (mobile_input != null and mobile_input.held(action))
 
 
 func _sample_actions() -> void:
@@ -374,7 +377,7 @@ func _action_pressed(action: StringName) -> bool:
 		return true
 	if use_action_override:
 		return _pressed_actions.get(action, false)
-	return Input.is_action_just_pressed(action)
+	return Input.is_action_just_pressed(action) or (mobile_input != null and mobile_input.pressed(action))
 
 
 func _update_switches(feet: Vector2) -> bool:

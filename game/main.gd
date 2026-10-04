@@ -7,6 +7,7 @@ const HeroAnimations = preload("res://game/animation_library.gd")
 const UiKit = preload("res://game/menus/ui_kit.gd")
 const AudioDirector = preload("res://game/audio_director.gd")
 const RouteRunner = preload("res://game/route_runner.gd")
+const MobileBridge = preload("res://game/mobile_bridge.gd")
 const LEVEL_SCENE := preload("res://game/level.tscn")
 const LEVEL_DIR := "res://levels/"
 const SCREENS := {
@@ -37,6 +38,7 @@ var _smoke_report: float = 0.0
 var _master_was_muted: bool = false
 var _level_files: Dictionary = {}
 var _level_names: Dictionary = {}
+var mobile: Node
 
 
 func _ready() -> void:
@@ -49,6 +51,9 @@ func _ready() -> void:
 	add_child(audio)
 	audio.set_bus_volume("Music", float(save.settings["music_volume"]))
 	audio.set_bus_volume("SFX", float(save.settings["sfx_volume"]))
+	mobile = MobileBridge.new()
+	mobile.main = self
+	add_child(mobile)
 	get_viewport().gui_focus_changed.connect(func(_control: Control) -> void: play_sfx("menu_move"))
 	if not art.load_all() or not animations.load_manifest():
 		error_message = art.error_message if not art.error_message.is_empty() else animations.error_message
@@ -170,6 +175,7 @@ func next_playable(level_id: String) -> String:
 
 
 func go_to(target: String, data: Dictionary = {}) -> void:
+	mobile.invalidate()
 	if target != "level":
 		_end_smoke()
 	get_tree().paused = false
@@ -184,6 +190,7 @@ func go_to(target: String, data: Dictionary = {}) -> void:
 		level.level_path = _level_files[current_level_id]
 		level.character = save.character
 		level.process_mode = Node.PROCESS_MODE_PAUSABLE
+		level.mobile_input = mobile.input
 		level.finished.connect(_on_level_finished)
 		level.sound.connect(play_sfx)
 		screen = level
@@ -198,6 +205,7 @@ func go_to(target: String, data: Dictionary = {}) -> void:
 		audio.play_music("results")
 	elif target == "level":
 		if screen.error_message.is_empty():
+			screen.hud.prompt_label.visible = not mobile.enabled
 			audio.play_music(String(screen.level["header"]["music"]))
 	else:
 		screen.build(self)
@@ -220,6 +228,7 @@ func start_level(level_id: String) -> void:
 func toggle_pause() -> void:
 	if screen_name != "level":
 		return
+	mobile.invalidate()
 	var pausing := not get_tree().paused
 	get_tree().paused = pausing
 	pause_menu.visible = pausing

@@ -26,6 +26,7 @@ var _pending_jump: bool = false
 var _pending_slide: bool = false
 var _shape: RectangleShape2D
 var _suppress_landing: bool = true
+var mobile_input: RefCounted
 
 @onready var sprite: AnimatedSprite2D = $Sprite
 @onready var collision: CollisionShape2D = $Collision
@@ -72,12 +73,18 @@ func read_input() -> Dictionary:
 		input_override.erase("jump_pressed")
 		return current
 	return {
-		"direction": Input.get_axis(&"move_left", &"move_right"),
-		"vertical": Input.get_axis(&"move_up", &"move_down"),
-		"jump_pressed": Input.is_action_just_pressed(&"jump"),
-		"jump_held": Input.is_action_pressed(&"jump"),
-		"slide_pressed": Input.is_action_just_pressed(&"slide"),
+		"direction": clampf(Input.get_axis(&"move_left", &"move_right") + _touch_axis(&"move_left", &"move_right"), -1.0, 1.0),
+		"vertical": clampf(Input.get_axis(&"move_up", &"move_down") + _touch_axis(&"move_up", &"move_down"), -1.0, 1.0),
+		"jump_pressed": Input.is_action_just_pressed(&"jump") or (mobile_input != null and mobile_input.pressed(&"jump")),
+		"jump_held": Input.is_action_pressed(&"jump") or (mobile_input != null and mobile_input.held(&"jump")),
+		"slide_pressed": Input.is_action_just_pressed(&"slide") or (mobile_input != null and mobile_input.pressed(&"slide")),
 	}
+
+
+func _touch_axis(negative: StringName, positive: StringName) -> float:
+	if mobile_input == null:
+		return 0.0
+	return float(mobile_input.held(positive)) - float(mobile_input.held(negative))
 
 
 func body_height() -> float:

@@ -294,3 +294,54 @@ Each level milestone delivers these items. The subplan gives exact names.
 - [ ] `audio/LICENSES.md` covers every audio file. All entries are CC0.
 - [ ] All Python and Godot tests pass in CI.
 - [ ] README describes play, controls, tests, and provenance.
+
+## Mobile touch interface handoff
+
+This separate effort starts from completed M0 to M7 on `main` at `ff1bcc2`.
+It does not authorize a merge. Ask the coordinator before integration.
+
+The browser shell detects touch support, a coarse pointer, and phone screen
+dimensions. It does not use a user agent string. Desktop uses the same canvas
+resize policy and existing Godot menus. Phone menus expose the actual Godot
+Button and HSlider controls through `game/mobile_bridge.gd`. Menu commands
+include a revision so a command from a replaced screen cannot activate a
+different control.
+If startup fails before a screen exists, the mobile menu shows the original
+startup error with no active controls.
+
+`game/mobile_input.gd` holds mobile state separately from physical input.
+It retains short taps until the next physics frame. All consumers can read
+the same frame edge. The player and task controller combine this state with
+their existing input. Recorded routes retain their existing override path.
+
+`web/mobile.js` owns pointers, browser lifecycle events, audio activation,
+menu rendering, and phone layout. `web/mobile.css` reserves space around a
+4:3 canvas and respects safe area insets. Portrait gameplay pauses rather
+than changing level geometry. Browser menus remain scrollable. Gameplay
+controls prevent scrolling and release on cancellation, lost capture,
+orientation changes, focus loss, page hiding, and screen changes.
+Pointer contacts remain tracked while a finger crosses a gap between buttons.
+Actual orientation angle changes clear holds, including a 180 degree turn.
+Unchanged status text does not replace live region text nodes.
+
+The export uses `web/shell.html`. Copy `web/mobile.js` and `web/mobile.css`
+beside the exported HTML. The Pages workflow and README include this step.
+The shell changes the canvas resize policy only when phone detection passes.
+
+Validation commands are in the README. The Godot tests exercise the actual
+menu callbacks, volume persistence, cable sequences, diagnosis, repair,
+part delivery, ordered switches, and physical input isolation. The browser
+test uses a dedicated agent-browser Chrome session plus CDP touch emulation.
+It captures phone screens and desktop keyboard gameplay. Do not label this
+evidence as physical phone testing.
+
+Verified on 2026-10-04: 52 Python tests, all Godot test scripts through the
+repository runner, 11 mobile input checks, 41 mobile bridge checks, and
+40 exported resource checks passed. The browser run exercised real emulated
+touch events, simultaneous movement and jump, cancellation, audio activation,
+menu error visibility, assistive hold activation, and resize focus retention.
+It checked phone sizes of 390x844, 844x390, 667x375 with a simulated notch,
+and 568x320. Desktop keyboard navigation reached gameplay at 960x720.
+The exported first route reached mobile results with 3 stars and no hits.
+Screenshots are in `docs/mobile/` and are excluded from the game export.
+Physical phone testing and approval to merge remain outside this verification.

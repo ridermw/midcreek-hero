@@ -25,6 +25,7 @@ jobs:
 
       - name: Check asset pipeline contracts
         run: |
+          node --test tests/mobile_web_test.cjs
           sudo apt-get update
           sudo apt-get install --yes ffmpeg
           python3 -m pip install -r tools/requirements.txt
@@ -82,6 +83,9 @@ jobs:
           test -s build/web/index.html
           test -s build/web/index.pck
           test -s build/web/index.wasm
+          cp web/mobile.js web/mobile.css build/web/
+          test -s build/web/mobile.js
+          test -s build/web/mobile.css
           touch build/web/.nojekyll
 
       - name: Check exported runtime resources
