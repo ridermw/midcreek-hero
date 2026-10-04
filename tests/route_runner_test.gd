@@ -60,6 +60,22 @@ func run() -> void:
 	for i: int in range(10):
 		stuck.apply(level, DT)
 	check(stuck.failed and stuck.error_message.contains("step 1"), "until_x fails after max_seconds.")
+	var climb := RouteRunner.new([{"hold": ["move_up", "move_right"], "seconds": 0.1}, {"tap": "jump"}, {"hold": ["slide"], "seconds": 0.1}])
+	climb.apply(level, DT)
+	check(level.player.input_override.get("vertical") == -1.0 and level.player.input_override.get("direction") == 1.0, "move_up sets vertical -1.")
+	for i: int in range(6):
+		climb.apply(level, DT)
+	check(level.action_override.get(&"jump") == true, "A jump tap is also an action press for reseats.")
+	climb.apply(level, DT)
+	check(level.player.input_override.get("slide_pressed") == true, "slide sets slide_pressed.")
+	check(RouteRunner.new([{"hold": ["move_up"], "until_y": 100, "max_seconds": 1}]).error_message.is_empty(), "until_y is a valid stop condition.")
+	var up := RouteRunner.new([{"hold": ["move_up"], "until_y": 50.0, "max_seconds": 1.0}])
+	level.player.position.y = 80.0
+	up.apply(level, DT)
+	check(up.index == 0, "until_y waits while above the target is not reached.")
+	level.player.position.y = 40.0
+	up.apply(level, DT)
+	check(up.done(), "until_y ends when y is at or above the target.")
 	check(not RouteRunner.new([{"dance": 1}]).error_message.is_empty(), "Unknown step kinds are rejected.")
 	for bad: Dictionary in [
 		{"hold": ["move_right"], "seconds": -1},

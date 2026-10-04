@@ -1,6 +1,8 @@
 extends RefCounted
 
-const ACTIONS: Array[String] = ["move_left", "move_right", "jump", "repair", "diagnose", "slide"]
+const ACTIONS: Array[String] = [
+	"move_left", "move_right", "move_up", "move_down", "jump", "repair", "diagnose", "slide"
+]
 
 var steps: Array = []
 var index: int = 0
@@ -41,6 +43,20 @@ func apply(level: Object, delta: float) -> void:
 		_tick(delta, float(step["wait"]))
 		return
 	var held: Array = step["hold"]
+	if step.has("until_y"):
+		if level.player.position.y <= float(step["until_y"]):
+			_advance()
+			apply(level, delta)
+			return
+		_set_input(level, held, first and "jump" in held)
+		_step_time += delta
+		_step_frames += 1
+		if _step_time > float(step["max_seconds"]):
+			failed = true
+			error_message = "Route step %d did not reach y=%.0f within %.1f s (y=%.0f)." % [
+				index + 1, float(step["until_y"]), float(step["max_seconds"]), level.player.position.y
+			]
+		return
 	if step.has("until_x"):
 		var target := float(step["until_x"])
 		var direction := -1.0 if "move_left" in held else 1.0
@@ -80,7 +96,12 @@ func _set_input(level: Object, held: Array, press_jump: bool) -> void:
 		direction -= 1.0
 	if "move_right" in held:
 		direction += 1.0
-	var input := {"direction": direction}
+	var vertical := 0.0
+	if "move_up" in held:
+		vertical -= 1.0
+	if "move_down" in held:
+		vertical += 1.0
+	var input := {"direction": direction, "vertical": vertical}
 	if "jump" in held:
 		input["jump_held"] = true
 		if press_jump:
@@ -89,7 +110,7 @@ func _set_input(level: Object, held: Array, press_jump: bool) -> void:
 		input["slide_pressed"] = true
 	level.player.input_override = input
 	var actions := {}
-	for action: String in ["repair", "diagnose"]:
+	for action: String in ["repair", "diagnose", "jump"]:
 		if action in held:
 			actions[StringName(action)] = true
 	level.action_override = actions
@@ -113,6 +134,15 @@ func _validate(step: Variant) -> String:
 	for action: Variant in step["hold"]:
 		if not action is String or String(action) not in ACTIONS:
 			return "unknown action '%s'." % action
+	if step.has("until_y"):
+		if step.has("seconds") or step.has("until_x"):
+			return "hold cannot combine until_y with seconds or until_x."
+		var target: Variant = step["until_y"]
+		if not ((target is float or target is int) and is_finite(float(target))):
+			return "until_y must be a finite number."
+		if not _is_duration(step.get("max_seconds")) or float(step["max_seconds"]) <= 0.0:
+			return "until_y needs a positive max_seconds."
+		return ""
 	if step.has("until_x"):
 		if step.has("seconds"):
 			return "hold cannot combine seconds and until_x."
