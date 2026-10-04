@@ -36,9 +36,10 @@ func load_data() -> void:
 		var entry: Dictionary = data["levels"][level_id]
 		levels[level_id] = {
 			"stars": int(entry.get("stars", 0)),
-			"best_seconds": float(entry.get("best_seconds", INF)),
 			"best_optional": int(entry.get("best_optional", 0)),
 		}
+		if entry.has("best_seconds"):
+			levels[level_id]["best_seconds"] = float(entry["best_seconds"])
 	for level_id: Variant in data.get("unlocked", []):
 		if String(level_id) not in unlocked:
 			unlocked.append(String(level_id))
