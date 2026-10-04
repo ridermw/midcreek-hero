@@ -60,6 +60,8 @@ func run() -> void:
 	main.queue_free()
 	for i: int in range(4):
 		await process_frame
+	# The audio server releases stopped playbacks on its own thread.
+	await create_timer(0.25).timeout
 	DirAccess.remove_absolute(SAVE_PATH)
 	print("MAIN_FLOW_TEST_COMPLETE: %d checks, %d failures" % [checks, failures])
 	quit(1 if failures else 0)

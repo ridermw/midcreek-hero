@@ -123,3 +123,12 @@ func set_bus_volume(bus: String, linear: float) -> void:
 	var volume := clampf(linear, 0.0, 1.0)
 	AudioServer.set_bus_mute(index, volume == 0.0)
 	AudioServer.set_bus_volume_db(index, linear_to_db(maxf(volume, 0.0001)))
+
+
+func _exit_tree() -> void:
+	if _crossfade != null:
+		_crossfade.kill()
+		_crossfade = null
+	for player: AudioStreamPlayer in _music_players + _sfx_players:
+		player.stop()
+		player.stream = null
