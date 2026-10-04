@@ -117,6 +117,14 @@ func run() -> void:
 	player.action = &""
 	player.update_animation()
 	check(player.sprite.animation != &"primary", "Releasing repair exits its animation.")
+	player.motor.climbing = true
+	for motion: Vector2 in [Vector2(90, 0), Vector2(-90, 0), Vector2(0, -90), Vector2(0, 90)]:
+		player.velocity = motion
+		player.update_animation()
+		check(player.sprite.animation == &"walk", "Ladder movement animates in every direction: %s" % motion)
+	player.velocity = Vector2.ZERO
+	player.update_animation()
+	check(player.sprite.animation == &"idle", "A stationary climber uses the idle animation.")
 	player.queue_free()
 	floor_body.queue_free()
 	await process_frame
