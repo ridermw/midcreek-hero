@@ -1,0 +1,118 @@
+{
+  "version": 1,
+  "assets": {
+    "floor": {
+      "cell": [
+        32,
+        32
+      ],
+      "fps": 1,
+      "frames": [
+        "frames/floor/00.png"
+      ]
+    },
+    "raised-floor": {
+      "cell": [
+        32,
+        32
+      ],
+      "fps": 1,
+      "frames": [
+        "frames/raised-floor/00.png"
+      ]
+    },
+    "platform": {
+      "cell": [
+        32,
+        32
+      ],
+      "fps": 1,
+      "frames": [
+        "frames/platform/00.png"
+      ]
+    },
+    "tray": {
+      "cell": [
+        32,
+        32
+      ],
+      "fps": 1,
+      "frames": [
+        "frames/tray/00.png"
+      ]
+    },
+    "ladder": {
+      "cell": [
+        32,
+        32
+      ],
+      "fps": 1,
+      "frames": [
+        "frames/ladder/00.png"
+      ]
+    },
+    "rack-ok": {
+      "cell": [
+        32,
+        96
+      ],
+      "fps": 1,
+      "frames": [
+        "frames/rack-ok/00.png"
+      ]
+    },
+    "rack-fault": {
+      "cell": [
+        32,
+        96
+      ],
+      "fps": 1,
+      "frames": [
+        "frames/rack-fault/00.png"
+      ]
+    },
+    "exit-closed": {
+      "cell": [
+        64,
+        96
+      ],
+      "fps": 1,
+      "frames": [
+        "frames/exit-closed/00.png"
+      ]
+    },
+    "exit-open": {
+      "cell": [
+        64,
+        96
+      ],
+      "fps": 1,
+      "frames": [
+        "frames/exit-open/00.png"
+      ]
+    },
+    "checkpoint-off": {
+      "cell": [
+        32,
+        64
+      ],
+      "fps": 1,
+      "frames": [
+        "frames/checkpoint-off/00.png"
+      ]
+    },
+    "checkpoint-on": {
+      "cell": [
+        32,
+        64
+      ],
+      "fps": 8,
+      "frames": [
+        "frames/checkpoint-on/00.png",
+        "frames/checkpoint-on/01.png",
+        "frames/checkpoint-on/02.png",
+        "frames/checkpoint-on/03.png"
+      ]
+    }
+  }
+}

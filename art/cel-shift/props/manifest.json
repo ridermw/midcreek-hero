@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "assets": {
+    "coolant": {
+      "cell": [
+        16,
+        16
+      ],
+      "fps": 8,
+      "frames": [
+        "frames/coolant/00.png",
+        "frames/coolant/01.png",
+        "frames/coolant/02.png",
+        "frames/coolant/03.png"
+      ]
+    }
+  }
+}

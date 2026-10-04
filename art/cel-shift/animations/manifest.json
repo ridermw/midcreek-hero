@@ -1,0 +1,241 @@
+{
+  "version": 1,
+  "cell_size": [
+    208,
+    208
+  ],
+  "pivot": [
+    104,
+    184
+  ],
+  "variants": {
+    "man-midcreek": {
+      "animations": {
+        "idle": {
+          "fps": 6,
+          "loop": true,
+          "frames": [
+            "frames/man-midcreek/idle/00.png",
+            "frames/man-midcreek/idle/01.png",
+            "frames/man-midcreek/idle/02.png",
+            "frames/man-midcreek/idle/03.png",
+            "frames/man-midcreek/idle/04.png",
+            "frames/man-midcreek/idle/05.png"
+          ]
+        },
+        "walk": {
+          "fps": 10,
+          "loop": true,
+          "frames": [
+            "frames/man-midcreek/walk/00.png",
+            "frames/man-midcreek/walk/01.png",
+            "frames/man-midcreek/walk/02.png",
+            "frames/man-midcreek/walk/03.png",
+            "frames/man-midcreek/walk/04.png",
+            "frames/man-midcreek/walk/05.png",
+            "frames/man-midcreek/walk/06.png",
+            "frames/man-midcreek/walk/07.png"
+          ]
+        },
+        "run": {
+          "fps": 14,
+          "loop": true,
+          "frames": [
+            "frames/man-midcreek/run/00.png",
+            "frames/man-midcreek/run/01.png",
+            "frames/man-midcreek/run/02.png",
+            "frames/man-midcreek/run/03.png",
+            "frames/man-midcreek/run/04.png",
+            "frames/man-midcreek/run/05.png",
+            "frames/man-midcreek/run/06.png",
+            "frames/man-midcreek/run/07.png"
+          ]
+        },
+        "jump": {
+          "fps": 10,
+          "loop": false,
+          "frames": [
+            "frames/man-midcreek/jump/00.png",
+            "frames/man-midcreek/jump/01.png",
+            "frames/man-midcreek/jump/02.png",
+            "frames/man-midcreek/jump/03.png",
+            "frames/man-midcreek/jump/04.png",
+            "frames/man-midcreek/jump/05.png"
+          ]
+        },
+        "slide": {
+          "fps": 12,
+          "loop": false,
+          "frames": [
+            "frames/man-midcreek/slide/00.png",
+            "frames/man-midcreek/slide/01.png",
+            "frames/man-midcreek/slide/02.png",
+            "frames/man-midcreek/slide/03.png"
+          ]
+        },
+        "primary": {
+          "fps": 10,
+          "loop": false,
+          "frames": [
+            "frames/man-midcreek/primary/00.png",
+            "frames/man-midcreek/primary/01.png",
+            "frames/man-midcreek/primary/02.png",
+            "frames/man-midcreek/primary/03.png",
+            "frames/man-midcreek/primary/04.png",
+            "frames/man-midcreek/primary/05.png"
+          ]
+        },
+        "secondary": {
+          "fps": 10,
+          "loop": false,
+          "frames": [
+            "frames/man-midcreek/secondary/00.png",
+            "frames/man-midcreek/secondary/01.png",
+            "frames/man-midcreek/secondary/02.png",
+            "frames/man-midcreek/secondary/03.png",
+            "frames/man-midcreek/secondary/04.png",
+            "frames/man-midcreek/secondary/05.png",
+            "frames/man-midcreek/secondary/06.png",
+            "frames/man-midcreek/secondary/07.png"
+          ]
+        },
+        "reaction": {
+          "fps": 10,
+          "loop": false,
+          "frames": [
+            "frames/man-midcreek/reaction/00.png",
+            "frames/man-midcreek/reaction/01.png",
+            "frames/man-midcreek/reaction/02.png",
+            "frames/man-midcreek/reaction/03.png"
+          ]
+        },
+        "signal": {
+          "fps": 8,
+          "loop": false,
+          "frames": [
+            "frames/man-midcreek/signal/00.png",
+            "frames/man-midcreek/signal/01.png",
+            "frames/man-midcreek/signal/02.png",
+            "frames/man-midcreek/signal/03.png",
+            "frames/man-midcreek/signal/04.png",
+            "frames/man-midcreek/signal/05.png"
+          ]
+        }
+      }
+    },
+    "woman-midcreek": {
+      "animations": {
+        "idle": {
+          "fps": 6,
+          "loop": true,
+          "frames": [
+            "frames/woman-midcreek/idle/00.png",
+            "frames/woman-midcreek/idle/01.png",
+            "frames/woman-midcreek/idle/02.png",
+            "frames/woman-midcreek/idle/03.png",
+            "frames/woman-midcreek/idle/04.png",
+            "frames/woman-midcreek/idle/05.png"
+          ]
+        },
+        "walk": {
+          "fps": 10,
+          "loop": true,
+          "frames": [
+            "frames/woman-midcreek/walk/00.png",
+            "frames/woman-midcreek/walk/01.png",
+            "frames/woman-midcreek/walk/02.png",
+            "frames/woman-midcreek/walk/03.png",
+            "frames/woman-midcreek/walk/04.png",
+            "frames/woman-midcreek/walk/05.png",
+            "frames/woman-midcreek/walk/06.png",
+            "frames/woman-midcreek/walk/07.png"
+          ]
+        },
+        "run": {
+          "fps": 14,
+          "loop": true,
+          "frames": [
+            "frames/woman-midcreek/run/00.png",
+            "frames/woman-midcreek/run/01.png",
+            "frames/woman-midcreek/run/02.png",
+            "frames/woman-midcreek/run/03.png",
+            "frames/woman-midcreek/run/04.png",
+            "frames/woman-midcreek/run/05.png",
+            "frames/woman-midcreek/run/06.png",
+            "frames/woman-midcreek/run/07.png"
+          ]
+        },
+        "jump": {
+          "fps": 10,
+          "loop": false,
+          "frames": [
+            "frames/woman-midcreek/jump/00.png",
+            "frames/woman-midcreek/jump/01.png",
+            "frames/woman-midcreek/jump/02.png",
+            "frames/woman-midcreek/jump/03.png",
+            "frames/woman-midcreek/jump/04.png",
+            "frames/woman-midcreek/jump/05.png"
+          ]
+        },
+        "slide": {
+          "fps": 12,
+          "loop": false,
+          "frames": [
+            "frames/woman-midcreek/slide/00.png",
+            "frames/woman-midcreek/slide/01.png",
+            "frames/woman-midcreek/slide/02.png",
+            "frames/woman-midcreek/slide/03.png"
+          ]
+        },
+        "primary": {
+          "fps": 10,
+          "loop": false,
+          "frames": [
+            "frames/woman-midcreek/primary/00.png",
+            "frames/woman-midcreek/primary/01.png",
+            "frames/woman-midcreek/primary/02.png",
+            "frames/woman-midcreek/primary/03.png",
+            "frames/woman-midcreek/primary/04.png",
+            "frames/woman-midcreek/primary/05.png"
+          ]
+        },
+        "secondary": {
+          "fps": 10,
+          "loop": false,
+          "frames": [
+            "frames/woman-midcreek/secondary/00.png",
+            "frames/woman-midcreek/secondary/01.png",
+            "frames/woman-midcreek/secondary/02.png",
+            "frames/woman-midcreek/secondary/03.png",
+            "frames/woman-midcreek/secondary/04.png",
+            "frames/woman-midcreek/secondary/05.png",
+            "frames/woman-midcreek/secondary/06.png",
+            "frames/woman-midcreek/secondary/07.png"
+          ]
+        },
+        "reaction": {
+          "fps": 10,
+          "loop": false,
+          "frames": [
+            "frames/woman-midcreek/reaction/00.png",
+            "frames/woman-midcreek/reaction/01.png",
+            "frames/woman-midcreek/reaction/02.png",
+            "frames/woman-midcreek/reaction/03.png"
+          ]
+        },
+        "signal": {
+          "fps": 8,
+          "loop": false,
+          "frames": [
+            "frames/woman-midcreek/signal/00.png",
+            "frames/woman-midcreek/signal/01.png",
+            "frames/woman-midcreek/signal/02.png",
+            "frames/woman-midcreek/signal/03.png",
+            "frames/woman-midcreek/signal/04.png",
+            "frames/woman-midcreek/signal/05.png"
+          ]
+        }
+      }
+    }
+  }
+}

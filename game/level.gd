@@ -13,13 +13,21 @@ const InputSetup = preload("res://game/input_setup.gd")
 const Score = preload("res://game/score.gd")
 const Player = preload("res://game/player.gd")
 const Hud = preload("res://game/hud.gd")
+const SpriteLibrary = preload("res://game/sprite_library.gd")
+const HeroAnimations = preload("res://game/animation_library.gd")
+const BACKGROUNDS := {"cold-aisle": "res://art/cel-shift/environment/layers/"}
+const PARALLAX := {"far": 0.2, "equipment": 0.6}
+const BACKGROUND_TINT := {"far": Color(0.42, 0.47, 0.56), "equipment": Color(0.55, 0.6, 0.68)}
 
 @export_file("*.level") var level_path: String = "res://levels/00-graybox.level"
+@export_enum("man", "woman") var character: String = "man"
 
 var health := Health.new()
 var timer := SlaTimer.new()
 var tasks := TaskSystem.new()
 var checkpoints := CheckpointManager.new()
+var art := SpriteLibrary.new()
+var animations := HeroAnimations.new()
 var level: Dictionary = {}
 var entities: Dictionary = {}
 var error_message: String = ""
@@ -57,7 +65,18 @@ func load_level(path: String) -> bool:
 	if not problems.is_empty():
 		error_message = "%s: %s" % [path, "\n".join(PackedStringArray(problems))]
 		return false
+	if not art.load_all():
+		error_message = art.error_message
+		return false
+	if not animations.load_manifest():
+		error_message = animations.error_message
+		return false
+	if not _build_background(String(level["header"]["background"])):
+		return false
+	player.character = character
+	player.configure(animations)
 	var builder := LevelBuilder.new()
+	builder.art = art
 	builder.build_solids(level, solids)
 	entities = builder.build_entities(level, entity_root)
 	if entities.is_empty():
@@ -70,12 +89,47 @@ func load_level(path: String) -> bool:
 	player.respawn(LevelBuilder.cell_to_world(level["player_start"]))
 	timer.start(float(level["header"]["sla_seconds"]))
 	checkpoints.begin(player.position, timer, tasks)
+	hud.art = art
+	for segment: TextureRect in hud.segments:
+		segment.texture = art.texture("ui", "health-full")
+		segment.custom_minimum_size = segment.texture.get_size() * 2
 	hud.bind(health, timer, tasks)
 	camera.limit_left = 0
 	camera.limit_top = 0
 	camera.limit_right = level["width"] * LevelBuilder.TILE
 	camera.limit_bottom = level["height"] * LevelBuilder.TILE
 	camera.position = player.position
+	return true
+
+
+func _build_background(background: String) -> bool:
+	if not BACKGROUNDS.has(background):
+		error_message = "Pending artwork: unknown background set: " + background
+		return false
+	var floor_y := float(level["height"] * LevelBuilder.TILE)
+	var z := -30
+	for layer: String in PARALLAX:
+		var path: String = BACKGROUNDS[background] + layer + ".png"
+		if not ResourceLoader.exists(path):
+			error_message = "Pending artwork: missing background layer: " + path
+			return false
+		var texture := load(path) as Texture2D
+		var parallax := Parallax2D.new()
+		parallax.name = layer.capitalize()
+		parallax.scroll_scale = Vector2(PARALLAX[layer], 1.0)
+		parallax.repeat_size = Vector2(texture.get_width(), 0)
+		parallax.repeat_times = 3
+		parallax.z_index = z
+		parallax.modulate = BACKGROUND_TINT[layer]
+		var sprite := Sprite2D.new()
+		sprite.texture = texture
+		sprite.centered = false
+		sprite.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+		sprite.position = Vector2(0, floor_y - texture.get_height())
+		parallax.add_child(sprite)
+		$World.add_child(parallax)
+		$World.move_child(parallax, 0)
+		z += 10
 	return true
 
 
@@ -91,8 +145,8 @@ func step(delta: float) -> void:
 	var body := player.hit_rect()
 	for hazard in entities["hazards"]:
 		hazard.advance(delta)
-		if hazard.active and hazard.hit_rect().intersects(body):
-			health.damage()
+		if hazard.active and hazard.hit_rect().intersects(body) and health.damage():
+			player.hurt()
 	if _out_of_bounds():
 		_request_respawn()
 	if _respawn_pending:
@@ -189,4 +243,5 @@ func _finish() -> void:
 		"stars": Score.stars(timer.elapsed, par, health.hits_taken),
 	}
 	hud.show_message("Level complete. Stars: %d" % result["stars"])
+	hud.show_stars(result["stars"])
 	finished.emit(result)

@@ -22,6 +22,15 @@ class AssetPipelineTest(unittest.TestCase):
         self.assertIn("art/cel-shift/sprites/manifest.json", includes)
         self.assertIn("art/cel-shift/animations/manifest.json", includes)
 
+    def test_export_ships_no_prompts_or_catalog(self):
+        presets = configparser.ConfigParser()
+        presets.read(ROOT / "export_presets.cfg")
+        includes = presets["preset.0"]["include_filter"].strip('"').split(",")
+        excludes = presets["preset.0"]["exclude_filter"].strip('"').split(",")
+        self.assertNotIn("art/cel-shift/catalog.json", includes)
+        self.assertIn("art/cel-shift/*/prompts/*", excludes)
+        self.assertIn("art/cel-shift/catalog.json", excludes)
+
     def test_export_excludes_source_artwork_not_runtime_artwork(self):
         presets = configparser.ConfigParser()
         presets.read(ROOT / "export_presets.cfg")
@@ -35,6 +44,17 @@ class AssetPipelineTest(unittest.TestCase):
                 self.assertIn(directory + "/*", excludes)
         self.assertNotIn("art/cel-shift/animations/frames/*", excludes)
         self.assertNotIn("art/cel-shift/environment/layers/*", excludes)
+
+    def test_clip_tables_cover_platformer_moves(self):
+        expected = ("idle", "walk", "run", "jump", "slide", "primary", "secondary", "reaction", "signal")
+        self.assertEqual(animation_assets.CLIPS, expected)
+        self.assertEqual(animation_assets.NORMAL_COUNTS, (6, 8, 8, 6, 4, 6, 8, 4, 6))
+        self.assertEqual(len(animation_assets.FPS), len(expected))
+        self.assertEqual(set(animation_assets.NORMAL_POSES), set(expected))
+        library = (ROOT / "game/animation_library.gd").read_text()
+        self.assertIn("const FRAME_COUNTS: Array[int] = [6, 8, 8, 6, 4, 6, 8, 4, 6]", library)
+        for clip in expected:
+            self.assertIn(f'\t&"{clip}",', library)
 
     def test_ponytail_guidance_is_woman_specific(self):
         for clip in animation_assets.CLIPS:

@@ -60,12 +60,46 @@ func run() -> void:
 	check(player.position.x == locked_x, "A locked player does not move.")
 	player.locked = false
 	player.position = Vector2(100, 320)
-	check(player.hit_rect() == Rect2(91, 272, 18, 48), "hit_rect covers the body above the feet.")
+	check(player.hit_rect() == Rect2(91, 256, 18, 64), "hit_rect covers the body above the feet.")
 	player.respawn(Vector2(40, 320))
 	check(
 		player.position == Vector2(40, 320) and player.velocity == Vector2.ZERO and player.motor.velocity == Vector2.ZERO,
 		"respawn moves the player and clears velocity.",
 	)
+	check(Player.choose_clip(true, Vector2.ZERO, false, true, &"primary") == &"reaction", "Hurt shows reaction.")
+	check(Player.choose_clip(true, Vector2.ZERO, false, false, &"primary") == &"primary", "Actions show their clip.")
+	check(Player.choose_clip(true, Vector2(200, 0), true, false, &"") == &"slide", "Sliding shows slide.")
+	check(Player.choose_clip(false, Vector2(100, -50), false, false, &"") == &"jump", "Air shows jump.")
+	check(Player.choose_clip(true, Vector2(180, 0), false, false, &"") == &"run", "Full speed shows run.")
+	check(Player.choose_clip(true, Vector2(60, 0), false, false, &"") == &"walk", "Low speed shows walk.")
+	check(Player.choose_clip(true, Vector2(5, 0), false, false, &"") == &"idle", "Standing shows idle.")
+	player.hurt()
+	check(player.hurt_remaining > 0.0, "hurt starts the reaction timer.")
+	check(player.has_node("Sprite") and not player.has_node("Body"), "The player draws an animated sprite.")
+	check(player.sprite.scale == Vector2(0.5, 0.5), "The technician is drawn at half scale.")
+	check(
+		player.sprite.position.y + (184.0 - 104.0) * player.sprite.scale.y == 0.0,
+		"The sprite pivot sits on the feet.",
+	)
+	var animations := Player.HeroAnimations.new()
+	check(animations.load_manifest(), "The shipped animation manifest loads.")
+	player.configure(animations)
+	player.set_physics_process(false)
+	player.hurt_remaining = 0.0
+	player.action = &"primary"
+	player.update_animation()
+	await player.sprite.animation_finished
+	player.update_animation()
+	check(
+		player.sprite.is_playing() and player.sprite.frame == 0,
+		"A held repair restarts its completed animation.",
+	)
+	player.sprite.set_frame_and_progress(2, 0.5)
+	player.update_animation()
+	check(player.sprite.frame == 2, "A repair animation in progress is not restarted.")
+	player.action = &""
+	player.update_animation()
+	check(player.sprite.animation != &"primary", "Releasing repair exits its animation.")
 	player.queue_free()
 	floor_body.queue_free()
 	await process_frame

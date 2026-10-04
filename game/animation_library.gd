@@ -11,12 +11,14 @@ const CLIPS: Array[StringName] = [
 	&"idle",
 	&"walk",
 	&"run",
+	&"jump",
+	&"slide",
 	&"primary",
 	&"secondary",
 	&"reaction",
 	&"signal",
 ]
-const FRAME_COUNTS: Array[int] = [6, 8, 8, 6, 8, 4, 6]
+const FRAME_COUNTS: Array[int] = [6, 8, 8, 6, 4, 6, 8, 4, 6]
 
 var variants: Dictionary[StringName, SpriteFrames] = {}
 var error_message: String = ""
@@ -47,7 +49,7 @@ func load_manifest() -> bool:
 	var manifest: Dictionary = parser.data
 	if manifest.get("version") != 1:
 		return _fail("Animation manifest requires version 1.")
-	if manifest.get("cell_size") != [208, 208] or manifest.get("pivot") != [104, 184]:
+	if not _is_pair(manifest.get("cell_size"), 208, 208) or not _is_pair(manifest.get("pivot"), 104, 184):
 		return _fail("Animation artwork requires 208x208 cells and pivot [104,184].")
 	if not manifest.get("variants") is Dictionary:
 		return _fail("Animation manifest requires a variants object.")
@@ -133,6 +135,10 @@ func _load_clip(
 		seen_paths[path] = true
 		frames.add_frame(clip, texture)
 	return true
+
+
+func _is_pair(value: Variant, first: int, second: int) -> bool:
+	return value is Array and value.size() == 2 and value[0] == first and value[1] == second
 
 
 func _fail(message: String) -> bool:
