@@ -11,13 +11,15 @@ from PIL import Image
 ROOT = Path(__file__).resolve().parents[1]
 ART = ROOT / "art/cel-shift/animations"
 VARIANTS = ("man-midcreek", "woman-midcreek")
-CLIPS = ("idle", "walk", "run", "primary", "secondary", "reaction", "signal")
-FPS = (6, 10, 14, 10, 10, 10, 8)
-NORMAL_COUNTS = (6, 8, 8, 6, 8, 4, 6)
+CLIPS = ("idle", "walk", "run", "jump", "slide", "primary", "secondary", "reaction", "signal")
+FPS = (6, 10, 14, 10, 12, 10, 10, 10, 8)
+NORMAL_COUNTS = (6, 8, 8, 6, 4, 6, 8, 4, 6)
 NORMAL_POSES = {
     "idle": "Small breathing loop, hands relaxed or resting near tool belt. Six phases: neutral, inhale begins, chest rises, inhale peak, exhale, near-neutral returning seamlessly to first. Keep planted feet absolutely stationary.",
     "walk": "Eight-frame RIGHT-FACING PROFILE walk loop: 1 left leg forward/right back contact, 2 weight sinks onto left heel, 3 right leg passes under hips while left supports, 4 rise over left toe/right reaches forward, 5 right forward/left back contact, 6 sink on right heel, 7 left passes under hips while right supports, 8 rise over right toe/left reaches forward. Arms swing opposite legs. Feet alternate, torso remains stable. Every phase differs. Hands empty, tools on belt.",
     "run": "Eight-frame RIGHT-FACING PROFILE run loop: 1 left-foot contact and right trailing, 2 compress over left, 3 left pushes off/right knee drives forward, 4 airborne right leg reaching ahead, 5 right-foot contact/left trailing, 6 compress right, 7 right pushes off/left knee drives, 8 airborne left leg reaching ahead. Clear alternating leg cycle and opposing bent arms. Hands empty.",
+    "jump": "Six-frame RIGHT-FACING PROFILE jump: 1 crouch with knees bent, 2 push off with arms swinging up, 3 rising with knees tucked, 4 apex with legs together, 5 falling with legs reaching down, 6 landing crouch. Hands empty, tools on belt. Feet leave the baseline in frames 3 to 5 by up to 60 pixels.",
+    "slide": "Four-frame RIGHT-FACING PROFILE floor slide: 1 drop low into a crouch, 2 slide on hip with lead leg extended forward and one hand trailing on the floor, 3 hold the low slide, 4 rise back to a crouch. In frames 2 and 3 the whole body, including the hard hat, is at most half the standing height. Boots stay on the baseline. Hands empty.",
     "primary": "Six-frame RIGHT-FACING working reach with short real ratchet: 1 hand goes to belt, 2 lifts small ratchet, 3 extends arm toward imaginary fastener at chest height, 4 tightens through short arc, 5 eases back, 6 returns near belt. Other hand steadies naturally. No rack in sprite. Tool shorter than forearm; no blades, shields or trails.",
     "secondary": "Eight-frame RIGHT-FACING multimeter test: 1 take compact meter from belt, 2 hold meter at waist, 3 extend test probe toward right, 4 contact/hold, 5 look down at meter, 6 lift probe clear, 7 retract lead, 8 lower meter. Thin red/black test cable hangs DOWN under gravity. Blank tiny screen. No glow, spell, floating cable or UI.",
     "reaction": "Four-frame RIGHT-FACING startled braced reaction: 1 surprise/flinch, 2 knees bend and forearm raises to protect face, 3 hold low with both feet planted, 4 relax back. Empty hands, no shield or panel, no sparks. Never kneel.",

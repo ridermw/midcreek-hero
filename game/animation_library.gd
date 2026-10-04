@@ -11,12 +11,14 @@ const CLIPS: Array[StringName] = [
 	&"idle",
 	&"walk",
 	&"run",
+	&"jump",
+	&"slide",
 	&"primary",
 	&"secondary",
 	&"reaction",
 	&"signal",
 ]
-const FRAME_COUNTS: Array[int] = [6, 8, 8, 6, 8, 4, 6]
+const FRAME_COUNTS: Array[int] = [6, 8, 8, 6, 4, 6, 8, 4, 6]
 
 var variants: Dictionary[StringName, SpriteFrames] = {}
 var error_message: String = ""
