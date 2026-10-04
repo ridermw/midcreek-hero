@@ -77,6 +77,7 @@ func play(file_name: String) -> void:
 		check(par == expected_par, "%s par %.0f follows the rule (expected %.0f)." % [file_name, par, expected_par])
 		check(sla == expected_sla, "%s SLA %.0f follows the rule (expected %.0f)." % [file_name, sla, expected_sla])
 		check(par >= 120.0 and par <= 240.0, "%s par %.0f s is 2 to 4 minutes." % [file_name, par])
+		check(result["hits"] == 0, "%s finishes without damage." % file_name)
 		print("ROUTE %s elapsed=%.2f hits=%d stars=%d optional=%d/%d" % [
 			file_name, result["elapsed"], result["hits"], result["stars"],
 			result["optional_done"], result["optional_total"]

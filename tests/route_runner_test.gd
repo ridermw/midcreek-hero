@@ -1,6 +1,7 @@
 extends SceneTree
 
 const RouteRunner = preload("res://game/route_runner.gd")
+const PlayerMotor = preload("res://game/player_motor.gd")
 const DT := 1.0 / 60.0
 
 
@@ -70,6 +71,26 @@ func run() -> void:
 	check(level.player.input_override.get("slide_pressed") == true, "slide presses on the first frame of a hold.")
 	climb.apply(level, DT)
 	check(not level.player.input_override.has("slide_pressed"), "A held slide is not pressed again every frame.")
+		var slide_runner := RouteRunner.new([
+		{"hold": ["move_right", "slide"], "seconds": 0.5},
+		{"hold": ["move_right", "slide"], "seconds": 0.4},
+		{"wait": 0.1},
+		{"tap": "slide"},
+	])
+	var motor := PlayerMotor.new()
+	slide_runner.apply(level, DT)
+	motor.step(level.player.input_override, true, DT)
+	check(motor.sliding, "Holding slide starts one slide.")
+	for i: int in range(53):
+		slide_runner.apply(level, DT)
+		motor.step(level.player.input_override, true, DT)
+	check(not motor.sliding and motor.velocity.x == PlayerMotor.RUN_SPEED, "Holding slide across route steps does not restart an expired slide.")
+	for i: int in range(6):
+		slide_runner.apply(level, DT)
+		motor.step(level.player.input_override, true, DT)
+	slide_runner.apply(level, DT)
+	motor.step(level.player.input_override, true, DT)
+	check(motor.sliding, "Releasing slide before another tap starts a new slide.")
 	check(RouteRunner.new([{"hold": ["move_up"], "until_y": 100, "max_seconds": 1}]).error_message.is_empty(), "until_y is a valid stop condition.")
 	var up := RouteRunner.new([{"hold": ["move_up"], "until_y": 50.0, "max_seconds": 1.0}])
 	level.player.position.y = 80.0

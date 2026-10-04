@@ -161,6 +161,11 @@ Route steps accept only `tap`, only `wait`, or `hold` with `seconds` or a target
 direction: left or right for x, up or down for y. Extra fields are rejected rather
 than ignored.
 
+Holding slide produces one press, including across adjacent hold steps. Release
+slide with a wait or a step without slide before triggering it again. The
+motor buffers a slide press for 0.1 s, so a press just before a slide ends
+starts the next slide with no gap. Every route must finish with no damage.
+
 ## Level layouts
 
 `tools/levels/level1.py` to `level5.py` build each level grid and its route

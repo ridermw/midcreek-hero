@@ -74,9 +74,10 @@ class Layout:
     def drone(self, col):
         self.put(col, self.stand, "d")
         self.run_to((col - 7) * TILE)
-        # Each step presses slide once, like a player who presses again as each 0.45 s slide ends.
+        # Release and press slide again every 0.45 s; the motor's slide buffer chains the slides.
         for _ in range(4):
-            self.route.append({"hold": ["move_right", "slide"], "seconds": 0.45})
+            self.route.append({"hold": ["move_right", "slide"], "seconds": 0.43})
+            self.route.append({"hold": ["move_right"], "seconds": 0.02})
         self.run_to((col + 7) * TILE)
 
     def coolant(self, col, row=None):
