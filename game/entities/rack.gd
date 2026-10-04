@@ -49,7 +49,21 @@ func set_done(value: bool) -> void:
 	queue_redraw()
 
 
+func _draw_badge() -> void:
+	if done:
+		return
+	if kind == "fetch" and art != null and art.has("props", part_kind):
+		draw_rect(Rect2(-11, -121, 22, 22), Color(0.04, 0.07, 0.1, 0.85))
+		draw_texture(art.texture("props", part_kind), Vector2(-8, -118))
+	elif kind == "diagnose_repair" and not diagnosed:
+		draw_rect(Rect2(-9, -119, 18, 18), Color(0.04, 0.07, 0.1, 0.85))
+		draw_rect(Rect2(-6, -116, 12, 12), Color(0.98, 0.7, 0.15))
+		draw_rect(Rect2(-2, -114, 4, 5), Color(0.1, 0.1, 0.1))
+		draw_rect(Rect2(-2, -108, 4, 2), Color(0.1, 0.1, 0.1))
+
+
 func _draw() -> void:
+	_draw_badge()
 	if art != null:
 		draw_texture(art.texture("tiles", "rack-ok" if done else "rack-fault"), Vector2(-16, -96))
 	else:
