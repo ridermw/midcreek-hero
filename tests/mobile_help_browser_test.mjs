@@ -44,7 +44,7 @@ try {
         demo: {images: {hero: image, "props/psu": image}, clips: {primary: {fps: 1, frames: ["hero"]}},
           steps: [{seconds: 2, clip: "primary", from: 280, to: 280, props: [], carry: false,
             prompt: {action: "repair", intent: "hold", display: "touch", description: "Hold Repair to repair the rack",
-              graphic: {shape: "touch", label: "Repair"}}}]},
+              pulse: true, held: false, graphic: {shape: "touch", label: "Repair"}}}]},
       }},
     ];
     window.currentHelp = 0;
@@ -84,6 +84,29 @@ try {
   assert.equal(await menu.evaluate(node => node.scrollTop), 0, "Previous must also open its destination at the top.");
   await page.getByRole("button", {name: "Next", exact: true}).click();
   assert.match(await menu.innerText(), /Hold Repair to repair the rack/, "Help keeps the full visible action purpose.");
+  const helpGlyph = page.locator("canvas.help-demo + p .control-graphic");
+  assert.equal(await helpGlyph.evaluate(node => node.getAnimations().length), 1, "Standalone touch help must pulse.");
+  assert.equal(await helpGlyph.evaluate(async node => {
+    const animation = node.getAnimations()[0];
+    const started = animation.currentTime;
+    for (let i = 0; i < 4; i++) await new Promise(requestAnimationFrame);
+    return node.getAnimations()[0] === animation && animation.currentTime > started;
+  }), true, "Help refresh must advance the pulse without restarting its animation.");
+  await page.evaluate(() => {
+    helpModels[1].help.demo.steps[0].prompt.held = true;
+    helpModels[1].revision++;
+    MidcreekTouch.render(JSON.stringify(helpModels[1]));
+  });
+  assert.equal(await helpGlyph.evaluate(node => node.getAnimations().length), 0, "Held help controls must not pulse.");
+  await page.evaluate(() => {
+    helpModels[1].help.demo.steps[0].prompt.held = false;
+    helpModels[1].revision++;
+    MidcreekTouch.render(JSON.stringify(helpModels[1]));
+  });
+  assert.equal(await helpGlyph.evaluate(node => node.getAnimations().length), 1, "Releasing the help control restores its pulse.");
+  await page.emulateMedia({reducedMotion: "reduce"});
+  assert.equal(await helpGlyph.evaluate(node => node.getAnimations().length), 0, "Reduced motion must suppress the help pulse.");
+  await page.emulateMedia({reducedMotion: "no-preference"});
   await page.evaluate(() => {
     MidcreekTouch.render(JSON.stringify({screen: "level", revision: 100, paused: false, summary: "", controls: [],
       prompt: {action: "jump", intent: "press", display: "keyboard", description: "Press Space to jump cables",

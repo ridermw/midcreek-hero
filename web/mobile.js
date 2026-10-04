@@ -27,7 +27,7 @@
     }
   }
 
-  function renderPrompt(text, graphic, buttons, model = {}, carry = "", reducedMotion = false, compact = false, announcement = null) {
+  function renderPrompt(text, graphic, buttons, model = {}, carry = "", reducedMotion = false, compact = false, announcement = null, standaloneTouch = false) {
     const description = [model.description, carry].filter(Boolean).join(" | ");
     const visibleText = compact
       ? [model.action && model.intent === "hold" ? "Hold" : "", model.status, carry].filter(Boolean).join(" | ")
@@ -37,7 +37,7 @@
       if (announcement.textContent !== description) announcement.textContent = description;
     } else if (text.getAttribute("aria-label") !== description) text.setAttribute("aria-label", description);
     const glyph = model.graphic;
-    graphic.hidden = !model.action || !glyph || model.display === "touch";
+    graphic.hidden = !model.action || !glyph || (model.display === "touch" && !standaloneTouch);
     if (!graphic.hidden) {
       graphic.textContent = glyph.label;
       graphic.dataset.shape = glyph.shape;
@@ -311,13 +311,8 @@
         }
         draw(frame.frame, frame.x - 62.4, 51.6, 124.8, 124.8);
         if (step.carry) draw("props/psu", frame.x + 22, 106, 22, 22);
-        renderPrompt(text, glyph, [], step.prompt, "", reduced);
         // Help has no live touch controls; its touch examples need a graphic of their own.
-        if (step.prompt.display === "touch" && step.prompt.action) {
-          glyph.hidden = false;
-          glyph.textContent = step.prompt.graphic.label;
-          glyph.dataset.shape = "touch";
-        }
+        renderPrompt(text, glyph, [], step.prompt, "", reduced, false, null, true);
         helpAnimation = requestAnimationFrame(animate);
       }
       animate();
