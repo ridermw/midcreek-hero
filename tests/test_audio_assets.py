@@ -7,8 +7,11 @@ import subprocess
 import sys
 import tempfile
 import unittest
+from unittest.mock import patch
 import wave
 import zipfile
+
+from tools import audio_assets
 
 ROOT = Path(__file__).resolve().parents[1]
 TOOL = ROOT / "tools/audio_assets.py"
@@ -198,6 +201,23 @@ class AudioAssetsTest(unittest.TestCase):
         result = self.run_tool("fetch")
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertEqual((self.audio / "music/title.ogg").read_bytes(), expected.read_bytes())
+
+    def test_fetch_attempts_each_failed_shared_download_only_once(self):
+        self.write_sources([
+            self.entry,
+            dict(self.entry, file="sfx/shared.wav"),
+            dict(self.entry, file="sfx/other.wav", url="https://example.org/other.zip"),
+        ])
+        for error in (
+            subprocess.CalledProcessError(22, ["curl"], stderr="archive unavailable"),
+            FileNotFoundError("curl is unavailable"),
+        ):
+            with self.subTest(error=type(error).__name__):
+                with patch.object(audio_assets.subprocess, "run", side_effect=error) as download:
+                    errors = audio_assets.fetch(self.audio)
+                self.assertEqual(download.call_count, 2, "each distinct URL is attempted once")
+                self.assertEqual(len(errors), 3, "every affected asset reports its failure")
+                self.assertEqual((self.audio / "music/title.ogg").read_bytes(), b"fixture audio")
 
     def test_real_repo_passes_check(self):
         result = subprocess.run(

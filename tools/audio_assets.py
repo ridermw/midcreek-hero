@@ -93,6 +93,7 @@ def fetch(audio):
     entries = load_sources(audio)
     errors = []
     downloads = {}
+    download_failures = {}
     with tempfile.TemporaryDirectory(prefix=".fetch-", dir=audio) as directory:
         scratch = Path(directory)
         for entry in entries:
@@ -101,13 +102,19 @@ def fetch(audio):
                 if entry["license"] != "CC0-1.0":
                     raise ValueError("license must be CC0-1.0")
                 url = entry["url"]
+                if url in download_failures:
+                    raise download_failures[url]
                 if url not in downloads:
                     archive = scratch / f"download-{len(downloads)}"
-                    subprocess.run([
-                        "curl", "--fail", "--location", "--silent", "--show-error",
-                        "--retry", "2", "--connect-timeout", "20", "--max-time", "180",
-                        "--output", str(archive), url,
-                    ], check=True, capture_output=True, text=True)
+                    try:
+                        subprocess.run([
+                            "curl", "--fail", "--location", "--silent", "--show-error",
+                            "--retry", "2", "--connect-timeout", "20", "--max-time", "180",
+                            "--output", str(archive), url,
+                        ], check=True, capture_output=True, text=True)
+                    except (OSError, subprocess.CalledProcessError) as error:
+                        download_failures[url] = error
+                        raise
                     downloads[url] = archive
                 source = downloads[url]
                 if entry["archive_member"] is not None:

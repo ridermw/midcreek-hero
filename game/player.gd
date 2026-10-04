@@ -18,6 +18,7 @@ var locked: bool = false
 var action: StringName = &""
 var sliding: bool = false
 var hurt_remaining: float = 0.0
+var _suppress_landing: bool = true
 
 @onready var sprite: AnimatedSprite2D = $Sprite
 
@@ -64,8 +65,9 @@ func _physics_process(delta: float) -> void:
 	if velocity.y == -PlayerMotor.JUMP_VELOCITY:
 		sound.emit("jump")
 	move_and_slide()
-	if not was_on_floor and is_on_floor():
+	if not _suppress_landing and not was_on_floor and is_on_floor():
 		sound.emit("land")
+	_suppress_landing = false
 	motor.velocity = velocity
 	hurt_remaining = maxf(hurt_remaining - delta, 0.0)
 	update_animation()
@@ -98,3 +100,4 @@ func respawn(at: Vector2) -> void:
 	velocity = Vector2.ZERO
 	motor.reset()
 	hurt_remaining = 0.0
+	_suppress_landing = true
