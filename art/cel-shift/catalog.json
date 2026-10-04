@@ -252,6 +252,150 @@
       "fps": 1,
       "prompt": "A wide rectangular menu button frame, dark slate fill with a lime green beveled border, empty center with no text.",
       "fit": "fill"
+    },
+    {
+      "name": "heat-vent",
+      "group": "hazards",
+      "cell": [
+        32,
+        16
+      ],
+      "frames": 4,
+      "fps": 8,
+      "prompt": "A floor heat exhaust grille seen from the side, dark steel slats glowing from dim orange to bright orange red across the frames.",
+      "fit": "bottom"
+    },
+    {
+      "name": "heat-plume",
+      "group": "hazards",
+      "cell": [
+        32,
+        64
+      ],
+      "frames": 4,
+      "fps": 8,
+      "prompt": "A tall column of hot air rising from a floor vent, drawn as wavy orange and pale yellow pixel ripples, semi solid, different wave phase in each frame.",
+      "fit": "bottom"
+    },
+    {
+      "name": "psu",
+      "group": "props",
+      "cell": [
+        16,
+        16
+      ],
+      "frames": 1,
+      "fps": 1,
+      "prompt": "A small server power supply unit module, grey metal box with a fan grille and a green handle, seen from the side.",
+      "fit": "center"
+    },
+    {
+      "name": "dimm",
+      "group": "props",
+      "cell": [
+        16,
+        16
+      ],
+      "frames": 1,
+      "fps": 1,
+      "prompt": "A small green memory module stick with black chips and gold contacts, seen at a slight angle.",
+      "fit": "center"
+    },
+    {
+      "name": "cable-port",
+      "group": "tiles",
+      "cell": [
+        32,
+        32
+      ],
+      "frames": 1,
+      "fps": 1,
+      "prompt": "A wall mounted network patch panel port block with three empty rectangular jacks and a dangling unplugged blue cable.",
+      "fit": "center"
+    },
+    {
+      "name": "moving-snag",
+      "group": "hazards",
+      "cell": [
+        32,
+        16
+      ],
+      "frames": 4,
+      "fps": 8,
+      "prompt": "A writhing loose bundle of orange and blue cables sliding on the floor, low and wide, the loops shifting shape in each frame.",
+      "fit": "bottom"
+    },
+    {
+      "name": "spark-arc",
+      "group": "hazards",
+      "cell": [
+        64,
+        24
+      ],
+      "frames": 4,
+      "fps": 12,
+      "prompt": "A horizontal electrical arc of crackling bright blue and white lightning between two points, a different jagged path in each frame.",
+      "fit": "center"
+    },
+    {
+      "name": "spark-emitter",
+      "group": "tiles",
+      "cell": [
+        32,
+        32
+      ],
+      "frames": 1,
+      "fps": 1,
+      "prompt": "A damaged electrical junction box with an exposed copper terminal and yellow hazard stripes.",
+      "fit": "center"
+    },
+    {
+      "name": "lift",
+      "group": "tiles",
+      "cell": [
+        64,
+        16
+      ],
+      "frames": 1,
+      "fps": 1,
+      "prompt": "A small industrial scissor lift platform top seen from the side: yellow steel deck with black and yellow hazard edge.",
+      "fit": "fill"
+    },
+    {
+      "name": "switch-off",
+      "group": "tiles",
+      "cell": [
+        32,
+        48
+      ],
+      "frames": 1,
+      "fps": 1,
+      "prompt": "A network switch control panel on a short stand with a large red unlit push button and a dark status screen.",
+      "fit": "fill"
+    },
+    {
+      "name": "switch-on",
+      "group": "tiles",
+      "cell": [
+        32,
+        48
+      ],
+      "frames": 1,
+      "fps": 1,
+      "prompt": "The same network switch control panel with a large green lit push button and a bright green status screen.",
+      "fit": "fill"
+    },
+    {
+      "name": "drone",
+      "group": "hazards",
+      "cell": [
+        32,
+        24
+      ],
+      "frames": 4,
+      "fps": 8,
+      "prompt": "A small hovering security drone with two rotors and a red scanning eye, rotors in a different blur position in each frame.",
+      "fit": "center"
     }
   ]
 }

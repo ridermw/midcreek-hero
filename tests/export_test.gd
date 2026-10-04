@@ -41,6 +41,15 @@ func _initialize() -> void:
 	check(FileAccess.file_exists("res://levels/routes/01-cold-aisle.route.json"), "The level 1 route is included.")
 	check(ResourceLoader.exists("res://game/main.tscn"), "The main scene is included.")
 	check(ResourceLoader.exists("res://audio/music/level1.ogg"), "Level 1 music is included.")
+	check(FileAccess.file_exists("res://levels/02-hot-aisle.level"), "Level 2 is included.")
+	for texture: String in [
+		"res://art/cel-shift/environment/hot-aisle/far.png",
+		"res://art/cel-shift/environment/outage-night/equipment.png",
+		"res://art/cel-shift/hazards/frames/heat-vent/00.png",
+		"res://art/cel-shift/props/frames/dimm/00.png",
+	]:
+		check(ResourceLoader.exists(texture), "Runtime texture is included: " + texture)
+	check(not DirAccess.dir_exists_absolute("res://art/cel-shift/environment/hot-aisle/generated"), "Background sources are excluded.")
 	check(FileAccess.file_exists("res://audio/sources.json"), "Audio provenance is included.")
 	check(ResourceLoader.exists("res://audio/sfx/jump.wav") or ResourceLoader.exists("res://audio/sfx/jump.ogg"), "The jump sound is included.")
 	for group: String in ["tiles", "hazards", "props", "ui"]:
