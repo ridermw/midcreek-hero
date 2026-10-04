@@ -17,8 +17,10 @@ const CLIPS: Array[StringName] = [
 	&"secondary",
 	&"reaction",
 	&"signal",
+	&"climb",
 ]
-const FRAME_COUNTS: Array[int] = [6, 8, 8, 6, 4, 6, 8, 4, 6]
+const FRAME_COUNTS: Array[int] = [6, 8, 8, 6, 4, 6, 8, 4, 6, 6]
+const LOOPING: Array[StringName] = [&"idle", &"walk", &"run", &"climb"]
 
 var variants: Dictionary[StringName, SpriteFrames] = {}
 var error_message: String = ""
@@ -94,8 +96,8 @@ func _load_clip(
 		return _fail("Animation fps must be finite and positive: " + context)
 	if not data.get("loop") is bool or not data.get("frames") is Array:
 		return _fail("Animation requires loop and frames: " + context)
-	if bool(data["loop"]) != (index < 3):
-		return _fail("Only idle, walk and run must loop: " + context)
+	if bool(data["loop"]) != (clip in LOOPING):
+		return _fail("Only idle, walk, run and climb must loop: " + context)
 	var paths: Array = data["frames"]
 	if paths.size() != FRAME_COUNTS[index]:
 		return _fail(

@@ -3,6 +3,8 @@ extends SceneTree
 const InputSetup = preload("res://game/input_setup.gd")
 const Player = preload("res://game/player.gd")
 const PLAYER_SCENE := preload("res://game/player.tscn")
+const RouteRunner = preload("res://game/route_runner.gd")
+const DT := 1.0 / 60.0
 
 var checks: int = 0
 var failures: int = 0
@@ -58,6 +60,7 @@ func run() -> void:
 	await frames(90)
 	check(player.is_on_floor(), "Player lands after the jump.")
 	check("land" in player_sounds, "Landing plays the land sound.")
+	await check_slide_held_across_thaw(player)
 	player.input_override = {"direction": 1.0}
 	player.locked = true
 	await frames(20)
@@ -90,6 +93,24 @@ func run() -> void:
 	check(Player.choose_clip(true, Vector2(180, 0), false, false, &"") == &"run", "Full speed shows run.")
 	check(Player.choose_clip(true, Vector2(60, 0), false, false, &"") == &"walk", "Low speed shows walk.")
 	check(Player.choose_clip(true, Vector2(5, 0), false, false, &"") == &"idle", "Standing shows idle.")
+	check(Player.choose_clip(false, Vector2(0, -90), false, false, &"", true) == &"climb", "Climbing shows climb.")
+	check(Player.choose_clip(false, Vector2.ZERO, false, false, &"", true) == &"climb", "Holding a ladder still shows climb.")
+	check(Player.choose_clip(false, Vector2(0, -90), false, true, &"", true) == &"reaction", "A hit on a ladder shows reaction.")
+	var library := preload("res://game/animation_library.gd").new()
+	if library.load_manifest():
+		player.configure(library)
+		player.motor.climbing = true
+		player.velocity = Vector2(0, -90)
+		player.motor.facing = -1.0
+		player.update_animation()
+		check(player.sprite.animation == &"climb" and player.sprite.is_playing(), "Moving on a ladder plays the climb clip.")
+		check(not player.sprite.flip_h, "The climb clip never mirrors.")
+		player.velocity = Vector2.ZERO
+		player.update_animation()
+		check(player.sprite.animation == &"climb" and not player.sprite.is_playing(), "A still climber holds the climb pose.")
+		player.motor.climbing = false
+	else:
+		check(false, "Animation manifest loads: " + library.error_message)
 	player.hurt()
 	check(player.hurt_remaining > 0.0, "hurt starts the reaction timer.")
 	check(player.has_node("Sprite") and not player.has_node("Body"), "The player draws an animated sprite.")
@@ -121,15 +142,51 @@ func run() -> void:
 	for motion: Vector2 in [Vector2(90, 0), Vector2(-90, 0), Vector2(0, -90), Vector2(0, 90)]:
 		player.velocity = motion
 		player.update_animation()
-		check(player.sprite.animation == &"walk", "Ladder movement animates in every direction: %s" % motion)
+		check(player.sprite.animation == &"climb" and player.sprite.is_playing(), "Ladder movement plays the climb clip in every direction: %s" % motion)
 	player.velocity = Vector2.ZERO
 	player.update_animation()
-	check(player.sprite.animation == &"idle", "A stationary climber uses the idle animation.")
+	check(player.sprite.animation == &"climb" and not player.sprite.is_playing(), "A stationary climber holds the climb pose.")
 	player.queue_free()
 	floor_body.queue_free()
 	await process_frame
 	print("PLAYER_TEST_COMPLETE: %d checks, %d failures" % [checks, failures])
 	quit(1 if failures else 0)
+
+
+class RouteLevel:
+	extends RefCounted
+	var player: Node
+	var use_action_override := false
+	var action_override: Dictionary = {}
+
+
+func check_slide_held_across_thaw(player: Player) -> void:
+	player.set_physics_process(false)
+	var level := RouteLevel.new()
+	level.player = player
+	# Two adjacent steps hold slide, so the route presses slide once on the first frame.
+	var runner := RouteRunner.new([{"hold": ["slide"], "seconds": 0.1}, {"hold": ["slide"], "seconds": 1.0}])
+	player.frozen = true
+	for i: int in range(3):
+		runner.apply(level, DT)
+		player._physics_process(DT)
+	check(not player.sliding, "The player does not slide during hit stop.")
+	player.frozen = false
+	var starts := 0
+	var was_sliding := false
+	for i: int in range(60):
+		runner.apply(level, DT)
+		player._physics_process(DT)
+		if player.sliding and not was_sliding:
+			starts += 1
+		if i == 0:
+			check(player.sliding, "A slide pressed during hit stop starts after it.")
+		was_sliding = player.sliding
+	check(starts == 1, "A slide held across hit stop and adjacent route steps slides once: %d starts." % starts)
+	check(not player.sliding, "A held slide does not restart after the slide ends.")
+	player.input_override = {}
+	player.set_physics_process(true)
+	await frames(5)
 
 
 func check(condition: bool, message: String) -> void:

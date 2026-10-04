@@ -54,6 +54,7 @@ func run() -> void:
 		arc.advance(DT)
 		states[arc.state] = states.get(arc.state, 0.0) + DT
 		check(arc.active == (arc.state == "on"), "A spark arc hurts only while on.")
+		check(arc.sparks.emitting == arc.active, "Arc particles emit only while the arc is on.")
 	check(absf(states.get("off", 0.0) - 1.4) < 0.05 and absf(states.get("warning", 0.0) - 0.5) < 0.05 and absf(states.get("on", 0.0) - 0.6) < 0.05, "The arc cycle is 1.4 s off, 0.5 s warning, 0.6 s on.")
 	check(arc.hit_rect() == Rect2(arc.position + Vector2(-32, -28), Vector2(64, 24)), "The arc covers 64x24 centered on its cell.")
 	arc.free()
@@ -170,6 +171,13 @@ func run() -> void:
 	for i: int in range(170):
 		await physics_frame
 	check(level.player.position.y < start_y - 80.0 and level.player.is_on_floor(), "The player rides a lift up.")
+	var lift_y: float = lift.position.y
+	level.hit_stop_remaining = 0.05
+	level.freeze_world(true)
+	for i: int in range(3):
+		await physics_frame
+	check(lift.position.y == lift_y, "Hit stop freezes lifts.")
+	level.freeze_world(false)
 	level.queue_free()
 	await process_frame
 	print("POWER_ROOM_TEST_COMPLETE: %d checks, %d failures" % [checks, failures])

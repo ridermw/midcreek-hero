@@ -23,6 +23,7 @@ const Score = preload("res://game/score.gd")
 const Player = preload("res://game/player.gd")
 const Hud = preload("res://game/hud.gd")
 const CablePort = preload("res://game/entities/cable_port.gd")
+const Feel = preload("res://game/feel.gd")
 const SparkArc = preload("res://game/hazards/spark_arc.gd")
 const SpriteLibrary = preload("res://game/sprite_library.gd")
 const HeroAnimations = preload("res://game/animation_library.gd")
@@ -60,6 +61,11 @@ var _switch_error_remaining: float = 0.0
 var _previous_actions: Dictionary = {}
 var _pressed_actions: Dictionary = {}
 var darkness: CanvasModulate
+var hit_stop_remaining: float = 0.0
+var pending_presses: Dictionary = {}
+var _replayed_presses: Dictionary = {}
+var shake_remaining: float = 0.0
+var _shake_rng := RandomNumberGenerator.new()
 var _flicker_times: Array = []
 var _flicker_rng := RandomNumberGenerator.new()
 var _clock: float = 0.0
@@ -192,6 +198,18 @@ func _update_darkness(delta: float) -> void:
 	darkness.color = FLICKER_COLOR if flicker_active_at(_clock) else DARK_COLOR
 
 
+func _update_shake(delta: float) -> void:
+	if shake_remaining <= 0.0:
+		camera.offset = Vector2.ZERO
+		return
+	shake_remaining = maxf(shake_remaining - delta, 0.0)
+	camera.offset = Feel.shake_offset(Feel.SHAKE_SECONDS - shake_remaining, _shake_rng) if shake_remaining > 0.0 else Vector2.ZERO
+
+
+func _sparks(at: Vector2) -> void:
+	$World.add_child(Feel.spark_burst(at + Vector2(0, -60)))
+
+
 func _build_background(background: String) -> bool:
 	if not BACKGROUNDS.has(background):
 		error_message = "Pending artwork: unknown background set: " + background
@@ -232,6 +250,18 @@ func step(delta: float) -> void:
 		return
 	_sample_actions()
 	_update_darkness(delta)
+	_update_shake(delta)
+	if hit_stop_remaining > 0.0:
+		hit_stop_remaining -= delta
+		for action: StringName in [&"repair", &"diagnose", &"jump"]:
+			if _action_pressed(action):
+				pending_presses[action] = true
+		if hit_stop_remaining <= 0.0:
+			freeze_world(false)
+		return
+	# Presses kept during hit stop count for one step only, so a stale press cannot fire later.
+	_replayed_presses = pending_presses
+	pending_presses = {}
 	_switch_error_remaining = maxf(0.0, _switch_error_remaining - delta)
 	timer.tick(delta)
 	health.tick(delta)
@@ -241,6 +271,9 @@ func step(delta: float) -> void:
 		if hazard.active and hazard.hit_rect().intersects(body) and health.damage():
 			player.hurt()
 			sound.emit("hit")
+			hit_stop_remaining = Feel.HIT_STOP_SECONDS
+			shake_remaining = Feel.SHAKE_SECONDS
+			freeze_world(true)
 	if _out_of_bounds():
 		_request_respawn()
 	if _respawn_pending:
@@ -329,7 +362,16 @@ func _sample_actions() -> void:
 		_previous_actions[action] = held
 
 
+func freeze_world(value: bool) -> void:
+	player.frozen = value
+	player.sprite.speed_scale = 0.0 if value else 1.0
+	for lift in entities.get("lifts", []):
+		lift.set_physics_process(not value)
+
+
 func _action_pressed(action: StringName) -> bool:
+	if _replayed_presses.has(action):
+		return true
 	if use_action_override:
 		return _pressed_actions.get(action, false)
 	return Input.is_action_just_pressed(action)
@@ -486,6 +528,7 @@ func _update_repair(delta: float, feet: Vector2) -> void:
 				sound.emit("deliver")
 			else:
 				sound.emit("repair_done")
+			_sparks(target.position)
 			_complete_if_all_racks_done(target.task_id)
 
 

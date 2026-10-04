@@ -1,19 +1,17 @@
 # Midcreek Hero
 
-Pixel-art and character-direction experiments for Midcreek.
+A pixel art side scroller set in a data center. You play a technician who runs,
+jumps, slides, and climbs through 5 data halls, avoids hazards, and completes
+work orders before the service level agreement (SLA) timer runs out.
 
-## Godot hello world
+**[Play in the browser](https://ridermw.github.io/midcreek-hero/)**
 
-**[Open the web viewer](https://ridermw.github.io/midcreek-hero/)**
+Built with Godot 4.7.2, GDScript, the Compatibility renderer, and a single
+threaded Web export. All art is generated with MockUI and normalized to pixel
+frames. All music and sound effects are CC0; see [audio/LICENSES.md](audio/LICENSES.md)
+and [audio/PROVENANCE.md](audio/PROVENANCE.md).
 
-A minimal viewer shows one of the 24 current individual hero sprites at a time.
-Press **Space** to advance; after the last image it wraps to the first.
-Holding Space does not skip through images. The caption identifies the
-character, variant and pose.
-
-Uses Godot 4.7.2, GDScript, nearest-neighbor sprite filtering, the Compatibility
-renderer, and a single-threaded Web export. The viewer reads the existing
-sprite manifest.
+## Build and run
 
 Open `project.godot` in Godot and press F5, or export and preview in a browser:
 
@@ -24,15 +22,21 @@ godot --headless --path . --export-release Web build/web/index.html
 python3 -m http.server 18765 --bind 127.0.0.1 --directory build/web
 ```
 
-Open `http://127.0.0.1:18765/`. If necessary, click the game once to give it
-keyboard focus. Install the matching Godot export templates before exporting.
-The complete `build/web/` folder is suitable for static hosting on GitHub Pages;
-it needs no backend or cross-origin-isolation headers. The
-`Godot web viewer` workflow imports, tests, and exports on pull requests,
-then deploys successful builds from `main` to GitHub Pages. Generated builds
-are ignored by Git rather than committed.
+Open `http://127.0.0.1:18765/`. Click the game once to give it keyboard focus;
+browsers also start audio only after this first input. Install the matching
+Godot export templates before exporting. The `Godot web viewer` workflow
+imports, tests, and exports on pull requests, then deploys successful builds
+from `main` to GitHub Pages.
 
-Run the sprite-loading and keyboard-cycle checks:
+Smoke mode plays a level's recorded route through the full game:
+`http://127.0.0.1:18765/?route=03` in a browser (the page title reports the
+result), or `godot --headless --fixed-fps 60 --path . -- --route=03` on the desktop.
+
+The title screen has a Settings screen with music and sound effect volume
+sliders. The volumes are saved with your progress.
+
+The original sprite viewer is still in `viewer.tscn`. Run its checks with:
+
 
 ```sh
 godot --headless --path . --script tests/viewer_test.gd
@@ -47,13 +51,12 @@ industrial sword/shield silhouettes and effects.
 
 ![Current sprite comparison](art/cel-shift/sprites/preview.png)
 
-## Animated data hall checkpoint
+## Data hall art test
 
-The `game/world.tscn` scene adds two technicians, local rack repair, camera
-tracking, and three environment layers. It requires all seven authored
-animation clips for each technician. Only the man's idle and walk clips are
-complete. The scene reports missing artwork instead of using static sprites.
-The sprite viewer remains the main scene.
+The `game/world.tscn` scene is the earlier art test: two technicians, local
+rack repair, camera tracking, and the cold aisle layers. It requires every
+authored clip for both technicians and reports missing artwork instead of
+using static sprites. The game itself starts from `game/main.tscn`.
 
 Install the asset-tool dependency and normalize the checked-in environment
 sources:
@@ -64,14 +67,15 @@ python3 tools/environment_assets.py normalize
 ```
 
 Use `--layer far`, `--layer equipment`, or `--layer floor` to normalize one
-layer. The command writes `environment/layers/` under `art/cel-shift/`.
+layer. The command writes `environment/layers/` under `art/cel-shift/` (the
+cold aisle set). The other 4 level sets use `render --set <name> --layer far`
+or `--layer equipment`, then `normalize --set <name>`.
 It uses nearest-neighbor sampling. Far and equipment layers become 640x360.
 The floor strip becomes 640x96. The equipment layer uses binary alpha.
 Source dimensions and transparency must match the layer contract.
 
-All animation prompts use the existing idle/walk geometry: 512x512 source
-cells, a boot baseline at y=448, and a standing height of approximately 270
-pixels. Keep this geometry when generating the remaining clips. The
+All animation prompts share one geometry: 512x512 source cells, a boot
+baseline at y=448, and a standing height of approximately 270 pixels. The
 normalizer uses one fixed 512-to-171 scale and writes 208x208 frames.
 Ponytail guidance applies only to the woman. The normalizer checks all frame
 hashes before it writes files, so duplicate artwork cannot overwrite prior
@@ -159,10 +163,33 @@ than ignored.
 
 Holding slide produces one press, including across adjacent hold steps. Release
 slide with a wait or a step without slide before triggering it again. The
-Outage Night route also checks that the player takes no damage and that its
-timing targets follow the milestone balance rule. Its par uses
-`ceil(route_seconds * 1.25 / 5) * 5`; its SLA uses
-`ceil(par_seconds * 1.35 / 5) * 5`.
+motor buffers a slide press for 0.1 s, so a press just before a slide ends
+starts the next slide with no gap. Every route must finish with no damage.
+
+## Level layouts
+
+`tools/levels/level1.py` to `level5.py` build each level grid and its route
+together with the helpers in `tools/levels/layout.py`. Run one from the
+repository root to rewrite its files, then run the route test:
+
+    python3 -m tools.levels.level3
+    tools/godot_test.sh tests/route_test.gd ROUTE_TEST
+
+Each level has 3 checkpoints, 3 to 6 work orders, and a par of 2 to 4 minutes.
+`tests/route_test.gd` enforces the par range and the par and SLA rule:
+
+| Level | Route time | Par | SLA |
+|---|---|---|---|
+| 1 Cold Aisle Onboarding | 93.2 s | 120 s | 195 s |
+| 2 Hot Aisle | 95.7 s | 120 s | 195 s |
+| 3 Cable Jungle | 96.2 s | 125 s | 200 s |
+| 4 Power Room | 97.2 s | 125 s | 200 s |
+| 5 Outage Night | 99.9 s | 125 s | 170 s |
+
+`tests/test_level_layouts.py` checks that the scripts reproduce the shipped
+files exactly. Par and SLA follow `layout.par_and_sla`: par is the route time
+plus 25 percent, rounded up to 5 s, and the SLA is par times 1.6 (1.35 for
+level 5).
 
 ## Core platformer
 
@@ -190,7 +217,9 @@ including sparse artwork that disappears when its alpha is thresholded.
 It validates the entire sequence before replacing previously normalized frames.
 
 Technician clips: idle, walk, run, jump, slide, primary, secondary, reaction,
-and signal for the man and the woman.
+signal, and climb for the man and the woman. Climb is drawn from behind with
+alternating hands and feet; it plays while the technician moves on a ladder and
+holds its pose while the technician stops on one.
 
     python3 tools/animation_assets.py render --variant woman-midcreek --clip jump
     python3 tools/animation_assets.py normalize --variant woman-midcreek --clip jump

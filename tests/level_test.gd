@@ -59,6 +59,8 @@ func run() -> void:
 	check(level.hud.prompt_label.text == "", "Level prompts hide away from their column.")
 	check(level.health.segments == 4 and level.health.hits_taken == 1, "A cable snag removes 1 segment.")
 	check("hit" in sounds, "A hit plays the hit sound.")
+	level.hit_stop_remaining = 0.0
+	level.player.frozen = false
 	at(Vector2i(12, 2))
 	level.step(DT)
 	check(level.health.segments == 5 and level.entities["coolant"][0].taken, "Coolant restores 1 segment.")

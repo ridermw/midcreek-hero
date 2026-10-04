@@ -120,6 +120,18 @@
             "frames/man-midcreek/signal/04.png",
             "frames/man-midcreek/signal/05.png"
           ]
+        },
+        "climb": {
+          "fps": 8,
+          "loop": true,
+          "frames": [
+            "frames/man-midcreek/climb/00.png",
+            "frames/man-midcreek/climb/01.png",
+            "frames/man-midcreek/climb/02.png",
+            "frames/man-midcreek/climb/03.png",
+            "frames/man-midcreek/climb/04.png",
+            "frames/man-midcreek/climb/05.png"
+          ]
         }
       }
     },
@@ -233,6 +245,18 @@
             "frames/woman-midcreek/signal/03.png",
             "frames/woman-midcreek/signal/04.png",
             "frames/woman-midcreek/signal/05.png"
+          ]
+        },
+        "climb": {
+          "fps": 8,
+          "loop": true,
+          "frames": [
+            "frames/woman-midcreek/climb/00.png",
+            "frames/woman-midcreek/climb/01.png",
+            "frames/woman-midcreek/climb/02.png",
+            "frames/woman-midcreek/climb/03.png",
+            "frames/woman-midcreek/climb/04.png",
+            "frames/woman-midcreek/climb/05.png"
           ]
         }
       }

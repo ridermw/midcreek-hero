@@ -20,6 +20,25 @@ var art: RefCounted
 var _time: float = 0.0
 var _frame: int = -1
 var _started: bool = false
+var sparks := CPUParticles2D.new()
+
+
+func _init() -> void:
+	sparks.amount = 14
+	sparks.lifetime = 0.3
+	sparks.position = Vector2(0, -16)
+	sparks.emission_shape = CPUParticles2D.EMISSION_SHAPE_RECTANGLE
+	sparks.emission_rect_extents = Vector2(28, 6)
+	sparks.direction = Vector2(0, -1)
+	sparks.spread = 180.0
+	sparks.gravity = Vector2(0, 300)
+	sparks.initial_velocity_min = 40.0
+	sparks.initial_velocity_max = 110.0
+	sparks.scale_amount_min = 1.5
+	sparks.scale_amount_max = 2.5
+	sparks.color = Color(0.7, 0.9, 1.0)
+	sparks.emitting = false
+	add_child(sparks)
 
 
 func advance(delta: float) -> void:
@@ -52,6 +71,7 @@ func _update_state() -> void:
 		queue_redraw()
 		if active and _started:
 			sparked.emit()
+	sparks.emitting = active
 
 
 func _draw() -> void:

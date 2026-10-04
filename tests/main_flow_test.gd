@@ -23,6 +23,16 @@ func run() -> void:
 	check(main.audio != null and main.audio.get_parent() == main, "main owns one audio director.")
 	check(main.music_name() == "title", "The title screen asks for title music.")
 	check(main.get_viewport().gui_get_focus_owner() != null, "The title screen focuses a button.")
+	check(main.screen.find_children("Settings", "Button", true, false).size() == 1, "The title screen has a Settings button.")
+	main.go_to("settings")
+	await process_frame
+	check(main.screen_name == "settings" and main.screen.find_children("*", "HSlider", true, false).size() == 2, "Settings shows 2 volume sliders.")
+	main.set_volume("music_volume", 0.3)
+	main.set_volume("sfx_volume", 0.6)
+	check(is_equal_approx(float(main.save.settings["music_volume"]), 0.3), "The music volume is saved.")
+	check(is_equal_approx(db_to_linear(AudioServer.get_bus_volume_db(AudioServer.get_bus_index("Music"))), 0.3), "The music bus follows the slider.")
+	check(main.route_from_query("?route=03") == "03" and main.route_from_query("?route=9") == "" and main.route_from_query("") == "", "Smoke mode parses ?route=0N.")
+	check(main.route_from_args(["--route=02"]) == "02" and main.route_from_args(["--x"]) == "", "Smoke mode parses --route=0N.")
 	main.go_to("character_select")
 	await process_frame
 	check(main.screen_name == "character_select", "Character select opens.")
@@ -69,6 +79,25 @@ func run() -> void:
 	main.go_to("level_select")
 	await process_frame
 	check(main.screen_name == "level_select", "Results return to level select.")
+	check(main.save.stars("02") == 0 and not main.save.is_unlocked("03"), "Level 2 has no saved progress before the smoke run.")
+	main.quit_after_smoke = false
+	main.start_smoke("02")
+	await process_frame
+	main.screen.finished.emit({"elapsed": 1.0, "hits": 0, "respawns": 0, "stars": 3, "optional_done": 0, "optional_total": 0})
+	await process_frame
+	check(main.save.stars("02") == 0 and not main.save.is_unlocked("03"), "A smoke run does not change saved progress.")
+	main.start_smoke("01")
+	await process_frame
+	check(main.screen_name == "level" and main.route_runner != null, "Smoke mode starts the level with its route.")
+	check(AudioServer.is_bus_mute(AudioServer.get_bus_index("Master")), "Smoke mode plays silently.")
+	check(main.smoke_status() .begins_with("MIDCREEK SMOKE 01 step="), "Smoke mode reports progress: " + main.smoke_status())
+	main.go_to("level_select")
+	await process_frame
+	check(main.route_runner == null, "Leaving the level stops the route.")
+	check(not main.smoke and not AudioServer.is_bus_mute(AudioServer.get_bus_index("Master")), "Leaving smoke mode restores sound and normal play.")
+	var reloaded_settings := preload("res://game/save_store.gd").new(SAVE_PATH)
+	reloaded_settings.load_data()
+	check(is_equal_approx(float(reloaded_settings.settings["sfx_volume"]), 0.6), "Volume settings persist.")
 	main.queue_free()
 	for i: int in range(4):
 		await process_frame

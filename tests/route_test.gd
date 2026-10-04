@@ -18,7 +18,8 @@ func _initialize() -> void:
 func run() -> void:
 	var files: Array[String] = []
 	for file_name: String in DirAccess.get_files_at(ROUTES):
-		if file_name.ends_with(".route.json"):
+		var only := OS.get_environment("ROUTE_ONLY")
+		if file_name.ends_with(".route.json") and (only.is_empty() or file_name.begins_with(only)):
 			files.append(file_name)
 	check(not files.is_empty(), "At least one route exists.")
 	for file_name: String in files:
@@ -68,12 +69,15 @@ func play(file_name: String) -> void:
 		var result := results[0]
 		check(result["respawns"] == 0, "%s finishes without a respawn." % file_name)
 		check(result["elapsed"] < sla, "%s finishes inside the SLA." % file_name)
-		if file_name == "05-outage-night.route.json":
-			check(result["hits"] == 0, "The Outage Night route avoids damage with real slide press edges.")
-			var expected_par := ceili(float(result["elapsed"]) * 1.25 / 5.0) * 5
-			var expected_sla := ceili(float(expected_par) * 1.35 / 5.0) * 5
-			check(level.level["header"]["par_seconds"] == expected_par, "Outage Night par follows the measured route formula: %d s." % expected_par)
-			check(sla == expected_sla, "Outage Night SLA follows the measured par formula: %d s." % expected_sla)
+		var header: Dictionary = level.level["header"]
+		var par := float(header["par_seconds"])
+		var expected_par := ceilf(float(result["elapsed"]) * 1.25 / 5.0) * 5.0
+		var factor := 1.35 if file_name.begins_with("05-") else 1.6
+		var expected_sla := ceilf(expected_par * factor / 5.0) * 5.0
+		check(par == expected_par, "%s par %.0f follows the rule (expected %.0f)." % [file_name, par, expected_par])
+		check(sla == expected_sla, "%s SLA %.0f follows the rule (expected %.0f)." % [file_name, sla, expected_sla])
+		check(par >= 120.0 and par <= 240.0, "%s par %.0f s is 2 to 4 minutes." % [file_name, par])
+		check(result["hits"] == 0, "%s finishes without damage." % file_name)
 		print("ROUTE %s elapsed=%.2f hits=%d stars=%d optional=%d/%d" % [
 			file_name, result["elapsed"], result["hits"], result["stars"],
 			result["optional_done"], result["optional_total"]

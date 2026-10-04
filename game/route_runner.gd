@@ -51,7 +51,7 @@ func apply(level: Object, delta: float) -> void:
 			_advance()
 			apply(level, delta)
 			return
-		_set_input(level, held, first and "jump" in held)
+		_set_input(level, held, first)
 		_step_time += delta
 		_step_frames += 1
 		if _step_time > float(step["max_seconds"]):
@@ -67,7 +67,7 @@ func apply(level: Object, delta: float) -> void:
 			_advance()
 			apply(level, delta)
 			return
-		_set_input(level, held, first and "jump" in held)
+		_set_input(level, held, first)
 		_step_time += delta
 		_step_frames += 1
 		if _step_time > float(step["max_seconds"]):
@@ -76,7 +76,7 @@ func apply(level: Object, delta: float) -> void:
 				index + 1, target, float(step["max_seconds"]), level.player.position.x
 			]
 		return
-	_set_input(level, held, first and "jump" in held)
+	_set_input(level, held, first)
 	_tick(delta, float(step["seconds"]))
 
 
@@ -93,7 +93,7 @@ func _advance() -> void:
 	_step_frames = 0
 
 
-func _set_input(level: Object, held: Array, press_jump: bool) -> void:
+func _set_input(level: Object, held: Array, first_frame: bool) -> void:
 	var direction := 0.0
 	if "move_left" in held:
 		direction -= 1.0
@@ -107,7 +107,7 @@ func _set_input(level: Object, held: Array, press_jump: bool) -> void:
 	var input := {"direction": direction, "vertical": vertical}
 	if "jump" in held:
 		input["jump_held"] = true
-		if press_jump:
+		if first_frame:
 			input["jump_pressed"] = true
 	var slide_held := "slide" in held
 	if slide_held and not _slide_held:

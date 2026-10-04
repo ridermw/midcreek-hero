@@ -46,13 +46,16 @@ class AssetPipelineTest(unittest.TestCase):
         self.assertNotIn("art/cel-shift/environment/layers/*", excludes)
 
     def test_clip_tables_cover_platformer_moves(self):
-        expected = ("idle", "walk", "run", "jump", "slide", "primary", "secondary", "reaction", "signal")
+        expected = ("idle", "walk", "run", "jump", "slide", "primary", "secondary", "reaction", "signal", "climb")
         self.assertEqual(animation_assets.CLIPS, expected)
-        self.assertEqual(animation_assets.NORMAL_COUNTS, (6, 8, 8, 6, 4, 6, 8, 4, 6))
+        self.assertEqual(animation_assets.NORMAL_COUNTS, (6, 8, 8, 6, 4, 6, 8, 4, 6, 6))
+        self.assertEqual(animation_assets.LOOPING, ("idle", "walk", "run", "climb"))
+        self.assertIn("BACK VIEW", animation_assets.NORMAL_POSES["climb"])
         self.assertEqual(len(animation_assets.FPS), len(expected))
         self.assertEqual(set(animation_assets.NORMAL_POSES), set(expected))
         library = (ROOT / "game/animation_library.gd").read_text()
-        self.assertIn("const FRAME_COUNTS: Array[int] = [6, 8, 8, 6, 4, 6, 8, 4, 6]", library)
+        self.assertIn("const FRAME_COUNTS: Array[int] = [6, 8, 8, 6, 4, 6, 8, 4, 6, 6]", library)
+        self.assertIn('const LOOPING: Array[StringName] = [&"idle", &"walk", &"run", &"climb"]', library)
         for clip in expected:
             self.assertIn(f'\t&"{clip}",', library)
 
@@ -79,6 +82,38 @@ class AssetPipelineTest(unittest.TestCase):
             with self.subTest(variant=variant):
                 self.assertLessEqual(max(heights), median * 1.15)
                 self.assertGreaterEqual(min(heights), median * 0.85)
+
+    @staticmethod
+    def pouch_offset(path):
+        """Horizontal offset of the brown tool pouch from the figure center, at belt height."""
+        with Image.open(path) as frame:
+            image = frame.convert("RGBA")
+        left, top, right, bottom = image.getbbox()
+        pouch, body = [], []
+        # The belt sits 55 to 80 pixels above the boot baseline in every frame.
+        for y in range(bottom - 80, bottom - 55):
+            for x in range(left, right):
+                r, g, b, a = image.getpixel((x, y))
+                if not a:
+                    continue
+                # Leather brown only; the vest's safety orange is brighter (r >= 200).
+                if 90 < r < 200 and 40 < g < 110 and b < 70 and r > g + 25:
+                    pouch.append(x)
+                else:
+                    body.append(x)
+        if len(pouch) < 8 or not body:
+            return 0.0
+        # Measure against the hips, not the bounding box, which shifts with a raised arm.
+        return sum(pouch) / len(pouch) - sorted(body)[len(body) // 2]
+
+    def test_climb_keeps_the_tool_pouch_on_one_side(self):
+        for variant in animation_assets.VARIANTS:
+            frames = sorted((animation_assets.ART / "frames" / variant / "climb").glob("*.png"))
+            offsets = [self.pouch_offset(path) for path in frames]
+            with self.subTest(variant=variant, offsets=[round(o, 1) for o in offsets]):
+                self.assertEqual(len(frames), 6)
+                self.assertTrue(all(abs(o) >= 3 for o in offsets), "pouch is visible beside the body")
+                self.assertTrue(all(o > 0 for o in offsets), "pouch stays on the right hip, image right in the back view")
 
     def test_ponytail_guidance_is_woman_specific(self):
         for clip in animation_assets.CLIPS:

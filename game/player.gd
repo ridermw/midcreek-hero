@@ -21,6 +21,9 @@ var action: StringName = &""
 var sliding: bool = false
 var hurt_remaining: float = 0.0
 var on_ladder: bool = false
+var frozen: bool = false
+var _pending_jump: bool = false
+var _pending_slide: bool = false
 var _shape: RectangleShape2D
 var _suppress_landing: bool = true
 
@@ -34,12 +37,19 @@ func _ready() -> void:
 
 
 static func choose_clip(
-	on_floor: bool, motion: Vector2, is_sliding: bool, is_hurt: bool, current_action: StringName
+	on_floor: bool,
+	motion: Vector2,
+	is_sliding: bool,
+	is_hurt: bool,
+	current_action: StringName,
+	is_climbing: bool = false,
 ) -> StringName:
 	if is_hurt:
 		return &"reaction"
 	if not current_action.is_empty():
 		return current_action
+	if is_climbing:
+		return &"climb"
 	if is_sliding:
 		return &"slide"
 	if not on_floor:
@@ -92,7 +102,21 @@ func standing_blocked() -> bool:
 
 
 func _physics_process(delta: float) -> void:
+	if frozen:
+		# Keep jump and slide presses during hit stop; replay each once on the next frame.
+		if not locked:
+			var held := read_input()
+			_pending_jump = _pending_jump or held.get("jump_pressed", false)
+			_pending_slide = _pending_slide or held.get("slide_pressed", false)
+		return
 	var input := {} if locked else read_input()
+	if _pending_jump:
+		_pending_jump = false
+		input["jump_pressed"] = true
+		input["jump_held"] = input.get("jump_held", true)
+	if _pending_slide:
+		_pending_slide = false
+		input["slide_pressed"] = true
 	var was_on_floor := is_on_floor()
 	var context := {
 		"on_floor": was_on_floor,
@@ -120,9 +144,17 @@ func update_animation() -> void:
 	sprite.flip_h = motor.facing < 0.0
 	if sprite.sprite_frames == null:
 		return
-	var clip := choose_clip(is_on_floor(), velocity, sliding, hurt_remaining > 0.0, action)
-	if motor.climbing and hurt_remaining <= 0.0 and action.is_empty():
-		clip = &"walk" if velocity != Vector2.ZERO else &"idle"
+	var clip := choose_clip(is_on_floor(), velocity, sliding, hurt_remaining > 0.0, action, motor.climbing)
+	if clip == &"climb":
+		# Face the ladder: the climb clip is drawn from behind, so it never mirrors.
+		sprite.flip_h = false
+		if sprite.animation != clip:
+			sprite.play(clip)
+		if velocity == Vector2.ZERO:
+			sprite.pause()
+		elif not sprite.is_playing():
+			sprite.play(clip)
+		return
 	if sprite.animation != clip:
 		sprite.play(clip)
 	elif clip == action and not sprite.is_playing():

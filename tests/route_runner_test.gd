@@ -68,7 +68,9 @@ func run() -> void:
 		climb.apply(level, DT)
 	check(level.action_override.get(&"jump") == true, "A jump tap is also an action press for reseats.")
 	climb.apply(level, DT)
-	check(level.player.input_override.get("slide_pressed") == true, "slide sets slide_pressed.")
+	check(level.player.input_override.get("slide_pressed") == true, "slide presses on the first frame of a hold.")
+	climb.apply(level, DT)
+	check(not level.player.input_override.has("slide_pressed"), "A held slide is not pressed again every frame.")
 	var slide_runner := RouteRunner.new([
 		{"hold": ["move_right", "slide"], "seconds": 0.5},
 		{"hold": ["move_right", "slide"], "seconds": 0.4},

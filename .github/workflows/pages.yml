@@ -66,6 +66,14 @@ jobs:
             tools/godot_test.sh "$t" "$(basename "$t" .gd | tr '[:lower:]' '[:upper:]')"
           done
 
+      - name: Play every level route through the main scene
+        run: |
+          for n in 01 02 03 04 05; do
+            timeout 120s godot --headless --fixed-fps 60 --path . -- --route=$n 2>&1 | tee "$RUNNER_TEMP/smoke-$n.log"
+            grep -Eq "^SMOKE_RESULT $n stars=3 respawns=0 " "$RUNNER_TEMP/smoke-$n.log"
+            ! grep -E '^(SCRIPT ERROR|ERROR|USER ERROR|Parse Error)' "$RUNNER_TEMP/smoke-$n.log"
+          done
+
       - name: Export single-threaded web build
         run: |
           mkdir -p build/web

@@ -47,7 +47,8 @@ func run() -> void:
 	check(hud.star_icons.size() == 3 and hud.star_icons[1].texture == art.texture("ui", "star-on") and hud.star_icons[2].texture == art.texture("ui", "star-off"), "Results show earned stars.")
 	timer.tick(100.0)
 	hud.update_timer()
-	check(hud.timer_label.modulate == Hud.WARNING_COLOR, "Timer turns red at 30 s or less.")
+	var shown := hud.timer_label.modulate
+	check(Color(shown.r, shown.g, shown.b) == Hud.WARNING_COLOR, "Timer turns red at 30 s or less.")
 	hud.show_message("Stars: 3")
 	check(hud.message_label.visible and hud.message_label.text == "Stars: 3", "show_message shows text.")
 	for i: int in range(3):
