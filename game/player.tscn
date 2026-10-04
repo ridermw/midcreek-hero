@@ -15,9 +15,6 @@ script = ExtResource("1")
 position = Vector2(0, -24)
 shape = SubResource("BodyShape")
 
-[node name="Body" type="ColorRect" parent="."]
-offset_left = -9.0
-offset_top = -48.0
-offset_right = 9.0
-mouse_filter = 2
-color = Color(0.86, 0.74, 0.12, 1)
+[node name="Sprite" type="AnimatedSprite2D" parent="."]
+texture_filter = 1
+position = Vector2(0, -80)

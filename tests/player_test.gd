@@ -66,6 +66,16 @@ func run() -> void:
 		player.position == Vector2(40, 320) and player.velocity == Vector2.ZERO and player.motor.velocity == Vector2.ZERO,
 		"respawn moves the player and clears velocity.",
 	)
+	check(Player.choose_clip(true, Vector2.ZERO, false, true, &"primary") == &"reaction", "Hurt shows reaction.")
+	check(Player.choose_clip(true, Vector2.ZERO, false, false, &"primary") == &"primary", "Actions show their clip.")
+	check(Player.choose_clip(true, Vector2(200, 0), true, false, &"") == &"slide", "Sliding shows slide.")
+	check(Player.choose_clip(false, Vector2(100, -50), false, false, &"") == &"jump", "Air shows jump.")
+	check(Player.choose_clip(true, Vector2(180, 0), false, false, &"") == &"run", "Full speed shows run.")
+	check(Player.choose_clip(true, Vector2(60, 0), false, false, &"") == &"walk", "Low speed shows walk.")
+	check(Player.choose_clip(true, Vector2(5, 0), false, false, &"") == &"idle", "Standing shows idle.")
+	player.hurt()
+	check(player.hurt_remaining > 0.0, "hurt starts the reaction timer.")
+	check(player.has_node("Sprite") and not player.has_node("Body"), "The player draws an animated sprite.")
 	player.queue_free()
 	floor_body.queue_free()
 	await process_frame
