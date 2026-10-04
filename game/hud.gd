@@ -35,13 +35,21 @@ func _ready() -> void:
 		segments.append(segment)
 	timer_label.position = Vector2(200, 14)
 	add_child(timer_label)
-	task_list.position = Vector2(16, 40)
-	add_child(task_list)
+	var task_column := VBoxContainer.new()
+	task_column.position = Vector2(16, 40)
+	task_column.add_theme_constant_override("separation", 8)
+	task_column.resized.connect(func() -> void:
+		panel.size = Vector2(
+			maxf(300.0, task_column.position.x + task_column.size.x),
+			maxf(140.0, task_column.position.y + task_column.size.y),
+		)
+	)
+	add_child(task_column)
+	task_column.add_child(task_list)
 	prompt_label.position = Vector2(16, 680)
 	add_child(prompt_label)
-	carry_label.position = Vector2(16, 150)
 	carry_label.add_theme_color_override("font_color", Color(0.6, 0.9, 1.0))
-	add_child(carry_label)
+	task_column.add_child(carry_label)
 	message_label.position = Vector2(360, 340)
 	message_label.hide()
 	add_child(message_label)
