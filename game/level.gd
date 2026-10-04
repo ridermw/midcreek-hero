@@ -6,6 +6,9 @@ signal sound(sound_name: String)
 const REPAIR_TICK_SECONDS := 0.4
 const DIAGNOSE_SECONDS := 0.8
 const PART_LABELS := {"psu": "PSU", "dimm": "DIMM"}
+const DARK_COLOR := Color(0.3, 0.32, 0.4)
+const FLICKER_COLOR := Color(0.12, 0.12, 0.18)
+const FLICKER_SECONDS := 1.2
 const BUTTON_LABELS := {&"repair": "E / X", &"diagnose": "Q / Y", &"jump": "Space / A"}
 
 const Health = preload("res://game/health.gd")
@@ -54,6 +57,9 @@ var carried_part: String = ""
 var _diagnose_remaining: float = 0.0
 var _previous_actions: Dictionary = {}
 var _pressed_actions: Dictionary = {}
+var darkness: CanvasModulate
+var _flicker_times: Array = []
+var _clock: float = 0.0
 
 @onready var solids: Node2D = $World/Solids
 @onready var entity_root: Node2D = $World/Entities
@@ -93,6 +99,8 @@ func load_level(path: String) -> bool:
 		return false
 	player.character = character
 	player.configure(animations)
+	if level["header"].get("darkness", false):
+		_build_darkness()
 	var builder := LevelBuilder.new()
 	builder.art = art
 	builder.build_solids(level, solids)
@@ -120,6 +128,53 @@ func load_level(path: String) -> bool:
 	camera.limit_bottom = level["height"] * LevelBuilder.TILE
 	camera.position = player.position
 	return true
+
+
+func flicker_schedule(count: int) -> Array:
+	var rng := RandomNumberGenerator.new()
+	rng.seed = hash(String(level["header"]["name"]))
+	var times: Array = []
+	var at := 0.0
+	for i: int in range(count):
+		at += rng.randf_range(6.0, 9.0)
+		times.append(at)
+	return times
+
+
+func _build_darkness() -> void:
+	darkness = CanvasModulate.new()
+	darkness.name = "Darkness"
+	darkness.color = DARK_COLOR
+	add_child(darkness)
+	var light := PointLight2D.new()
+	light.name = "Flashlight"
+	var gradient := GradientTexture2D.new()
+	gradient.width = 320
+	gradient.height = 320
+	gradient.fill = GradientTexture2D.FILL_RADIAL
+	gradient.fill_from = Vector2(0.5, 0.5)
+	gradient.fill_to = Vector2(1.0, 0.5)
+	var colors := Gradient.new()
+	colors.set_color(0, Color(1, 1, 1, 1))
+	colors.set_color(1, Color(1, 1, 1, 0))
+	gradient.gradient = colors
+	light.texture = gradient
+	light.energy = 1.1
+	light.position = Vector2(0, -40)
+	player.add_child(light)
+	_flicker_times = flicker_schedule(int(float(level["header"]["sla_seconds"]) / 6.0) + 2)
+
+
+func _update_darkness(delta: float) -> void:
+	if darkness == null:
+		return
+	_clock += delta
+	var flickering := false
+	for time: float in _flicker_times:
+		if _clock >= time and _clock < time + FLICKER_SECONDS:
+			flickering = true
+			break
+	darkness.color = FLICKER_COLOR if flickering else DARK_COLOR
 
 
 func _build_background(background: String) -> bool:
@@ -161,6 +216,7 @@ func step(delta: float) -> void:
 	if completed:
 		return
 	_sample_actions()
+	_update_darkness(delta)
 	timer.tick(delta)
 	health.tick(delta)
 	var body := player.hit_rect()
