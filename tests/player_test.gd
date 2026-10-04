@@ -27,7 +27,7 @@ func run() -> void:
 			kinds[event.get_class()] = true
 		bound = bound and kinds.has("InputEventKey") and kinds.has("InputEventJoypadButton")
 	check(bound, "Every action has a key and a gamepad button.")
-	check(InputMap.action_get_events(&"jump").size() == 4, "install does not duplicate events.")
+	check(InputMap.action_get_events(&"jump").size() == 2, "install does not duplicate events.")
 	var floor_body := StaticBody2D.new()
 	var shape := CollisionShape2D.new()
 	var rectangle := RectangleShape2D.new()
