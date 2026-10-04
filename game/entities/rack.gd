@@ -5,6 +5,10 @@ const RANGE_X := 40.0
 const SIZE := Vector2(40, 96)
 
 var task_id: String = ""
+var kind: String = "repair"
+var repair_seconds: float = REPAIR_SECONDS
+var diagnosed: bool = false
+var part_kind: String = ""
 var done: bool = false
 var progress: float = 0.0
 var art: RefCounted
@@ -17,7 +21,7 @@ func in_range(feet: Vector2) -> bool:
 func work(delta: float) -> bool:
 	if done:
 		return false
-	progress = minf(progress + delta / REPAIR_SECONDS, 1.0)
+	progress = minf(progress + delta / repair_seconds, 1.0)
 	if progress >= 1.0:
 		done = true
 	queue_redraw()
@@ -30,13 +34,36 @@ func cancel() -> void:
 		queue_redraw()
 
 
+func capture_state() -> Dictionary:
+	return {"done": done, "diagnosed": diagnosed}
+
+
+func restore_state(state: Dictionary) -> void:
+	diagnosed = bool(state["diagnosed"])
+	set_done(bool(state["done"]))
+
+
 func set_done(value: bool) -> void:
 	done = value
 	progress = 1.0 if value else 0.0
 	queue_redraw()
 
 
+func _draw_badge() -> void:
+	if done:
+		return
+	if kind == "fetch" and art != null and art.has("props", part_kind):
+		draw_rect(Rect2(-11, -121, 22, 22), Color(0.04, 0.07, 0.1, 0.85))
+		draw_texture(art.texture("props", part_kind), Vector2(-8, -118))
+	elif kind == "diagnose_repair" and not diagnosed:
+		draw_rect(Rect2(-9, -119, 18, 18), Color(0.04, 0.07, 0.1, 0.85))
+		draw_rect(Rect2(-6, -116, 12, 12), Color(0.98, 0.7, 0.15))
+		draw_rect(Rect2(-2, -114, 4, 5), Color(0.1, 0.1, 0.1))
+		draw_rect(Rect2(-2, -108, 4, 2), Color(0.1, 0.1, 0.1))
+
+
 func _draw() -> void:
+	_draw_badge()
 	if art != null:
 		draw_texture(art.texture("tiles", "rack-ok" if done else "rack-fault"), Vector2(-16, -96))
 	else:

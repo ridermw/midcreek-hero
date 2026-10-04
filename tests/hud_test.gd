@@ -50,6 +50,20 @@ func run() -> void:
 	check(hud.timer_label.modulate == Hud.WARNING_COLOR, "Timer turns red at 30 s or less.")
 	hud.show_message("Stars: 3")
 	check(hud.message_label.visible and hud.message_label.text == "Stars: 3", "show_message shows text.")
+	for i: int in range(3):
+		tasks.add_task("extra%d" % i, "repair", true)
+	hud.refresh_tasks()
+	hud.set_carry("Carrying PSU")
+	await process_frame
+	await process_frame
+	check(
+		hud.carry_label.get_global_rect().position.y >= hud.task_list.get_global_rect().end.y,
+		"The carried part label stays below all five work orders.",
+	)
+	check(
+		(hud.get_node("Panel") as Control).get_global_rect().encloses(hud.carry_label.get_global_rect()),
+		"The HUD panel covers the carried part label below five work orders.",
+	)
 	hud.queue_free()
 	await process_frame
 	print("HUD_TEST_COMPLETE: %d checks, %d failures" % [checks, failures])

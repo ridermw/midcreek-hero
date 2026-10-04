@@ -117,6 +117,18 @@ reaches zero, then reach the exit door.
 | Diagnose | Q | Y |
 | Pause | Escape or P | Start |
 
+## Levels
+
+| # | Name | New mechanics | Hazards |
+|---|---|---|---|
+| 1 | Cold Aisle Onboarding | Run, jump, repair | Cable snags, open floor tiles |
+| 2 | Hot Aisle | Fetch a PSU or DIMM, diagnose then repair | Heat vents (1.5 s off, 0.4 s warning, 1.0 s on) |
+
+Work order types: hold E to repair a red rack. For a fetch order, run over the
+spare part, then hold E at the rack that shows the part icon. For a diagnose
+order, press Q at the rack with the amber marker, then hold E. A restart at a
+checkpoint undoes pickups, diagnoses, and repairs made after that checkpoint.
+
 Progress (stars, best times, unlocked levels, and the chosen technician) is
 saved in `user://save.json`. On the web this is browser storage.
 

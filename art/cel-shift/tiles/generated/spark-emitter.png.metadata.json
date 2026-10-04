@@ -1,0 +1,36 @@
+{
+  "rendered_at": "2026-10-04T02:27:08.832413+00:00",
+  "size": "2048x2048",
+  "quality": "high",
+  "deployment": "gpt-image-2.5-sunburst",
+  "model_name": "gpt-image-2.5-sunburst",
+  "model_version": "default",
+  "prompt_char_count": 793,
+  "prompt": "Edit image 1: replace its entire content with a new isolated game sprite described below. Keep unchanged from image 1: the pixel art style, the color palette, the outline treatment and the lighting direction.\n\nTRUE PIXEL ART game sprite in the same Cel Shift style as image 1: dark stepped pixel contours, small square color clusters, shaded material ramps, cool data center palette. Never smooth illustration, vector art, 3D render or painted concept art. Use actual TRANSPARENT RGBA output around the object. No checkerboard, backdrop, ground shadow, scenery, text, labels, logos or watermark unless the prompt asks for text.\n\nOne object centered in the 2048x2048 canvas, as large as fits.\n\nOBJECT: A damaged electrical junction box with an exposed copper terminal and yellow hazard stripes.",
+  "operation": "edit",
+  "source_image": "art/cel-shift/environment/layers/equipment.png",
+  "reference_images": [],
+  "mask": null,
+  "inputs": [
+    {
+      "role": "source",
+      "path": "art/cel-shift/environment/layers/equipment.png",
+      "sha256": "a09f7c4cccba50034b119c18b75921c347a5687fe959d7aa1b82314192992e26"
+    }
+  ],
+  "background": "transparent",
+  "output_format": "png",
+  "usage": {
+    "input_tokens": 758,
+    "input_tokens_details": {
+      "image_tokens": 576,
+      "text_tokens": 182
+    },
+    "output_tokens": 3568,
+    "output_tokens_details": {
+      "image_tokens": 3568,
+      "text_tokens": 0
+    },
+    "total_tokens": 4326
+  }
+}

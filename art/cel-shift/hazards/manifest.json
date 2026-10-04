@@ -11,6 +11,71 @@
         "frames/cable-snag/00.png",
         "frames/cable-snag/01.png"
       ]
+    },
+    "heat-vent": {
+      "cell": [
+        32,
+        16
+      ],
+      "fps": 8,
+      "frames": [
+        "frames/heat-vent/00.png",
+        "frames/heat-vent/01.png",
+        "frames/heat-vent/02.png",
+        "frames/heat-vent/03.png"
+      ]
+    },
+    "heat-plume": {
+      "cell": [
+        32,
+        64
+      ],
+      "fps": 8,
+      "frames": [
+        "frames/heat-plume/00.png",
+        "frames/heat-plume/01.png",
+        "frames/heat-plume/02.png",
+        "frames/heat-plume/03.png"
+      ]
+    },
+    "moving-snag": {
+      "cell": [
+        32,
+        16
+      ],
+      "fps": 8,
+      "frames": [
+        "frames/moving-snag/00.png",
+        "frames/moving-snag/01.png",
+        "frames/moving-snag/02.png",
+        "frames/moving-snag/03.png"
+      ]
+    },
+    "spark-arc": {
+      "cell": [
+        64,
+        24
+      ],
+      "fps": 12,
+      "frames": [
+        "frames/spark-arc/00.png",
+        "frames/spark-arc/01.png",
+        "frames/spark-arc/02.png",
+        "frames/spark-arc/03.png"
+      ]
+    },
+    "drone": {
+      "cell": [
+        32,
+        24
+      ],
+      "fps": 8,
+      "frames": [
+        "frames/drone/00.png",
+        "frames/drone/01.png",
+        "frames/drone/02.png",
+        "frames/drone/03.png"
+      ]
     }
   }
 }

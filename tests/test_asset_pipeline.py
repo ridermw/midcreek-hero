@@ -129,6 +129,27 @@ class AssetPipelineTest(unittest.TestCase):
                             self.assertEqual(result.getchannel("A").getextrema(), (255, 255))
                             self.assertEqual(result.getpixel((0, 0)), (20, 40, 60, 255))
 
+    def test_background_sets_cover_every_level(self):
+        self.assertEqual(
+            set(environment_assets.SETS), {"hot-aisle", "cable-jungle", "power-room", "outage-night"}
+        )
+        for name, prompts in environment_assets.SETS.items():
+            with self.subTest(name=name):
+                self.assertEqual(set(prompts), {"far", "equipment"})
+                text = environment_assets.prompt_text(name, "equipment")
+                self.assertIn("Edit image 1", text)
+                self.assertIn("Keep unchanged", text)
+
+    def test_named_set_normalizes_into_its_own_directory(self):
+        with tempfile.TemporaryDirectory() as directory:
+            art = Path(directory)
+            (art / "hot-aisle/generated").mkdir(parents=True)
+            Image.new("RGBA", (1280, 720), (90, 40, 30, 255)).save(art / "hot-aisle/generated/far.png")
+            environment_assets.normalize("far", art, "hot-aisle")
+            with Image.open(art / "hot-aisle/far.png") as result:
+                self.assertEqual(result.size, (640, 360))
+            self.assertFalse((art / "layers/far.png").exists())
+
     def test_environment_rejects_invalid_sources(self):
         with tempfile.TemporaryDirectory() as directory:
             art = Path(directory)

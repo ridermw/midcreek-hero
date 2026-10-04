@@ -19,6 +19,15 @@ func hit_rect() -> Rect2:
 	return Rect2(position + Vector2(-8, -16), Vector2(16, 16))
 
 
+func capture_state() -> Dictionary:
+	return {"taken": taken}
+
+
+func restore_state(state: Dictionary) -> void:
+	taken = bool(state["taken"])
+	visible = not taken
+
+
 func take() -> void:
 	taken = true
 	hide()

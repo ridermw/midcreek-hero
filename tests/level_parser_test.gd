@@ -10,7 +10,7 @@ const VALID_HEADER := {
 	"background": "cold-aisle",
 	"tasks": [
 		{"id": "r1", "type": "repair", "at": ["A"], "required": true},
-		{"id": "f1", "type": "fetch", "at": ["B"], "part_at": "D", "required": true},
+		{"id": "f1", "type": "fetch", "at": ["B"], "part_at": "D", "part": "psu", "required": true},
 		{"id": "o1", "type": "reseat", "at": ["F"], "required": false},
 	],
 }
@@ -151,6 +151,16 @@ func run() -> void:
 	expect_error(level_text(header_with("prompts", [{"x": 99, "text": "Hi"}]), VALID_GRID), "Prompt column 99 is outside the grid.")
 	expect_error(level_text(header_with("prompts", [{"x": 1}]), VALID_GRID), "Each prompt needs an integer x and a text string.")
 	check(not parser.parse(level_text(header_with("prompts", [{"x": 1, "text": "Hi"}]), VALID_GRID), "p.level").is_empty(), "Valid prompts parse.")
+	expect_error(
+		level_text(task_header({"id": "f9", "type": "fetch", "at": ["A"], "part_at": "Z", "part": "psu", "required": true}), VALID_GRID),
+		"references missing anchor 'Z'",
+	)
+	var no_part: Dictionary = VALID_HEADER.duplicate(true)
+	no_part["tasks"][1].erase("part")
+	expect_error(level_text(no_part, VALID_GRID), "Fetch task 'f1' part must be psu or dimm.")
+	var gpu_header: Dictionary = VALID_HEADER.duplicate(true)
+	gpu_header["tasks"][1]["part"] = "gpu"
+	expect_error(level_text(gpu_header, VALID_GRID), "Fetch task 'f1' part must be psu or dimm.")
 	print("LEVEL_PARSER_TEST_COMPLETE: %d checks, %d failures" % [checks, failures])
 	quit(1 if failures else 0)
 
