@@ -44,6 +44,9 @@ func run() -> void:
 				level.step(0.01)
 				check(level.hud.prompt_model()["action"] == "" and level.hud.prompt_model()["status"] == "Diagnosing...", "Diagnosis in flight shows status only.")
 				level.action_override = {}
+				level.hud.set_prompt({})
+				level.step(0.01)
+				check(level.hud.prompt_model()["status"] == "Diagnosing...", "Active diagnosis restores its status after pause or help clears guidance.")
 				level.step(0.9)
 				level.step(0.01)
 				check(level.hud.prompt_model()["action"] == "repair" and level.hud.prompt_model()["intent"] == "hold", "Finished diagnosis offers just hold repair.")

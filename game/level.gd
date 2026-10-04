@@ -495,6 +495,7 @@ func _update_repair(delta: float, feet: Vector2) -> void:
 		_diagnose_remaining -= delta
 		player.locked = true
 		player.action = &"secondary"
+		hud.set_prompt(ControlPrompt.make("", "", "", "Diagnosing..."))
 		return
 	if target != null and target.kind == "diagnose_repair" and not target.diagnosed and _action_pressed(&"diagnose"):
 		target.diagnosed = true
