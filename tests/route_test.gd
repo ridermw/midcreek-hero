@@ -1,3 +1,4 @@
+# godot_test_args: --fixed-fps 60
 extends SceneTree
 
 const RouteRunner = preload("res://game/route_runner.gd")
