@@ -25,7 +25,7 @@ jobs:
 
       - name: Check asset pipeline contracts
         run: |
-          node --test tests/mobile_web_test.cjs
+          node --test tests/*_test.cjs
           sudo apt-get update
           sudo apt-get install --yes ffmpeg
           python3 -m pip install -r tools/requirements.txt

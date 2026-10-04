@@ -4,6 +4,8 @@ const Health = preload("res://game/health.gd")
 const SlaTimer = preload("res://game/sla_timer.gd")
 const TaskSystem = preload("res://game/task_system.gd")
 const Feel = preload("res://game/feel.gd")
+const ControlPrompt = preload("res://game/control_prompt.gd")
+const ControlGraphic = preload("res://game/control_graphic.gd")
 const WARNING_COLOR := Color(1.0, 0.35, 0.3)
 
 var segments: Array[TextureRect] = []
@@ -13,6 +15,15 @@ var art: RefCounted
 var timer_label := Label.new()
 var task_list := VBoxContainer.new()
 var prompt_label := Label.new()
+var prompt_graphic := ControlGraphic.new()
+var hold_label := Label.new()
+var prompt_row := HBoxContainer.new()
+var prompt: Dictionary = ControlPrompt.make()
+var control_display := "keyboard":
+	set(value):
+		control_display = value
+		_refresh_prompt()
+var _prompt_description := ""
 var message_label := Label.new()
 var carry_label := Label.new()
 var _timer: SlaTimer
@@ -47,8 +58,18 @@ func _ready() -> void:
 	)
 	add_child(task_column)
 	task_column.add_child(task_list)
-	prompt_label.position = Vector2(16, 680)
-	add_child(prompt_label)
+	prompt_row.position = Vector2(16, 660)
+	prompt_row.add_theme_constant_override("separation", 12)
+	add_child(prompt_row)
+	prompt_row.add_child(prompt_graphic)
+	hold_label.text = "Hold"
+	prompt_row.add_child(hold_label)
+	prompt_row.add_child(prompt_label)
+	prompt_label.custom_minimum_size.x = 790
+	prompt_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	star_row.position = Vector2(400, 380)
+	add_child(star_row)
+	_refresh_prompt()
 	carry_label.add_theme_color_override("font_color", Color(0.6, 0.9, 1.0))
 	task_column.add_child(carry_label)
 	message_label.position = Vector2(360, 340)
@@ -151,8 +172,26 @@ func set_carry(text: String) -> void:
 	carry_label.text = text
 
 
-func set_prompt(text: String) -> void:
-	prompt_label.text = text
+func set_prompt(value: Dictionary) -> void:
+	if prompt == value:
+		return
+	prompt = value.duplicate()
+	_refresh_prompt()
+
+
+func prompt_model() -> Dictionary:
+	return ControlPrompt.render(prompt, control_display)
+
+
+func _refresh_prompt() -> void:
+	var model := prompt_model()
+	prompt_graphic.show_model(model)
+	hold_label.visible = not model["action"].is_empty() and model["intent"] == "hold"
+	if model["description"] != _prompt_description:
+		_prompt_description = model["description"]
+		prompt_label.text = model["status"]
+		prompt_label.accessibility_description = _prompt_description
+		prompt_row.accessibility_description = _prompt_description
 
 
 func show_message(text: String) -> void:

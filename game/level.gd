@@ -11,7 +11,7 @@ const PART_LABELS := {"psu": "PSU", "dimm": "DIMM"}
 const DARK_COLOR := Color(0.3, 0.32, 0.4)
 const FLICKER_COLOR := Color(0.12, 0.12, 0.18)
 const FLICKER_SECONDS := 1.2
-const BUTTON_LABELS := {&"repair": "E / X", &"diagnose": "Q / Y", &"jump": "Space / A"}
+const ControlPrompt = preload("res://game/control_prompt.gd")
 
 const Health = preload("res://game/health.gd")
 const SlaTimer = preload("res://game/sla_timer.gd")
@@ -225,10 +225,11 @@ func _build_background(background: String) -> bool:
 			error_message = "Pending artwork: missing background layer: " + path
 			return false
 		var texture := load(path) as Texture2D
+		var background_scale := maxf(1.0, floor_y / texture.get_height()) if layer == "far" else 1.0
 		var parallax := Parallax2D.new()
 		parallax.name = layer.capitalize()
 		parallax.scroll_scale = Vector2(PARALLAX[layer], 1.0)
-		parallax.repeat_size = Vector2(texture.get_width(), 0)
+		parallax.repeat_size = Vector2(texture.get_width() * background_scale, 0)
 		parallax.repeat_times = 3
 		parallax.z_index = z
 		parallax.modulate = BACKGROUND_TINT[layer]
@@ -236,7 +237,8 @@ func _build_background(background: String) -> bool:
 		sprite.texture = texture
 		sprite.centered = false
 		sprite.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
-		sprite.position = Vector2(0, floor_y - texture.get_height())
+		sprite.scale = Vector2.ONE * background_scale
+		sprite.position = Vector2(0, floor_y - texture.get_height() * background_scale)
 		parallax.add_child(sprite)
 		$World.add_child(parallax)
 		$World.move_child(parallax, 0)
@@ -346,7 +348,7 @@ func restore_state(state: Dictionary) -> void:
 	hud.set_carry(label)
 	_diagnose_remaining = 0.0
 	_switch_error_remaining = 0.0
-	hud.set_prompt("")
+	hud.set_prompt(ControlPrompt.make())
 	for group: String in ["racks", "parts", "ports", "switches", "coolant"]:
 		for i: int in range(entities[group].size()):
 			entities[group][i].restore_state(state[group][i])
@@ -405,7 +407,7 @@ func _update_switches(feet: Vector2) -> bool:
 		return true
 	_switch_error_remaining = 0.0
 	panel.set_on(true)
-	hud.set_prompt("")
+	hud.set_prompt(ControlPrompt.make())
 	sound.emit("switch")
 	if next == group.size():
 		tasks.complete(panel.task_id)
@@ -417,11 +419,11 @@ func _show_switch_prompt(feet: Vector2) -> void:
 	if player.locked:
 		return
 	if _switch_error_remaining > 0.0:
-		hud.set_prompt("Wrong order. Start again at switch 1")
+		hud.set_prompt(ControlPrompt.make("", "", "", "Wrong order. Start again at switch 1"))
 		return
 	for panel in entities["switches"]:
 		if not tasks.is_done(panel.task_id) and panel.in_range(feet) and not panel.on:
-			hud.set_prompt("Throw switch %d: press E or X" % panel.order)
+			hud.set_prompt(ControlPrompt.make("repair", "press", "Throw switch %d" % panel.order))
 			return
 
 
@@ -438,12 +440,12 @@ func _update_ports(delta: float, feet: Vector2) -> bool:
 			return false
 		player.locked = false
 		player.action = &""
-		hud.set_prompt("Press E or X to reseat the cable")
+		hud.set_prompt(ControlPrompt.make("repair", "press", "reseat the cable"))
 		if _action_pressed(&"repair"):
 			port.begin()
 			player.locked = true
 			player.action = &"primary"
-			hud.set_prompt("Press " + BUTTON_LABELS[port.current_button()])
+			hud.set_prompt(ControlPrompt.make(String(port.current_button()), "press", "reseat cable (1 of 3)"))
 			sound.emit("menu_move")
 		return true
 	player.locked = true
@@ -468,9 +470,11 @@ func _update_ports(delta: float, feet: Vector2) -> bool:
 		player.locked = false
 		player.action = &""
 	if port.state == "active":
-		hud.set_prompt("Press %s  (%d of 3)" % [BUTTON_LABELS[port.current_button()], port.step + 1])
+		hud.set_prompt(ControlPrompt.make(String(port.current_button()), "press", "reseat cable (%d of 3)" % (port.step + 1)))
 	elif not port.done:
-		hud.set_prompt("Press E or X to reseat the cable")
+		hud.set_prompt(ControlPrompt.make("repair", "press", "reseat the cable"))
+	else:
+		hud.set_prompt(ControlPrompt.make())
 	return true
 
 
@@ -491,6 +495,7 @@ func _update_repair(delta: float, feet: Vector2) -> void:
 		_diagnose_remaining -= delta
 		player.locked = true
 		player.action = &"secondary"
+		hud.set_prompt(ControlPrompt.make("", "", "", "Diagnosing..."))
 		return
 	if target != null and target.kind == "diagnose_repair" and not target.diagnosed and _action_pressed(&"diagnose"):
 		target.diagnosed = true
@@ -498,12 +503,12 @@ func _update_repair(delta: float, feet: Vector2) -> void:
 		_diagnose_remaining = DIAGNOSE_SECONDS
 		player.locked = true
 		player.action = &"secondary"
-		hud.set_prompt("Diagnosing...")
+		hud.set_prompt(ControlPrompt.make("", "", "", "Diagnosing..."))
 		sound.emit("diagnose")
 		return
 	var blocked := ""
 	if target != null and target.kind == "diagnose_repair" and not target.diagnosed:
-		blocked = "Diagnose first (Q / Y)"
+		blocked = "Diagnose first"
 	elif target != null and target.kind == "fetch" and carried_part != target.task_id:
 		blocked = "Bring the %s to this rack" % _part_label(target)
 	var holding: bool = target != null and blocked.is_empty() and _action_held(&"repair")
@@ -513,13 +518,14 @@ func _update_repair(delta: float, feet: Vector2) -> void:
 		hud.set_prompt(_level_prompt(feet))
 	elif not blocked.is_empty():
 		target.cancel()
-		hud.set_prompt(blocked)
+		hud.set_prompt(ControlPrompt.make("diagnose", "press", "diagnose", blocked) if target.kind == "diagnose_repair" else ControlPrompt.make("", "", "", blocked))
 	elif not holding:
 		target.cancel()
 		var verb := "install the %s" % _part_label(target) if target.kind == "fetch" else "repair"
-		hud.set_prompt("Hold E or X to " + verb)
+		hud.set_prompt(ControlPrompt.make("repair", "hold", verb))
 	else:
-		hud.set_prompt("Working...")
+		var verb := "install the %s" % _part_label(target) if target.kind == "fetch" else "repair"
+		hud.set_prompt(ControlPrompt.make("repair", "hold", verb, "Working...", true))
 		_repair_tick -= delta
 		if _repair_tick <= 0.0:
 			_repair_tick = REPAIR_TICK_SECONDS
@@ -533,14 +539,32 @@ func _update_repair(delta: float, feet: Vector2) -> void:
 				sound.emit("repair_done")
 			_sparks(target.position)
 			_complete_if_all_racks_done(target.task_id)
+			hud.set_prompt(ControlPrompt.make())
 
 
-func _level_prompt(feet: Vector2) -> String:
+func _level_prompt(feet: Vector2) -> Dictionary:
 	var column := int(floorf(feet.x / LevelBuilder.TILE))
 	for prompt: Dictionary in level["header"].get("prompts", []):
 		if absi(column - int(prompt["x"])) <= 3:
-			return String(prompt["text"])
-	return ""
+			var task_id: String = prompt.get("task", "")
+			if not task_id.is_empty():
+				if tasks.is_done(task_id):
+					continue
+				if prompt["action"] == "diagnose":
+					var diagnosed := false
+					for rack in entities["racks"]:
+						if rack.task_id == task_id and rack.diagnosed:
+							diagnosed = true
+					if diagnosed:
+						continue
+				var switched := false
+				for panel in entities["switches"]:
+					if panel.task_id == task_id and panel.on:
+						switched = true
+				if switched:
+					continue
+			return ControlPrompt.make(prompt["action"], prompt["intent"], prompt["text"], prompt["status"], _action_held(StringName(prompt["action"])) if not prompt["action"].is_empty() else false)
+	return ControlPrompt.make()
 
 
 func _complete_if_all_racks_done(task_id: String) -> void:
@@ -566,6 +590,7 @@ func _respawn() -> void:
 
 func _finish() -> void:
 	completed = true
+	hud.set_prompt(ControlPrompt.make())
 	timer.stop()
 	player.locked = true
 	var par := float(level["header"]["par_seconds"])

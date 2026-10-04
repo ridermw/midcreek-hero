@@ -2,12 +2,14 @@ extends RefCounted
 
 const LEVEL_IDS: Array[String] = ["01", "02", "03", "04", "05"]
 const DEFAULT_SETTINGS := {"music_volume": 0.8, "sfx_volume": 0.9}
+const CONTROL_DISPLAYS := ["keyboard", "gamepad", "touch"]
 
 var path: String
 var character: String = "man"
 var levels: Dictionary = {}
 var unlocked: Array[String] = ["01"]
 var settings: Dictionary = DEFAULT_SETTINGS.duplicate()
+var warning_message := ""
 
 
 func _init(save_path: String = "user://save.json") -> void:
@@ -44,7 +46,14 @@ func load_data() -> void:
 		if String(level_id) not in unlocked:
 			unlocked.append(String(level_id))
 	for key: String in data.get("settings", {}):
-		settings[key] = clampf(float(data["settings"][key]), 0.0, 1.0)
+		var value: Variant = data["settings"][key]
+		if key == "control_display":
+			if value is String and value in CONTROL_DISPLAYS:
+				settings[key] = value
+			else:
+				warning_message = "The saved control display was invalid. Using the device default; progress is safe."
+		else:
+			settings[key] = clampf(float(value), 0.0, 1.0)
 
 
 func save() -> bool:
@@ -63,8 +72,10 @@ func save() -> bool:
 			"  ",
 		)
 	)
+	file.flush()
+	var success := file.get_error() == OK
 	file.close()
-	return true
+	return success
 
 
 func record(level_id: String, earned_stars: int, seconds: float, optional_done: int) -> void:
@@ -132,6 +143,8 @@ func _is_valid(data: Variant) -> bool:
 		if not data["settings"] is Dictionary:
 			return false
 		for key: Variant in data["settings"]:
+			if key == "control_display":
+				continue
 			if key not in DEFAULT_SETTINGS or not _is_number(data["settings"][key]):
 				return false
 	return true
@@ -142,3 +155,4 @@ func _reset() -> void:
 	levels = {}
 	unlocked = ["01"]
 	settings = DEFAULT_SETTINGS.duplicate()
+	warning_message = ""

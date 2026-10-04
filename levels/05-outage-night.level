@@ -8,27 +8,47 @@
   "prompts": [
     {
       "x": 2,
-      "text": "Outage! Slide under security drones with C"
+      "action": "slide",
+      "intent": "press",
+      "text": "slide under security drones",
+      "status": "Outage!"
     },
     {
       "x": 21,
-      "text": "Reseat the core uplink"
+      "task": "c3",
+      "action": "repair",
+      "intent": "press",
+      "text": "reseat the core uplink",
+      "status": ""
     },
     {
       "x": 57,
-      "text": "Spare PSU. The lift goes up to the PDU deck"
+      "action": "",
+      "intent": "",
+      "text": "",
+      "status": "Spare PSU. The lift goes up to the PDU deck"
     },
     {
       "x": 96,
-      "text": "Reboot the spine switch: 1, 2, 3"
+      "task": "b1",
+      "action": "repair",
+      "intent": "press",
+      "text": "throw switch 1",
+      "status": "Reboot the spine switch: 1, 2, 3 in order."
     },
     {
       "x": 129,
-      "text": "Optional: a rack on the catwalk"
+      "action": "",
+      "intent": "",
+      "text": "",
+      "status": "Optional: a rack on the catwalk"
     },
     {
       "x": 392,
-      "text": "Final job: bring the whole row back online"
+      "action": "",
+      "intent": "",
+      "text": "",
+      "status": "Final job: bring the whole row back online"
     }
   ],
   "tasks": [

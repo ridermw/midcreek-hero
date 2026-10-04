@@ -19,6 +19,8 @@ const RUNTIME_TEXTURES: Array[String] = [
 	"res://art/cel-shift/hazards/frames/cable-snag/00.png",
 	"res://art/cel-shift/props/frames/coolant/00.png",
 	"res://art/cel-shift/ui/frames/health-full/00.png",
+	"res://art/cel-shift/ui/frames/title/00.png",
+	"res://art/cel-shift/ui/icon.png",
 	"res://art/cel-shift/animations/frames/woman-midcreek/slide/00.png",
 ]
 

@@ -93,8 +93,10 @@ func run() -> void:
 	player.on_ladder = true
 	player.input_override = {"vertical": -1.0}
 	var start_y := player.position.y
+	var ladder_x := player.position.x
 	await frames(30)
 	check(player.motor.climbing and player.position.y < start_y - 30.0, "Holding up on a ladder climbs.")
+	check(absf(player.position.x - ladder_x) < 0.01, "Holding only Up does not move the character sideways.")
 	player.on_ladder = false
 	player.input_override = {}
 	await frames(60)

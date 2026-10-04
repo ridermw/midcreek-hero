@@ -41,8 +41,8 @@ func play(file_name: String) -> void:
 	if file_name == "01-cold-aisle.route.json":
 		var prompts: Array = level.level["header"]["prompts"]
 		for i: int in range(3):
-			var text: String = prompts[i]["text"]
-			check(text.contains("Pad:"), "Onboarding includes gamepad controls: " + text)
+			var model := preload("res://game/control_prompt.gd").render(prompts[i], "gamepad")
+			check(not model["graphic"].is_empty() and model["graphic"]["shape"] == "button", "Onboarding resolves selected gamepad controls.")
 	var results: Array[Dictionary] = []
 	level.finished.connect(func(result: Dictionary) -> void: results.append(result))
 	var sla := float(level.level["header"]["sla_seconds"])

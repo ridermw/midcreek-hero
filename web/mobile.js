@@ -27,7 +27,44 @@
     }
   }
 
-  if (typeof module !== "undefined") module.exports = {isPhone, TouchState};
+  function renderPrompt(text, graphic, buttons, model = {}, carry = "", reducedMotion = false, compact = false, announcement = null, standaloneTouch = false) {
+    const description = [model.description, carry].filter(Boolean).join(" | ");
+    const visibleText = compact
+      ? [model.action && model.intent === "hold" ? "Hold" : "", model.status, carry].filter(Boolean).join(" | ")
+      : description;
+    if (text.textContent !== visibleText) text.textContent = visibleText;
+    if (announcement) {
+      if (announcement.textContent !== description) announcement.textContent = description;
+    } else if (text.getAttribute("aria-label") !== description) text.setAttribute("aria-label", description);
+    const glyph = model.graphic;
+    graphic.hidden = !model.action || !glyph || (model.display === "touch" && !standaloneTouch);
+    if (!graphic.hidden) {
+      graphic.textContent = glyph.label;
+      graphic.dataset.shape = glyph.shape;
+    }
+    graphic.classList.toggle("guidance-pulse", !graphic.hidden && !!model.pulse && !model.held && !reducedMotion);
+    for (const button of buttons) {
+      const current = model.display === "touch" && button.dataset.action === model.action;
+      button.classList.toggle("guidance-cue", current);
+      button.classList.toggle("guidance-pulse", current && !!model.pulse && !model.held && !reducedMotion);
+    }
+  }
+
+  function demoFrame(demo, seconds, reducedMotion = false) {
+    const duration = demo.steps.reduce((sum, step) => sum + step.seconds, 0);
+    let remaining = reducedMotion ? 0 : ((seconds % duration) + duration) % duration;
+    for (let i = 0; i < demo.steps.length; i++) {
+      const step = demo.steps[i];
+      if (remaining < step.seconds) {
+        const clip = demo.clips[step.clip];
+        return {step: i, frame: clip.frames[Math.floor(remaining * clip.fps) % clip.frames.length],
+          x: step.from + (step.to - step.from) * remaining / step.seconds};
+      }
+      remaining -= step.seconds;
+    }
+  }
+
+  if (typeof module !== "undefined") module.exports = {isPhone, TouchState, renderPrompt, demoFrame};
   if (!root.document) return;
   const enabled = isPhone({
     touch: navigator.maxTouchPoints,
@@ -41,6 +78,9 @@
   let menu;
   let controls;
   let prompt;
+  let promptGraphic;
+  let promptText;
+  let promptAnnouncement;
   let status;
   let rotate;
   let notice;
@@ -48,6 +88,7 @@
   let lastPortrait;
   let lastOrientation;
   let clearing = false;
+  let helpAnimation;
   const contexts = [];
   const activeContacts = new Set();
   const state = new TouchState((action, down) => {
@@ -192,7 +233,16 @@
     status.id = "mobile-status";
     prompt = element("div", "", controls);
     prompt.id = "mobile-prompt";
-    prompt.setAttribute("role", "status");
+    promptGraphic = element("span", "", prompt);
+    promptGraphic.className = "control-graphic";
+    promptGraphic.setAttribute("aria-hidden", "true");
+    promptText = element("span", "", prompt);
+    promptText.className = "hint-visible";
+    promptText.setAttribute("aria-hidden", "true");
+    promptAnnouncement = element("span", "", prompt);
+    promptAnnouncement.className = "visually-hidden";
+    promptAnnouncement.setAttribute("role", "status");
+    promptAnnouncement.setAttribute("aria-atomic", "true");
     rotate = element("p", "Rotate your phone to landscape to play. The game is paused.", shell);
     rotate.id = "mobile-rotate";
     notice = element("p", "", shell);
@@ -209,8 +259,71 @@
     root.visualViewport?.addEventListener("resize", layout);
     layout();
   }
+  function buildHelp(help) {
+    element("h2", `${help.title} · ${help.page} / ${help.count}`, menu);
+    for (const control of help.controls) {
+      const row = element("p", "", menu);
+      const glyph = element("span", control.graphic.label, row);
+      glyph.className = "control-graphic";
+      glyph.dataset.shape = control.graphic.shape;
+      glyph.setAttribute("aria-hidden", "true");
+      element("span", control.description, row);
+    }
+    if (help.demo?.steps?.length) {
+      const canvas = element("canvas", "", menu);
+      canvas.width = 520;
+      canvas.height = 190;
+      canvas.className = "help-demo";
+      canvas.setAttribute("role", "img");
+      canvas.setAttribute("aria-label", `${help.title} demonstration.`);
+      const caption = element("p", "", menu);
+      const glyph = element("span", "", caption);
+      glyph.className = "control-graphic";
+      glyph.setAttribute("aria-hidden", "true");
+      const text = element("span", "", caption);
+      const images = {};
+      for (const [id, source] of Object.entries(help.demo.images)) {
+        images[id] = new Image();
+        images[id].src = source;
+      }
+      const started = performance.now();
+      const context = canvas.getContext("2d");
+      function draw(id, x, y, width, height) {
+        const image = images[id];
+        if (image?.complete && image.naturalWidth) context.drawImage(image, x, y, width, height);
+      }
+      function animate() {
+        const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+        const frame = demoFrame(help.demo, (performance.now() - started) / 1000, reduced);
+        const step = help.demo.steps[frame.step];
+        context.fillStyle = "#061014";
+        context.fillRect(0, 0, 520, 190);
+        context.imageSmoothingEnabled = false;
+        context.fillStyle = "#526773";
+        context.fillRect(16, 163, 488, 2);
+        for (const prop of step.props) {
+          draw(prop.image, prop.x - prop.width / 2, 162 - prop.height, prop.width, prop.height);
+          if (prop.label) {
+            context.fillStyle = "#eaf5fa";
+            context.font = "16px system-ui";
+            context.fillText(prop.label, prop.x - 12, 20);
+          }
+        }
+        draw(frame.frame, frame.x - 62.4, 51.6, 124.8, 124.8);
+        if (step.carry) draw("props/psu", frame.x + 22, 106, 22, 22);
+        // Help has no live touch controls; its touch examples need a graphic of their own.
+        renderPrompt(text, glyph, [], step.prompt, "", reduced, false, null, true);
+        helpAnimation = requestAnimationFrame(animate);
+      }
+      animate();
+    }
+    element("p", help.instructions, menu).className = "menu-summary";
+  }
   function render(json) {
+    const previousModel = model;
     model = JSON.parse(json);
+    const changingHelpPage = model.screen === "help" &&
+      (previousModel?.screen !== "help" || previousModel.help?.page !== model.help?.page);
     const playing = model.screen === "level" && !model.paused;
     document.body.classList.toggle("mobile-playing", playing);
     controls.hidden = !playing;
@@ -222,17 +335,23 @@
     }
     const statusText = model.status || "";
     if (status.textContent !== statusText) status.textContent = statusText;
-    const promptText = [model.prompt, model.carry].filter(Boolean).join(" | ");
-    if (prompt.textContent !== promptText) prompt.textContent = promptText;
+    renderPrompt(promptText, promptGraphic, controls.querySelectorAll("[data-action]"),
+      playing ? model.prompt : {}, playing ? model.carry : "",
+      matchMedia("(prefers-reduced-motion: reduce)").matches, true, promptAnnouncement);
     if (revision === model.revision) return;
     revision = model.revision;
+    if (helpAnimation) cancelAnimationFrame(helpAnimation);
+    helpAnimation = undefined;
     releaseAll();
     notice.hidden = true;
     menu.replaceChildren();
-    element("h1", model.paused ? "Paused" : "Midcreek Hero", menu);
+    element("h1", model.screen === "help" ? "How to Play" : model.paused ? "Paused" : "Midcreek Hero", menu);
     const summary = model.summary.replace("Press any key or button", "Use the touchscreen controls.");
-    if (summary && summary !== "Paused") element("p", summary, menu).className = "menu-summary";
-    if (model.paused && model.tasks) element("p", model.tasks, menu).className = "menu-summary";
+    if (model.screen === "help") buildHelp(model.help);
+    else {
+      if (summary && summary !== "Paused") element("p", summary, menu).className = "menu-summary";
+      if (model.paused && model.tasks) element("p", model.tasks, menu).className = "menu-summary";
+    }
     for (const item of model.controls) {
       if (item.kind === "button") {
         const button = element("button", item.text, menu);
@@ -254,6 +373,7 @@
       }
     }
     menu.querySelector("button:not(:disabled), input")?.focus({preventScroll: true});
+    if (changingHelpPage) menu.scrollTop = 0;
   }
   root.MidcreekTouch = {
     enabled,

@@ -10,6 +10,7 @@ var _controls: Dictionary = {}
 var _callback: JavaScriptObject
 var _browser: JavaScriptObject
 var _publish_after := 0.0
+var _published_help_revision := -1
 
 
 func _ready() -> void:
@@ -87,13 +88,29 @@ func command(data: Dictionary) -> bool:
 func menu_model() -> Dictionary:
 	var source: Node = main.pause_menu if get_tree().paused and main.screen_name == "level" else main.screen
 	var model := {"screen": main.screen_name, "paused": get_tree().paused, "revision": revision, "controls": [], "summary": ""}
+	if is_instance_valid(main.help_view):
+		source = main.help_view
+		model["screen"] = "help"
+		model["help"] = main.help_view.browser_model()
 	_controls.clear()
 	if not is_instance_valid(source):
-		model["summary"] = main.error_message
+		model["summary"] = main.error_message if not main.error_message.is_empty() else ("Work order unavailable." if model["screen"] == "level" else "")
 		return model
-	if main.screen_name == "level" and not get_tree().paused:
+	if model["screen"] == "level":
+		var hud = main.screen.get("hud") if is_instance_valid(main.screen) else null
+		var health = main.screen.get("health") if is_instance_valid(main.screen) else null
+		if not is_instance_valid(hud) or not is_instance_valid(health):
+			model["summary"] = main.error_message if not main.error_message.is_empty() else "Work order unavailable."
+			return model
+		model["prompt"] = hud.prompt_model()
+		model["status"] = "%s | Health %d/5" % [hud.timer_label.text, health.segments]
+		model["tasks"] = "\n".join(hud.task_lines())
+		model["carry"] = hud.carry_label.text
+	if model["screen"] == "level" and not get_tree().paused:
 		return model
 	var labels: Array[String] = []
+	if not main.notice_message.is_empty():
+		labels.append(main.notice_message)
 	var last_label := ""
 	for node: Node in source.find_children("*", "", true, false):
 		if node is Label and not node.text.is_empty():
@@ -123,31 +140,12 @@ func _physics_process(_delta: float) -> void:
 func _process(delta: float) -> void:
 	if not enabled or _browser == null:
 		return
+	if main.help_view != null and _published_help_revision == revision:
+		return
 	_publish_after -= delta
 	if _publish_after > 0.0:
 		return
 	_publish_after = 0.1
 	var model := menu_model()
-	if main.screen_name == "level" and is_instance_valid(main.screen.hud):
-		var hud = main.screen.hud
-		model["prompt"] = touch_prompt(hud.prompt_label.text)
-		model["status"] = "%s | Health %d/5" % [hud.timer_label.text, main.screen.health.segments]
-		model["tasks"] = "\n".join(hud.task_lines())
-		model["carry"] = hud.carry_label.text
 	_browser.render(JSON.stringify(model))
-
-
-static func touch_prompt(text: String) -> String:
-	var replacements := {
-		"Run: A / D or arrows. Pad: left stick": "Run with Left and Right.",
-		"Space. Pad: A": "Jump",
-		"hold E. Pad: hold X": "hold Repair",
-		"E / X": "Repair", "Q / Y": "Diagnose", "Space / A": "Jump",
-		"E or X": "Repair", "Q or Y": "Diagnose",
-		"Hold E": "Hold Repair", "hold E": "hold Repair",
-		"Press Q": "Press Diagnose", "press E": "press Repair",
-		"C or Shift": "Slide", "with C": "with Slide", "W or Up": "Up",
-	}
-	for original: String in replacements:
-		text = text.replace(original, replacements[original])
-	return text
+	_published_help_revision = revision if main.help_view != null else -1

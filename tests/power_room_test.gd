@@ -93,7 +93,7 @@ func run() -> void:
 	check(panels()[0].order == 1 and panels()[2].order == 3, "Panels know their order.")
 	at(Vector2i(12, 4))
 	level.step(DT)
-	check(level.hud.prompt_label.text.contains("switch 2"), "The HUD names the panel number.")
+	check(level.hud.prompt_model()["description"].contains("switch 2"), "The accessible hint names the panel number.")
 	tap(&"repair")
 	check(not panels()[1].on and "timer_warning" in sounds, "A switch out of order resets the panels.")
 	check(level.hud.prompt_label.text.contains("Wrong order"), "The switch error survives the input frame.")
@@ -102,7 +102,7 @@ func run() -> void:
 	check(level.hud.prompt_label.text.contains("Wrong order"), "The switch error remains readable after releasing the button.")
 	for i: int in range(90):
 		level.step(DT)
-	check(level.hud.prompt_label.text.contains("Throw switch 2"), "The normal switch prompt returns after the error.")
+	check(level.hud.prompt_model()["description"].contains("Throw switch 2"), "The normal switch prompt returns after the error.")
 	tap(&"repair")
 	at(Vector2i(2, 4))
 	for i: int in range(90):

@@ -96,10 +96,10 @@ func run() -> void:
 	check(not level.player.on_ladder, "Leaving the ladder clears on_ladder.")
 	at(Vector2i(15, 4))
 	level.step(DT)
-	check(level.hud.prompt_label.text.contains("reseat"), "A cable port offers a reseat.")
+	check(level.hud.prompt_model()["description"].contains("reseat"), "A cable port offers a reseat.")
 	tap(&"repair")
 	check(level.entities["ports"][0].state == "active" and level.player.locked, "Pressing repair starts the sequence and locks the player.")
-	check(level.hud.prompt_label.text.contains(KEYS[sequence[0]]), "The HUD shows the next button.")
+	check(level.hud.prompt_graphic.text == KEYS[sequence[0]], "The HUD shows the next graphical button.")
 	for i: int in range(sequence.size()):
 		level.action_override = {sequence[i]: true}
 		level.step(DT)

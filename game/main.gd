@@ -39,6 +39,10 @@ var _master_was_muted: bool = false
 var _level_files: Dictionary = {}
 var _level_names: Dictionary = {}
 var mobile: Node
+var help_menu: CanvasLayer
+var help_view: Control
+var notice_message := ""
+var notice_label: Label
 
 
 func _ready() -> void:
@@ -46,6 +50,16 @@ func _ready() -> void:
 	InputSetup.install()
 	save = SaveStore.new(save_path)
 	save.load_data()
+	var notices := CanvasLayer.new()
+	notices.layer = 30
+	add_child(notices)
+	notice_label = Label.new()
+	notice_label.position = Vector2(12, 8)
+	notice_label.size = Vector2(936, 60)
+	notice_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	notice_label.add_theme_color_override("font_color", Color(1.0, 0.8, 0.35))
+	notices.add_child(notice_label)
+	show_notice(save.warning_message)
 	audio = AudioDirector.new()
 	audio.name = "Audio"
 	add_child(audio)
@@ -119,7 +133,38 @@ func _quit_smoke() -> void:
 func set_volume(key: String, value: float) -> void:
 	save.settings[key] = clampf(value, 0.0, 1.0)
 	audio.set_bus_volume("Music" if key == "music_volume" else "SFX", save.settings[key])
-	save.save()
+	_persist()
+
+
+func control_display() -> String:
+	return String(save.settings.get("control_display", "touch" if mobile != null and mobile.enabled else "keyboard"))
+
+
+func set_control_display(value: String) -> void:
+	if value not in SaveStore.CONTROL_DISPLAYS:
+		return
+	save.settings["control_display"] = value
+	_persist()
+	if screen_name == "level":
+		screen.hud.control_display = control_display()
+	if screen_name == "settings":
+		screen.refresh_choices()
+		mobile.revision += 1
+
+
+func _persist() -> void:
+	if not save.save():
+		show_notice("Could not save changes. They apply for this session only; check available storage.")
+	elif not notice_message.is_empty():
+		show_notice("")
+
+
+func show_notice(message: String) -> void:
+	notice_message = message
+	notice_label.text = message
+	notice_label.visible = not message.is_empty()
+	if mobile != null:
+		mobile.revision += 1
 
 
 func smoke_status() -> String:
@@ -132,7 +177,7 @@ func smoke_status() -> String:
 
 
 func _physics_process(delta: float) -> void:
-	if route_runner != null and screen_name == "level" and is_instance_valid(screen):
+	if route_runner != null and screen_name == "level" and is_instance_valid(screen) and not get_tree().paused:
 		route_runner.apply(screen, delta)
 		_smoke_report += delta
 		if OS.has_feature("web") and _smoke_report >= 1.0:
@@ -175,6 +220,7 @@ func next_playable(level_id: String) -> String:
 
 
 func go_to(target: String, data: Dictionary = {}) -> void:
+	_discard_help()
 	mobile.invalidate()
 	if target != "level":
 		_end_smoke()
@@ -205,6 +251,8 @@ func go_to(target: String, data: Dictionary = {}) -> void:
 		audio.play_music("results")
 	elif target == "level":
 		if screen.error_message.is_empty():
+			screen.hud.control_display = control_display()
+			screen.hud.prompt_row.visible = not mobile.enabled
 			screen.hud.prompt_label.visible = not mobile.enabled
 			audio.play_music(String(screen.level["header"]["music"]))
 	else:
@@ -216,7 +264,7 @@ func go_to(target: String, data: Dictionary = {}) -> void:
 
 func choose_character(character: String) -> void:
 	save.character = character
-	save.save()
+	_persist()
 	go_to("level_select")
 
 
@@ -228,24 +276,70 @@ func start_level(level_id: String) -> void:
 func toggle_pause() -> void:
 	if screen_name != "level":
 		return
+	if help_view != null:
+		close_help()
+		return
 	mobile.invalidate()
 	var pausing := not get_tree().paused
 	get_tree().paused = pausing
 	pause_menu.visible = pausing
 	if pausing:
+		screen.hud.set_prompt({})
 		_pause_first.grab_focus()
 
 
 func _unhandled_input(event: InputEvent) -> void:
-	if event.is_action_pressed(&"pause") and screen_name == "level":
-		toggle_pause()
+	if event.is_action_pressed(&"pause") and (screen_name == "level" or help_view != null):
+		if help_view != null:
+			close_help()
+		else:
+			toggle_pause()
 		get_viewport().set_input_as_handled()
+
+
+func open_help() -> void:
+	if help_view != null:
+		return
+	if screen_name == "level":
+		if not get_tree().paused:
+			toggle_pause()
+		pause_menu.hide()
+	mobile.invalidate()
+	help_menu = CanvasLayer.new()
+	help_menu.layer = 20
+	help_menu.process_mode = Node.PROCESS_MODE_ALWAYS
+	add_child(help_menu)
+	help_view = preload("res://game/menus/help.gd").new()
+	help_menu.add_child(help_view)
+	help_view.build(self)
+
+
+func close_help() -> void:
+	_discard_help()
+	mobile.invalidate()
+	if screen_name == "level":
+		get_tree().paused = true
+		pause_menu.show()
+		_pause_first.grab_focus()
+	elif is_instance_valid(screen):
+		for button: Button in screen.find_children("*", "Button", true, false):
+			if button.text == "How to Play":
+				button.grab_focus()
+				break
+
+
+func _discard_help() -> void:
+	if is_instance_valid(help_menu):
+		remove_child(help_menu)
+		help_menu.queue_free()
+	help_view = null
+	help_menu = null
 
 
 func _on_level_finished(result: Dictionary) -> void:
 	if not smoke:
 		save.record(current_level_id, int(result["stars"]), float(result["elapsed"]), int(result["optional_done"]))
-		save.save()
+		_persist()
 	_show_results.call_deferred(result)
 
 
@@ -291,6 +385,7 @@ func _build_pause_menu() -> void:
 	var buttons: Array = []
 	for entry: Array in [
 		["Resume", toggle_pause],
+		["How to Play", open_help],
 		["Restart work order", func() -> void: start_level(current_level_id)],
 		["Quit to level select", func() -> void: go_to("level_select")],
 	]:

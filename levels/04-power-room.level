@@ -7,19 +7,32 @@
   "prompts": [
     {
       "x": 2,
-      "text": "Spark arcs flicker before they fire. Jump them"
+      "action": "jump",
+      "intent": "press",
+      "text": "jump the spark arcs",
+      "status": "Arcs flicker before they fire."
     },
     {
       "x": 16,
-      "text": "Reboot the core switch: throw switches 1, 2, 3 in order"
+      "task": "b1",
+      "action": "repair",
+      "intent": "press",
+      "text": "throw switch 1",
+      "status": "Reboot the core: switches 1, 2, 3 in order."
     },
     {
       "x": 39,
-      "text": "Ride the lift up to the busbar deck"
+      "action": "",
+      "intent": "",
+      "text": "",
+      "status": "Ride the lift up to the busbar deck"
     },
     {
       "x": 99,
-      "text": "Optional: a spare PSU sits on the upper deck"
+      "action": "",
+      "intent": "",
+      "text": "",
+      "status": "Optional: a spare PSU sits on the upper deck"
     }
   ],
   "tasks": [

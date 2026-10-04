@@ -53,7 +53,7 @@ func run() -> void:
 	check(level.get_node("World/Far").modulate.v < 0.7, "The far background is darker than gameplay objects.")
 	at(Vector2i(0, 2))
 	level.step(DT)
-	check(level.hud.prompt_label.text == "Run right", "Level prompts show near their column.")
+	check(level.hud.prompt_model()["action"] == "move_right", "Level prompts show near their column.")
 	at(Vector2i(9, 2))
 	level.step(DT)
 	check(level.hud.prompt_label.text == "", "Level prompts hide away from their column.")

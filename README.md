@@ -35,6 +35,21 @@ result), or `godot --headless --fixed-fps 60 --path . -- --route=03` on the desk
 
 The title screen has a Settings screen with music and sound effect volume
 sliders. The volumes are saved with your progress.
+Settings also selects Keyboard, Gamepad, or Touch control graphics.
+This choice changes the displayed controls, not which input devices work.
+Without a saved choice, detected phones use Touch and other devices use Keyboard.
+
+Open How to Play from the title screen for graphical controls and animated
+examples of all five work order types. During a level, press Escape and open
+How to Play from the pause menu. Back returns to the pause menu without
+restarting the level or resuming the timer.
+Action hints show one control for the selected display. The control pulses
+when an action is needed and stays steady while held. Task status remains
+visible when a part is missing or a switch sequence is wrong.
+
+The web loading screen and engine startup use the Midcreek Hero title artwork.
+The app icon uses the same pixels centered on a transparent 480 by 480 canvas,
+without stretching the logo. Loading progress and startup errors remain visible.
 
 The original sprite viewer is still in `viewer.tscn`. Run its checks with:
 
@@ -74,6 +89,8 @@ or `--layer equipment`, then `normalize --set <name>`.
 It uses nearest-neighbor sampling. Far and equipment layers become 640x360.
 The floor strip becomes 640x96. The equipment layer uses binary alpha.
 Source dimensions and transparency must match the layer contract.
+In gameplay, the distant layer scales uniformly to cover the level height,
+including the highest camera position. Equipment keeps its original scale.
 
 All animation prompts share one geometry: 512x512 source cells, a boot
 baseline at y=448, and a standing height of approximately 270 pixels. The
@@ -153,6 +170,19 @@ node --test tests/mobile_web_test.cjs
 tools/godot_test.sh tests/mobile_input_test.gd MOBILE_INPUT_TEST
 tools/godot_test.sh tests/mobile_bridge_test.gd MOBILE_BRIDGE_TEST
 ```
+
+Loading screen checks run with `node --test tests/loading_shell_test.cjs`.
+
+The help navigation browser regression requires Microsoft Edge and an installed
+Playwright package. Pass the absolute path to that package:
+
+```sh
+node tests/mobile_help_browser_test.mjs /absolute/path/to/node_modules/playwright
+```
+
+This check opens an isolated emulated phone browser. It verifies that changing
+help pages resets scroll position, while repeated updates preserve scroll and
+focus. It does not run in the default Node test command.
 
 For rendered browser checks, open the local export in a dedicated
 `agent-browser` session. Get that session's endpoint with
@@ -267,6 +297,21 @@ Technician clips: idle, walk, run, jump, slide, primary, secondary, reaction,
 signal, and climb for the man and the woman. Climb is drawn from behind with
 alternating hands and feet; it plays while the technician moves on a ladder and
 holds its pose while the technician stops on one.
+Climb normalization aligns the blue hard hat with the ladder axis in every
+frame. It preserves the shared scale and boot baseline, and rejects artwork
+that has no alignment anchor or would be clipped.
+
+To regenerate the square app icon from the title without changing its pixels:
+
+```sh
+python3 - <<'PY'
+from PIL import Image
+with Image.open("art/cel-shift/ui/frames/title/00.png") as title:
+    icon = Image.new("RGBA", (480, 480))
+    icon.paste(title.convert("RGBA"), (0, 180))
+    icon.save("art/cel-shift/ui/icon.png")
+PY
+```
 
     python3 tools/animation_assets.py render --variant woman-midcreek --clip jump
     python3 tools/animation_assets.py normalize --variant woman-midcreek --clip jump

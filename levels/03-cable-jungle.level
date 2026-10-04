@@ -7,27 +7,46 @@
   "prompts": [
     {
       "x": 2,
-      "text": "Low trays ahead: slide under them with C or Shift"
+      "action": "slide",
+      "intent": "press",
+      "text": "slide under the low trays",
+      "status": ""
     },
     {
       "x": 16,
-      "text": "Loose cables crawl along the floor. Time your jump"
+      "action": "jump",
+      "intent": "press",
+      "text": "jump the loose cables",
+      "status": "Time your jump."
     },
     {
       "x": 25,
-      "text": "Reseat the cable: press E, then each button shown"
+      "task": "c2",
+      "action": "repair",
+      "intent": "press",
+      "text": "start reseating the cable",
+      "status": "Follow each button shown."
     },
     {
       "x": 36,
-      "text": "Climb with W or Up, then step onto the catwalk"
+      "action": "move_up",
+      "intent": "hold",
+      "text": "climb onto the catwalk",
+      "status": ""
     },
     {
       "x": 58,
-      "text": "Grab the spare DIMM"
+      "action": "",
+      "intent": "",
+      "text": "",
+      "status": "Grab the spare DIMM"
     },
     {
       "x": 100,
-      "text": "Optional: a loose patch cable up the ladder"
+      "action": "",
+      "intent": "",
+      "text": "",
+      "status": "Optional: a loose patch cable up the ladder"
     }
   ],
   "tasks": [

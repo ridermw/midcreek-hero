@@ -15,6 +15,14 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 class AssetPipelineTest(unittest.TestCase):
+    def test_app_icon_preserves_the_title_artwork_without_stretching(self):
+        with Image.open(ROOT / "art/cel-shift/ui/frames/title/00.png") as title:
+            with Image.open(ROOT / "art/cel-shift/ui/icon.png") as icon:
+                self.assertEqual(icon.size, (480, 480))
+                self.assertEqual(icon.crop((0, 180, 480, 300)).tobytes(), title.tobytes())
+                self.assertIsNone(icon.crop((0, 0, 480, 180)).getbbox())
+                self.assertIsNone(icon.crop((0, 300, 480, 480)).getbbox())
+
     def test_export_includes_runtime_manifests(self):
         presets = configparser.ConfigParser()
         presets.read(ROOT / "export_presets.cfg")
@@ -114,6 +122,69 @@ class AssetPipelineTest(unittest.TestCase):
                 self.assertEqual(len(frames), 6)
                 self.assertTrue(all(abs(o) >= 3 for o in offsets), "pouch is visible beside the body")
                 self.assertTrue(all(o > 0 for o in offsets), "pouch stays on the right hip, image right in the back view")
+
+    def test_climb_hat_stays_over_the_ladder_axis(self):
+        for variant in animation_assets.VARIANTS:
+            for path in sorted((animation_assets.ART / "frames" / variant / "climb").glob("*.png")):
+                with Image.open(path) as frame:
+                    blue = [
+                        x for y in range(85) for x in range(frame.width)
+                        if (lambda p: p[3] and p[2] - p[0] > 80 and p[2] - p[1] > 60)(
+                            frame.getpixel((x, y))
+                        )
+                    ]
+                with self.subTest(variant=variant, frame=path.name):
+                    self.assertTrue(blue, "the blue hard hat is visible")
+                    center = (min(blue) + max(blue)) / 2
+                    self.assertLessEqual(abs(center - 104), 3, "climb helmet bounds stay over the ladder axis")
+
+    def test_climb_alignment_preserves_pixels_and_baseline(self):
+        frame = Image.new("RGBA", (208, 208))
+        frame.paste((15, 80, 180, 255), (132, 35, 149, 51))
+        frame.paste((180, 200, 20, 255), (128, 52, 155, 125))
+        frame.paste((60, 40, 20, 255), (134, 125, 150, 184))
+        aligned = animation_assets.align_climb(frame)
+        self.assertEqual(aligned.getpixel((104, 40)), (15, 80, 180, 255))
+        self.assertEqual(aligned.getbbox()[3], 184)
+        self.assertEqual(sorted(frame.getcolors(208 * 208)), sorted(aligned.getcolors(208 * 208)))
+        self.assertEqual(aligned.tobytes(), animation_assets.align_climb(aligned).tobytes())
+
+    def test_climb_alignment_rejects_missing_anchor_and_clipping(self):
+        with self.assertRaisesRegex(ValueError, "hard hat"):
+            animation_assets.align_climb(Image.new("RGBA", (208, 208)))
+        frame = Image.new("RGBA", (208, 208))
+        frame.paste((15, 80, 180, 255), (12, 35, 29, 51))
+        frame.putpixel((207, 120), (120, 120, 120, 255))
+        with self.assertRaisesRegex(ValueError, "clipping"):
+            animation_assets.align_climb(frame)
+
+    def test_climb_alignment_ignores_separate_blue_shoulders(self):
+        frame = Image.new("RGBA", (208, 208))
+        frame.paste((15, 80, 180, 255), (112, 35, 129, 51))
+        frame.paste((15, 80, 180, 255), (50, 70, 101, 84))
+        aligned = animation_assets.align_climb(frame)
+        self.assertEqual(aligned.getpixel((104, 40)), (15, 80, 180, 255))
+        self.assertEqual(aligned.getpixel((40, 75)), (15, 80, 180, 255))
+
+    def test_normalize_climb_aligns_authored_off_center_figures(self):
+        with tempfile.TemporaryDirectory() as directory:
+            art = Path(directory)
+            source = art / "generated/man-midcreek"
+            source.mkdir(parents=True)
+            sheet = Image.new("RGBA", (1536, 1024))
+            for index, center in enumerate((280, 300, 320, 240, 260, 220)):
+                x, y = index % 3 * 512, index // 3 * 512
+                sheet.paste((15, 80, 180, 255), (x + center - 20, y + 100, x + center + 20, y + 140))
+                sheet.paste((180, 200, 20, 255), (x + center - 30, y + 145, x + center + 30, y + 320))
+                sheet.paste((60, 40, 20, 255), (x + center - 20, y + 320, x + center + 20, y + 448))
+                sheet.paste((255, 255, 255, 255), (x + center, y + 160 + index * 12, x + center + 9, y + 169 + index * 12))
+            sheet.save(source / "climb.png")
+            with patch.object(animation_assets, "ART", art):
+                animation_assets.normalize("man-midcreek", "climb")
+            for path in sorted((art / "frames/man-midcreek/climb").glob("*.png")):
+                with self.subTest(frame=path.name), Image.open(path) as frame:
+                    self.assertEqual(frame.getpixel((104, 72)), (15, 80, 180, 255))
+                    self.assertEqual(frame.getbbox()[3], 184)
 
     def test_ponytail_guidance_is_woman_specific(self):
         for clip in animation_assets.CLIPS:

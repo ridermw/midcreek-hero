@@ -15,6 +15,24 @@ LEVELS = {
 
 
 class LevelLayoutTest(unittest.TestCase):
+    def test_authored_guidance_carries_one_explicit_action(self):
+        actions = {"move_left", "move_right", "move_up", "move_down", "jump", "slide", "repair", "diagnose", "pause"}
+        for name in LEVELS:
+            for prompt in importlib.import_module(f"tools.levels.{name}").build()[1]["prompts"]:
+                with self.subTest(level=name, column=prompt["x"]):
+                    self.assertIn("action", prompt)
+                    self.assertIn("status", prompt)
+                    if prompt["action"]:
+                        self.assertIn(prompt["action"], actions)
+                        self.assertIn(prompt["intent"], ["press", "hold"])
+                        self.assertTrue(prompt["text"])
+                        if prompt["action"] in {"repair", "diagnose"}:
+                            self.assertIn(prompt.get("task"), {task["id"] for task in importlib.import_module(f"tools.levels.{name}").build()[1]["tasks"]})
+                    else:
+                        self.assertEqual(prompt["intent"], "")
+                        self.assertTrue(prompt["status"])
+                    self.assertNotRegex(prompt["text"] + prompt["status"], r"Pad:|E or X|E / X|Q / Y|C or Shift|hold E|Press Q")
+
     def test_par_and_sla_follow_the_plan_rule(self):
         self.assertEqual(layout.par_and_sla(42.3), (55, 90))
         self.assertEqual(layout.par_and_sla(35.88), (45, 75))

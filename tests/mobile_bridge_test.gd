@@ -23,10 +23,6 @@ func run() -> void:
 		finish()
 		return
 	var bridge = main.mobile
-	check(bridge.touch_prompt("Run: A / D or arrows. Pad: left stick") == "Run with Left and Right.", "Touch tutorial names movement controls.")
-	check(bridge.touch_prompt("Low trays ahead: slide under them with C or Shift") == "Low trays ahead: slide under them with Slide", "Touch tutorial names Slide.")
-	check(bridge.touch_prompt("Climb with W or Up, then step onto the catwalk") == "Climb with Up, then step onto the catwalk", "Touch tutorial names Up.")
-	check(bridge.touch_prompt("Press Q to diagnose, then hold E to repair") == "Press Diagnose to diagnose, then hold Repair to repair", "Touch tutorial names both task controls.")
 	check(not bridge.enabled, "Desktop does not enable the mobile interface.")
 	bridge.enabled = true
 	main.audio.unlocked = false
@@ -54,6 +50,13 @@ func run() -> void:
 	main.screen.set_physics_process(false)
 	main.screen.player.set_physics_process(false)
 	check(not main.screen.hud.prompt_label.visible, "Mobile uses the readable browser prompt instead of a duplicate keyboard prompt.")
+	main.screen.hud.set_prompt({"action": "repair", "intent": "hold", "text": "repair", "status": ""})
+	var guidance: Dictionary = bridge.menu_model().get("prompt", {})
+	check(guidance.get("action") == "repair" and guidance.get("description") == "Hold Repair to repair", "Bridge publishes one structured action and description.")
+	bridge.command({"type": "action", "action": "repair", "down": true})
+	main.screen.hud.set_prompt({"action": "jump", "intent": "press", "text": "reseat cable", "status": ""})
+	check(bridge.input.held(&"repair"), "Changing guidance never clears touch input.")
+	check(bridge.menu_model().get("prompt", {}).get("action") == "jump", "The next cable action reaches the browser without prose parsing.")
 	for action: String in ["move_left", "move_right", "move_up", "move_down", "jump", "slide", "repair", "diagnose"]:
 		bridge.command({"type": "action", "action": action, "down": true})
 	bridge.input.advance()
@@ -70,6 +73,7 @@ func run() -> void:
 	Input.action_release(&"move_right")
 	bridge.command({"type": "pause"})
 	check(paused and not bridge.input.held(&"move_up"), "Pause releases movement.")
+	check(bridge.menu_model().get("prompt", {}).get("action") == "", "Pause clears the published cue.")
 	model = bridge.menu_model()
 	check(activate(bridge, model, "Restart work order"), "Touch can restart from pause.")
 	await process_frame
@@ -88,6 +92,18 @@ func run() -> void:
 	check(activate(bridge, bridge.menu_model(), "Quit to level select"), "Touch can quit to work orders.")
 	await process_frame
 	await exercise_tasks(main, bridge)
+	main.toggle_pause()
+	main.open_help()
+	main.screen.free()
+	main.screen = null
+	var retired_help: Dictionary = bridge.menu_model()
+	check(retired_help.get("screen") == "help" and not retired_help.get("controls", []).is_empty(), "A retained help view does not dereference a retired level.")
+	check(not retired_help.has("status") and not retired_help.has("prompt"), "Self-contained help does not publish live-level telemetry.")
+	main.close_help()
+	var retired_pause: Dictionary = bridge.menu_model()
+	check(retired_pause.get("summary") == "Work order unavailable." and not retired_pause.has("status"), "An unavailable paused level returns a precise error rather than dereferencing it.")
+	main.go_to("title")
+	await process_frame
 	main.queue_free()
 	await process_frame
 	await create_timer(0.3).timeout
