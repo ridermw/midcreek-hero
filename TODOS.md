@@ -113,10 +113,44 @@ The baseline uses `3f35b12`. The corrected player matches `032ae3b`.
 Rendered movies remain local session artifacts, not published evidence.
 The repeatable harness is `tests/animation_probe.gd`.
 Native cadence, player, help, and hit stop checks pass. Both native help
-demonstrations were captured. Exported browser verification remains unresolved:
-the browser canvas does not expose the tool needed to obtain its page handle,
-and the fallback `agent-browser` executable is absent. Physical phone evidence
-and player difficulty observations also remain unresolved.
+demonstrations were captured. The available Edge Work Browser subsequently
+rendered the desktop export and completed the male Level 3 route without hits
+or respawns. Browser frame timing and complete motion coverage remain unresolved.
+Physical phone evidence and player difficulty observations also remain unresolved.
+
+### Verified increment: climb cadence and direction
+
+- [x] Diagnose the reported mismatch between climbing motion and playback.
+  Six frames at 8 fps take 0.75 seconds while the hero travels 67.5 world pixels.
+  The artwork depicts two hand steps; each 32 pixel ladder tile has two rungs.
+  Descent also played the ascent sequence forward.
+- [x] Tie the cycle to 32 pixels of movement and reverse it during descent.
+  The motor still moves at 90 pixels per second. Effective playback becomes
+  16.875 frames per second at that speed and scales with slower input.
+  Stopping and changing direction retain the current pose.
+- [x] Observe the failing regression for both heroes before changing playback.
+  All 33 cadence checks then pass, including diagonal input and sideways exits.
+  Real physics route segments cover ascent,
+  descent, and return for both heroes without hits or respawns.
+- [x] Capture native walking, running, repair, ascent, and descent for both heroes.
+  The [native trace](docs/evidence/animation-cadence/climb-after.json) records
+  playback speeds of 2.109375 for ascent and -2.109375 for descent.
+- [x] Capture a climb, stop, and reversal in the same rendered scene.
+  Each hero holds one unchanged position and sprite phase for 36 render samples
+  during the stop, then resumes with reversed playback. Neither segment takes
+  damage or respawns.
+- [ ] Finish exported browser coverage of the corrected ascent and descent.
+
+The climb test uses an isolated prefix of the authored Level 3 route. Adding
+descent to the full route shifted later moving hazard timing and caused hits,
+so the production route remains unchanged. Its full completion check still
+passes in 96.22 seconds without hits.
+
+Walking remains a separate asset task. The user identified repeated anatomical
+legs in pairs 2/6 and 3/7. All four opposite phase pairs require verification:
+1/5 contact, 2/6 loading, 3/7 passing, and 4/8 push off and reach.
+Do not treat distinct file hashes or different arm poses as proof that the
+legs alternate.
 
 ## 2. Select additional environments and tasks
 

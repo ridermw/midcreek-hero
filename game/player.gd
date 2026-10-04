@@ -10,6 +10,7 @@ const CEILING_MASK := 4
 const HURT_SECONDS := 0.4
 const RUN_THRESHOLD := 120.0
 const WALK_THRESHOLD := 10.0
+const CLIMB_CYCLE_PIXELS := 32.0
 
 @export_enum("man", "woman") var character: String = "man"
 
@@ -161,8 +162,14 @@ func update_animation() -> void:
 			sprite.play(clip)
 		if velocity == Vector2.ZERO:
 			sprite.pause()
-		elif not sprite.is_playing():
+		elif velocity.y == 0.0:
 			sprite.play(clip)
+		else:
+			# The alternating hand cycle covers the two rungs in one ladder tile.
+			var cycles_per_second := absf(velocity.y) / CLIMB_CYCLE_PIXELS
+			var frames := sprite.sprite_frames
+			var speed := cycles_per_second * frames.get_frame_count(clip) / frames.get_animation_speed(clip)
+			sprite.play(clip, -speed if velocity.y > 0.0 else speed)
 		return
 	if sprite.animation != clip:
 		sprite.play(clip)

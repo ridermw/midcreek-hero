@@ -37,6 +37,7 @@ func record(delta: float) -> void:
 		"camera": [current.camera.get_screen_center_position().x, current.camera.get_screen_center_position().y],
 		"clip": String(sprite.animation), "frame": sprite.frame,
 		"progress": sprite.frame_progress, "playing": sprite.is_playing(),
+		"playback_speed": sprite.get_playing_speed(),
 		"locked": player.locked, "action": String(player.action),
 		"climbing": player.motor.climbing, "hits": current.health.hits_taken,
 		"respawns": current.respawns,
@@ -53,7 +54,7 @@ func _process(delta: float) -> bool:
 
 func run() -> void:
 	for hero: String in ["man", "woman"]:
-		for action: String in ["run", "repair", "climb"]:
+		for action: String in ["walk", "run", "repair", "climb", "descend", "climb-turn"]:
 			current = LEVEL.instantiate()
 			current.character = hero
 			current.level_path = "res://levels/03-cable-jungle.level"
@@ -72,18 +73,34 @@ func run() -> void:
 			elif action == "climb":
 				at = Vector2(4880, 416)
 				seconds = 1.7
+			elif action == "descend":
+				at = Vector2(4880, 256)
+				seconds = 1.3
+			elif action == "climb-turn":
+				at = Vector2(4880, 352)
 			current.player.respawn(at)
 			await create_timer(0.2).timeout
-			if action == "run":
+			if action == "walk":
+				current.player.input_override = {"direction": 0.4}
+			elif action == "run":
 				current.player.input_override = {"direction": 1.0}
 			elif action == "repair":
 				current.action_override = {"repair": true}
-			else:
+			elif action in ["climb", "climb-turn"]:
 				current.player.input_override = {"vertical": -1.0}
+			else:
+				current.player.input_override = {"vertical": 1.0}
 			phase = hero + "-" + action
 			started = Time.get_ticks_usec()
 			DisplayServer.window_set_title("Animation probe: " + phase)
-			await create_timer(seconds).timeout
+			if action == "climb-turn":
+				await create_timer(0.5).timeout
+				current.player.input_override = {}
+				await create_timer(0.3).timeout
+				current.player.input_override = {"vertical": 1.0}
+				await create_timer(0.5).timeout
+			else:
+				await create_timer(seconds).timeout
 			phase = ""
 			current.queue_free()
 			await process_frame
