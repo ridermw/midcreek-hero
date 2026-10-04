@@ -13,6 +13,7 @@ var timer_label := Label.new()
 var task_list := VBoxContainer.new()
 var prompt_label := Label.new()
 var message_label := Label.new()
+var carry_label := Label.new()
 var _timer: SlaTimer
 var _tasks: TaskSystem
 
@@ -38,6 +39,9 @@ func _ready() -> void:
 	add_child(task_list)
 	prompt_label.position = Vector2(16, 680)
 	add_child(prompt_label)
+	carry_label.position = Vector2(16, 150)
+	carry_label.add_theme_color_override("font_color", Color(0.6, 0.9, 1.0))
+	add_child(carry_label)
 	message_label.position = Vector2(360, 340)
 	message_label.hide()
 	add_child(message_label)
@@ -130,6 +134,10 @@ func show_stars(count: int) -> void:
 		var icon := _icon("star-on" if i < count else "star-off", 3)
 		star_row.add_child(icon)
 		star_icons.append(icon)
+
+
+func set_carry(text: String) -> void:
+	carry_label.text = text
 
 
 func set_prompt(text: String) -> void:

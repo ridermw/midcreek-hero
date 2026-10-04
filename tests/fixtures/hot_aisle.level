@@ -1,0 +1,40 @@
+{
+  "name": "Hot Aisle Fixture",
+  "sla_seconds": 120,
+  "par_seconds": 60,
+  "music": "level2",
+  "background": "cold-aisle",
+  "tasks": [
+    {
+      "id": "f1",
+      "type": "fetch",
+      "at": [
+        "A"
+      ],
+      "part_at": "D",
+      "part": "psu",
+      "required": true
+    },
+    {
+      "id": "d1",
+      "type": "diagnose_repair",
+      "at": [
+        "B"
+      ],
+      "required": true
+    },
+    {
+      "id": "r1",
+      "type": "repair",
+      "at": [
+        "G"
+      ],
+      "required": true
+    }
+  ]
+}
+---
+..............................
+..............................
+P..v..A..C..D..B..C..G..C...E.
+##############################
