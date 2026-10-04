@@ -231,7 +231,7 @@ Each level milestone delivers these items. The subplan gives exact names.
 
 1. Mechanics and entities with headless tests. These are pure logic tests. Construct the node, call `advance(delta)` or the interaction method, and check the state.
 2. Catalog entries and normalized art for new tiles, hazards, and props. Use the art loop rule.
-3. A background set `art/cel-shift/environment/<background>/` with `far.png` (640x360), `equipment.png` (640x360, binary alpha), and `floor.png` (640x96). Generate them with `tools/environment_assets.py`, extended with `render --set <name>`. Use `layers/far.png` as the style reference image.
+3. A background set `art/cel-shift/environment/<background>/` with `far.png` (640x360) and `equipment.png` (640x360, binary alpha). The level draws only these 2 parallax layers; the floor comes from the tile art. Generate them with `python3 tools/environment_assets.py render --set <name> --layer far|equipment`, then `normalize --set <name>`. Each layer uses the matching `layers/` file of the cold aisle set as its style reference.
 4. A music track from a CC0 source, added through `audio/sources.json`.
 5. The level file, 160 to 260 tiles wide. It uses each new mechanic first in a safe spot, then under pressure. It has 3 checkpoints and 3 to 6 tasks.
 6. A route file that passes `tests/route_test.gd`.

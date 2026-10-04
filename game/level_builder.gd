@@ -53,7 +53,7 @@ func build_entities(level: Dictionary, parent: Node2D) -> Dictionary:
 		if task["type"] not in RACK_TASKS:
 			error_message = "Task type '%s' is not built yet." % task["type"]
 			return {}
-		var part_kind := String(task.get("part", "psu"))
+		var part_kind := String(task.get("part", ""))
 		for anchor: String in task["at"]:
 			var rack := Rack.new()
 			rack.task_id = task["id"]
