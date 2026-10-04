@@ -20,6 +20,7 @@ const Score = preload("res://game/score.gd")
 const Player = preload("res://game/player.gd")
 const Hud = preload("res://game/hud.gd")
 const CablePort = preload("res://game/entities/cable_port.gd")
+const SparkArc = preload("res://game/hazards/spark_arc.gd")
 const SpriteLibrary = preload("res://game/sprite_library.gd")
 const HeroAnimations = preload("res://game/animation_library.gd")
 const BACKGROUNDS := {
@@ -101,6 +102,9 @@ func load_level(path: String) -> bool:
 	if entities.is_empty():
 		error_message = "%s: %s" % [path, builder.error_message]
 		return false
+	for hazard in entities["hazards"]:
+		if hazard is SparkArc:
+			hazard.sparked.connect(sound.emit.bind("spark"))
 	for task: Dictionary in level["header"]["tasks"]:
 		tasks.add_task(task["id"], task["type"], task["required"], task.get("label", ""))
 	health.died.connect(_request_respawn)

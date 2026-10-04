@@ -64,6 +64,21 @@ func run() -> void:
 	check(is_equal_approx(Lift.offset_at(4.0), 48.0) and is_equal_approx(Lift.offset_at(5.0), 0.0), "A lift returns down over 2 s.")
 
 	load_fixture()
+	level.entities["hazards"][0].cell_x = 0
+	for i: int in range(113):
+		level.step(DT)
+	check(sounds.count("spark") == 0, "An arc stays silent while off or warning.")
+	for i: int in range(3):
+		level.step(DT)
+	check(sounds.count("spark") == 1, "An arc entering its active phase reaches the level audio path.")
+	for i: int in range(34):
+		level.step(DT)
+	check(sounds.count("spark") == 1, "An active arc does not replay its sound every frame.")
+	for i: int in range(150):
+		level.step(DT)
+	check(sounds.count("spark") == 2, "The next arc activation plays another spark sound.")
+
+	load_fixture()
 	check(level.error_message.is_empty(), "The power fixture loads: " + level.error_message)
 	check(panels().size() == 3 and level.entities["lifts"].size() == 1, "Switch panels and lifts are built.")
 	check(panels()[0].order == 1 and panels()[2].order == 3, "Panels know their order.")
