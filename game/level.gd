@@ -20,7 +20,13 @@ const Player = preload("res://game/player.gd")
 const Hud = preload("res://game/hud.gd")
 const SpriteLibrary = preload("res://game/sprite_library.gd")
 const HeroAnimations = preload("res://game/animation_library.gd")
-const BACKGROUNDS := {"cold-aisle": "res://art/cel-shift/environment/layers/"}
+const BACKGROUNDS := {
+	"cold-aisle": "res://art/cel-shift/environment/layers/",
+	"hot-aisle": "res://art/cel-shift/environment/hot-aisle/",
+	"cable-jungle": "res://art/cel-shift/environment/cable-jungle/",
+	"power-room": "res://art/cel-shift/environment/power-room/",
+	"outage-night": "res://art/cel-shift/environment/outage-night/",
+}
 const PARALLAX := {"far": 0.2, "equipment": 0.6}
 const BACKGROUND_TINT := {"far": Color(0.42, 0.47, 0.56), "equipment": Color(0.55, 0.6, 0.68)}
 
