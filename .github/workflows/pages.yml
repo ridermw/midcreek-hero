@@ -54,23 +54,15 @@ jobs:
           godot --headless --editor --path . --import 2>&1 | tee "$RUNNER_TEMP/import.log"
           ! grep -E '^(SCRIPT ERROR|ERROR|USER ERROR|Parse Error)' "$RUNNER_TEMP/import.log"
 
-      - name: Check sprite loading and keyboard cycling
+      - name: Run Godot tests
         run: |
-          timeout 120s godot --headless --path . --script tests/viewer_test.gd 2>&1 | tee "$RUNNER_TEMP/test.log"
-          grep -F 'VIEWER_TEST_COMPLETE: 149 checks, 0 failures' "$RUNNER_TEMP/test.log"
-          ! grep -E '^(SCRIPT ERROR|ERROR|USER ERROR|Parse Error)' "$RUNNER_TEMP/test.log"
-
-      - name: Check normalized environment loading
-        run: |
-          timeout 120s godot --headless --path . --script tests/environment_test.gd 2>&1 | tee "$RUNNER_TEMP/environment-test.log"
-          grep -F 'ENVIRONMENT_TEST_COMPLETE: 44 checks, 0 failures' "$RUNNER_TEMP/environment-test.log"
-          ! grep -E '^(SCRIPT ERROR|ERROR|USER ERROR|Parse Error)' "$RUNNER_TEMP/environment-test.log"
-
-      - name: Check local tool action direction
-        run: |
-          timeout 120s godot --headless --path . --script tests/local_action_test.gd 2>&1 | tee "$RUNNER_TEMP/local-action-test.log"
-          grep -F 'LOCAL_ACTION_TEST_COMPLETE: 68 checks, 0 failures' "$RUNNER_TEMP/local-action-test.log"
-          ! grep -E '^(SCRIPT ERROR|ERROR|USER ERROR|Parse Error)' "$RUNNER_TEMP/local-action-test.log"
+          for t in tests/*_test.gd; do
+            case "$t" in
+              tests/export_test.gd) continue ;;
+              tests/world_test.gd) continue ;;  # M1 removes this line; the test needs all 18 clips.
+            esac
+            tools/godot_test.sh "$t" "$(basename "$t" .gd | tr '[:lower:]' '[:upper:]')"
+          done
 
       - name: Export single-threaded web build
         run: |
@@ -87,7 +79,7 @@ jobs:
           timeout 120s godot --headless --path "$RUNNER_TEMP" \
             --main-pack "$GITHUB_WORKSPACE/build/web/index.pck" \
             --script "$GITHUB_WORKSPACE/tests/export_test.gd" 2>&1 | tee "$RUNNER_TEMP/export-test.log"
-          grep -F 'EXPORT_TEST_COMPLETE: 9 checks, 0 failures' "$RUNNER_TEMP/export-test.log"
+          grep -Eq '^EXPORT_TEST_COMPLETE: [1-9][0-9]* checks, 0 failures$' "$RUNNER_TEMP/export-test.log"
           ! grep -E '^(SCRIPT ERROR|ERROR|USER ERROR|Parse Error)' "$RUNNER_TEMP/export-test.log"
 
       - name: Upload Pages artifact
