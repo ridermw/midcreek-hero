@@ -89,6 +89,9 @@ Generated source sheets and previews are excluded from Web exports.
 Local primary and diagnostic actions face the rack when it is in range.
 Run the asset-pipeline regression checks with:
 
+Install ffmpeg on your PATH first. The audio conversion regression test
+uses its native Vorbis encoder. CI installs ffmpeg before running this suite.
+
 ```sh
 python3 -m unittest discover -s tests -p 'test_*.py'
 godot --headless --path . --script tests/environment_test.gd
@@ -98,6 +101,36 @@ godot --headless --path . --script tests/local_action_test.gd
 CI also opens the exported resource pack from outside the project directory.
 It checks that runtime textures remain available and source-art directories
 are absent.
+
+## Play
+
+Open the [web build](https://ridermw.github.io/midcreek-hero/) or run
+`godot --path .`. The game starts on the title screen. Choose a technician,
+then choose a work order. Finish every required task before the SLA timer
+reaches zero, then reach the exit door.
+
+| Action | Keyboard | Gamepad |
+|---|---|---|
+| Run | A and D, or the arrow keys | Left stick or D pad |
+| Jump | Space, W, or Up | A |
+| Repair (hold) | E | X |
+| Diagnose | Q | Y |
+| Pause | Escape or P | Start |
+
+Progress (stars, best times, unlocked levels, and the chosen technician) is
+saved in `user://save.json`. On the web this is browser storage.
+
+Each level has a route file in `levels/routes/`. `tests/route_test.gd` plays every
+route at a fixed 60 frames per second and checks that it finishes without a
+restart.
+
+    tools/godot_test.sh tests/route_test.gd ROUTE_TEST
+
+A test can request engine flags with a first line such as
+`# godot_test_args: --fixed-fps 60`.
+
+Route steps accept only `tap`, only `wait`, or `hold` with either `seconds`
+or both `until_x` and `max_seconds`. Extra fields are rejected rather than ignored.
 
 ## Core platformer
 

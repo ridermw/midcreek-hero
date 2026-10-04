@@ -1,6 +1,9 @@
 extends Node2D
 
 signal finished(result: Dictionary)
+signal sound(sound_name: String)
+
+const REPAIR_TICK_SECONDS := 0.4
 
 const Health = preload("res://game/health.gd")
 const SlaTimer = preload("res://game/sla_timer.gd")
@@ -36,6 +39,7 @@ var respawns: int = 0
 var use_action_override: bool = false
 var action_override: Dictionary = {}
 var _respawn_pending: bool = false
+var _repair_tick: float = 0.0
 
 @onready var solids: Node2D = $World/Solids
 @onready var entity_root: Node2D = $World/Entities
@@ -86,6 +90,8 @@ func load_level(path: String) -> bool:
 		tasks.add_task(task["id"], task["type"], task["required"], task.get("label", ""))
 	health.died.connect(_request_respawn)
 	timer.expired.connect(_request_respawn)
+	timer.warning.connect(sound.emit.bind("timer_warning"))
+	player.sound.connect(sound.emit)
 	player.respawn(LevelBuilder.cell_to_world(level["player_start"]))
 	timer.start(float(level["header"]["sla_seconds"]))
 	checkpoints.begin(player.position, timer, tasks)
@@ -147,6 +153,7 @@ func step(delta: float) -> void:
 		hazard.advance(delta)
 		if hazard.active and hazard.hit_rect().intersects(body) and health.damage():
 			player.hurt()
+			sound.emit("hit")
 	if _out_of_bounds():
 		_request_respawn()
 	if _respawn_pending:
@@ -159,13 +166,17 @@ func step(delta: float) -> void:
 		if not pickup.taken and can_heal and pickup.hit_rect().intersects(body):
 			pickup.take()
 			health.heal()
+			sound.emit("heal")
 	var feet := player.position
 	for i: int in range(entities["checkpoints"].size()):
 		var node = entities["checkpoints"][i]
 		if node.in_range(feet) and checkpoints.activate(i, node.position, timer, tasks):
 			node.set_reached()
+			sound.emit("checkpoint")
 	_update_repair(delta, feet)
 	var door = entities["exit"]
+	if tasks.required_done() and not door.open:
+		sound.emit("door_open")
 	door.set_open(tasks.required_done())
 	if door.open and door.in_range(feet):
 		_finish()
@@ -200,14 +211,27 @@ func _update_repair(delta: float, feet: Vector2) -> void:
 	player.locked = holding
 	player.action = &"primary" if holding else &""
 	if target == null:
-		hud.set_prompt("")
+		hud.set_prompt(_level_prompt(feet))
 	elif not holding:
 		target.cancel()
 		hud.set_prompt("Hold E or X to repair")
 	else:
 		hud.set_prompt("Repairing...")
+		_repair_tick -= delta
+		if _repair_tick <= 0.0:
+			_repair_tick = REPAIR_TICK_SECONDS
+			sound.emit("repair_tick")
 		if target.work(delta):
+			sound.emit("repair_done")
 			_complete_if_all_racks_done(target.task_id)
+
+
+func _level_prompt(feet: Vector2) -> String:
+	var column := int(floorf(feet.x / LevelBuilder.TILE))
+	for prompt: Dictionary in level["header"].get("prompts", []):
+		if absi(column - int(prompt["x"])) <= 3:
+			return String(prompt["text"])
+	return ""
 
 
 func _complete_if_all_racks_done(task_id: String) -> void:
@@ -223,6 +247,7 @@ func _request_respawn() -> void:
 
 func _respawn() -> void:
 	_respawn_pending = false
+	sound.emit("fail")
 	respawns += 1
 	player.respawn(checkpoints.restore(timer, tasks))
 	health.refill()
@@ -241,7 +266,15 @@ func _finish() -> void:
 		"hits": health.hits_taken,
 		"respawns": respawns,
 		"stars": Score.stars(timer.elapsed, par, health.hits_taken),
+		"optional_done": 0,
+		"optional_total": 0,
 	}
+	for entry: Dictionary in tasks.entries():
+		if not entry["required"]:
+			result["optional_total"] += 1
+			if entry["done"]:
+				result["optional_done"] += 1
+	sound.emit("win")
 	hud.show_message("Level complete. Stars: %d" % result["stars"])
 	hud.show_stars(result["stars"])
 	finished.emit(result)

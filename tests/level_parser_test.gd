@@ -148,6 +148,9 @@ func run() -> void:
 	if not example_level.is_empty():
 		var example_errors := LevelValidator.new().validate(example_level)
 		check(example_errors.is_empty(), "Spec level example is playable: " + str(example_errors))
+	expect_error(level_text(header_with("prompts", [{"x": 99, "text": "Hi"}]), VALID_GRID), "Prompt column 99 is outside the grid.")
+	expect_error(level_text(header_with("prompts", [{"x": 1}]), VALID_GRID), "Each prompt needs an integer x and a text string.")
+	check(not parser.parse(level_text(header_with("prompts", [{"x": 1, "text": "Hi"}]), VALID_GRID), "p.level").is_empty(), "Valid prompts parse.")
 	print("LEVEL_PARSER_TEST_COMPLETE: %d checks, %d failures" % [checks, failures])
 	quit(1 if failures else 0)
 

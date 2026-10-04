@@ -69,6 +69,9 @@ func parse(text: String, source: String) -> Dictionary:
 			var problem := _place(level, row[x], Vector2i(x, y))
 			if not problem.is_empty():
 				return _fail(source, line_number, "%s (column %d)" % [problem, x + 1])
+	var prompt_error := _check_prompts(header, level["width"])
+	if not prompt_error.is_empty():
+		return _fail(source, 1, prompt_error)
 	var grid_error := _check_grid(level)
 	if grid_error.is_empty():
 		grid_error = _check_tasks(level)
@@ -89,6 +92,24 @@ func _check_header(header: Dictionary) -> String:
 		return "par_seconds must be above 0 and below sla_seconds."
 	if not header.get("tasks") is Array or header["tasks"].is_empty():
 		return "Header key 'tasks' must be a non-empty array."
+	return ""
+
+
+func _check_prompts(header: Dictionary, width: int) -> String:
+	if not header.has("prompts"):
+		return ""
+	if not header["prompts"] is Array:
+		return "Header key 'prompts' must be an array."
+	for prompt: Variant in header["prompts"]:
+		if (
+			not prompt is Dictionary
+			or not (prompt.get("x") is float or prompt.get("x") is int)
+			or float(prompt["x"]) != floorf(float(prompt["x"]))
+			or not prompt.get("text") is String
+		):
+			return "Each prompt needs an integer x and a text string."
+		if int(prompt["x"]) < 0 or int(prompt["x"]) >= width:
+			return "Prompt column %d is outside the grid." % int(prompt["x"])
 	return ""
 
 

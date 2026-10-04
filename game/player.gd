@@ -1,5 +1,7 @@
 extends CharacterBody2D
 
+signal sound(sound_name: String)
+
 const PlayerMotor = preload("res://game/player_motor.gd")
 const HeroAnimations = preload("res://game/animation_library.gd")
 const BODY_SIZE := Vector2(18, 64)
@@ -16,6 +18,7 @@ var locked: bool = false
 var action: StringName = &""
 var sliding: bool = false
 var hurt_remaining: float = 0.0
+var _suppress_landing: bool = true
 
 @onready var sprite: AnimatedSprite2D = $Sprite
 
@@ -57,8 +60,14 @@ func read_input() -> Dictionary:
 
 func _physics_process(delta: float) -> void:
 	var input := {} if locked else read_input()
-	velocity = motor.step(input, is_on_floor(), delta)
+	var was_on_floor := is_on_floor()
+	velocity = motor.step(input, was_on_floor, delta)
+	if velocity.y == -PlayerMotor.JUMP_VELOCITY:
+		sound.emit("jump")
 	move_and_slide()
+	if not _suppress_landing and not was_on_floor and is_on_floor():
+		sound.emit("land")
+	_suppress_landing = false
 	motor.velocity = velocity
 	hurt_remaining = maxf(hurt_remaining - delta, 0.0)
 	update_animation()
@@ -91,3 +100,4 @@ func respawn(at: Vector2) -> void:
 	velocity = Vector2.ZERO
 	motor.reset()
 	hurt_remaining = 0.0
+	_suppress_landing = true

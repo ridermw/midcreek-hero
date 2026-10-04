@@ -38,20 +38,26 @@ func run() -> void:
 	root.add_child(floor_body)
 	var player := PLAYER_SCENE.instantiate() as Player
 	player.use_override = true
-	player.position = Vector2(100, 300)
+	player.position = Vector2(100, 320)
+	var player_sounds: Array[String] = []
+	player.sound.connect(func(sound_name: String) -> void: player_sounds.append(sound_name))
 	root.add_child(player)
 	await frames(30)
 	check(player.is_on_floor() and absf(player.position.y - 320.0) < 1.0, "Player lands on the floor.")
+	check(player_sounds.is_empty(), "Spawning on the floor does not play landing audio.")
 	player.input_override = {"direction": 1.0}
 	await frames(30)
 	check(player.position.x > 150.0, "Player runs right.")
+	player_sounds.clear()
 	player.input_override = {"direction": 1.0, "jump_pressed": true, "jump_held": true}
 	await frames(5)
+	check(player_sounds == ["jump"], "Jumping plays the jump sound.")
 	check(player.position.y < 300.0 and not player.is_on_floor(), "Player jumps.")
 	check(not player.input_override.has("jump_pressed"), "jump_pressed lasts one frame.")
 	player.input_override = {}
 	await frames(90)
 	check(player.is_on_floor(), "Player lands after the jump.")
+	check("land" in player_sounds, "Landing plays the land sound.")
 	player.input_override = {"direction": 1.0}
 	player.locked = true
 	await frames(20)
@@ -61,11 +67,18 @@ func run() -> void:
 	player.locked = false
 	player.position = Vector2(100, 320)
 	check(player.hit_rect() == Rect2(91, 256, 18, 64), "hit_rect covers the body above the feet.")
+	player.position.y = 200
+	player.input_override = {}
+	await frames(3)
+	check(not player.is_on_floor(), "The player is airborne before the checkpoint respawn.")
+	player_sounds.clear()
 	player.respawn(Vector2(40, 320))
 	check(
 		player.position == Vector2(40, 320) and player.velocity == Vector2.ZERO and player.motor.velocity == Vector2.ZERO,
 		"respawn moves the player and clears velocity.",
 	)
+	await frames(3)
+	check(player.is_on_floor() and player_sounds.is_empty(), "A checkpoint respawn on the floor does not play landing audio.")
 	check(Player.choose_clip(true, Vector2.ZERO, false, true, &"primary") == &"reaction", "Hurt shows reaction.")
 	check(Player.choose_clip(true, Vector2.ZERO, false, false, &"primary") == &"primary", "Actions show their clip.")
 	check(Player.choose_clip(true, Vector2(200, 0), true, false, &"") == &"slide", "Sliding shows slide.")

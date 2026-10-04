@@ -6,8 +6,10 @@ tag="$2"
 log="$(mktemp)"
 trap 'rm -f "$log"' EXIT
 status=0
+# A test can request engine flags with a line such as: # godot_test_args: --fixed-fps 60
+declared="$(sed -n 's/^# godot_test_args: //p' "$script" | head -1)"
 # shellcheck disable=SC2086
-timeout 60s godot --headless --path . ${GODOT_EXTRA_ARGS:-} --script "$script" >"$log" 2>&1 || status=$?
+timeout 60s godot --headless --path . ${declared} ${GODOT_EXTRA_ARGS:-} --script "$script" >"$log" 2>&1 || status=$?
 cat "$log"
 if grep -Eq '^(SCRIPT ERROR|ERROR|USER ERROR|Parse Error)' "$log"; then
 	echo "godot_test: error lines in output" >&2
