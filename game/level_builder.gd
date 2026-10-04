@@ -91,6 +91,7 @@ func _solid_body(kind: String, rect: Rect2) -> StaticBody2D:
 		var tiles := TextureRect.new()
 		tiles.texture = art.texture("tiles", kind)
 		tiles.stretch_mode = TextureRect.STRETCH_TILE
+		tiles.texture_repeat = CanvasItem.TEXTURE_REPEAT_ENABLED
 		tiles.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 		tiles.position = -rect.size / 2.0
 		tiles.size = rect.size

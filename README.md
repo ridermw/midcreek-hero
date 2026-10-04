@@ -147,6 +147,9 @@ Level files are in `levels/`. `levels/LEGEND.md` describes the format.
 All game art is generated with MockUI and normalized to binary alpha pixel
 frames. Each asset group (technician animations, tiles, hazards, props, ui)
 shares one palette of at most 96 opaque colors.
+The sprite normalizer rejects blank frames both before and after resizing,
+including sparse artwork that disappears when its alpha is thresholded.
+It validates the entire sequence before replacing previously normalized frames.
 
 Technician clips: idle, walk, run, jump, slide, primary, secondary, reaction,
 and signal for the man and the woman.
@@ -166,4 +169,3 @@ has a cell size, a frame count, a `fit` mode, and a prompt.
 
 `fit` modes: `fill` stretches the drawn object to the cell, `top`, `bottom`, and
 `center` keep its aspect ratio, and `canvas` scales the whole render.
-

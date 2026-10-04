@@ -78,6 +78,9 @@ func update_animation() -> void:
 	var clip := choose_clip(is_on_floor(), velocity, sliding, hurt_remaining > 0.0, action)
 	if sprite.animation != clip:
 		sprite.play(clip)
+	elif clip == action and not sprite.is_playing():
+		sprite.play(clip)
+		sprite.set_frame_and_progress(0, 0.0)
 	elif clip == &"jump" and sprite.frame == sprite.sprite_frames.get_frame_count(clip) - 1:
 		sprite.pause()
 

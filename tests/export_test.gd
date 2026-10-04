@@ -5,6 +5,8 @@ const SOURCE_DIRECTORIES: Array[String] = [
 	"res://art/cel-shift/animations/previews",
 	"res://art/cel-shift/environment/generated",
 	"res://art/cel-shift/tiles/generated",
+	"res://art/cel-shift/hazards/generated",
+	"res://art/cel-shift/props/generated",
 	"res://art/cel-shift/ui/generated",
 ]
 const RUNTIME_TEXTURES: Array[String] = [

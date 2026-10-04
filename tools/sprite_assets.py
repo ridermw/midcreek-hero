@@ -123,10 +123,6 @@ def normalize(name, art=ART):
     if image.size != (width, height):
         raise ValueError(f"{source}: wrong size {image.size}, expected {(width, height)}")
     output = art / asset["group"] / "frames" / name
-    output.mkdir(parents=True, exist_ok=True)
-    for old in output.glob("*.png"):
-        old.unlink()
-    paths = []
     crops = []
     for index in range(frames):
         x = (index % grid["cols"]) * cell_w * scale
@@ -145,11 +141,20 @@ def normalize(name, art=ART):
         union = (min(b[0] for b in boxes), min(b[1] for b in boxes),
                  max(b[2] for b in boxes), max(b[3] for b in boxes))
         crops = [crop.crop(union) for crop in crops]
-    for crop in crops:
+    fitted = []
+    for index, crop in enumerate(crops):
         frame = _fit(crop, (cell_w, cell_h), fit)
         alpha = frame.getchannel("A").point(lambda value: 255 if value >= 128 else 0)
+        if alpha.getbbox() is None:
+            raise ValueError(f"{source}: {name} frame {index} is blank after resizing")
         frame.putalpha(alpha)
         frame.paste((0, 0, 0, 0), mask=alpha.point(lambda value: 255 if value == 0 else 0))
+        fitted.append(frame)
+    output.mkdir(parents=True, exist_ok=True)
+    for old in output.glob("*.png"):
+        old.unlink()
+    paths = []
+    for frame in fitted:
         path = output / f"{len(paths):02d}.png"
         frame.save(path)
         paths.append(path.relative_to(art / asset["group"]).as_posix())
