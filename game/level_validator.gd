@@ -9,6 +9,14 @@ const CHECKPOINTS := 3
 
 func validate(level: Dictionary) -> Array[String]:
 	var errors: Array[String] = []
+	if "tray" in level["solids"].values():
+		errors.append("Terrain 'tray' is not built yet.")
+	if not level["ladders"].is_empty():
+		errors.append("Terrain 'ladder' is not built yet.")
+	if not level["lifts"].is_empty():
+		errors.append("Terrain 'lift' is not built yet.")
+	if not errors.is_empty():
+		return errors
 	var task_count: int = level["header"]["tasks"].size()
 	if task_count < MIN_TASKS or task_count > MAX_TASKS:
 		errors.append("Level needs %d to %d tasks, found %d." % [MIN_TASKS, MAX_TASKS, task_count])
