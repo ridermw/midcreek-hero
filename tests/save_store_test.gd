@@ -40,6 +40,22 @@ func run() -> void:
 	loaded.load_data()
 	check(loaded.stars("01") == 3 and loaded.is_unlocked("02"), "load restores progress.")
 	check(loaded.character == "woman" and is_equal_approx(float(loaded.settings["music_volume"]), 0.4), "load restores character and settings.")
+	var partial_file := FileAccess.open(PATH, FileAccess.WRITE)
+	partial_file.store_string('{"version": 1, "character": "woman", "levels": {"01": {"stars": 2}}, "unlocked": ["01", "02"]}')
+	partial_file.close()
+	var partial := SaveStore.new(PATH)
+	partial.load_data()
+	check(not partial.levels["01"].has("best_seconds"), "Loading a partial entry preserves the absent completion time.")
+	check(partial.save(), "A partial save can be written again.")
+	var partial_reloaded := SaveStore.new(PATH)
+	partial_reloaded.load_data()
+	check(
+		partial_reloaded.character == "woman" and partial_reloaded.stars("01") == 2 and partial_reloaded.is_unlocked("02"),
+		"Saving and loading a partial entry preserves progress.",
+	)
+	check(not FileAccess.file_exists("user://test-save.corrupt.json"), "A valid partial save is not treated as corrupt.")
+	partial_reloaded.record("01", 3, 40.0, 1)
+	check(partial_reloaded.best_seconds("01") == 40.0, "A real completion establishes the missing best time.")
 	var file := FileAccess.open(PATH, FileAccess.WRITE)
 	file.store_string("{not json")
 	file.close()
