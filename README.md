@@ -159,7 +159,10 @@ than ignored.
 
 Holding slide produces one press, including across adjacent hold steps. Release
 slide with a wait or a step without slide before triggering it again. The
-Outage Night route also checks that the player takes no damage.
+Outage Night route also checks that the player takes no damage and that its
+timing targets follow the milestone balance rule. Its par uses
+`ceil(route_seconds * 1.25 / 5) * 5`; its SLA uses
+`ceil(par_seconds * 1.35 / 5) * 5`.
 
 ## Core platformer
 

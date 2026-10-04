@@ -1,7 +1,7 @@
 {
   "name": "Outage Night",
-  "sla_seconds": 95,
-  "par_seconds": 70,
+  "sla_seconds": 110,
+  "par_seconds": 80,
   "music": "level5",
   "background": "outage-night",
   "darkness": true,
