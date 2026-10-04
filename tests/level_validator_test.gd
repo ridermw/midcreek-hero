@@ -74,6 +74,15 @@ func run() -> void:
 	alternate["solids"][Vector2i(0, 2)] = "#"
 	alternate["solids"][Vector2i(1, 2)] = "#"
 	check(validator.reachable_cells(alternate).has(Vector2i(1, 1)), "Ordinary terrain at a lift top remains reachable from an adjacent platform.")
+	var unused_lift := parse_text(FileAccess.get_file_as_string("res://tests/fixtures/power_room.level"))
+	check(validator.validate(unused_lift).is_empty(), "The Power Room fixture has a clear lift shaft.")
+	for row: int in [1, 2, 3]:
+		var obstructed: Dictionary = unused_lift.duplicate(true)
+		obstructed["solids"][Vector2i(20, row)] = "#"
+		check(not validator.validate(obstructed).is_empty(), "An unused lift with a blocked shaft at row %d is invalid even when targets remain reachable." % row)
+	var above_level := parse_text(text)
+	above_level["lifts"].append(Vector2i(1, 2))
+	check(not validator.validate(above_level).is_empty(), "An unused lift cannot travel above the level.")
 	var two_checkpoints := text.replace("..C..F..E", ".....F..E")
 	check(
 		errors_of(two_checkpoints).contains("Level needs exactly 3 checkpoints, found 2."),
