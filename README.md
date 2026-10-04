@@ -135,7 +135,8 @@ cable, press E at the port, then press each button the HUD shows within 1 s.
 To reboot a switch, press E at switch panels 1, 2, and 3 in that order; a wrong
 panel turns them all off. Stand on a lift to ride it 3 tiles up. Slide under a low tray; the slide continues until there is room to stand. Press
 into a wall in the air to slow your fall, and jump to kick off it. A restart at a
-checkpoint undoes pickups, diagnoses, and repairs made after that checkpoint.
+checkpoint undoes pickups, diagnoses, repairs, and cable reseats made after that
+checkpoint.
 
 Progress (stars, best times, unlocked levels, and the chosen technician) is
 saved in `user://save.json`. On the web this is browser storage.
@@ -148,6 +149,11 @@ restart.
 
 A test can request engine flags with a first line such as
 `# godot_test_args: --fixed-fps 60`.
+
+Route steps accept only `tap`, only `wait`, or `hold` with `seconds` or a target
+(`until_x` or `until_y`) and `max_seconds`. A target needs exactly one matching
+direction: left or right for x, up or down for y. Extra fields are rejected rather
+than ignored.
 
 ## Core platformer
 

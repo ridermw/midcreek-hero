@@ -44,7 +44,9 @@ func apply(level: Object, delta: float) -> void:
 		return
 	var held: Array = step["hold"]
 	if step.has("until_y"):
-		if level.player.position.y <= float(step["until_y"]):
+		var target := float(step["until_y"])
+		var direction := -1.0 if "move_up" in held else 1.0
+		if (level.player.position.y - target) * direction >= 0.0:
 			_advance()
 			apply(level, delta)
 			return
@@ -125,6 +127,14 @@ func _validate(step: Variant) -> String:
 			kinds += 1
 	if kinds != 1:
 		return "needs exactly one of hold, tap, or wait."
+	var allowed: Array = ["tap"] if step.has("tap") else ["wait"]
+	if step.has("hold"):
+		allowed = ["hold", "until_x", "max_seconds"] if step.has("until_x") else ["hold", "seconds"]
+		if step.has("until_y") and not step.has("until_x"):
+			allowed = ["hold", "until_y", "max_seconds"]
+	for key: Variant in step:
+		if key not in allowed:
+			return "unsupported field '%s'." % key
 	if step.has("tap"):
 		return "" if step["tap"] is String and String(step["tap"]) in ACTIONS else "unknown tap action."
 	if step.has("wait"):
@@ -142,10 +152,10 @@ func _validate(step: Variant) -> String:
 			return "until_y must be a finite number."
 		if not _is_duration(step.get("max_seconds")) or float(step["max_seconds"]) <= 0.0:
 			return "until_y needs a positive max_seconds."
+		if ("move_up" in step["hold"]) == ("move_down" in step["hold"]):
+			return "until_y needs exactly one of move_up or move_down."
 		return ""
 	if step.has("until_x"):
-		if step.has("seconds"):
-			return "hold cannot combine seconds and until_x."
 		var value: Variant = step["until_x"]
 		if not ((value is float or value is int) and is_finite(float(value))):
 			return "until_x must be a finite number."
