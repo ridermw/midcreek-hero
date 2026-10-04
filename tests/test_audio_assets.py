@@ -219,6 +219,37 @@ class AudioAssetsTest(unittest.TestCase):
                 self.assertEqual(len(errors), 3, "every affected asset reports its failure")
                 self.assertEqual((self.audio / "music/title.ogg").read_bytes(), b"fixture audio")
 
+    def test_fetch_continues_after_encrypted_or_unsupported_zip_members(self):
+        source = self.audio / "good.wav"
+        source.write_bytes(b"restored sound")
+        good = dict(
+            self.entry, file="sfx/restored.wav", url=source.as_uri(), archive_member=None,
+            sha256=hashlib.sha256(source.read_bytes()).hexdigest(),
+        )
+        for kind, local_offset, central_offset, value in (
+            ("encrypted", 6, 8, 1),
+            ("unsupported compression", 8, 10, 99),
+        ):
+            with self.subTest(kind=kind):
+                archive = self.audio / "invalid.zip"
+                with zipfile.ZipFile(archive, "w") as zipped:
+                    zipped.writestr("title.ogg", b"fixture audio")
+                payload = bytearray(archive.read_bytes())
+                central = payload.index(b"PK\x01\x02")
+                payload[local_offset:local_offset + 2] = value.to_bytes(2, "little")
+                payload[central + central_offset:central + central_offset + 2] = value.to_bytes(2, "little")
+                archive.write_bytes(payload)
+                self.entry["url"] = archive.as_uri()
+                self.write_sources([self.entry, good])
+                restored = self.audio / "sfx/restored.wav"
+                restored.unlink(missing_ok=True)
+                result = self.run_tool("fetch")
+                self.assertNotEqual(result.returncode, 0)
+                self.assertIn("music/title.ogg:", result.stderr)
+                self.assertNotIn("Traceback", result.stderr)
+                self.assertEqual(restored.read_bytes(), b"restored sound")
+                self.assertEqual((self.audio / "music/title.ogg").read_bytes(), b"fixture audio")
+
     def test_real_repo_passes_check(self):
         result = subprocess.run(
             [sys.executable, "-B", str(TOOL), "check"],

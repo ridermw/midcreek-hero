@@ -134,7 +134,8 @@ spare part, then hold E at the rack that shows the part icon. For a diagnose
 order, press Q at the rack with the amber marker, then hold E. To reseat a
 cable, press E at the port, then press each button the HUD shows within 1 s.
 To reboot a switch, press E at switch panels 1, 2, and 3 in that order; a wrong
-panel turns them all off. Stand on a lift to ride it 3 tiles up. Slide under a low tray; the slide continues until there is room to stand. Press
+panel turns them all off. A spark sound marks each arc becoming active.
+Stand on a lift to ride it 3 tiles up. Slide under a low tray; the slide continues until there is room to stand. Press
 into a wall in the air to slow your fall, and jump to kick off it. A restart at a
 checkpoint undoes pickups, diagnoses, repairs, cable reseats, and switch throws
 made after that checkpoint.
