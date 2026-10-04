@@ -382,8 +382,10 @@
       ],
       "frames": 1,
       "fps": 1,
-      "prompt": "The same network switch control panel with a large green lit push button and a bright green status screen.",
-      "fit": "fill"
+      "prompt": "Light the large push button bright green and make the small status screen glow green. Nothing else changes.",
+      "fit": "fill",
+      "keep_object": true,
+      "reference": "art/cel-shift/tiles/generated/switch-off.png"
     },
     {
       "name": "drone",

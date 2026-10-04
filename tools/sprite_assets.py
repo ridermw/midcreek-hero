@@ -75,6 +75,12 @@ def prompt_text(asset):
         )
     else:
         arrangement = f"One object centered in the {width}x{height} canvas, as large as fits."
+    if asset.get("keep_object"):
+        return (
+            "Edit image 1, a pixel art game sprite. Keep the same object, its shape, framing, size, position, pixel art "
+            "style, palette and outlines exactly as they are. Keep the transparent background. "
+            f"{arrangement}\n\nChange only: {asset['prompt']}"
+        )
     return (
         "Edit image 1: replace its entire content with a new isolated game sprite described below. "
         "Keep unchanged from image 1: the pixel art style, the color palette, the outline treatment "
@@ -188,22 +194,51 @@ def group_colors(group, art=ART):
     return colors
 
 
+def _build_palette(samples, colors):
+    """Median cut for most slots, then the farthest remaining colors for the reserved slots."""
+    reserved = max(2, colors // 8) if len(samples) > colors else 0
+    base_count = min(colors - reserved, len(samples))
+    source = Image.new("RGB", (len(samples), 1))
+    source.putdata(samples)
+    base = source.quantize(colors=base_count, method=Image.Quantize.MEDIANCUT, dither=Image.Dither.NONE)
+    entries = base.getpalette()[: 3 * base_count]
+    chosen = [tuple(entries[i : i + 3]) for i in range(0, len(entries), 3)]
+    nearest = [min(_distance(color, entry) for entry in chosen) for color in samples]
+    for _ in range(reserved):
+        index = max(range(len(samples)), key=nearest.__getitem__)
+        if nearest[index] == 0:
+            break
+        pick = samples[index]
+        chosen.append(pick)
+        nearest = [min(value, _distance(color, pick)) for value, color in zip(nearest, samples)]
+    palette = Image.new("P", (1, 1))
+    flat = [channel for color in chosen for channel in color]
+    palette.putpalette(flat + flat[:3] * (256 - len(chosen)))
+    return palette
+
+
+def _distance(first, second):
+    return sum((a - b) ** 2 for a, b in zip(first, second))
+
+
 def apply_group_palette(group, art=ART, colors=GROUP_COLORS):
     paths = group_frames(group, art)
     frames = [Image.open(path).convert("RGBA") for path in paths]
-    samples = [pixel[:3] for frame in frames for pixel in frame.getdata() if pixel[3]]
+    # Weight every distinct color once, so small saturated accents keep a palette slot.
+    samples = sorted({pixel[:3] for frame in frames for pixel in frame.getdata() if pixel[3]})
     if not samples:
         raise ValueError(f"{group}: no opaque pixels")
-    source = Image.new("RGB", (256, (len(samples) + 255) // 256), samples[0])
-    source.putdata(samples)
-    palette = source.quantize(colors=colors, method=Image.Quantize.MEDIANCUT, dither=Image.Dither.NONE)
+    palette = _build_palette(samples, colors)
     for path, frame in zip(paths, frames):
         alpha = frame.getchannel("A")
         result = frame.convert("RGB").quantize(palette=palette, dither=Image.Dither.NONE).convert("RGBA")
         result.putalpha(alpha)
         result.paste((0, 0, 0, 0), mask=alpha.point(lambda value: 255 if value == 0 else 0))
         result.save(path)
-    swatch = palette.convert("RGB").resize((len(palette.getpalette()) // 3, 1))
+    entries = palette.getpalette()
+    distinct = list(dict.fromkeys(tuple(entries[i : i + 3]) for i in range(0, len(entries), 3)))
+    swatch = Image.new("RGB", (len(distinct), 1))
+    swatch.putdata(distinct)
     swatch.save(art / group / "palette.png")
 
 

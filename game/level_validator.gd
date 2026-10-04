@@ -2,6 +2,7 @@ extends RefCounted
 
 const JUMP_REACH := {0: 4, 1: 4, 2: 3, 3: 2}
 const FALL_REACH := 4
+const LIFT_RISE := Vector2i(0, 3)
 const MIN_TASKS := 3
 const MAX_TASKS := 6
 const CHECKPOINTS := 3
@@ -9,8 +10,6 @@ const CHECKPOINTS := 3
 
 func validate(level: Dictionary) -> Array[String]:
 	var errors: Array[String] = []
-	if not level["lifts"].is_empty():
-		errors.append("Terrain 'lift' is not built yet.")
 	if not errors.is_empty():
 		return errors
 	var task_count: int = level["header"]["tasks"].size()
@@ -42,7 +41,7 @@ func is_standable(level: Dictionary, cell: Vector2i) -> bool:
 	var solids: Dictionary = level["solids"]
 	if solids.has(cell):
 		return false
-	if cell in level["ladders"] or cell in level["lifts"]:
+	if cell in level["ladders"] or cell in level["lifts"] or (cell + LIFT_RISE) in level["lifts"]:
 		return true
 	return solids.has(cell + Vector2i.DOWN)
 
@@ -77,6 +76,8 @@ func _neighbors(level: Dictionary, cell: Vector2i) -> Array[Vector2i]:
 			var next := Vector2i(cell.x + dx, y)
 			if next != cell and next.x >= 0 and next.x < width and is_standable(level, next):
 				result.append(next)
+	if cell in level["lifts"]:
+		result.append(cell - LIFT_RISE)
 	if cell in level["ladders"]:
 		for step: Vector2i in [Vector2i.UP, Vector2i.DOWN]:
 			if is_standable(level, cell + step):
