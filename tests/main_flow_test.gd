@@ -82,6 +82,7 @@ func run() -> void:
 	main.start_smoke("01")
 	await process_frame
 	check(main.screen_name == "level" and main.route_runner != null, "Smoke mode starts the level with its route.")
+	check(AudioServer.is_bus_mute(AudioServer.get_bus_index("Master")), "Smoke mode plays silently.")
 	main.go_to("level_select")
 	await process_frame
 	check(main.route_runner == null, "Leaving the level stops the route.")

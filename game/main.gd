@@ -80,6 +80,7 @@ static func route_from_args(args: PackedStringArray) -> String:
 
 func start_smoke(level_id: String) -> void:
 	smoke = true
+	AudioServer.set_bus_mute(AudioServer.get_bus_index("Master"), true)
 	start_level(level_id)
 	var path: String = "res://levels/routes/" + _level_files[level_id].get_file().get_basename() + ".route.json"
 	var json := JSON.new()
