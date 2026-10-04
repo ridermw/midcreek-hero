@@ -10,6 +10,7 @@ static func button(text: String, art: SpriteLibrary) -> Button:
 	result.text = text
 	result.custom_minimum_size = Vector2(320, 64)
 	result.focus_mode = Control.FOCUS_ALL
+	result.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	result.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	result.add_theme_font_size_override("font_size", 24)
 	result.add_theme_color_override("font_color", TEXT_COLOR)

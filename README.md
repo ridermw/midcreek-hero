@@ -99,6 +99,33 @@ CI also opens the exported resource pack from outside the project directory.
 It checks that runtime textures remain available and source-art directories
 are absent.
 
+## Play
+
+Open the [web build](https://ridermw.github.io/midcreek-hero/) or run
+`godot --path .`. The game starts on the title screen. Choose a technician,
+then choose a work order. Finish every required task before the SLA timer
+reaches zero, then reach the exit door.
+
+| Action | Keyboard | Gamepad |
+|---|---|---|
+| Run | A and D, or the arrow keys | Left stick or D pad |
+| Jump | Space, W, or Up | A |
+| Repair (hold) | E | X |
+| Diagnose | Q | Y |
+| Pause | Escape or P | Start |
+
+Progress (stars, best times, unlocked levels, and the chosen technician) is
+saved in `user://save.json`. On the web this is browser storage.
+
+Each level has a route file in `levels/routes/`. `tests/route_test.gd` plays every
+route at a fixed 60 frames per second and checks that it finishes without a
+restart.
+
+    tools/godot_test.sh tests/route_test.gd ROUTE_TEST
+
+A test can request engine flags with a first line such as
+`# godot_test_args: --fixed-fps 60`.
+
 ## Core platformer
 
 The gray box level tests movement, health, the SLA timer, repair tasks,
