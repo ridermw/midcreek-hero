@@ -129,6 +129,9 @@ restart.
 A test can request engine flags with a first line such as
 `# godot_test_args: --fixed-fps 60`.
 
+Route steps accept only `tap`, only `wait`, or `hold` with either `seconds`
+or both `until_x` and `max_seconds`. Extra fields are rejected rather than ignored.
+
 ## Core platformer
 
 The gray box level tests movement, health, the SLA timer, repair tasks,
