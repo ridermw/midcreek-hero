@@ -56,6 +56,27 @@ class AssetPipelineTest(unittest.TestCase):
         for clip in expected:
             self.assertIn(f'\t&"{clip}",', library)
 
+    def test_shipped_clips_share_baseline_and_scale(self):
+        standing = ("idle", "walk", "run", "primary", "secondary", "signal")
+        for variant in animation_assets.VARIANTS:
+            heights = []
+            for clip in animation_assets.CLIPS:
+                frames = sorted((animation_assets.ART / "frames" / variant / clip).glob("*.png"))
+                self.assertTrue(frames, f"{variant}/{clip} has frames")
+                bottoms = []
+                for path in frames:
+                    with Image.open(path) as frame:
+                        box = frame.getbbox()
+                    bottoms.append(box[3])
+                    if clip in standing:
+                        heights.append(box[3] - box[1])
+                with self.subTest(variant=variant, clip=clip):
+                    self.assertLessEqual(abs(max(bottoms) - 184), 3, "boots sit on the baseline")
+            median = sorted(heights)[len(heights) // 2]
+            with self.subTest(variant=variant):
+                self.assertLessEqual(max(heights), median * 1.15)
+                self.assertGreaterEqual(min(heights), median * 0.85)
+
     def test_ponytail_guidance_is_woman_specific(self):
         for clip in animation_assets.CLIPS:
             with self.subTest(clip=clip):
