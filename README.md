@@ -98,3 +98,20 @@ godot --headless --path . --script tests/local_action_test.gd
 CI also opens the exported resource pack from outside the project directory.
 It checks that runtime textures remain available and source-art directories
 are absent.
+
+## Core platformer
+
+The gray box level tests movement, health, the SLA timer, repair tasks,
+checkpoints, and the exit. It uses flat colors. Generated art comes in M1.
+
+    godot --path . res://game/level.tscn
+
+Controls: A and D or the arrow keys to run, Space to jump, hold E to repair.
+A gamepad uses the left stick or D pad, A to jump, and X to repair.
+
+Run one core test:
+
+    tools/godot_test.sh tests/level_test.gd LEVEL_TEST
+
+Level files are in `levels/`. `levels/LEGEND.md` describes the format.
+

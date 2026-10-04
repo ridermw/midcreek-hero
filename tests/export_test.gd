@@ -26,6 +26,7 @@ func _initialize() -> void:
 		FileAccess.file_exists("res://art/cel-shift/sprites/manifest.json"),
 		"Runtime sprite manifest is included.",
 	)
+	check(FileAccess.file_exists("res://levels/00-graybox.level"), "Gray box level is included.")
 	print("EXPORT_TEST_COMPLETE: %d checks, %d failures" % [checks, failures])
 	quit(1 if failures else 0)
 

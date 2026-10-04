@@ -1,0 +1,84 @@
+extends SceneTree
+
+const PlayerMotor = preload("res://game/player_motor.gd")
+const LevelValidator = preload("res://game/level_validator.gd")
+const DT := 1.0 / 60.0
+
+var checks: int = 0
+var failures: int = 0
+
+
+func _initialize() -> void:
+	run.call_deferred()
+
+
+func coyote_jump(air_steps: int) -> bool:
+	var motor := PlayerMotor.new()
+	motor.step({}, true, DT)
+	for i: int in range(air_steps):
+		motor.step({}, false, DT)
+	return motor.step({"jump_pressed": true, "jump_held": true}, false, DT).y == -PlayerMotor.JUMP_VELOCITY
+
+
+func buffered_jump(air_steps: int) -> bool:
+	var motor := PlayerMotor.new()
+	motor.step({"jump_pressed": true, "jump_held": true}, false, DT)
+	for i: int in range(air_steps):
+		motor.step({"jump_held": true}, false, DT)
+	return motor.step({"jump_held": true}, true, DT).y == -PlayerMotor.JUMP_VELOCITY
+
+
+func landing_x(rise_pixels: float) -> float:
+	var motor := PlayerMotor.new()
+	var position := Vector2.ZERO
+	motor.step({}, true, DT)
+	var input := {"direction": 1.0, "jump_pressed": true, "jump_held": true}
+	for i: int in range(240):
+		var velocity := motor.step(input, i == 0, DT)
+		input = {"direction": 1.0, "jump_held": true}
+		var next := position + velocity * DT
+		if velocity.y > 0.0 and position.y <= -rise_pixels and next.y > -rise_pixels:
+			return next.x
+		position = next
+	return 0.0
+
+
+func run() -> void:
+	var motor := PlayerMotor.new()
+	var velocity := motor.step({"direction": 1.0}, true, DT)
+	check(is_equal_approx(velocity.x, PlayerMotor.ACCELERATION * DT), "Running accelerates.")
+	for i: int in range(30):
+		velocity = motor.step({"direction": 1.0}, true, DT)
+	check(velocity.x == PlayerMotor.RUN_SPEED, "Run speed caps at 180 px/s.")
+	check(motor.facing == 1.0, "facing follows direction.")
+	velocity = motor.step({"direction": -1.0}, true, DT)
+	check(motor.facing == -1.0 and velocity.x < PlayerMotor.RUN_SPEED, "Turning decelerates first.")
+	check(coyote_jump(4), "Jump works 5 steps after leaving a ledge.")
+	check(not coyote_jump(6), "Jump fails 7 steps after leaving a ledge.")
+	check(buffered_jump(4), "A jump pressed 5 steps before landing happens.")
+	check(not buffered_jump(6), "A jump pressed 7 steps before landing is dropped.")
+	motor.reset()
+	motor.step({"jump_pressed": true, "jump_held": true}, true, DT)
+	velocity = motor.step({}, false, DT)
+	check(velocity.y == -PlayerMotor.JUMP_CUT_VELOCITY, "Releasing jump cuts the rise.")
+	motor.reset()
+	for i: int in range(120):
+		velocity = motor.step({}, false, DT)
+	check(velocity.y == PlayerMotor.MAX_FALL_SPEED, "Fall speed caps at 600 px/s.")
+	motor.reset()
+	check(motor.velocity == Vector2.ZERO, "reset clears velocity.")
+	for rise: int in LevelValidator.JUMP_REACH:
+		var across: int = LevelValidator.JUMP_REACH[rise]
+		check(
+			landing_x(rise * 32.0) >= across * 32.0 - 16.0,
+			"Motor reaches %d tiles across at %d tiles up." % [across, rise],
+		)
+	print("PLAYER_MOTOR_TEST_COMPLETE: %d checks, %d failures" % [checks, failures])
+	quit(1 if failures else 0)
+
+
+func check(condition: bool, message: String) -> void:
+	checks += 1
+	if not condition:
+		failures += 1
+		push_error(message)
