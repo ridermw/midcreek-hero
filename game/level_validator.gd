@@ -74,11 +74,20 @@ func _neighbors(level: Dictionary, cell: Vector2i) -> Array[Vector2i]:
 			limit = JUMP_REACH[rise]
 		for dx: int in range(-limit, limit + 1):
 			var next := Vector2i(cell.x + dx, y)
+			if (next + LIFT_RISE) in level["lifts"]:
+				var terrain: bool = next in level["ladders"] or level["solids"].has(next + Vector2i.DOWN)
+				if not terrain or (dx == 0 and rise > 0):
+					continue
 			if next != cell and next.x >= 0 and next.x < width and is_standable(level, next):
 				result.append(next)
 	if cell in level["lifts"]:
 		var top := cell - LIFT_RISE
-		if top.y >= 0 and not level["solids"].has(top) and not level["solids"].has(top + Vector2i.DOWN):
+		var clear := top.y >= 0
+		for y: int in range(top.y, cell.y + 1):
+			if level["solids"].has(Vector2i(cell.x, y)):
+				clear = false
+				break
+		if clear:
 			result.append(top)
 	if cell in level["ladders"]:
 		for step: Vector2i in [Vector2i.UP, Vector2i.DOWN]:

@@ -20,6 +20,7 @@ var velocity: Vector2 = Vector2.ZERO
 var facing: float = 1.0
 var sliding: bool = false
 var climbing: bool = false
+var jumped: bool = false
 var _coyote: float = 0.0
 var _buffer: float = 0.0
 var _slide_remaining: float = 0.0
@@ -32,11 +33,13 @@ func reset() -> void:
 	_buffer = 0.0
 	sliding = false
 	climbing = false
+	jumped = false
 	_slide_remaining = 0.0
 	_wall_lock = 0.0
 
 
 func step(input: Dictionary, context: Variant, delta: float) -> Vector2:
+	jumped = false
 	var ctx: Dictionary = context if context is Dictionary else {"on_floor": bool(context)}
 	var on_floor := bool(ctx.get("on_floor", false))
 	var direction := clampf(float(input.get("direction", 0.0)), -1.0, 1.0)
@@ -50,6 +53,7 @@ func step(input: Dictionary, context: Variant, delta: float) -> Vector2:
 			_buffer = 0.0
 			_coyote = 0.0
 			velocity = Vector2(direction * RUN_SPEED, -JUMP_VELOCITY)
+			jumped = true
 			return velocity
 	if not climbing and ctx.get("on_ladder", false) and vertical != 0.0 and not sliding and _wall_lock <= 0.0:
 		climbing = true
@@ -61,7 +65,7 @@ func step(input: Dictionary, context: Variant, delta: float) -> Vector2:
 		if _slide_remaining <= 0.0 and not ctx.get("ceiling_blocked", false):
 			sliding = false
 		else:
-			velocity = Vector2(facing * SLIDE_SPEED, 0.0 if on_floor else minf(velocity.y + GRAVITY * delta, MAX_FALL_SPEED))
+			velocity = Vector2(0.0 if ctx.get("locked", false) else facing * SLIDE_SPEED, 0.0 if on_floor else minf(velocity.y + GRAVITY * delta, MAX_FALL_SPEED))
 			return velocity
 	if on_floor and input.get("slide_pressed", false):
 		sliding = true
@@ -80,11 +84,13 @@ func step(input: Dictionary, context: Variant, delta: float) -> Vector2:
 		_wall_lock = WALL_JUMP_LOCK_SECONDS
 		facing = signf(normal)
 		velocity = Vector2(normal * WALL_JUMP_PUSH, -WALL_JUMP_VELOCITY)
+		jumped = true
 		return velocity
 	if _buffer > 0.0 and _coyote > 0.0:
 		velocity.y = -JUMP_VELOCITY
 		_buffer = 0.0
 		_coyote = 0.0
+		jumped = true
 		return velocity
 	if on_floor:
 		velocity.y = 0.0

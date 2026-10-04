@@ -55,6 +55,7 @@ var _respawn_pending: bool = false
 var _repair_tick: float = 0.0
 var carried_part: String = ""
 var _diagnose_remaining: float = 0.0
+var _switch_error_remaining: float = 0.0
 var _previous_actions: Dictionary = {}
 var _pressed_actions: Dictionary = {}
 var darkness: CanvasModulate
@@ -223,6 +224,7 @@ func step(delta: float) -> void:
 		return
 	_sample_actions()
 	_update_darkness(delta)
+	_switch_error_remaining = maxf(0.0, _switch_error_remaining - delta)
 	timer.tick(delta)
 	health.tick(delta)
 	var body := player.hit_rect()
@@ -299,6 +301,8 @@ func restore_state(state: Dictionary) -> void:
 			label = "Carrying " + PART_LABELS[part.kind]
 	hud.set_carry(label)
 	_diagnose_remaining = 0.0
+	_switch_error_remaining = 0.0
+	hud.set_prompt("")
 	for group: String in ["racks", "parts", "ports", "switches", "coolant"]:
 		for i: int in range(entities[group].size()):
 			entities[group][i].restore_state(state[group][i])
@@ -344,9 +348,11 @@ func _update_switches(feet: Vector2) -> bool:
 		for other in group:
 			other.set_on(false)
 		sound.emit("timer_warning")
-		hud.set_prompt("Wrong order. Start again at switch 1")
+		_switch_error_remaining = 1.0
 		return true
+	_switch_error_remaining = 0.0
 	panel.set_on(true)
+	hud.set_prompt("")
 	sound.emit("switch")
 	if next == group.size():
 		tasks.complete(panel.task_id)
@@ -356,6 +362,9 @@ func _update_switches(feet: Vector2) -> bool:
 
 func _show_switch_prompt(feet: Vector2) -> void:
 	if player.locked:
+		return
+	if _switch_error_remaining > 0.0:
+		hud.set_prompt("Wrong order. Start again at switch 1")
 		return
 	for panel in entities["switches"]:
 		if not tasks.is_done(panel.task_id) and panel.in_range(feet) and not panel.on:
