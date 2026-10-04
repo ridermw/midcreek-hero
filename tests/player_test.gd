@@ -3,6 +3,8 @@ extends SceneTree
 const InputSetup = preload("res://game/input_setup.gd")
 const Player = preload("res://game/player.gd")
 const PLAYER_SCENE := preload("res://game/player.tscn")
+const RouteRunner = preload("res://game/route_runner.gd")
+const DT := 1.0 / 60.0
 
 var checks: int = 0
 var failures: int = 0
@@ -58,6 +60,7 @@ func run() -> void:
 	await frames(90)
 	check(player.is_on_floor(), "Player lands after the jump.")
 	check("land" in player_sounds, "Landing plays the land sound.")
+	await check_slide_held_across_thaw(player)
 	player.input_override = {"direction": 1.0}
 	player.locked = true
 	await frames(20)
@@ -148,6 +151,42 @@ func run() -> void:
 	await process_frame
 	print("PLAYER_TEST_COMPLETE: %d checks, %d failures" % [checks, failures])
 	quit(1 if failures else 0)
+
+
+class RouteLevel:
+	extends RefCounted
+	var player: Node
+	var use_action_override := false
+	var action_override: Dictionary = {}
+
+
+func check_slide_held_across_thaw(player: Player) -> void:
+	player.set_physics_process(false)
+	var level := RouteLevel.new()
+	level.player = player
+	# Two adjacent steps hold slide, so the route presses slide once on the first frame.
+	var runner := RouteRunner.new([{"hold": ["slide"], "seconds": 0.1}, {"hold": ["slide"], "seconds": 1.0}])
+	player.frozen = true
+	for i: int in range(3):
+		runner.apply(level, DT)
+		player._physics_process(DT)
+	check(not player.sliding, "The player does not slide during hit stop.")
+	player.frozen = false
+	var starts := 0
+	var was_sliding := false
+	for i: int in range(60):
+		runner.apply(level, DT)
+		player._physics_process(DT)
+		if player.sliding and not was_sliding:
+			starts += 1
+		if i == 0:
+			check(player.sliding, "A slide pressed during hit stop starts after it.")
+		was_sliding = player.sliding
+	check(starts == 1, "A slide held across hit stop and adjacent route steps slides once: %d starts." % starts)
+	check(not player.sliding, "A held slide does not restart after the slide ends.")
+	player.input_override = {}
+	player.set_physics_process(true)
+	await frames(5)
 
 
 func check(condition: bool, message: String) -> void:

@@ -70,7 +70,7 @@ jobs:
         run: |
           for n in 01 02 03 04 05; do
             timeout 120s godot --headless --fixed-fps 60 --path . -- --route=$n 2>&1 | tee "$RUNNER_TEMP/smoke-$n.log"
-            grep -Eq "^SMOKE_RESULT $n stars=[1-3] respawns=0 " "$RUNNER_TEMP/smoke-$n.log"
+            grep -Eq "^SMOKE_RESULT $n stars=3 respawns=0 " "$RUNNER_TEMP/smoke-$n.log"
             ! grep -E '^(SCRIPT ERROR|ERROR|USER ERROR|Parse Error)' "$RUNNER_TEMP/smoke-$n.log"
           done
 
