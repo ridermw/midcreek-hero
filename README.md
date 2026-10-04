@@ -160,6 +160,20 @@ Route steps accept only `tap`, only `wait`, or `hold` with `seconds` or a target
 direction: left or right for x, up or down for y. Extra fields are rejected rather
 than ignored.
 
+## Level layouts
+
+`tools/levels/level1.py` to `level5.py` build each level grid and its route
+together with the helpers in `tools/levels/layout.py`. Run one from the
+repository root to rewrite its files, then run the route test:
+
+    python3 -m tools.levels.level3
+    tools/godot_test.sh tests/route_test.gd ROUTE_TEST
+
+`tests/test_level_layouts.py` checks that the scripts reproduce the shipped
+files exactly. Par and SLA follow `layout.par_and_sla`: par is the route time
+plus 25 percent, rounded up to 5 s, and the SLA is par times 1.6 (1.35 for
+level 5).
+
 ## Core platformer
 
 The gray box level tests movement, health, the SLA timer, repair tasks,

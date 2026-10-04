@@ -1,0 +1,77 @@
+"""Level 5, Outage Night: darkness, drones, every task type, and a 4 rack finale."""
+
+from tools.levels.layout import Layout
+
+SEQUENCES = {"c3": ["diagnose", "jump", "repair"]}
+HEADER = {'name': 'Outage Night',
+ 'sla_seconds': 95,
+ 'par_seconds': 70,
+ 'music': 'level5',
+ 'background': 'outage-night',
+ 'darkness': True,
+ 'prompts': [{'x': 2, 'text': 'Outage! Slide under security drones with C'},
+             {'x': 21, 'text': 'Reseat the core uplink'},
+             {'x': 57, 'text': 'Spare PSU. The lift goes up to the PDU deck'},
+             {'x': 96, 'text': 'Reboot the spine switch: 1, 2, 3'},
+             {'x': 129, 'text': 'Optional: a rack on the catwalk'},
+             {'x': 162, 'text': 'Final job: bring the whole row back online'}],
+ 'tasks': [{'id': 'c3', 'type': 'reseat', 'at': ['A'], 'required': True, 'label': 'Reseat core uplink'},
+           {'id': 'd1', 'type': 'diagnose_repair', 'at': ['D'], 'required': True, 'label': 'Diagnose PDU D7'},
+           {'id': 'f1',
+            'type': 'fetch',
+            'at': ['F'],
+            'part_at': 'K',
+            'part': 'psu',
+            'required': True,
+            'label': 'Install PSU in F3'},
+           {'id': 'b1',
+            'type': 'reboot',
+            'at': ['Y', 'X', 'Z'],
+            'required': True,
+            'label': 'Reboot spine switch'},
+           {'id': 'row',
+            'type': 'repair',
+            'at': ['R', 'U', 'V', 'W'],
+            'required': True,
+            'label': 'Restore row 9 (4 racks)'},
+           {'id': 'o1', 'type': 'repair', 'at': ['O'], 'required': False, 'label': 'Repair rack O2'}]}
+
+
+def build():
+    L = Layout(186)
+    S = L.stand
+    L.start()
+    L.drone(12)
+    L.port(23, "A", SEQUENCES["c3"])
+    L.vent(29)
+    L.checkpoint(34)
+    L.tray(38, 43)
+    L.mover(50, 47)
+    L.part(55, S, "K")
+    L.lift_up(59, 61, 75)
+    L.rack(66, 9, "D", "diagnose")
+    L.arc(71, 9)
+    L.run_to(L.cx(78))
+    L.pit(81, 83)
+    L.rack(89, S, "F", "deliver")
+    L.checkpoint(94)
+    L.switch(104, "Y")
+    L.switch(98, "X", left=True)
+    L.switch(110, "Z")
+    L.drone(120)
+    L.ladder(131, 9, 132, 137)
+    L.rack(135, 9, "O")
+    L.run_to(L.cx(140))
+    L.checkpoint(144)
+    L.arc(149)
+    L.vent(155)
+    L.snag(160)
+    for col, letter in ((165, "R"), (168, "U"), (171, "V"), (174, "W")):
+        L.rack(col, S, letter)
+    L.exit(181)
+    return L, HEADER
+
+
+if __name__ == "__main__":
+    grid, header = build()
+    grid.write("05-outage-night", header)
