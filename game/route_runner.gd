@@ -127,6 +127,14 @@ func _validate(step: Variant) -> String:
 			kinds += 1
 	if kinds != 1:
 		return "needs exactly one of hold, tap, or wait."
+	var allowed: Array = ["tap"] if step.has("tap") else ["wait"]
+	if step.has("hold"):
+		allowed = ["hold", "until_x", "max_seconds"] if step.has("until_x") else ["hold", "seconds"]
+		if step.has("until_y") and not step.has("until_x"):
+			allowed = ["hold", "until_y", "max_seconds"]
+	for key: Variant in step:
+		if key not in allowed:
+			return "unsupported field '%s'." % key
 	if step.has("tap"):
 		return "" if step["tap"] is String and String(step["tap"]) in ACTIONS else "unknown tap action."
 	if step.has("wait"):
@@ -148,8 +156,6 @@ func _validate(step: Variant) -> String:
 			return "until_y needs exactly one of move_up or move_down."
 		return ""
 	if step.has("until_x"):
-		if step.has("seconds"):
-			return "hold cannot combine seconds and until_x."
 		var value: Variant = step["until_x"]
 		if not ((value is float or value is int) and is_finite(float(value))):
 			return "until_x must be a finite number."

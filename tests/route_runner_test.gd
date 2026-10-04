@@ -99,6 +99,16 @@ func run() -> void:
 		{"hold": ["move_up", "move_down"], "until_y": 10, "max_seconds": 1},
 		{"wait": -0.5},
 		{"tap": "jump", "wait": 1},
+		{"tap": "jump", "seconds": 2},
+		{"wait": 1, "max_seconds": 5},
+		{"hold": ["repair"], "seconds": 1, "max_seconds": 5},
+		{"tap": "jump", "unknown": true},
+		{"wait": 1, "unknown": true},
+		{"hold": ["repair"], "seconds": 1, "unknown": true},
+		{"hold": ["move_right"], "until_x": 10, "max_seconds": 1, "unknown": true},
+		{"hold": ["move_up"], "until_y": 10, "max_seconds": 1, "unknown": true},
+		{"hold": ["move_down"], "until_y": 10, "max_seconds": 1, "seconds": 2},
+		{"hold": ["move_up"], "until_y": 10, "until_x": 20, "max_seconds": 1},
 	]:
 		check(not RouteRunner.new([bad]).error_message.is_empty(), "Malformed step is rejected: %s" % bad)
 	print("ROUTE_RUNNER_TEST_COMPLETE: %d checks, %d failures" % [checks, failures])
