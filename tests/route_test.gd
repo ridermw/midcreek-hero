@@ -68,6 +68,8 @@ func play(file_name: String) -> void:
 		var result := results[0]
 		check(result["respawns"] == 0, "%s finishes without a respawn." % file_name)
 		check(result["elapsed"] < sla, "%s finishes inside the SLA." % file_name)
+		if file_name == "05-outage-night.route.json":
+			check(result["hits"] == 0, "The Outage Night route avoids damage with real slide press edges.")
 		print("ROUTE %s elapsed=%.2f hits=%d stars=%d optional=%d/%d" % [
 			file_name, result["elapsed"], result["hits"], result["stars"],
 			result["optional_done"], result["optional_total"]

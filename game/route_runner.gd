@@ -10,6 +10,7 @@ var failed: bool = false
 var error_message: String = ""
 var _step_time: float = 0.0
 var _step_frames: int = 0
+var _slide_held: bool = false
 
 
 func _init(route_steps: Array) -> void:
@@ -108,8 +109,10 @@ func _set_input(level: Object, held: Array, press_jump: bool) -> void:
 		input["jump_held"] = true
 		if press_jump:
 			input["jump_pressed"] = true
-	if "slide" in held:
+	var slide_held := "slide" in held
+	if slide_held and not _slide_held:
 		input["slide_pressed"] = true
+	_slide_held = slide_held
 	level.player.input_override = input
 	var actions := {}
 	for action: String in ["repair", "diagnose", "jump"]:

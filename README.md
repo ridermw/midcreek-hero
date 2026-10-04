@@ -157,6 +157,10 @@ Route steps accept only `tap`, only `wait`, or `hold` with `seconds` or a target
 direction: left or right for x, up or down for y. Extra fields are rejected rather
 than ignored.
 
+Holding slide produces one press, including across adjacent hold steps. Release
+slide with a wait or a step without slide before triggering it again. The
+Outage Night route also checks that the player takes no damage.
+
 ## Core platformer
 
 The gray box level tests movement, health, the SLA timer, repair tasks,
