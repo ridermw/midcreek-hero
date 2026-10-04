@@ -1,0 +1,252 @@
+[
+  {
+    "file": "music/title.ogg",
+    "url": "https://opengameart.org/sites/default/files/Juhani%20Junkala%20%5BChiptune%20Adventures%5D%20WAV.zip",
+    "page": "https://opengameart.org/content/4-chiptunes-adventure",
+    "author": "Juhani Junkala (SubspaceAudio)",
+    "license": "CC0-1.0",
+    "archive_member": "Juhani Junkala [Chiptune Adventures] 4. Stage Select.wav",
+    "sha256": "e1720a46a469fca0d9e546e4bc61d99cc248624603cca33638a8eed097178f2c",
+    "notes": "ffmpeg: [\"-map_metadata\", \"-1\", \"-af\", \"volume=0.35\", \"-c:a\", \"vorbis\", \"-strict\", \"experimental\", \"-ac\", \"2\", \"-ar\", \"44100\", \"-q:a\", \"4\", \"-fflags\", \"+bitexact\", \"-flags:a\", \"+bitexact\"]"
+  },
+  {
+    "file": "music/results.ogg",
+    "url": "https://opengameart.org/sites/default/files/5%20Action%20Chiptunes%20By%20Juhani%20Junkala.zip",
+    "page": "https://opengameart.org/content/5-chiptunes-action",
+    "author": "Juhani Junkala (SubspaceAudio)",
+    "license": "CC0-1.0",
+    "archive_member": "Juhani Junkala [Retro Game Music Pack] Ending.wav",
+    "sha256": "54217fbdbc73a004e6409ed22c018cbb78332ccb5349950774106c371274d715",
+    "notes": "ffmpeg: [\"-map_metadata\", \"-1\", \"-af\", \"volume=0.35\", \"-c:a\", \"vorbis\", \"-strict\", \"experimental\", \"-ac\", \"2\", \"-ar\", \"44100\", \"-q:a\", \"4\", \"-fflags\", \"+bitexact\", \"-flags:a\", \"+bitexact\"]"
+  },
+  {
+    "file": "music/level1.ogg",
+    "url": "https://opengameart.org/sites/default/files/5%20Action%20Chiptunes%20By%20Juhani%20Junkala.zip",
+    "page": "https://opengameart.org/content/5-chiptunes-action",
+    "author": "Juhani Junkala (SubspaceAudio)",
+    "license": "CC0-1.0",
+    "archive_member": "Juhani Junkala [Retro Game Music Pack] Level 1.wav",
+    "sha256": "def1f918ad8eeb79c83d13ca3822a426a59a78d9b56a3ea56bc4f5f5748e7ef2",
+    "notes": "ffmpeg: [\"-map_metadata\", \"-1\", \"-af\", \"volume=0.5\", \"-c:a\", \"vorbis\", \"-strict\", \"experimental\", \"-ac\", \"2\", \"-ar\", \"44100\", \"-q:a\", \"4\", \"-fflags\", \"+bitexact\", \"-flags:a\", \"+bitexact\"]"
+  },
+  {
+    "file": "music/level2.ogg",
+    "url": "https://opengameart.org/sites/default/files/Juhani%20Junkala%20%5BChiptune%20Adventures%5D%20WAV.zip",
+    "page": "https://opengameart.org/content/4-chiptunes-adventure",
+    "author": "Juhani Junkala (SubspaceAudio)",
+    "license": "CC0-1.0",
+    "archive_member": "Juhani Junkala [Chiptune Adventures] 2. Stage2.wav",
+    "sha256": "5bbe6f9166c8962793d05e9309eb9478147a01fdf92faab6190b16d2673d12d3",
+    "notes": "ffmpeg: [\"-map_metadata\", \"-1\", \"-af\", \"volume=0.5\", \"-c:a\", \"vorbis\", \"-strict\", \"experimental\", \"-ac\", \"2\", \"-ar\", \"44100\", \"-q:a\", \"4\", \"-fflags\", \"+bitexact\", \"-flags:a\", \"+bitexact\"]"
+  },
+  {
+    "file": "music/level3.ogg",
+    "url": "https://opengameart.org/sites/default/files/5%20Action%20Chiptunes%20By%20Juhani%20Junkala.zip",
+    "page": "https://opengameart.org/content/5-chiptunes-action",
+    "author": "Juhani Junkala (SubspaceAudio)",
+    "license": "CC0-1.0",
+    "archive_member": "Juhani Junkala [Retro Game Music Pack] Level 2.wav",
+    "sha256": "6c97cf9dee2b7d15ea9366807f8ecf635344851d4fa589dec5ac7d49b0ffa6e2",
+    "notes": "ffmpeg: [\"-map_metadata\", \"-1\", \"-af\", \"volume=0.5\", \"-c:a\", \"vorbis\", \"-strict\", \"experimental\", \"-ac\", \"2\", \"-ar\", \"44100\", \"-q:a\", \"4\", \"-fflags\", \"+bitexact\", \"-flags:a\", \"+bitexact\"]"
+  },
+  {
+    "file": "music/level4.ogg",
+    "url": "https://opengameart.org/sites/default/files/5%20Action%20Chiptunes%20By%20Juhani%20Junkala.zip",
+    "page": "https://opengameart.org/content/5-chiptunes-action",
+    "author": "Juhani Junkala (SubspaceAudio)",
+    "license": "CC0-1.0",
+    "archive_member": "Juhani Junkala [Retro Game Music Pack] Level 3.wav",
+    "sha256": "b5e839bd7e66848960243cdaebe0343b677b826dc2125519ade536e151effd1d",
+    "notes": "ffmpeg: [\"-map_metadata\", \"-1\", \"-af\", \"volume=0.5\", \"-c:a\", \"vorbis\", \"-strict\", \"experimental\", \"-ac\", \"2\", \"-ar\", \"44100\", \"-q:a\", \"4\", \"-fflags\", \"+bitexact\", \"-flags:a\", \"+bitexact\"]"
+  },
+  {
+    "file": "music/level5.ogg",
+    "url": "https://opengameart.org/sites/default/files/Juhani%20Junkala%20%5BChiptune%20Adventures%5D%20WAV.zip",
+    "page": "https://opengameart.org/content/4-chiptunes-adventure",
+    "author": "Juhani Junkala (SubspaceAudio)",
+    "license": "CC0-1.0",
+    "archive_member": "Juhani Junkala [Chiptune Adventures] 3. Boss Fight.wav",
+    "sha256": "40a221e1fd1026d0a6c798623ac4c615889de062da59730b22795fe6ec400d00",
+    "notes": "ffmpeg: [\"-map_metadata\", \"-1\", \"-af\", \"volume=0.5\", \"-c:a\", \"vorbis\", \"-strict\", \"experimental\", \"-ac\", \"2\", \"-ar\", \"44100\", \"-q:a\", \"4\", \"-fflags\", \"+bitexact\", \"-flags:a\", \"+bitexact\"]"
+  },
+  {
+    "file": "sfx/jump.wav",
+    "url": "https://opengameart.org/sites/default/files/The%20Essential%20Retro%20Video%20Game%20Sound%20Effects%20Collection%20%5B512%20sounds%5D.zip",
+    "page": "https://opengameart.org/content/512-sound-effects-8-bit-style",
+    "author": "Juhani Junkala (SubspaceAudio)",
+    "license": "CC0-1.0",
+    "archive_member": "The Essential Retro Video Game Sound Effects Collection [512 sounds] By Juhani Junkala/Movement/Jumping and Landing/sfx_movement_jump10.wav",
+    "sha256": "01f287fd44a6937e91ec2bf634a7bf1c9f5aa9523ef9c27030d0a1d621be55cf",
+    "notes": "copy"
+  },
+  {
+    "file": "sfx/land.wav",
+    "url": "https://opengameart.org/sites/default/files/The%20Essential%20Retro%20Video%20Game%20Sound%20Effects%20Collection%20%5B512%20sounds%5D.zip",
+    "page": "https://opengameart.org/content/512-sound-effects-8-bit-style",
+    "author": "Juhani Junkala (SubspaceAudio)",
+    "license": "CC0-1.0",
+    "archive_member": "The Essential Retro Video Game Sound Effects Collection [512 sounds] By Juhani Junkala/Movement/Jumping and Landing/sfx_movement_jump10_landing.wav",
+    "sha256": "44cabfa1852bd1ab62fcfabfbaf1733885443ae9f1c794c0fdbb1c08a431a0c6",
+    "notes": "copy"
+  },
+  {
+    "file": "sfx/hit.wav",
+    "url": "https://opengameart.org/sites/default/files/The%20Essential%20Retro%20Video%20Game%20Sound%20Effects%20Collection%20%5B512%20sounds%5D.zip",
+    "page": "https://opengameart.org/content/512-sound-effects-8-bit-style",
+    "author": "Juhani Junkala (SubspaceAudio)",
+    "license": "CC0-1.0",
+    "archive_member": "The Essential Retro Video Game Sound Effects Collection [512 sounds] By Juhani Junkala/General Sounds/Simple Damage Sounds/sfx_damage_hit1.wav",
+    "sha256": "0d56e04829ea9bcbbba40e5db9c9fc04ada278a893a0698dc2dcc2b2173db375",
+    "notes": "copy"
+  },
+  {
+    "file": "sfx/heal.wav",
+    "url": "https://opengameart.org/sites/default/files/The%20Essential%20Retro%20Video%20Game%20Sound%20Effects%20Collection%20%5B512%20sounds%5D.zip",
+    "page": "https://opengameart.org/content/512-sound-effects-8-bit-style",
+    "author": "Juhani Junkala (SubspaceAudio)",
+    "license": "CC0-1.0",
+    "archive_member": "The Essential Retro Video Game Sound Effects Collection [512 sounds] By Juhani Junkala/General Sounds/Positive Sounds/sfx_sounds_powerup1.wav",
+    "sha256": "ded83f9452006571efa231e3be8a0a0cc9c48d4b316df204417e02c0e54c538b",
+    "notes": "copy"
+  },
+  {
+    "file": "sfx/repair_tick.wav",
+    "url": "https://opengameart.org/sites/default/files/The%20Essential%20Retro%20Video%20Game%20Sound%20Effects%20Collection%20%5B512%20sounds%5D.zip",
+    "page": "https://opengameart.org/content/512-sound-effects-8-bit-style",
+    "author": "Juhani Junkala (SubspaceAudio)",
+    "license": "CC0-1.0",
+    "archive_member": "The Essential Retro Video Game Sound Effects Collection [512 sounds] By Juhani Junkala/General Sounds/Interactions/sfx_sounds_interaction1.wav",
+    "sha256": "3e668233434f41e25bd3cf9c1f8c38710cc9a4d19af7d212dc4c30bf68dea492",
+    "notes": "copy"
+  },
+  {
+    "file": "sfx/repair_done.wav",
+    "url": "https://opengameart.org/sites/default/files/The%20Essential%20Retro%20Video%20Game%20Sound%20Effects%20Collection%20%5B512%20sounds%5D.zip",
+    "page": "https://opengameart.org/content/512-sound-effects-8-bit-style",
+    "author": "Juhani Junkala (SubspaceAudio)",
+    "license": "CC0-1.0",
+    "archive_member": "The Essential Retro Video Game Sound Effects Collection [512 sounds] By Juhani Junkala/General Sounds/Positive Sounds/sfx_sounds_powerup4.wav",
+    "sha256": "50011dea630c05d56ce5415ad3ffe41924a089ee701337705adff1ae3cfbeb38",
+    "notes": "copy"
+  },
+  {
+    "file": "sfx/checkpoint.wav",
+    "url": "https://opengameart.org/sites/default/files/The%20Essential%20Retro%20Video%20Game%20Sound%20Effects%20Collection%20%5B512%20sounds%5D.zip",
+    "page": "https://opengameart.org/content/512-sound-effects-8-bit-style",
+    "author": "Juhani Junkala (SubspaceAudio)",
+    "license": "CC0-1.0",
+    "archive_member": "The Essential Retro Video Game Sound Effects Collection [512 sounds] By Juhani Junkala/General Sounds/Positive Sounds/sfx_sounds_powerup3.wav",
+    "sha256": "ba1231c9791ae933faffb1d01899c5d205a234e0e25e8c28653588431a7f3014",
+    "notes": "copy"
+  },
+  {
+    "file": "sfx/door_open.wav",
+    "url": "https://opengameart.org/sites/default/files/The%20Essential%20Retro%20Video%20Game%20Sound%20Effects%20Collection%20%5B512%20sounds%5D.zip",
+    "page": "https://opengameart.org/content/512-sound-effects-8-bit-style",
+    "author": "Juhani Junkala (SubspaceAudio)",
+    "license": "CC0-1.0",
+    "archive_member": "The Essential Retro Video Game Sound Effects Collection [512 sounds] By Juhani Junkala/Movement/Opening Doors/sfx_movement_dooropen1.wav",
+    "sha256": "fc045f4bd0fe9f47f922a2939d094a83793c4b215d059cc47912361c12e0feef",
+    "notes": "copy"
+  },
+  {
+    "file": "sfx/timer_warning.wav",
+    "url": "https://opengameart.org/sites/default/files/The%20Essential%20Retro%20Video%20Game%20Sound%20Effects%20Collection%20%5B512%20sounds%5D.zip",
+    "page": "https://opengameart.org/content/512-sound-effects-8-bit-style",
+    "author": "Juhani Junkala (SubspaceAudio)",
+    "license": "CC0-1.0",
+    "archive_member": "The Essential Retro Video Game Sound Effects Collection [512 sounds] By Juhani Junkala/General Sounds/Alarms/Low health Alarms/sfx_lowhealth_alarmloop1.wav",
+    "sha256": "588993839a7fd772f36a5d56ca3ea10e4c6957f56200457193676d8a5cee52bb",
+    "notes": "copy"
+  },
+  {
+    "file": "sfx/fail.wav",
+    "url": "https://opengameart.org/sites/default/files/The%20Essential%20Retro%20Video%20Game%20Sound%20Effects%20Collection%20%5B512%20sounds%5D.zip",
+    "page": "https://opengameart.org/content/512-sound-effects-8-bit-style",
+    "author": "Juhani Junkala (SubspaceAudio)",
+    "license": "CC0-1.0",
+    "archive_member": "The Essential Retro Video Game Sound Effects Collection [512 sounds] By Juhani Junkala/General Sounds/Negative Sounds/sfx_sounds_error1.wav",
+    "sha256": "04088388f3fb97ac2d1c8268f6dcb003fd5cf8a62b4246be3af5f5818b3add39",
+    "notes": "copy"
+  },
+  {
+    "file": "sfx/win.wav",
+    "url": "https://opengameart.org/sites/default/files/The%20Essential%20Retro%20Video%20Game%20Sound%20Effects%20Collection%20%5B512%20sounds%5D.zip",
+    "page": "https://opengameart.org/content/512-sound-effects-8-bit-style",
+    "author": "Juhani Junkala (SubspaceAudio)",
+    "license": "CC0-1.0",
+    "archive_member": "The Essential Retro Video Game Sound Effects Collection [512 sounds] By Juhani Junkala/General Sounds/Fanfares/sfx_sounds_fanfare1.wav",
+    "sha256": "f66509a79af67f2cc3efd3c524d54809c2be2235bf27562e5d6fd0542c2fcad3",
+    "notes": "copy"
+  },
+  {
+    "file": "sfx/pickup.wav",
+    "url": "https://opengameart.org/sites/default/files/The%20Essential%20Retro%20Video%20Game%20Sound%20Effects%20Collection%20%5B512%20sounds%5D.zip",
+    "page": "https://opengameart.org/content/512-sound-effects-8-bit-style",
+    "author": "Juhani Junkala (SubspaceAudio)",
+    "license": "CC0-1.0",
+    "archive_member": "The Essential Retro Video Game Sound Effects Collection [512 sounds] By Juhani Junkala/General Sounds/Coins/sfx_coin_single1.wav",
+    "sha256": "5db3c16ed50acd8fb02525caf5446402910fd3fb61071ae9098ac232e22a63aa",
+    "notes": "copy"
+  },
+  {
+    "file": "sfx/deliver.wav",
+    "url": "https://opengameart.org/sites/default/files/The%20Essential%20Retro%20Video%20Game%20Sound%20Effects%20Collection%20%5B512%20sounds%5D.zip",
+    "page": "https://opengameart.org/content/512-sound-effects-8-bit-style",
+    "author": "Juhani Junkala (SubspaceAudio)",
+    "license": "CC0-1.0",
+    "archive_member": "The Essential Retro Video Game Sound Effects Collection [512 sounds] By Juhani Junkala/General Sounds/Positive Sounds/sfx_sounds_powerup2.wav",
+    "sha256": "14e1dff8518ff2e9de8e03c7971a98d30812b012ae54cd24456bb1f682b04708",
+    "notes": "copy"
+  },
+  {
+    "file": "sfx/diagnose.wav",
+    "url": "https://opengameart.org/sites/default/files/The%20Essential%20Retro%20Video%20Game%20Sound%20Effects%20Collection%20%5B512%20sounds%5D.zip",
+    "page": "https://opengameart.org/content/512-sound-effects-8-bit-style",
+    "author": "Juhani Junkala (SubspaceAudio)",
+    "license": "CC0-1.0",
+    "archive_member": "The Essential Retro Video Game Sound Effects Collection [512 sounds] By Juhani Junkala/General Sounds/Simple Bleeps/sfx_sounds_Blip4.wav",
+    "sha256": "57fdc6733b8bcd16eb717f946f195b889886d7eb0653e3c57b271916028e1d0c",
+    "notes": "copy"
+  },
+  {
+    "file": "sfx/switch.wav",
+    "url": "https://opengameart.org/sites/default/files/The%20Essential%20Retro%20Video%20Game%20Sound%20Effects%20Collection%20%5B512%20sounds%5D.zip",
+    "page": "https://opengameart.org/content/512-sound-effects-8-bit-style",
+    "author": "Juhani Junkala (SubspaceAudio)",
+    "license": "CC0-1.0",
+    "archive_member": "The Essential Retro Video Game Sound Effects Collection [512 sounds] By Juhani Junkala/General Sounds/Buttons/sfx_sounds_button1.wav",
+    "sha256": "7f4dea2f09a568ea27c266ea62c4547031efacacc1ae010f6a1ceb0f4902cf58",
+    "notes": "copy"
+  },
+  {
+    "file": "sfx/spark.wav",
+    "url": "https://opengameart.org/sites/default/files/The%20Essential%20Retro%20Video%20Game%20Sound%20Effects%20Collection%20%5B512%20sounds%5D.zip",
+    "page": "https://opengameart.org/content/512-sound-effects-8-bit-style",
+    "author": "Juhani Junkala (SubspaceAudio)",
+    "license": "CC0-1.0",
+    "archive_member": "The Essential Retro Video Game Sound Effects Collection [512 sounds] By Juhani Junkala/General Sounds/Impacts/sfx_sounds_impact1.wav",
+    "sha256": "3657bac0f62b5ccc0842fb22ec515e23c0c30878b76126fb56822198742a6471",
+    "notes": "copy"
+  },
+  {
+    "file": "sfx/menu_move.wav",
+    "url": "https://opengameart.org/sites/default/files/The%20Essential%20Retro%20Video%20Game%20Sound%20Effects%20Collection%20%5B512%20sounds%5D.zip",
+    "page": "https://opengameart.org/content/512-sound-effects-8-bit-style",
+    "author": "Juhani Junkala (SubspaceAudio)",
+    "license": "CC0-1.0",
+    "archive_member": "The Essential Retro Video Game Sound Effects Collection [512 sounds] By Juhani Junkala/General Sounds/Menu Sounds/sfx_menu_move1.wav",
+    "sha256": "3b65d806195db0dd80fc36e03f950864d91302bc2d477981e9686d6b1b826131",
+    "notes": "copy"
+  },
+  {
+    "file": "sfx/menu_select.wav",
+    "url": "https://opengameart.org/sites/default/files/The%20Essential%20Retro%20Video%20Game%20Sound%20Effects%20Collection%20%5B512%20sounds%5D.zip",
+    "page": "https://opengameart.org/content/512-sound-effects-8-bit-style",
+    "author": "Juhani Junkala (SubspaceAudio)",
+    "license": "CC0-1.0",
+    "archive_member": "The Essential Retro Video Game Sound Effects Collection [512 sounds] By Juhani Junkala/General Sounds/Menu Sounds/sfx_menu_select1.wav",
+    "sha256": "a739f6c39b90ba2551d5fd81d8bc2b1cd9b72b3cc1e35d76fc7e2ef6f7e6f392",
+    "notes": "copy"
+  }
+]
