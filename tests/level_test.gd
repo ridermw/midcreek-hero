@@ -43,8 +43,12 @@ func run() -> void:
 	check(level.player.sprite.sprite_frames != null, "The player has animation frames.")
 	check(level.entities["racks"][0].art != null, "Entities draw generated art.")
 	check(level.get_node("World/Far").modulate.v < 0.7, "The far background is darker than gameplay objects.")
+	at(Vector2i(0, 2))
+	level.step(DT)
+	check(level.hud.prompt_label.text == "Run right", "Level prompts show near their column.")
 	at(Vector2i(9, 2))
 	level.step(DT)
+	check(level.hud.prompt_label.text == "", "Level prompts hide away from their column.")
 	check(level.health.segments == 4 and level.health.hits_taken == 1, "A cable snag removes 1 segment.")
 	at(Vector2i(12, 2))
 	level.step(DT)
@@ -96,6 +100,7 @@ func run() -> void:
 		results[0]["stars"] == 2 and results[0]["respawns"] == 2 and results[0]["hits"] == 6,
 		"Under par with 6 hits gives 2 stars.",
 	)
+	check(results[0]["optional_done"] == 0 and results[0]["optional_total"] == 1, "Results count optional tasks.")
 	level.queue_free()
 	level = LEVEL_SCENE.instantiate()
 	level.level_path = "res://tests/fixtures/controller.level"

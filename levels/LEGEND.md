@@ -34,3 +34,6 @@ must be a string; an omitted or empty label uses the default task label.
 The parser recognizes future terrain symbols, but M0 level validation rejects
 trays (`T`), ladders (`|`), and lifts (`l`) before construction. Their runtime
 mechanics arrive in the milestones listed above.
+
+Optional header key `prompts`: an array of `{"x": <column>, "text": "<hint>"}`.
+The HUD shows the text while the player is within 3 columns of `x`.

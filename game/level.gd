@@ -200,7 +200,7 @@ func _update_repair(delta: float, feet: Vector2) -> void:
 	player.locked = holding
 	player.action = &"primary" if holding else &""
 	if target == null:
-		hud.set_prompt("")
+		hud.set_prompt(_level_prompt(feet))
 	elif not holding:
 		target.cancel()
 		hud.set_prompt("Hold E or X to repair")
@@ -208,6 +208,14 @@ func _update_repair(delta: float, feet: Vector2) -> void:
 		hud.set_prompt("Repairing...")
 		if target.work(delta):
 			_complete_if_all_racks_done(target.task_id)
+
+
+func _level_prompt(feet: Vector2) -> String:
+	var column := int(floorf(feet.x / LevelBuilder.TILE))
+	for prompt: Dictionary in level["header"].get("prompts", []):
+		if absi(column - int(prompt["x"])) <= 3:
+			return String(prompt["text"])
+	return ""
 
 
 func _complete_if_all_racks_done(task_id: String) -> void:
@@ -241,7 +249,14 @@ func _finish() -> void:
 		"hits": health.hits_taken,
 		"respawns": respawns,
 		"stars": Score.stars(timer.elapsed, par, health.hits_taken),
+		"optional_done": 0,
+		"optional_total": 0,
 	}
+	for entry: Dictionary in tasks.entries():
+		if not entry["required"]:
+			result["optional_total"] += 1
+			if entry["done"]:
+				result["optional_done"] += 1
 	hud.show_message("Level complete. Stars: %d" % result["stars"])
 	hud.show_stars(result["stars"])
 	finished.emit(result)
