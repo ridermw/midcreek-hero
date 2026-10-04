@@ -23,6 +23,7 @@ const Score = preload("res://game/score.gd")
 const Player = preload("res://game/player.gd")
 const Hud = preload("res://game/hud.gd")
 const CablePort = preload("res://game/entities/cable_port.gd")
+const Feel = preload("res://game/feel.gd")
 const SpriteLibrary = preload("res://game/sprite_library.gd")
 const HeroAnimations = preload("res://game/animation_library.gd")
 const BACKGROUNDS := {
@@ -58,6 +59,9 @@ var _diagnose_remaining: float = 0.0
 var _previous_actions: Dictionary = {}
 var _pressed_actions: Dictionary = {}
 var darkness: CanvasModulate
+var hit_stop_remaining: float = 0.0
+var shake_remaining: float = 0.0
+var _shake_rng := RandomNumberGenerator.new()
 var _flicker_times: Array = []
 var _clock: float = 0.0
 
@@ -183,6 +187,18 @@ func _update_darkness(delta: float) -> void:
 	darkness.color = FLICKER_COLOR if flicker_active_at(_clock) else DARK_COLOR
 
 
+func _update_shake(delta: float) -> void:
+	if shake_remaining <= 0.0:
+		camera.offset = Vector2.ZERO
+		return
+	shake_remaining = maxf(shake_remaining - delta, 0.0)
+	camera.offset = Feel.shake_offset(Feel.SHAKE_SECONDS - shake_remaining, _shake_rng) if shake_remaining > 0.0 else Vector2.ZERO
+
+
+func _sparks(at: Vector2) -> void:
+	$World.add_child(Feel.spark_burst(at + Vector2(0, -60)))
+
+
 func _build_background(background: String) -> bool:
 	if not BACKGROUNDS.has(background):
 		error_message = "Pending artwork: unknown background set: " + background
@@ -223,6 +239,11 @@ func step(delta: float) -> void:
 		return
 	_sample_actions()
 	_update_darkness(delta)
+	_update_shake(delta)
+	if hit_stop_remaining > 0.0:
+		hit_stop_remaining -= delta
+		player.frozen = hit_stop_remaining > 0.0
+		return
 	timer.tick(delta)
 	health.tick(delta)
 	var body := player.hit_rect()
@@ -231,6 +252,9 @@ func step(delta: float) -> void:
 		if hazard.active and hazard.hit_rect().intersects(body) and health.damage():
 			player.hurt()
 			sound.emit("hit")
+			hit_stop_remaining = Feel.HIT_STOP_SECONDS
+			shake_remaining = Feel.SHAKE_SECONDS
+			player.frozen = true
 	if _out_of_bounds():
 		_request_respawn()
 	if _respawn_pending:
@@ -467,6 +491,7 @@ func _update_repair(delta: float, feet: Vector2) -> void:
 				sound.emit("deliver")
 			else:
 				sound.emit("repair_done")
+			_sparks(target.position)
 			_complete_if_all_racks_done(target.task_id)
 
 

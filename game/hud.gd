@@ -3,6 +3,7 @@ extends CanvasLayer
 const Health = preload("res://game/health.gd")
 const SlaTimer = preload("res://game/sla_timer.gd")
 const TaskSystem = preload("res://game/task_system.gd")
+const Feel = preload("res://game/feel.gd")
 const WARNING_COLOR := Color(1.0, 0.35, 0.3)
 
 var segments: Array[TextureRect] = []
@@ -97,7 +98,9 @@ func update_timer() -> void:
 	if _timer == null:
 		return
 	timer_label.text = format_time(_timer.remaining)
-	timer_label.modulate = WARNING_COLOR if _timer.remaining <= SlaTimer.WARNING_SECONDS else Color.WHITE
+	var color := WARNING_COLOR if _timer.remaining <= SlaTimer.WARNING_SECONDS else Color.WHITE
+	color.a = Feel.timer_pulse(_timer.remaining, Time.get_ticks_msec() / 1000.0)
+	timer_label.modulate = color
 
 
 static func format_time(seconds: float) -> String:

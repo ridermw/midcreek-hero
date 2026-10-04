@@ -21,6 +21,7 @@ var action: StringName = &""
 var sliding: bool = false
 var hurt_remaining: float = 0.0
 var on_ladder: bool = false
+var frozen: bool = false
 var _shape: RectangleShape2D
 var _suppress_landing: bool = true
 
@@ -92,6 +93,8 @@ func standing_blocked() -> bool:
 
 
 func _physics_process(delta: float) -> void:
+	if frozen:
+		return
 	var input := {} if locked else read_input()
 	var was_on_floor := is_on_floor()
 	var context := {
