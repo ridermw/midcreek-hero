@@ -320,6 +320,9 @@ menu rendering, and phone layout. `web/mobile.css` reserves space around a
 than changing level geometry. Browser menus remain scrollable. Gameplay
 controls prevent scrolling and release on cancellation, lost capture,
 orientation changes, focus loss, page hiding, and screen changes.
+Pointer contacts remain tracked while a finger crosses a gap between buttons.
+Actual orientation angle changes clear holds, including a 180 degree turn.
+Unchanged status text does not replace live region text nodes.
 
 The export uses `web/shell.html`. Copy `web/mobile.js` and `web/mobile.css`
 beside the exported HTML. The Pages workflow and README include this step.

@@ -50,7 +50,10 @@ async function wait(expression) {
   throw new Error("Timed out: " + expression);
 }
 async function dimensions(width, height) {
-  await cdp("Emulation.setDeviceMetricsOverride", {width, height, screenWidth: width, screenHeight: height, deviceScaleFactor: 1, mobile: true});
+  await cdp("Emulation.setDeviceMetricsOverride", {
+    width, height, screenWidth: width, screenHeight: height, deviceScaleFactor: 1, mobile: true,
+    screenOrientation: {type: width > height ? "landscapePrimary" : "portraitPrimary", angle: width > height ? 90 : 0},
+  });
 }
 async function point(selector) {
   const box = await evaluate(`(() => { const node = document.querySelector(${JSON.stringify(selector)}); if (!node) return null; const r = node.getBoundingClientRect(); return {x:r.x,y:r.y,width:r.width,height:r.height}; })()`);
@@ -62,6 +65,11 @@ async function tap(selector) {
   const p = await point(selector);
   await cdp("Input.dispatchTouchEvent", {type: "touchStart", touchPoints: [p]});
   await cdp("Input.dispatchTouchEvent", {type: "touchEnd", touchPoints: []});
+}
+async function moveTouches(touchPoints) {
+  const before = await evaluate("window.touchMoves");
+  await cdp("Input.dispatchTouchEvent", {type: "touchMove", touchPoints});
+  await wait(`window.touchMoves > ${before}`);
 }
 async function menuButton(text) {
   const selector = await evaluate(`(() => { const buttons = [...document.querySelectorAll("#mobile-menu button")]; const i = buttons.findIndex(b => b.textContent === ${JSON.stringify(text)}); if(i < 0) return null; buttons[i].scrollIntoView({block:"center"}); return "#mobile-menu button:nth-of-type(" + (i+1) + ")"; })()`);
@@ -126,25 +134,58 @@ try {
     });
   })()`), true, "Controls and prompt do not cover the game image.");
   await screenshot("phone-gameplay");
+  await wait('document.querySelector("#mobile-prompt").textContent === "Run with Left and Right."');
+  const repeatedMutations = await evaluate(`new Promise(resolve => {
+    const node = document.querySelector("#mobile-prompt");
+    let count = 0;
+    const observer = new MutationObserver(records => { count += records.length; });
+    observer.observe(node, {childList: true, characterData: true, subtree: true});
+    setTimeout(() => { observer.disconnect(); resolve({count, text: node.textContent}); }, 350);
+  })`);
+  assert.equal(repeatedMutations.text, "Run with Left and Right.", "The prompt remains stable during the announcement check.");
+  if (repeatedMutations.count !== 0) regressions.push("Unchanged live prompt mutates repeatedly.");
   const right = await point('[data-action="move_right"]');
+  const left = await point('[data-action="move_left"]');
   const jump = {...await point('[data-action="jump"]'), id: 2};
+  await evaluate('window.touchMoves = 0; document.addEventListener("pointermove", () => { window.touchMoves++; }, true)');
   await cdp("Input.dispatchTouchEvent", {type: "touchStart", touchPoints: [right]});
   await delay(150);
   await cdp("Input.dispatchTouchEvent", {type: "touchStart", touchPoints: [right, jump]});
   await delay(150);
   assert.equal(await evaluate('document.querySelectorAll(\'[aria-pressed="true"]\').length'), 2, "Two fingers hold independent actions.");
   await screenshot("phone-move-jump");
+  const gap = {x: (left.x + right.x) / 2, y: right.y, id: 1};
+  assert.equal(await evaluate(`document.elementFromPoint(${gap.x}, ${gap.y})?.dataset.action === undefined`), true, "The measured point lies in the pad gap.");
+  await moveTouches([gap, jump]);
+  assert.equal(await evaluate('document.querySelectorAll(\'[aria-pressed="true"]\').length'), 1, "The gap releases movement but keeps Jump held.");
+  await moveTouches([left, jump]);
+  if (!await evaluate('document.querySelector(\'[data-action="move_left"]\').getAttribute("aria-pressed") === "true"')) {
+    regressions.push("A finger cannot reenter a direction after crossing the pad gap.");
+  }
   await cdp("Input.dispatchTouchEvent", {type: "touchCancel", touchPoints: []});
   assert.equal(await evaluate('document.querySelectorAll(\'[aria-pressed="true"]\').length'), 0, "Cancellation releases both actions.");
   await cdp("Input.dispatchTouchEvent", {type: "touchStart", touchPoints: [right]});
-  await cdp("Input.dispatchTouchEvent", {type: "touchMove", touchPoints: [{x: 422, y: 100, id: 1}]});
+  await moveTouches([{x: 422, y: 100, id: 1}]);
   assert.equal(await evaluate('document.querySelectorAll(\'[aria-pressed="true"]\').length'), 0, "Dragging off a control releases it.");
+  await cdp("Input.dispatchTouchEvent", {type: "touchEnd", touchPoints: []});
+  await cdp("Input.dispatchTouchEvent", {type: "touchStart", touchPoints: [right]});
+  await evaluate("MidcreekTouch.releaseAll()");
+  await moveTouches([left]);
+  assert.equal(await evaluate('document.querySelectorAll(\'[aria-pressed="true"]\').length'), 0, "A cleared contact cannot resume without another press.");
   await cdp("Input.dispatchTouchEvent", {type: "touchEnd", touchPoints: []});
   for (const action of ["slide", "move_up", "move_down", "repair", "diagnose"]) await tap(`[data-action="${action}"]`);
   await evaluate('document.querySelector(\'[data-action="repair"]\').click()');
   await delay(100);
   if (!await evaluate('document.querySelector(\'[data-action="repair"]\').getAttribute("aria-pressed") === "true"')) regressions.push("Assistive activation cannot hold Repair.");
-  await evaluate('document.querySelector(\'[data-action="repair"]\').click()');
+  await evaluate(`window.orientationEvents = 0;
+    screen.orientation.addEventListener("change", () => { window.orientationEvents++; });`);
+  await cdp("Emulation.setDeviceMetricsOverride", {
+    width: 844, height: 390, screenWidth: 844, screenHeight: 390, deviceScaleFactor: 1, mobile: true,
+    screenOrientation: {type: "landscapeSecondary", angle: 270},
+  });
+  await wait("screen.orientation.angle === 270 && window.orientationEvents > 0");
+  if (!await evaluate('document.querySelector(\'[data-action="repair"]\').getAttribute("aria-pressed") === "false"')) regressions.push("A 180 degree landscape rotation retains held Repair.");
+  await evaluate("MidcreekTouch.releaseAll()");
   assert.equal(await evaluate("scrollX === 0 && scrollY === 0"), true, "Play does not scroll the page.");
   await tap("#mobile-pause");
   await wait('document.querySelector("#mobile-menu")?.textContent.includes("Restart work order")');

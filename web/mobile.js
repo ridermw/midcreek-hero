@@ -46,8 +46,10 @@
   let notice;
   let revision = -1;
   let lastPortrait;
+  let lastOrientation;
   let clearing = false;
   const contexts = [];
+  const activeContacts = new Set();
   const state = new TouchState((action, down) => {
     if (!clearing) send({type: "action", action, down});
     shell?.querySelector(`[data-action="${action}"]`)?.setAttribute("aria-pressed", String(down));
@@ -75,6 +77,7 @@
     }
   }
   function releaseAll() {
+    activeContacts.clear();
     clearing = true;
     state.clear();
     clearing = false;
@@ -100,10 +103,12 @@
   function layout() {
     if (!shell) return;
     const portrait = innerHeight > innerWidth;
-    if (portrait !== lastPortrait) {
+    const orientation = screen.orientation?.angle ?? root.orientation ?? 0;
+    if (portrait !== lastPortrait || orientation !== lastOrientation) {
       releaseAll();
-      revision = -1;
+      if (portrait !== lastPortrait) revision = -1;
       lastPortrait = portrait;
+      lastOrientation = orientation;
     }
     shell.classList.toggle("portrait", portrait);
     if (portrait && model?.screen === "level" && !model.paused) suspend();
@@ -126,13 +131,17 @@
       event.preventDefault();
       resumeAudio();
       button.setPointerCapture(event.pointerId);
+      activeContacts.add(event.pointerId);
       state.press(event.pointerId, action);
     });
     for (const eventName of ["pointerup", "pointercancel", "lostpointercapture"]) {
-      button.addEventListener(eventName, event => state.release(event.pointerId));
+      button.addEventListener(eventName, event => {
+        activeContacts.delete(event.pointerId);
+        state.release(event.pointerId);
+      });
     }
     button.addEventListener("pointermove", event => {
-      if (!state.pointers.has(event.pointerId)) return;
+      if (!activeContacts.has(event.pointerId)) return;
       const target = document.elementFromPoint(event.clientX, event.clientY);
       if (target?.dataset.action) state.press(event.pointerId, target.dataset.action);
       else state.release(event.pointerId);
@@ -195,6 +204,8 @@
     document.addEventListener("visibilitychange", () => { if (document.hidden) suspend(); });
     addEventListener("pagehide", suspend);
     addEventListener("resize", layout);
+    screen.orientation?.addEventListener("change", layout);
+    addEventListener("orientationchange", layout);
     root.visualViewport?.addEventListener("resize", layout);
     layout();
   }
@@ -209,8 +220,10 @@
       suspend();
       return;
     }
-    status.textContent = model.status || "";
-    prompt.textContent = [model.prompt, model.carry].filter(Boolean).join(" | ");
+    const statusText = model.status || "";
+    if (status.textContent !== statusText) status.textContent = statusText;
+    const promptText = [model.prompt, model.carry].filter(Boolean).join(" | ");
+    if (prompt.textContent !== promptText) prompt.textContent = promptText;
     if (revision === model.revision) return;
     revision = model.revision;
     releaseAll();
