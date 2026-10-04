@@ -60,7 +60,7 @@ func run() -> void:
 	check(player.position.x == locked_x, "A locked player does not move.")
 	player.locked = false
 	player.position = Vector2(100, 320)
-	check(player.hit_rect() == Rect2(91, 272, 18, 48), "hit_rect covers the body above the feet.")
+	check(player.hit_rect() == Rect2(91, 256, 18, 64), "hit_rect covers the body above the feet.")
 	player.respawn(Vector2(40, 320))
 	check(
 		player.position == Vector2(40, 320) and player.velocity == Vector2.ZERO and player.motor.velocity == Vector2.ZERO,
@@ -76,6 +76,11 @@ func run() -> void:
 	player.hurt()
 	check(player.hurt_remaining > 0.0, "hurt starts the reaction timer.")
 	check(player.has_node("Sprite") and not player.has_node("Body"), "The player draws an animated sprite.")
+	check(player.sprite.scale == Vector2(0.5, 0.5), "The technician is drawn at half scale.")
+	check(
+		player.sprite.position.y + (184.0 - 104.0) * player.sprite.scale.y == 0.0,
+		"The sprite pivot sits on the feet.",
+	)
 	player.queue_free()
 	floor_body.queue_free()
 	await process_frame

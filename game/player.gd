@@ -2,7 +2,7 @@ extends CharacterBody2D
 
 const PlayerMotor = preload("res://game/player_motor.gd")
 const HeroAnimations = preload("res://game/animation_library.gd")
-const BODY_SIZE := Vector2(18, 48)
+const BODY_SIZE := Vector2(18, 64)
 const HURT_SECONDS := 0.4
 const RUN_THRESHOLD := 120.0
 const WALK_THRESHOLD := 10.0

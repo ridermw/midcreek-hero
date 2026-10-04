@@ -7,7 +7,7 @@ log="$(mktemp)"
 trap 'rm -f "$log"' EXIT
 status=0
 # shellcheck disable=SC2086
-timeout 120s godot --headless --path . ${GODOT_EXTRA_ARGS:-} --script "$script" >"$log" 2>&1 || status=$?
+timeout 60s godot --headless --path . ${GODOT_EXTRA_ARGS:-} --script "$script" >"$log" 2>&1 || status=$?
 cat "$log"
 if grep -Eq '^(SCRIPT ERROR|ERROR|USER ERROR|Parse Error)' "$log"; then
 	echo "godot_test: error lines in output" >&2

@@ -55,7 +55,6 @@ Apply these rules to every milestone.
    godot --headless --editor --path . --import
    for t in tests/*_test.gd; do
      case "$t" in tests/export_test.gd) continue ;; esac
-     # Before M1 merges, also skip tests/world_test.gd: it needs all 18 clips.
      tag=$(basename "$t" .gd | tr '[:lower:]' '[:upper:]')
      tools/godot_test.sh "$t" "$tag" > /dev/null || { echo "FAILED: $t"; exit 1; }
    done

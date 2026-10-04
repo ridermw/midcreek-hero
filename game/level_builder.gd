@@ -15,6 +15,7 @@ const SOLID_COLORS := {
 const HAZARD_SCRIPTS := {"cable_snag": CableSnag}
 
 var error_message: String = ""
+var art: RefCounted
 
 
 static func cell_to_world(cell: Vector2i) -> Vector2:
@@ -69,6 +70,8 @@ func build_entities(level: Dictionary, parent: Node2D) -> Dictionary:
 
 func _add(parent: Node2D, node: Node2D, cell: Vector2i) -> Node2D:
 	node.position = cell_to_world(cell)
+	node.set("art", art)
+	node.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
 	parent.add_child(node)
 	return node
 
@@ -84,10 +87,20 @@ func _solid_body(kind: String, rect: Rect2) -> StaticBody2D:
 	shape.shape = rectangle
 	shape.one_way_collision = kind == "platform"
 	body.add_child(shape)
-	var view := ColorRect.new()
-	view.color = SOLID_COLORS[kind]
-	view.position = -rect.size / 2.0
-	view.size = rect.size
-	view.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	body.add_child(view)
+	if art != null:
+		var tiles := TextureRect.new()
+		tiles.texture = art.texture("tiles", kind)
+		tiles.stretch_mode = TextureRect.STRETCH_TILE
+		tiles.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+		tiles.position = -rect.size / 2.0
+		tiles.size = rect.size
+		tiles.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		body.add_child(tiles)
+	else:
+		var view := ColorRect.new()
+		view.color = SOLID_COLORS[kind]
+		view.position = -rect.size / 2.0
+		view.size = rect.size
+		view.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		body.add_child(view)
 	return body

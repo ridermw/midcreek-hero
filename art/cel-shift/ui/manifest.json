@@ -1,0 +1,85 @@
+{
+  "version": 1,
+  "assets": {
+    "health-full": {
+      "cell": [
+        12,
+        12
+      ],
+      "fps": 1,
+      "frames": [
+        "frames/health-full/00.png"
+      ]
+    },
+    "health-empty": {
+      "cell": [
+        12,
+        12
+      ],
+      "fps": 1,
+      "frames": [
+        "frames/health-empty/00.png"
+      ]
+    },
+    "task-open": {
+      "cell": [
+        12,
+        12
+      ],
+      "fps": 1,
+      "frames": [
+        "frames/task-open/00.png"
+      ]
+    },
+    "task-done": {
+      "cell": [
+        12,
+        12
+      ],
+      "fps": 1,
+      "frames": [
+        "frames/task-done/00.png"
+      ]
+    },
+    "star-on": {
+      "cell": [
+        24,
+        24
+      ],
+      "fps": 1,
+      "frames": [
+        "frames/star-on/00.png"
+      ]
+    },
+    "star-off": {
+      "cell": [
+        24,
+        24
+      ],
+      "fps": 1,
+      "frames": [
+        "frames/star-off/00.png"
+      ]
+    },
+    "title": {
+      "cell": [
+        480,
+        120
+      ],
+      "fps": 1,
+      "frames": [
+        "frames/title/00.png"
+      ]
+    },
+    "button": {
+      "cell": [
+        160,
+        32
+      ],
+      "fps": 1,
+      "frames": [
+        "frames/button/00.png"
+      ]
+    }
+  }
+}

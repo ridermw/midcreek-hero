@@ -1,0 +1,16 @@
+{
+  "version": 1,
+  "assets": {
+    "cable-snag": {
+      "cell": [
+        32,
+        16
+      ],
+      "fps": 4,
+      "frames": [
+        "frames/cable-snag/00.png",
+        "frames/cable-snag/01.png"
+      ]
+    }
+  }
+}

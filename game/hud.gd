@@ -3,11 +3,11 @@ extends CanvasLayer
 const Health = preload("res://game/health.gd")
 const SlaTimer = preload("res://game/sla_timer.gd")
 const TaskSystem = preload("res://game/task_system.gd")
-const FULL_COLOR := Color(0.86, 0.2, 0.2)
-const EMPTY_COLOR := Color(0.25, 0.25, 0.28)
 const WARNING_COLOR := Color(1.0, 0.35, 0.3)
 
-var segments: Array[ColorRect] = []
+var segments: Array[TextureRect] = []
+var star_icons: Array[TextureRect] = []
+var art: RefCounted
 var timer_label := Label.new()
 var task_list := VBoxContainer.new()
 var prompt_label := Label.new()
@@ -17,16 +17,21 @@ var _tasks: TaskSystem
 
 
 func _ready() -> void:
+	var panel := ColorRect.new()
+	panel.name = "Panel"
+	panel.color = Color(0.04, 0.07, 0.1, 0.72)
+	panel.position = Vector2(8, 8)
+	panel.size = Vector2(300, 140)
+	panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(panel)
 	var bar := HBoxContainer.new()
 	bar.position = Vector2(16, 16)
 	add_child(bar)
 	for i: int in range(Health.MAX_SEGMENTS):
-		var segment := ColorRect.new()
-		segment.custom_minimum_size = Vector2(20, 12)
-		segment.color = FULL_COLOR
+		var segment := _icon("health-full", 2)
 		bar.add_child(segment)
 		segments.append(segment)
-	timer_label.position = Vector2(420, 12)
+	timer_label.position = Vector2(200, 14)
 	add_child(timer_label)
 	task_list.position = Vector2(16, 40)
 	add_child(task_list)
@@ -47,15 +52,30 @@ func bind(health: Health, timer: SlaTimer, tasks: TaskSystem) -> void:
 	update_timer()
 
 
+func _icon(icon_name: String, scale_factor: int) -> TextureRect:
+	var icon := TextureRect.new()
+	icon.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	icon.stretch_mode = TextureRect.STRETCH_SCALE
+	icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	if art != null:
+		icon.texture = art.texture("ui", icon_name)
+		icon.custom_minimum_size = icon.texture.get_size() * scale_factor
+	else:
+		icon.custom_minimum_size = Vector2(12, 12) * scale_factor
+	return icon
+
+
 func set_health(value: int) -> void:
+	if art == null:
+		return
 	for i: int in range(segments.size()):
-		segments[i].color = FULL_COLOR if i < value else EMPTY_COLOR
+		segments[i].texture = art.texture("ui", "health-full" if i < value else "health-empty")
 
 
 func health_shown() -> int:
 	var count := 0
-	for segment: ColorRect in segments:
-		if segment.color == FULL_COLOR:
+	for segment: TextureRect in segments:
+		if art != null and segment.texture == art.texture("ui", "health-full"):
 			count += 1
 	return count
 
@@ -77,20 +97,37 @@ func refresh_tasks() -> void:
 		task_list.remove_child(child)
 		child.free()
 	for entry: Dictionary in _tasks.entries():
+		var row := HBoxContainer.new()
+		row.add_child(_icon("task-done" if entry["done"] else "task-open", 2))
 		var label := Label.new()
-		label.text = "%s %s%s" % [
-			"[x]" if entry["done"] else "[ ]",
-			entry["label"],
-			"" if entry["required"] else " (optional)",
-		]
-		task_list.add_child(label)
+		label.text = "%s%s" % [entry["label"], "" if entry["required"] else " (optional)"]
+		row.set_meta("done", entry["done"])
+		row.add_child(label)
+		task_list.add_child(row)
 
 
 func task_lines() -> Array[String]:
 	var lines: Array[String] = []
-	for child: Node in task_list.get_children():
-		lines.append((child as Label).text)
+	for row: Node in task_list.get_children():
+		lines.append("%s %s" % ["[x]" if row.get_meta("done") else "[ ]", (row.get_child(1) as Label).text])
 	return lines
+
+
+func task_icon(index: int) -> Texture2D:
+	return (task_list.get_child(index).get_child(0) as TextureRect).texture
+
+
+func show_stars(count: int) -> void:
+	for icon: TextureRect in star_icons:
+		icon.queue_free()
+	star_icons.clear()
+	var row := HBoxContainer.new()
+	row.position = Vector2(400, 380)
+	add_child(row)
+	for i: int in range(3):
+		var icon := _icon("star-on" if i < count else "star-off", 3)
+		row.add_child(icon)
+		star_icons.append(icon)
 
 
 func set_prompt(text: String) -> void:

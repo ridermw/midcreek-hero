@@ -115,3 +115,28 @@ Run one core test:
 
 Level files are in `levels/`. `levels/LEGEND.md` describes the format.
 
+## Game art pipeline
+
+All game art is generated with MockUI and normalized to binary alpha pixel
+frames. Each asset group (technician animations, tiles, hazards, props, ui)
+shares one palette of at most 96 opaque colors.
+
+Technician clips: idle, walk, run, jump, slide, primary, secondary, reaction,
+and signal for the man and the woman.
+
+    python3 tools/animation_assets.py render --variant woman-midcreek --clip jump
+    python3 tools/animation_assets.py normalize --variant woman-midcreek --clip jump
+    python3 tools/sprite_assets.py palette --group animations
+    python3 tools/animation_assets.py manifest
+
+Tiles, hazards, props, and UI come from `art/cel-shift/catalog.json`. Each entry
+has a cell size, a frame count, a `fit` mode, and a prompt.
+
+    python3 tools/sprite_assets.py render --name rack-fault
+    python3 tools/sprite_assets.py normalize --name rack-fault
+    python3 tools/sprite_assets.py palette --group tiles
+    python3 tools/sprite_assets.py manifest --group tiles
+
+`fit` modes: `fill` stretches the drawn object to the cell, `top`, `bottom`, and
+`center` keep its aspect ratio, and `canvas` scales the whole render.
+
