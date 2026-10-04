@@ -171,6 +171,13 @@ func run() -> void:
 	for i: int in range(170):
 		await physics_frame
 	check(level.player.position.y < start_y - 80.0 and level.player.is_on_floor(), "The player rides a lift up.")
+	var lift_y: float = lift.position.y
+	level.hit_stop_remaining = 0.05
+	level.freeze_world(true)
+	for i: int in range(3):
+		await physics_frame
+	check(lift.position.y == lift_y, "Hit stop freezes lifts.")
+	level.freeze_world(false)
 	level.queue_free()
 	await process_frame
 	print("POWER_ROOM_TEST_COMPLETE: %d checks, %d failures" % [checks, failures])

@@ -22,6 +22,7 @@ var sliding: bool = false
 var hurt_remaining: float = 0.0
 var on_ladder: bool = false
 var frozen: bool = false
+var _pending_jump: bool = false
 var _shape: RectangleShape2D
 var _suppress_landing: bool = true
 
@@ -101,8 +102,15 @@ func standing_blocked() -> bool:
 
 func _physics_process(delta: float) -> void:
 	if frozen:
+		# Keep a jump pressed during hit stop; the motor's jump buffer uses it on the next frame.
+		if not locked and read_input().get("jump_pressed", false):
+			_pending_jump = true
 		return
 	var input := {} if locked else read_input()
+	if _pending_jump:
+		_pending_jump = false
+		input["jump_pressed"] = true
+		input["jump_held"] = input.get("jump_held", true)
 	var was_on_floor := is_on_floor()
 	var context := {
 		"on_floor": was_on_floor,

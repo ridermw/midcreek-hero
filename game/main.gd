@@ -32,6 +32,7 @@ var audio: AudioDirector
 var last_sfx: String = ""
 var route_runner: RouteRunner
 var smoke: bool = false
+var quit_after_smoke: bool = true
 var _smoke_report: float = 0.0
 var _master_was_muted: bool = false
 var _level_files: Dictionary = {}
@@ -233,15 +234,16 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 func _on_level_finished(result: Dictionary) -> void:
-	save.record(current_level_id, int(result["stars"]), float(result["elapsed"]), int(result["optional_done"]))
-	save.save()
+	if not smoke:
+		save.record(current_level_id, int(result["stars"]), float(result["elapsed"]), int(result["optional_done"]))
+		save.save()
 	_show_results.call_deferred(result)
 
 
 func _show_results(result: Dictionary) -> void:
 	if smoke:
 		print("SMOKE_RESULT %s stars=%d respawns=%d elapsed=%.2f" % [current_level_id, int(result["stars"]), int(result["respawns"]), float(result["elapsed"])])
-		if not OS.has_feature("web"):
+		if quit_after_smoke and not OS.has_feature("web"):
 			_quit_smoke.call_deferred()
 	if smoke and OS.has_feature("web"):
 		JavaScriptBridge.eval(

@@ -38,6 +38,17 @@ func run() -> void:
 	var before: float = level.timer.remaining
 	level.step(DT)
 	check(level.health.hits_taken == 1 and level.hit_stop_remaining > 0.0, "A hit starts a hit stop.")
+	check(level.player.sprite.speed_scale == 0.0, "Hit stop freezes the player animation.")
+	level.action_override = {&"repair": true}
+	level.step(DT)
+	level.action_override = {}
+	check(level.pending_presses.has(&"repair"), "A press during hit stop is kept for later.")
+	level.player.use_override = true
+	level.player.input_override = {"jump_pressed": true, "jump_held": true}
+	level.player._physics_process(DT)
+	level.player.input_override = {"jump_held": true}
+	level.player._physics_process(DT)
+	check(level.player.velocity.y >= 0.0, "The player does not jump during hit stop.")
 	check(level.shake_remaining > 0.0, "A hit starts a screen shake.")
 	var during: float = level.timer.remaining
 	level.step(DT)
@@ -47,6 +58,15 @@ func run() -> void:
 		level.step(DT)
 	check(level.timer.remaining < during, "Play resumes after the hit stop.")
 	check(level.player.frozen == false, "The player thaws after the hit stop.")
+	check(level.player.sprite.speed_scale == 1.0, "The player animation resumes after the hit stop.")
+	check(level.pending_presses.is_empty(), "Kept presses are used after the hit stop.")
+	var jumped := false
+	for i: int in range(6):
+		level.player._physics_process(DT)
+		jumped = jumped or level.player.velocity.y < 0.0
+	check(jumped, "A jump pressed during hit stop happens after it.")
+	level.player.input_override = {}
+	level.player.use_override = false
 	for i: int in range(20):
 		level.step(DT)
 	check(level.camera.offset == Vector2.ZERO, "The camera settles after the shake.")

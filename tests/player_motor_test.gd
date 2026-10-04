@@ -85,6 +85,22 @@ func run() -> void:
 	check(slider.sliding, "Slide continues under a low ceiling.")
 	slide = slider.step({}, {"on_floor": true}, DT)
 	check(not slider.sliding, "Slide ends when the ceiling clears.")
+	var chain := PlayerMotor.new()
+	chain.step({"slide_pressed": true}, {"on_floor": true}, DT)
+	for i: int in range(24):
+		chain.step({}, {"on_floor": true}, DT)
+	chain.step({"slide_pressed": true}, {"on_floor": true}, DT)
+	var gapless := true
+	for i: int in range(8):
+		chain.step({}, {"on_floor": true}, DT)
+		gapless = gapless and chain.sliding
+	check(gapless, "A slide pressed near the end of a slide starts the next slide with no gap.")
+	var late := PlayerMotor.new()
+	late.step({"slide_pressed": true}, {"on_floor": true}, DT)
+	late.step({"slide_pressed": true}, {"on_floor": true}, DT)
+	for i: int in range(40):
+		late.step({}, {"on_floor": true}, DT)
+	check(not late.sliding, "An early press does not extend a slide.")
 	var air := PlayerMotor.new()
 	check(not air.step({"slide_pressed": true}, {"on_floor": false}, DT).x == PlayerMotor.SLIDE_SPEED and not air.sliding, "Slide needs the floor.")
 	var wall := PlayerMotor.new()

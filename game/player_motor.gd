@@ -24,6 +24,7 @@ var jumped: bool = false
 var _coyote: float = 0.0
 var _buffer: float = 0.0
 var _slide_remaining: float = 0.0
+var _slide_buffer: float = 0.0
 var _wall_lock: float = 0.0
 
 
@@ -35,6 +36,7 @@ func reset() -> void:
 	climbing = false
 	jumped = false
 	_slide_remaining = 0.0
+	_slide_buffer = 0.0
 	_wall_lock = 0.0
 
 
@@ -46,6 +48,7 @@ func step(input: Dictionary, context: Variant, delta: float) -> Vector2:
 	var vertical := clampf(float(input.get("vertical", 0.0)), -1.0, 1.0)
 	_coyote = COYOTE_SECONDS if on_floor else maxf(_coyote - delta, 0.0)
 	_buffer = BUFFER_SECONDS if input.get("jump_pressed", false) else maxf(_buffer - delta, 0.0)
+	_slide_buffer = BUFFER_SECONDS if input.get("slide_pressed", false) else maxf(_slide_buffer - delta, 0.0)
 	_wall_lock = maxf(_wall_lock - delta, 0.0)
 	if climbing and (not ctx.get("on_ladder", false) or _buffer > 0.0):
 		climbing = false
@@ -71,7 +74,8 @@ func step(input: Dictionary, context: Variant, delta: float) -> Vector2:
 		else:
 			velocity = Vector2(0.0 if ctx.get("locked", false) else facing * SLIDE_SPEED, 0.0 if on_floor else minf(velocity.y + GRAVITY * delta, MAX_FALL_SPEED))
 			return velocity
-	if on_floor and input.get("slide_pressed", false):
+	if on_floor and _slide_buffer > 0.0:
+		_slide_buffer = 0.0
 		sliding = true
 		_slide_remaining = SLIDE_SECONDS
 		velocity = Vector2(facing * SLIDE_SPEED, 0.0)

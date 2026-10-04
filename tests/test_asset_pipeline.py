@@ -113,7 +113,7 @@ class AssetPipelineTest(unittest.TestCase):
             with self.subTest(variant=variant, offsets=[round(o, 1) for o in offsets]):
                 self.assertEqual(len(frames), 6)
                 self.assertTrue(all(abs(o) >= 3 for o in offsets), "pouch is visible beside the body")
-                self.assertTrue(all(o > 0 for o in offsets) or all(o < 0 for o in offsets), "pouch stays on one side")
+                self.assertTrue(all(o > 0 for o in offsets), "pouch stays on the right hip, image right in the back view")
 
     def test_ponytail_guidance_is_woman_specific(self):
         for clip in animation_assets.CLIPS:

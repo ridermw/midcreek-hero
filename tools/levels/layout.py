@@ -74,7 +74,10 @@ class Layout:
     def drone(self, col):
         self.put(col, self.stand, "d")
         self.run_to((col - 7) * TILE)
-        self.route.append({"hold": ["move_right", "slide"], "until_x": (col + 7) * TILE, "max_seconds": 8})
+        # Each step presses slide once, like a player who presses again as each 0.45 s slide ends.
+        for _ in range(4):
+            self.route.append({"hold": ["move_right", "slide"], "seconds": 0.45})
+        self.run_to((col + 7) * TILE)
 
     def coolant(self, col, row=None):
         self.put(col, self.stand if row is None else row, "h")
