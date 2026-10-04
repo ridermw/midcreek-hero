@@ -60,6 +60,20 @@ func run() -> void:
 	check(errors_of(lifted).is_empty(), "A lift reaches a ledge 3 tiles up.")
 	var blocked := lifted.replace(".........................#####\n", "......................#####...\n").replace("...........................E..\n", "........................E.....\n")
 	check(not errors_of(blocked).is_empty(), "A lift top inside a solid is not reachable.")
+	var lift_level := {
+		"width": 3, "height": 6, "player_start": Vector2i(1, 4),
+		"solids": {Vector2i(1, 5): "#"}, "ladders": [], "lifts": [Vector2i(1, 4)],
+	}
+	check(validator.reachable_cells(lift_level).has(Vector2i(1, 1)), "An unobstructed lift reaches its top.")
+	for row: int in [1, 2, 3]:
+		var obstructed: Dictionary = lift_level.duplicate(true)
+		obstructed["solids"][Vector2i(1, row)] = "#"
+		check(not validator.reachable_cells(obstructed).has(Vector2i(1, 1)), "A solid at shaft row %d prevents lift top access." % row)
+	var alternate: Dictionary = lift_level.duplicate(true)
+	alternate["player_start"] = Vector2i(0, 1)
+	alternate["solids"][Vector2i(0, 2)] = "#"
+	alternate["solids"][Vector2i(1, 2)] = "#"
+	check(validator.reachable_cells(alternate).has(Vector2i(1, 1)), "Ordinary terrain at a lift top remains reachable from an adjacent platform.")
 	var two_checkpoints := text.replace("..C..F..E", ".....F..E")
 	check(
 		errors_of(two_checkpoints).contains("Level needs exactly 3 checkpoints, found 2."),
