@@ -64,6 +64,14 @@ func run() -> void:
 	check(is_equal_approx(Lift.offset_at(4.0), 48.0) and is_equal_approx(Lift.offset_at(5.0), 0.0), "A lift returns down over 2 s.")
 
 	load_fixture()
+	check(level.entities["hazards"][0].active, "The fixture includes an initially active arc.")
+	level.step(DT)
+	check(sounds.count("spark") == 1, "An initially active arc is audible after level listeners connect.")
+	for i: int in range(5):
+		level.step(DT)
+	check(sounds.count("spark") == 1, "An initially active arc plays its startup sound only once.")
+
+	load_fixture()
 	level.entities["hazards"][0].cell_x = 0
 	for i: int in range(113):
 		level.step(DT)
