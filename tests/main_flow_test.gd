@@ -87,6 +87,7 @@ func run() -> void:
 	main.go_to("level_select")
 	await process_frame
 	check(main.route_runner == null, "Leaving the level stops the route.")
+	check(not main.smoke and not AudioServer.is_bus_mute(AudioServer.get_bus_index("Master")), "Leaving smoke mode restores sound and normal play.")
 	var reloaded_settings := preload("res://game/save_store.gd").new(SAVE_PATH)
 	reloaded_settings.load_data()
 	check(is_equal_approx(float(reloaded_settings.settings["sfx_volume"]), 0.6), "Volume settings persist.")

@@ -33,6 +33,7 @@ var last_sfx: String = ""
 var route_runner: RouteRunner
 var smoke: bool = false
 var _smoke_report: float = 0.0
+var _master_was_muted: bool = false
 var _level_files: Dictionary = {}
 var _level_names: Dictionary = {}
 
@@ -79,7 +80,16 @@ static func route_from_args(args: PackedStringArray) -> String:
 	return ""
 
 
+func _end_smoke() -> void:
+	route_runner = null
+	if smoke:
+		smoke = false
+		AudioServer.set_bus_mute(AudioServer.get_bus_index("Master"), _master_was_muted)
+
+
 func start_smoke(level_id: String) -> void:
+	if not smoke:
+		_master_was_muted = AudioServer.is_bus_mute(AudioServer.get_bus_index("Master"))
 	smoke = true
 	AudioServer.set_bus_mute(AudioServer.get_bus_index("Master"), true)
 	start_level(level_id)
@@ -90,8 +100,13 @@ func start_smoke(level_id: String) -> void:
 
 
 func _quit_smoke() -> void:
+	if is_instance_valid(screen):
+		screen.queue_free()
 	audio.queue_free()
-	await get_tree().create_timer(0.3).timeout
+	await get_tree().process_frame
+	await get_tree().process_frame
+	# The audio thread releases stopped playbacks in wall time, which --fixed-fps does not advance.
+	OS.delay_msec(400)
 	get_tree().quit()
 
 
@@ -155,7 +170,7 @@ func next_playable(level_id: String) -> String:
 
 func go_to(target: String, data: Dictionary = {}) -> void:
 	if target != "level":
-		route_runner = null
+		_end_smoke()
 	get_tree().paused = false
 	if pause_menu != null:
 		pause_menu.hide()
