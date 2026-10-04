@@ -1,19 +1,17 @@
 # Midcreek Hero
 
-Pixel-art and character-direction experiments for Midcreek.
+A pixel art side scroller set in a data center. You play a technician who runs,
+jumps, slides, and climbs through 5 data halls, avoids hazards, and completes
+work orders before the service level agreement (SLA) timer runs out.
 
-## Godot hello world
+**[Play in the browser](https://ridermw.github.io/midcreek-hero/)**
 
-**[Open the web viewer](https://ridermw.github.io/midcreek-hero/)**
+Built with Godot 4.7.2, GDScript, the Compatibility renderer, and a single
+threaded Web export. All art is generated with MockUI and normalized to pixel
+frames. All music and sound effects are CC0; see [audio/LICENSES.md](audio/LICENSES.md)
+and [audio/PROVENANCE.md](audio/PROVENANCE.md).
 
-A minimal viewer shows one of the 24 current individual hero sprites at a time.
-Press **Space** to advance; after the last image it wraps to the first.
-Holding Space does not skip through images. The caption identifies the
-character, variant and pose.
-
-Uses Godot 4.7.2, GDScript, nearest-neighbor sprite filtering, the Compatibility
-renderer, and a single-threaded Web export. The viewer reads the existing
-sprite manifest.
+## Build and run
 
 Open `project.godot` in Godot and press F5, or export and preview in a browser:
 
@@ -24,15 +22,21 @@ godot --headless --path . --export-release Web build/web/index.html
 python3 -m http.server 18765 --bind 127.0.0.1 --directory build/web
 ```
 
-Open `http://127.0.0.1:18765/`. If necessary, click the game once to give it
-keyboard focus. Install the matching Godot export templates before exporting.
-The complete `build/web/` folder is suitable for static hosting on GitHub Pages;
-it needs no backend or cross-origin-isolation headers. The
-`Godot web viewer` workflow imports, tests, and exports on pull requests,
-then deploys successful builds from `main` to GitHub Pages. Generated builds
-are ignored by Git rather than committed.
+Open `http://127.0.0.1:18765/`. Click the game once to give it keyboard focus;
+browsers also start audio only after this first input. Install the matching
+Godot export templates before exporting. The `Godot web viewer` workflow
+imports, tests, and exports on pull requests, then deploys successful builds
+from `main` to GitHub Pages.
 
-Run the sprite-loading and keyboard-cycle checks:
+Smoke mode plays a level's recorded route through the full game:
+`http://127.0.0.1:18765/?route=03` in a browser (the page title reports the
+result), or `godot --headless --fixed-fps 60 --path . -- --route=03` on the desktop.
+
+The title screen has a Settings screen with music and sound effect volume
+sliders. The volumes are saved with your progress.
+
+The original sprite viewer is still in `viewer.tscn`. Run its checks with:
+
 
 ```sh
 godot --headless --path . --script tests/viewer_test.gd
@@ -47,13 +51,12 @@ industrial sword/shield silhouettes and effects.
 
 ![Current sprite comparison](art/cel-shift/sprites/preview.png)
 
-## Animated data hall checkpoint
+## Data hall art test
 
-The `game/world.tscn` scene adds two technicians, local rack repair, camera
-tracking, and three environment layers. It requires all seven authored
-animation clips for each technician. Only the man's idle and walk clips are
-complete. The scene reports missing artwork instead of using static sprites.
-The sprite viewer remains the main scene.
+The `game/world.tscn` scene is the earlier art test: two technicians, local
+rack repair, camera tracking, and the cold aisle layers. It requires every
+authored clip for both technicians and reports missing artwork instead of
+using static sprites. The game itself starts from `game/main.tscn`.
 
 Install the asset-tool dependency and normalize the checked-in environment
 sources:
@@ -64,14 +67,15 @@ python3 tools/environment_assets.py normalize
 ```
 
 Use `--layer far`, `--layer equipment`, or `--layer floor` to normalize one
-layer. The command writes `environment/layers/` under `art/cel-shift/`.
+layer. The command writes `environment/layers/` under `art/cel-shift/` (the
+cold aisle set). The other 4 level sets use `render --set <name> --layer far`
+or `--layer equipment`, then `normalize --set <name>`.
 It uses nearest-neighbor sampling. Far and equipment layers become 640x360.
 The floor strip becomes 640x96. The equipment layer uses binary alpha.
 Source dimensions and transparency must match the layer contract.
 
-All animation prompts use the existing idle/walk geometry: 512x512 source
-cells, a boot baseline at y=448, and a standing height of approximately 270
-pixels. Keep this geometry when generating the remaining clips. The
+All animation prompts share one geometry: 512x512 source cells, a boot
+baseline at y=448, and a standing height of approximately 270 pixels. The
 normalizer uses one fixed 512-to-171 scale and writes 208x208 frames.
 Ponytail guidance applies only to the woman. The normalizer checks all frame
 hashes before it writes files, so duplicate artwork cannot overwrite prior
