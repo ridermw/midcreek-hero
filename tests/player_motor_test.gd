@@ -73,6 +73,41 @@ func run() -> void:
 			landing_x(rise * 32.0) >= across * 32.0 - 16.0,
 			"Motor reaches %d tiles across at %d tiles up." % [across, rise],
 		)
+	var slider := PlayerMotor.new()
+	slider.facing = 1.0
+	var slide := slider.step({"slide_pressed": true}, {"on_floor": true}, DT)
+	check(slider.sliding and slide.x == PlayerMotor.SLIDE_SPEED, "Slide starts at 260 px/s in the facing direction.")
+	for i: int in range(26):
+		slide = slider.step({}, {"on_floor": true}, DT)
+	check(slider.sliding, "Slide lasts 0.45 s.")
+	for i: int in range(2):
+		slide = slider.step({}, {"on_floor": true, "ceiling_blocked": true}, DT)
+	check(slider.sliding, "Slide continues under a low ceiling.")
+	slide = slider.step({}, {"on_floor": true}, DT)
+	check(not slider.sliding, "Slide ends when the ceiling clears.")
+	var air := PlayerMotor.new()
+	check(not air.step({"slide_pressed": true}, {"on_floor": false}, DT).x == PlayerMotor.SLIDE_SPEED and not air.sliding, "Slide needs the floor.")
+	var wall := PlayerMotor.new()
+	wall.velocity.y = 400.0
+	var falling := wall.step({"direction": 1.0}, {"on_wall": true, "wall_normal_x": -1.0}, DT)
+	check(falling.y == PlayerMotor.WALL_SLIDE_SPEED, "Pressing into a wall in the air caps the fall at 90 px/s.")
+	var kick := wall.step({"direction": 1.0, "jump_pressed": true}, {"on_wall": true, "wall_normal_x": -1.0}, DT)
+	check(kick == Vector2(-PlayerMotor.WALL_JUMP_PUSH, -PlayerMotor.WALL_JUMP_VELOCITY), "Wall jump pushes away from the wall.")
+	kick = wall.step({"direction": 1.0, "jump_held": true}, {}, DT)
+	check(kick.x < 0.0, "Input toward the wall is ignored briefly after a wall jump.")
+	var away := PlayerMotor.new()
+	away.velocity.y = 400.0
+	check(away.step({"direction": -1.0}, {"on_wall": true, "wall_normal_x": -1.0}, DT).y > PlayerMotor.WALL_SLIDE_SPEED, "No wall slide without pressing into the wall.")
+	var climber := PlayerMotor.new()
+	var climb := climber.step({"vertical": -1.0}, {"on_ladder": true}, DT)
+	check(climber.climbing and climb == Vector2(0, -PlayerMotor.CLIMB_SPEED), "Up on a ladder climbs at 90 px/s.")
+	climb = climber.step({}, {"on_ladder": true}, DT)
+	check(climb == Vector2.ZERO, "A climber with no input holds still.")
+	climb = climber.step({"jump_pressed": true, "jump_held": true}, {"on_ladder": true}, DT)
+	check(not climber.climbing and climb.y == -PlayerMotor.JUMP_VELOCITY, "Jump leaves the ladder.")
+	climber.step({"vertical": -1.0}, {"on_ladder": true}, DT)
+	climb = climber.step({"vertical": -1.0}, {"on_ladder": false}, DT)
+	check(not climber.climbing, "Leaving the ladder ends the climb.")
 	print("PLAYER_MOTOR_TEST_COMPLETE: %d checks, %d failures" % [checks, failures])
 	quit(1 if failures else 0)
 
