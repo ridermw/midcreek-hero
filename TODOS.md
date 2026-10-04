@@ -103,8 +103,14 @@ between frames 2 and 3. Climbing retains abrupt pose changes despite its fixed
 horizontal helmet anchor. Correct the authored poses and their contact anchors;
 do not conceal them with runtime camera or movement changes.
 
-The session evidence is under `files/animation-baseline/` and
-`files/animation-cadence/`, including native traces and rendered movies.
+The exact native traces are committed as
+[before](docs/evidence/animation-cadence/before.json) and
+[after](docs/evidence/animation-cadence/after.json). Group samples by `phase`;
+subtract `wall_us` values at successive sprite frame changes to measure holds.
+For the transition from frame 5 to frame 0, `physics_frame` spans confirm six
+ticks after the fix, compared with occasional seven tick spans before it.
+The baseline uses `3f35b12`. The corrected player matches `032ae3b`.
+Rendered movies remain local session artifacts, not published evidence.
 The repeatable harness is `tests/animation_probe.gd`.
 Native cadence, player, help, and hit stop checks pass. Both native help
 demonstrations were captured. Exported browser verification remains unresolved:
