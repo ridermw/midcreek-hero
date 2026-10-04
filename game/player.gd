@@ -22,6 +22,7 @@ var sliding: bool = false
 var hurt_remaining: float = 0.0
 var on_ladder: bool = false
 var _shape: RectangleShape2D
+var _suppress_landing: bool = true
 
 @onready var sprite: AnimatedSprite2D = $Sprite
 @onready var collision: CollisionShape2D = $Collision
@@ -106,8 +107,9 @@ func _physics_process(delta: float) -> void:
 	if velocity.y == -PlayerMotor.JUMP_VELOCITY:
 		sound.emit("jump")
 	move_and_slide()
-	if not was_on_floor and is_on_floor():
+	if not _suppress_landing and not was_on_floor and is_on_floor():
 		sound.emit("land")
+	_suppress_landing = false
 	motor.velocity = velocity
 	hurt_remaining = maxf(hurt_remaining - delta, 0.0)
 	update_animation()
@@ -146,3 +148,4 @@ func respawn(at: Vector2) -> void:
 	sliding = false
 	if _shape != null:
 		_set_body_height(BODY_SIZE.y)
+	_suppress_landing = true
