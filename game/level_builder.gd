@@ -6,17 +6,20 @@ const Coolant = preload("res://game/entities/coolant.gd")
 const ExitDoor = preload("res://game/entities/exit_door.gd")
 const CableSnag = preload("res://game/hazards/cable_snag.gd")
 const HeatVent = preload("res://game/hazards/heat_vent.gd")
+const MovingSnag = preload("res://game/hazards/moving_snag.gd")
+const CablePort = preload("res://game/entities/cable_port.gd")
 const Part = preload("res://game/entities/part.gd")
 const RACK_TASKS: Array[String] = ["repair", "diagnose_repair", "fetch"]
 const DELIVER_SECONDS := 0.5
 
 const TILE := 32
+const CEILING_LAYER := 4
 const SOLID_COLORS := {
 	"floor": Color(0.25, 0.29, 0.33),
 	"platform": Color(0.36, 0.42, 0.47),
 	"tray": Color(0.55, 0.45, 0.2),
 }
-const HAZARD_SCRIPTS := {"cable_snag": CableSnag, "heat_vent": HeatVent}
+const HAZARD_SCRIPTS := {"cable_snag": CableSnag, "heat_vent": HeatVent, "moving_snag": MovingSnag}
 
 var error_message: String = ""
 var art: RefCounted
@@ -40,16 +43,24 @@ func build_solids(level: Dictionary, parent: Node2D) -> int:
 			var start := x
 			while x < width and solids.get(Vector2i(x, y), "") == kind:
 				x += 1
-			parent.add_child(_solid_body(kind, Rect2(start * TILE, y * TILE, (x - start) * TILE, TILE)))
+			var height := TILE / 2 if kind == "tray" else TILE
+			parent.add_child(_solid_body(kind, Rect2(start * TILE, y * TILE, (x - start) * TILE, height)))
 			count += 1
+	for cell: Vector2i in level["ladders"]:
+		parent.add_child(_ladder(cell))
 	return count
 
 
 func build_entities(level: Dictionary, parent: Node2D) -> Dictionary:
 	error_message = ""
-	var built := {"racks": [], "parts": [], "hazards": [], "coolant": [], "checkpoints": [], "exit": null}
+	var built := {"racks": [], "parts": [], "ports": [], "hazards": [], "coolant": [], "checkpoints": [], "exit": null}
 	var anchors: Dictionary = level["anchors"]
 	for task: Dictionary in level["header"]["tasks"]:
+		if task["type"] == "reseat":
+			var port := CablePort.new()
+			port.task_id = task["id"]
+			built["ports"].append(_add(parent, port, anchors[task["at"][0]]))
+			continue
 		if task["type"] not in RACK_TASKS:
 			error_message = "Task type '%s' is not built yet." % task["type"]
 			return {}
@@ -93,11 +104,30 @@ func _add(parent: Node2D, node: Node2D, cell: Vector2i) -> Node2D:
 	return node
 
 
+func _ladder(cell: Vector2i) -> Node2D:
+	var node := Node2D.new()
+	node.name = "Ladder_%d_%d" % [cell.x, cell.y]
+	node.position = Vector2(cell.x * TILE, cell.y * TILE)
+	node.z_index = -1
+	if art != null:
+		var sprite := Sprite2D.new()
+		sprite.texture = art.texture("tiles", "ladder")
+		sprite.centered = false
+		sprite.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+		node.add_child(sprite)
+	else:
+		var view := ColorRect.new()
+		view.color = Color(0.6, 0.62, 0.65)
+		view.size = Vector2(TILE, TILE)
+		node.add_child(view)
+	return node
+
+
 func _solid_body(kind: String, rect: Rect2) -> StaticBody2D:
 	var body := StaticBody2D.new()
 	body.name = "%s_%d_%d" % [kind, int(rect.position.x) / TILE, int(rect.position.y) / TILE]
 	body.position = rect.get_center()
-	body.collision_layer = 1
+	body.collision_layer = 1 if kind == "platform" else 1 | CEILING_LAYER
 	var shape := CollisionShape2D.new()
 	var rectangle := RectangleShape2D.new()
 	rectangle.size = rect.size

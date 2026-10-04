@@ -112,7 +112,9 @@ reaches zero, then reach the exit door.
 | Action | Keyboard | Gamepad |
 |---|---|---|
 | Run | A and D, or the arrow keys | Left stick or D pad |
-| Jump | Space, W, or Up | A |
+| Jump | Space | A |
+| Climb a ladder | W or Up, S or Down | Left stick or D pad |
+| Slide | C or Shift | B |
 | Repair (hold) | E | X |
 | Diagnose | Q | Y |
 | Pause | Escape or P | Start |
@@ -123,11 +125,16 @@ reaches zero, then reach the exit door.
 |---|---|---|---|
 | 1 | Cold Aisle Onboarding | Run, jump, repair | Cable snags, open floor tiles |
 | 2 | Hot Aisle | Fetch a PSU or DIMM, diagnose then repair | Heat vents (1.5 s off, 0.4 s warning, 1.0 s on) |
+| 3 | Cable Jungle | Slide under trays, ladders, wall jump, reseat a cable | Moving cable snags |
 
 Work order types: hold E to repair a red rack. For a fetch order, run over the
 spare part, then hold E at the rack that shows the part icon. For a diagnose
-order, press Q at the rack with the amber marker, then hold E. A restart at a
-checkpoint undoes pickups, diagnoses, and repairs made after that checkpoint.
+order, press Q at the rack with the amber marker, then hold E. To reseat a
+cable, press E at the port, then press each button the HUD shows within 1 s.
+Slide under a low tray; the slide continues until there is room to stand. Press
+into a wall in the air to slow your fall, and jump to kick off it. A restart at a
+checkpoint undoes pickups, diagnoses, repairs, and cable reseats made after that
+checkpoint.
 
 Progress (stars, best times, unlocked levels, and the chosen technician) is
 saved in `user://save.json`. On the web this is browser storage.
@@ -141,8 +148,10 @@ restart.
 A test can request engine flags with a first line such as
 `# godot_test_args: --fixed-fps 60`.
 
-Route steps accept only `tap`, only `wait`, or `hold` with either `seconds`
-or both `until_x` and `max_seconds`. Extra fields are rejected rather than ignored.
+Route steps accept only `tap`, only `wait`, or `hold` with `seconds` or a target
+(`until_x` or `until_y`) and `max_seconds`. A target needs exactly one matching
+direction: left or right for x, up or down for y. Extra fields are rejected rather
+than ignored.
 
 ## Core platformer
 

@@ -1,0 +1,40 @@
+{
+  "name": "Cable Fixture",
+  "sla_seconds": 120,
+  "par_seconds": 60,
+  "music": "level3",
+  "background": "cable-jungle",
+  "tasks": [
+    {
+      "id": "c1",
+      "type": "reseat",
+      "at": [
+        "A"
+      ],
+      "required": true
+    },
+    {
+      "id": "r1",
+      "type": "repair",
+      "at": [
+        "B"
+      ],
+      "required": true
+    },
+    {
+      "id": "r2",
+      "type": "repair",
+      "at": [
+        "G"
+      ],
+      "required": true
+    }
+  ]
+}
+---
+..............................
+..........|.G.................
+..........|===................
+..........|...................
+P..C..m...|....A..C...B..C..E.
+##############################
