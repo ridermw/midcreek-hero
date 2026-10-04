@@ -1,0 +1,23 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://game/level.gd" id="1"]
+[ext_resource type="PackedScene" path="res://game/player.tscn" id="2"]
+[ext_resource type="Script" path="res://game/hud.gd" id="3"]
+
+[node name="Level" type="Node2D"]
+texture_filter = 1
+script = ExtResource("1")
+
+[node name="World" type="Node2D" parent="."]
+
+[node name="Solids" type="Node2D" parent="World"]
+
+[node name="Entities" type="Node2D" parent="World"]
+
+[node name="Player" parent="." instance=ExtResource("2")]
+
+[node name="Camera" type="Camera2D" parent="."]
+zoom = Vector2(2, 2)
+
+[node name="HUD" type="CanvasLayer" parent="."]
+script = ExtResource("3")
