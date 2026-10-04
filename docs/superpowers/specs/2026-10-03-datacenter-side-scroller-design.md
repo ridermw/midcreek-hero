@@ -160,7 +160,7 @@ manifest. Only normalized outputs ship in the Web export.
 | Tileset | Floor, raised floor tile, platform, cable tray, ladder, rack face (OK and fault), exit door, checkpoint beacon |
 | Hazards | Heat vent, spark arc, cable snag, patrol drone (animated frames) |
 | Props and pickups | PSU, DIMM, coolant, switch panel, cable port |
-| Backgrounds | 5 parallax sets (far, equipment, floor), one per level |
+| Backgrounds | 5 parallax sets (far and equipment layers), one per level |
 | UI | Health segment, task icons, star, title art, button frames |
 
 ### Audio

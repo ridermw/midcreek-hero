@@ -51,6 +51,7 @@ var _repair_tick: float = 0.0
 var carried_part: String = ""
 var _diagnose_remaining: float = 0.0
 var _previous_actions: Dictionary = {}
+var _pressed_actions: Dictionary = {}
 
 @onready var solids: Node2D = $World/Solids
 @onready var entity_root: Node2D = $World/Entities
@@ -157,6 +158,7 @@ func _physics_process(delta: float) -> void:
 func step(delta: float) -> void:
 	if completed:
 		return
+	_sample_actions()
 	timer.tick(delta)
 	health.tick(delta)
 	var body := player.hit_rect()
@@ -191,8 +193,6 @@ func step(delta: float) -> void:
 			hud.set_carry("Carrying " + PART_LABELS[part.kind])
 			sound.emit("pickup")
 	_update_repair(delta, feet)
-	for action: StringName in [&"repair", &"diagnose"]:
-		_previous_actions[action] = _action_held(action)
 	var door = entities["exit"]
 	if tasks.required_done() and not door.open:
 		sound.emit("door_open")
@@ -242,9 +242,16 @@ func _action_held(action: StringName) -> bool:
 	return Input.is_action_pressed(action)
 
 
+func _sample_actions() -> void:
+	for action: StringName in [&"repair", &"diagnose"]:
+		var held := _action_held(action)
+		_pressed_actions[action] = held and not _previous_actions.get(action, false)
+		_previous_actions[action] = held
+
+
 func _action_pressed(action: StringName) -> bool:
 	if use_action_override:
-		return _action_held(action) and not _previous_actions.get(action, false)
+		return _pressed_actions.get(action, false)
 	return Input.is_action_just_pressed(action)
 
 
