@@ -196,7 +196,9 @@ def group_colors(group, art=ART):
 
 def _build_palette(samples, colors):
     """Median cut for most slots, then the farthest remaining colors for the reserved slots."""
-    reserved = max(2, colors // 8) if len(samples) > colors else 0
+    if not 1 <= colors <= 256:
+        raise ValueError(f"Palette size must be 1 to 256, got {colors}")
+    reserved = min(max(1, colors // 8), colors - 1) if len(samples) > colors else 0
     base_count = min(colors - reserved, len(samples))
     source = Image.new("RGB", (len(samples), 1))
     source.putdata(samples)
