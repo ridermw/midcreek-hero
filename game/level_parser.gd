@@ -189,7 +189,7 @@ func _check_tasks(level: Dictionary) -> String:
 		if type == "fetch":
 			if not task.get("part_at") is String:
 				return "Fetch task '%s' needs 'part_at'." % id
-			if task.has("part") and String(task["part"]) not in ["psu", "dimm"]:
+			if not task.get("part") is String or String(task["part"]) not in ["psu", "dimm"]:
 				return "Fetch task '%s' part must be psu or dimm." % id
 			references.append(task["part_at"])
 		if type in SINGLE_ANCHOR_TYPES and at.size() != 1:

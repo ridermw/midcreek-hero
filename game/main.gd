@@ -193,6 +193,7 @@ func _build_pause_menu() -> void:
 	]:
 		var item := UiKit.button(entry[0], art)
 		item.pressed.connect(entry[1])
+		item.pressed.connect(play_sfx.bind("menu_select"))
 		box.add_child(item)
 		buttons.append(item)
 	_pause_first = buttons[0]

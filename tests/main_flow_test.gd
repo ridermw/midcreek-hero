@@ -45,6 +45,18 @@ func run() -> void:
 	check(paused and main.pause_menu.visible, "Pause stops the tree and shows the menu.")
 	main.toggle_pause()
 	check(not paused and not main.pause_menu.visible, "Pause again resumes.")
+	var pause_buttons: Array[Node] = main.pause_menu.find_children("*", "Button", true, false)
+	check(pause_buttons.size() == 3, "The pause menu has three actions.")
+	for button: Button in pause_buttons:
+		main.toggle_pause()
+		main.last_sfx = ""
+		button.pressed.emit()
+		check(main.last_sfx == "menu_select", "Pause action plays selection audio: " + button.text)
+		await process_frame
+		check(not paused, "Pause action resumes the tree: " + button.text)
+		if main.screen_name != "level":
+			main.start_level("01")
+			await process_frame
 	main.screen.finished.emit({"elapsed": 40.0, "hits": 0, "respawns": 0, "stars": 3, "optional_done": 1, "optional_total": 1})
 	await process_frame
 	check(main.screen_name == "results", "Finishing a level opens results.")

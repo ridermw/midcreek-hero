@@ -114,6 +114,8 @@ func _validate(step: Variant) -> String:
 		if not action is String or String(action) not in ACTIONS:
 			return "unknown action '%s'." % action
 	if step.has("until_x"):
+		if step.has("seconds"):
+			return "hold cannot combine seconds and until_x."
 		var value: Variant = step["until_x"]
 		if not ((value is float or value is int) and is_finite(float(value))):
 			return "until_x must be a finite number."

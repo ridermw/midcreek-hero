@@ -51,6 +51,10 @@ func run() -> void:
 		'{"version": 1, "character": "robot"}',
 		'{"version": 1, "unlocked": ["01", "99"]}',
 		'{"version": 1, "levels": {"01": {"stars": 7}}}',
+		'{"version": 1, "levels": {"01": {"stars": 3.9}}}',
+		'{"version": 1, "levels": {"01": {"stars": -0.5}}}',
+		'{"version": 1, "levels": {"01": {"best_optional": 1.5}}}',
+		'{"version": 1, "levels": {"01": {"best_optional": -0.5}}}',
 		'{"version": 1, "settings": {"music_volume": "loud"}}',
 	]:
 		if FileAccess.file_exists("user://test-save.corrupt.json"):

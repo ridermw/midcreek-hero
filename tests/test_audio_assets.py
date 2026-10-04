@@ -106,6 +106,21 @@ class AudioAssetsTest(unittest.TestCase):
         self.assertIn("invalid audio path", result.stderr)
         self.assertNotIn("Traceback", result.stderr)
 
+    def test_invalid_archive_member_fails_cleanly_before_fetch(self):
+        archive = self.audio / "download.zip"
+        with zipfile.ZipFile(archive, "w") as zipped:
+            zipped.writestr("title.ogg", b"fixture audio")
+        self.entry["url"] = archive.as_uri()
+        for member in ([], {}, 7, True, ""):
+            self.entry["archive_member"] = member
+            self.write_sources([self.entry])
+            for command in ("check", "fetch", "licenses"):
+                with self.subTest(member=member, command=command):
+                    result = self.run_tool(command)
+                    self.assertNotEqual(result.returncode, 0)
+                    self.assertIn("archive_member", result.stderr)
+                    self.assertNotIn("Traceback", result.stderr)
+
     def test_licenses_regenerates_a_complete_table(self):
         (self.audio / "LICENSES.md").unlink()
         result = self.run_tool("licenses")

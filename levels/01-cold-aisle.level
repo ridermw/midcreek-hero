@@ -7,15 +7,15 @@
   "prompts": [
     {
       "x": 1,
-      "text": "Run with A and D, or the arrow keys"
+      "text": "Run: A / D or arrows. Pad: left stick"
     },
     {
       "x": 6,
-      "text": "Jump over loose cables with Space"
+      "text": "Jump cables: Space. Pad: A"
     },
     {
       "x": 13,
-      "text": "Hold E beside a red rack to repair it"
+      "text": "Repair red racks: hold E. Pad: hold X"
     },
     {
       "x": 20,

@@ -116,6 +116,17 @@ func run() -> void:
 	die()
 	check(level.carried_part == "f1" and level.entities["parts"][0].taken, "A part picked up before the checkpoint stays carried.")
 	check(rack_for("d1").diagnosed, "A diagnosis made before the checkpoint stays.")
+	load_fixture()
+	at(Vector2i(15, 2))
+	level.action_override = {&"diagnose": true}
+	for i: int in range(5):
+		level.health.damage()
+		level.health.tick(1.0)
+	level.step(DT)
+	at(Vector2i(15, 2))
+	level.step(DT)
+	check(not rack_for("d1").diagnosed, "A diagnose held through a respawn is not a new press.")
+	level.action_override = {}
 	level.queue_free()
 	await process_frame
 	print("HOT_AISLE_TEST_COMPLETE: %d checks, %d failures" % [checks, failures])

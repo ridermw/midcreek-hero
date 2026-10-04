@@ -13,6 +13,26 @@
         "frames/coolant/02.png",
         "frames/coolant/03.png"
       ]
+    },
+    "psu": {
+      "cell": [
+        16,
+        16
+      ],
+      "fps": 1,
+      "frames": [
+        "frames/psu/00.png"
+      ]
+    },
+    "dimm": {
+      "cell": [
+        16,
+        16
+      ],
+      "fps": 1,
+      "frames": [
+        "frames/dimm/00.png"
+      ]
     }
   }
 }
