@@ -93,6 +93,13 @@ func step(delta: float) -> void:
 		hazard.advance(delta)
 		if hazard.active and hazard.hit_rect().intersects(body):
 			health.damage()
+	if _out_of_bounds():
+		_request_respawn()
+	if _respawn_pending:
+		_respawn()
+		hud.update_timer()
+		camera.position = player.position
+		return
 	for pickup in entities["coolant"]:
 		var can_heal := health.segments > 0 and health.segments < Health.MAX_SEGMENTS
 		if not pickup.taken and can_heal and pickup.hit_rect().intersects(body):
@@ -109,10 +116,15 @@ func step(delta: float) -> void:
 	if door.open and door.in_range(feet):
 		_finish()
 		return
-	if _respawn_pending:
-		_respawn()
 	hud.update_timer()
 	camera.position = player.position
+
+
+func _out_of_bounds() -> bool:
+	var width := float(level["width"] * LevelBuilder.TILE)
+	var height := float(level["height"] * LevelBuilder.TILE)
+	var feet := player.position
+	return feet.y > height + 64.0 or feet.x < -64.0 or feet.x > width + 64.0
 
 
 func _action_held(action: StringName) -> bool:

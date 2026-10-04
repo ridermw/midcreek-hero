@@ -94,6 +94,25 @@ func run() -> void:
 		"Under par with 6 hits gives 2 stars.",
 	)
 	level.queue_free()
+	level = LEVEL_SCENE.instantiate()
+	level.level_path = "res://tests/fixtures/controller.level"
+	root.add_child(level)
+	level.set_physics_process(false)
+	level.player.set_physics_process(false)
+	for id: String in ["r1", "r2"]:
+		level.tasks.complete(id)
+	level.timer.remaining = 0.01
+	at(Vector2i(29, 2))
+	level.step(DT)
+	check(not level.completed and level.respawns == 1, "SLA expiry at the open exit restarts instead of finishing.")
+	at(Vector2i(6, 2))
+	level.timer.remaining = 0.01
+	level.step(DT)
+	check(level.checkpoints.index == -1, "A failed step does not activate a checkpoint.")
+	level.player.position = Vector2(100, 2000)
+	level.step(DT)
+	check(level.respawns == 3, "Falling out of the level restarts at the checkpoint.")
+	level.queue_free()
 	var graybox := LEVEL_SCENE.instantiate()
 	root.add_child(graybox)
 	check(
