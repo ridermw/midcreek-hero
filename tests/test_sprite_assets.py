@@ -86,6 +86,19 @@ class SpriteAssetsTest(unittest.TestCase):
                     rows = [y for y in range(16) if frame.getpixel((8, y))[3]]
                     self.assertEqual((rows[0], rows[-1]), (opaque_top, opaque_bottom))
 
+    def test_normalize_rejects_blank_frames(self):
+        with tempfile.TemporaryDirectory() as directory:
+            art = Path(directory)
+            write_catalog(art, [{"name": "b", "group": "props", "cell": [16, 16], "frames": 2,
+                                 "fps": 4, "fit": "center", "prompt": "x"}])
+            grid = sprite_assets.layout((16, 16), 2)
+            image = Image.new("RGBA", (grid["width"], grid["height"]), (0, 0, 0, 0))
+            image.paste((90, 100, 110, 255), (0, 0, 32, 32))
+            (art / "props/generated").mkdir(parents=True)
+            image.save(art / "props/generated/b.png")
+            with self.assertRaisesRegex(ValueError, "b frame 1 is blank"):
+                sprite_assets.normalize("b", art)
+
     def test_normalize_rejects_wrong_size(self):
         with tempfile.TemporaryDirectory() as directory:
             art = Path(directory)

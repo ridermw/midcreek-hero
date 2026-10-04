@@ -136,12 +136,12 @@ def normalize(name, art=ART):
             crop = crop.crop((0, pad, cell_w * scale, pad + cell_h * scale))
         crops.append(crop)
     fit = asset.get("fit", "canvas")
+    boxes = [crop.getchannel("A").point(lambda value: 255 if value >= 128 else 0).getbbox()
+             for crop in crops]
+    for index, box in enumerate(boxes):
+        if box is None:
+            raise ValueError(f"{source}: {name} frame {index} is blank")
     if fit != "canvas":
-        boxes = [crop.getchannel("A").point(lambda value: 255 if value >= 128 else 0).getbbox()
-                 for crop in crops]
-        boxes = [box for box in boxes if box]
-        if not boxes:
-            raise ValueError(f"{source}: no opaque pixels")
         union = (min(b[0] for b in boxes), min(b[1] for b in boxes),
                  max(b[2] for b in boxes), max(b[3] for b in boxes))
         crops = [crop.crop(union) for crop in crops]

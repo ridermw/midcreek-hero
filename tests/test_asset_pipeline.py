@@ -22,6 +22,15 @@ class AssetPipelineTest(unittest.TestCase):
         self.assertIn("art/cel-shift/sprites/manifest.json", includes)
         self.assertIn("art/cel-shift/animations/manifest.json", includes)
 
+    def test_export_ships_no_prompts_or_catalog(self):
+        presets = configparser.ConfigParser()
+        presets.read(ROOT / "export_presets.cfg")
+        includes = presets["preset.0"]["include_filter"].strip('"').split(",")
+        excludes = presets["preset.0"]["exclude_filter"].strip('"').split(",")
+        self.assertNotIn("art/cel-shift/catalog.json", includes)
+        self.assertIn("art/cel-shift/*/prompts/*", excludes)
+        self.assertIn("art/cel-shift/catalog.json", excludes)
+
     def test_export_excludes_source_artwork_not_runtime_artwork(self):
         presets = configparser.ConfigParser()
         presets.read(ROOT / "export_presets.cfg")

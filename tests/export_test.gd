@@ -34,6 +34,7 @@ func _initialize() -> void:
 		"Runtime sprite manifest is included.",
 	)
 	check(FileAccess.file_exists("res://levels/00-graybox.level"), "Gray box level is included.")
+	check(not FileAccess.file_exists("res://art/cel-shift/catalog.json"), "The prompt catalog is excluded.")
 	for group: String in ["tiles", "hazards", "props", "ui"]:
 		check(
 			FileAccess.file_exists("res://art/cel-shift/%s/manifest.json" % group),

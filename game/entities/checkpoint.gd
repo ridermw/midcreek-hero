@@ -3,12 +3,16 @@ extends Node2D
 var reached: bool = false
 var art: RefCounted
 var _time: float = 0.0
+var _frame: int = -1
 
 
 func _process(delta: float) -> void:
 	if reached and art != null:
 		_time += delta
-		queue_redraw()
+		var next: int = int(_time * 8.0) % art.frame_count("tiles", "checkpoint-on")
+		if next != _frame:
+			_frame = next
+			queue_redraw()
 
 
 func in_range(feet: Vector2) -> bool:
@@ -22,7 +26,7 @@ func set_reached() -> void:
 
 func _draw() -> void:
 	if art != null:
-		var frame: int = int(_time * 8.0) % art.frame_count("tiles", "checkpoint-on") if reached else 0
+		var frame: int = maxi(_frame, 0) if reached else 0
 		draw_texture(art.texture("tiles", "checkpoint-on" if reached else "checkpoint-off", frame), Vector2(-16, -64))
 		return
 	draw_rect(Rect2(-2, -64, 4, 64), Color(0.45, 0.5, 0.55))

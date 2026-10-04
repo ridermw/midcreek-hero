@@ -7,6 +7,7 @@ const WARNING_COLOR := Color(1.0, 0.35, 0.3)
 
 var segments: Array[TextureRect] = []
 var star_icons: Array[TextureRect] = []
+var star_row := HBoxContainer.new()
 var art: RefCounted
 var timer_label := Label.new()
 var task_list := VBoxContainer.new()
@@ -118,15 +119,16 @@ func task_icon(index: int) -> Texture2D:
 
 
 func show_stars(count: int) -> void:
+	if star_row.get_parent() == null:
+		star_row.position = Vector2(400, 380)
+		add_child(star_row)
 	for icon: TextureRect in star_icons:
-		icon.queue_free()
+		star_row.remove_child(icon)
+		icon.free()
 	star_icons.clear()
-	var row := HBoxContainer.new()
-	row.position = Vector2(400, 380)
-	add_child(row)
 	for i: int in range(3):
 		var icon := _icon("star-on" if i < count else "star-off", 3)
-		row.add_child(icon)
+		star_row.add_child(icon)
 		star_icons.append(icon)
 
 
