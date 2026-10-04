@@ -88,6 +88,8 @@ func run() -> void:
 		stuck_down.apply(level, DT)
 	check(stuck_down.failed and stuck_down.error_message.contains("y=120"), "A descending route fails when its target cannot be reached.")
 	check(not RouteRunner.new([{"dance": 1}]).error_message.is_empty(), "Unknown step kinds are rejected.")
+	var missing_stop := RouteRunner.new([{"hold": ["move_up"]}])
+	check(missing_stop.error_message.contains("seconds") and missing_stop.error_message.contains("until_x") and missing_stop.error_message.contains("until_y"), "A hold without a stop condition reports every supported alternative.")
 	for bad: Dictionary in [
 		{"hold": ["move_right"], "seconds": -1},
 		{"hold": ["move_right"], "seconds": "2"},

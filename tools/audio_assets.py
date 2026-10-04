@@ -143,7 +143,7 @@ def fetch(audio):
                 target = audio / name
                 target.parent.mkdir(parents=True, exist_ok=True)
                 candidate.replace(target)
-            except (OSError, ValueError, KeyError, zipfile.BadZipFile,
+            except (OSError, ValueError, KeyError, RuntimeError, zipfile.BadZipFile,
                     subprocess.CalledProcessError) as error:
                 detail = error.stderr.strip() if isinstance(
                     error, subprocess.CalledProcessError
