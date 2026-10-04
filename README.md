@@ -301,6 +301,25 @@ Climb normalization aligns the blue hard hat with the ladder axis in every
 frame. It preserves the shared scale and boot baseline, and rejects artwork
 that has no alignment anchor or would be clipped.
 
+Held repairs loop on the sprite's render clock. They do not wait for a physics
+tick to restart. The player keeps a private animation configuration, so this
+does not change the shared clips used by the art viewer and help.
+
+To reproduce running, repair, and climbing for both heroes in Level 3, then
+capture both repair help demonstrations:
+
+```sh
+mkdir -p /tmp/midcreek-motion
+godot --path . --script tests/animation_probe.gd -- --output=/tmp/midcreek-motion
+```
+
+The probe uses repeatable input and writes frame, physics, camera, and timing
+samples to `native-trace.json`. It also writes two help screenshots. Use a
+separate run with `--write-movie /tmp/midcreek-motion/actions.avi --fixed-fps 60`
+before `--` to record all six actions and the help demonstrations.
+Movie mode fixes the simulation rate; do not use its timing as a device
+performance measurement. The probe does not change saved progress.
+
 To regenerate the square app icon from the title without changing its pixels:
 
 ```sh

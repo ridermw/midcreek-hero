@@ -63,7 +63,9 @@ static func choose_clip(
 
 
 func configure(library: HeroAnimations) -> void:
-	sprite.sprite_frames = library.variants[StringName(character + "-midcreek")]
+	# Held repair loops on the render clock without changing shared single action clips.
+	sprite.sprite_frames = library.variants[StringName(character + "-midcreek")].duplicate()
+	sprite.sprite_frames.set_animation_loop(&"primary", true)
 	sprite.play(&"idle")
 
 
