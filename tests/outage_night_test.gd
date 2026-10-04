@@ -48,6 +48,15 @@ func run() -> void:
 	var long_schedule: Array = level.flicker_schedule(80)
 	check(long_schedule.size() == 80 and long_schedule.slice(0, 3) == schedule, "The flicker schedule extends without changing its start.")
 	check(level.flicker_active_at(long_schedule[60] + 0.5), "Flickers keep coming long after the SLA length.")
+	check(level._flicker_times.size() <= 2, "Flicker storage stays bounded after 60 events; stored %d." % level._flicker_times.size())
+	var extended_schedule: Array = level.flicker_schedule(2048)
+	var late_start: float = extended_schedule.back()
+	check(not level.flicker_active_at(late_start - 0.1), "A late flicker does not start early.")
+	check(level.flicker_active_at(late_start), "A late flicker starts at its seeded time.")
+	check(level.flicker_active_at(late_start + 1.1), "A late flicker stays active for its duration.")
+	check(not level.flicker_active_at(late_start + 1.2), "A late flicker ends after 1.2 s.")
+	check(level._flicker_times.size() <= 2, "Flicker storage stays bounded after 2048 events; stored %d." % level._flicker_times.size())
+	check(level.flicker_active_at(schedule[1] + 0.5), "An earlier query replays the same seeded flicker.")
 	var saw_flicker := false
 	var saw_normal_after := false
 	for i: int in range(int((schedule[0] + 1.5) * 60.0)):

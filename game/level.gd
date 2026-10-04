@@ -61,6 +61,7 @@ var _previous_actions: Dictionary = {}
 var _pressed_actions: Dictionary = {}
 var darkness: CanvasModulate
 var _flicker_times: Array = []
+var _flicker_rng := RandomNumberGenerator.new()
 var _clock: float = 0.0
 
 @onready var solids: Node2D = $World/Solids
@@ -167,18 +168,21 @@ func _build_darkness() -> void:
 	light.energy = 1.1
 	light.position = Vector2(0, -40)
 	player.add_child(light)
-	_flicker_times = flicker_schedule(4)
+	_flicker_times.clear()
 
 
 func flicker_active_at(time: float) -> bool:
-	while _flicker_times.is_empty() or _flicker_times.back() < time:
-		_flicker_times = flicker_schedule(_flicker_times.size() + 8)
-	for start: float in _flicker_times:
-		if start > time:
-			return false
-		if time < start + FLICKER_SECONDS:
-			return true
-	return false
+	if _flicker_times.is_empty() or (_flicker_times.size() == 2 and time < _flicker_times[0]):
+		# Earlier queries replay the seed rather than retaining the full history.
+		_flicker_rng.seed = hash(String(level["header"]["name"]))
+		_flicker_times = [_flicker_rng.randf_range(6.0, 9.0)]
+	while _flicker_times.back() <= time:
+		var next: float = _flicker_times.back() + _flicker_rng.randf_range(6.0, 9.0)
+		if _flicker_times.size() == 2:
+			_flicker_times.pop_front()
+		_flicker_times.append(next)
+	var start: float = _flicker_times[0]
+	return time >= start and time < start + FLICKER_SECONDS
 
 
 func _update_darkness(delta: float) -> void:
