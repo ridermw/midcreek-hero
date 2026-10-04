@@ -1,11 +1,13 @@
 """Level 5, Outage Night: darkness, drones, every task type, and a 4 rack finale."""
 
-from tools.levels.layout import Layout
+from tools.levels.layout import (
+    Layout, arc_run, catwalk, drone_run, ladder_tower, lift_deck, snag_run, stairs, tray_run,
+)
 
 SEQUENCES = {"c3": ["diagnose", "jump", "repair"]}
 HEADER = {'name': 'Outage Night',
- 'sla_seconds': 95,
- 'par_seconds': 70,
+ 'sla_seconds': 170,
+ 'par_seconds': 125,
  'music': 'level5',
  'background': 'outage-night',
  'darkness': True,
@@ -14,7 +16,7 @@ HEADER = {'name': 'Outage Night',
              {'x': 57, 'text': 'Spare PSU. The lift goes up to the PDU deck'},
              {'x': 96, 'text': 'Reboot the spine switch: 1, 2, 3'},
              {'x': 129, 'text': 'Optional: a rack on the catwalk'},
-             {'x': 162, 'text': 'Final job: bring the whole row back online'}],
+             {'x': 392, 'text': 'Final job: bring the whole row back online'}],
  'tasks': [{'id': 'c3', 'type': 'reseat', 'at': ['A'], 'required': True, 'label': 'Reseat core uplink'},
            {'id': 'd1', 'type': 'diagnose_repair', 'at': ['D'], 'required': True, 'label': 'Diagnose PDU D7'},
            {'id': 'f1',
@@ -38,13 +40,12 @@ HEADER = {'name': 'Outage Night',
 
 
 def build():
-    L = Layout(186)
+    L = Layout(560)
     S = L.stand
     L.start()
     L.drone(12)
     L.port(23, "A", SEQUENCES["c3"])
     L.vent(29)
-    L.checkpoint(34)
     L.tray(38, 43)
     L.mover(50, 47)
     L.part(55, S, "K")
@@ -66,9 +67,20 @@ def build():
     L.arc(149)
     L.vent(155)
     L.snag(160)
-    for col, letter in ((165, "R"), (168, "U"), (171, "V"), (174, "W")):
-        L.rack(col, S, letter)
-    L.exit(181)
+    x = drone_run(L, 164, 2)
+    x = ladder_tower(L, x + 2, 7)
+    x = lift_deck(L, x + 2, length=12, hazard="vent")
+    L.checkpoint(x)
+    x = tray_run(L, x + 3, 2)
+    x = catwalk(L, x + 2, 3)
+    x = arc_run(L, x + 2, 2)
+    x = drone_run(L, x, 1)
+    x = stairs(L, x + 3, 3)
+    x = snag_run(L, x, 2)
+    for i, letter in enumerate("RUVW"):
+        L.rack(x + 3 + i * 3, S, letter)
+    L.exit(x + 19)
+    L.trim(x + 23)
     return L, HEADER
 
 

@@ -1,10 +1,10 @@
 """Level 1, Cold Aisle Onboarding: run, jump, then repair."""
 
-from tools.levels.layout import Layout
+from tools.levels.layout import Layout, catwalk, pit_run, snag_run, stairs
 
 HEADER = {'name': 'Cold Aisle Onboarding',
- 'sla_seconds': 90,
- 'par_seconds': 55,
+ 'sla_seconds': 195,
+ 'par_seconds': 120,
  'music': 'level1',
  'background': 'cold-aisle',
  'prompts': [{'x': 1, 'text': 'Run: A / D or arrows. Pad: left stick'},
@@ -13,21 +13,23 @@ HEADER = {'name': 'Cold Aisle Onboarding',
              {'x': 20, 'text': 'Jump the open floor tiles'},
              {'x': 34, 'text': 'Climb the catwalks'},
              {'x': 69, 'text': 'Optional: a rack up high needs tuning'},
-             {'x': 174, 'text': 'Reach the exit when every required task is done'}],
+             {'x': 176, 'text': 'Climb the stacked catwalks to rack H30'},
+             {'x': 430, 'text': 'Reach the exit when every required task is done'}],
  'tasks': [{'id': 'r1', 'type': 'repair', 'at': ['A'], 'required': True, 'label': 'Repair rack A12'},
            {'id': 'r2', 'type': 'repair', 'at': ['B'], 'required': True, 'label': 'Repair rack B07'},
            {'id': 'r3', 'type': 'repair', 'at': ['G'], 'required': True, 'label': 'Repair rack G03'},
-           {'id': 'o1', 'type': 'repair', 'at': ['F'], 'required': False, 'label': 'Tune rack F21'}]}
+           {'id': 'o1', 'type': 'repair', 'at': ['F'], 'required': False, 'label': 'Tune rack F21'},
+           {'id': 'r4', 'type': 'repair', 'at': ['H'], 'required': True, 'label': 'Repair rack H30'},
+           {'id': 'r5', 'type': 'repair', 'at': ['J'], 'required': True, 'label': 'Repair rack J44'}]}
 
 
 def build():
-    L = Layout(180)
+    L = Layout(520)
     S = L.stand
     L.start()
     L.snag(9)
     L.rack(15, S, "A")
     L.pit(22, 24)
-    L.checkpoint(31)
     L.platform(11, 36, 39)
     L.platform(9, 42, 46)
     L.coolant(44, 8)
@@ -62,11 +64,25 @@ def build():
     L.rack(141, 6, "G")
     L.run_to(L.cx(145))
     L.route.append({"wait": 0.6})
-    L.checkpoint(148)
     L.snag(152)
     L.snag(160)
     L.pit(166, 168)
-    L.exit(176)
+    x = stairs(L, 178, 3, rack="H", coolant=True)
+    L.checkpoint(x + 1)
+    x = snag_run(L, x + 4, 3)
+    x = pit_run(L, x, 2)
+    x = catwalk(L, x, 3)
+    x = snag_run(L, x, 2)
+    L.rack(x + 3, L.stand, "J")
+    x += 9
+    L.checkpoint(x)
+    x = stairs(L, x + 3, 4)
+    x = catwalk(L, x + 2, 2, length=5)
+    x = pit_run(L, x, 2)
+    x = stairs(L, x + 4, 3, coolant=True)
+    x = snag_run(L, x, 2)
+    L.exit(x + 4)
+    L.trim(x + 8)
     return L, HEADER
 
 

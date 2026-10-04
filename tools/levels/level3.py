@@ -1,11 +1,15 @@
 """Level 3, Cable Jungle: trays, ladders, moving snags, and reseats."""
 
-from tools.levels.layout import Layout
+from tools.levels.layout import Layout, catwalk, ladder_tower, mover_run, pit_run, snag_run, stairs, tray_run
 
-SEQUENCES = {"c2": ["diagnose", "diagnose", "jump"], "o2": ["repair", "diagnose", "jump"]}
+SEQUENCES = {
+    "c2": ["diagnose", "diagnose", "jump"],
+    "o2": ["repair", "diagnose", "jump"],
+    "c4": ["diagnose", "jump", "diagnose"],
+}
 HEADER = {'name': 'Cable Jungle',
- 'sla_seconds': 75,
- 'par_seconds': 45,
+ 'sla_seconds': 200,
+ 'par_seconds': 125,
  'music': 'level3',
  'background': 'cable-jungle',
  'prompts': [{'x': 2, 'text': 'Low trays ahead: slide under them with C or Shift'},
@@ -23,11 +27,13 @@ HEADER = {'name': 'Cable Jungle',
             'part': 'dimm',
             'required': True,
             'label': 'Install DIMM in B08'},
-           {'id': 'o2', 'type': 'reseat', 'at': ['H'], 'required': False, 'label': 'Reseat patch H1'}]}
+           {'id': 'o2', 'type': 'reseat', 'at': ['H'], 'required': False, 'label': 'Reseat patch H1'},
+           {'id': 'r3', 'type': 'repair', 'at': ['Q'], 'required': True, 'label': 'Repair switch Q9'},
+           {'id': 'c4', 'type': 'reseat', 'at': ['U'], 'required': True, 'label': 'Reseat spine U4'}]}
 
 
 def build():
-    L = Layout(158)
+    L = Layout(520)
     S = L.stand
     L.start()
     L.tray(8, 13)
@@ -36,7 +42,6 @@ def build():
     L.run_to(L.cx(17))
     L.jump()
     L.port(28, "A", SEQUENCES["c2"])
-    L.checkpoint(33)
     L.ladder(38, 9, 39, 44)
     L.rack(42, 9, "G")
     L.run_to(L.cx(47))
@@ -50,12 +55,28 @@ def build():
     L.ladder(102, 7, 103, 108)
     L.port(106, "H", SEQUENCES["o2"], row=7)
     L.run_to(L.cx(111))
-    L.checkpoint(116)
     L.mover(122, 117)
     L.tray(128, 133)
     L.pit(138, 140)
     L.snag(146)
-    L.exit(154)
+    x = ladder_tower(L, 152, 7, rack="Q")
+    L.checkpoint(x)
+    x = tray_run(L, x + 4, 2)
+    x = mover_run(L, x, 2, lead=4)
+    x = catwalk(L, x + 2, 3)
+    L.port(x + 3, "U", SEQUENCES["c4"])
+    x += 9
+    L.checkpoint(x)
+    x = stairs(L, x + 4, 3)
+    x = tray_run(L, x, 2)
+    x = ladder_tower(L, x + 3, 6)
+    x = catwalk(L, x + 2, 2)
+    x = stairs(L, x + 4, 3)
+    x = pit_run(L, x, 2)
+    x = mover_run(L, x, 1, lead=2)
+    x = snag_run(L, x + 2, 2)
+    L.exit(x + 4)
+    L.trim(x + 8)
     return L, HEADER
 
 

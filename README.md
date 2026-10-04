@@ -170,6 +170,17 @@ repository root to rewrite its files, then run the route test:
     python3 -m tools.levels.level3
     tools/godot_test.sh tests/route_test.gd ROUTE_TEST
 
+Each level has 3 checkpoints, 3 to 6 work orders, and a par of 2 to 4 minutes.
+`tests/route_test.gd` enforces the par range and the par and SLA rule:
+
+| Level | Route time | Par | SLA |
+|---|---|---|---|
+| 1 Cold Aisle Onboarding | 93.2 s | 120 s | 195 s |
+| 2 Hot Aisle | 95.7 s | 120 s | 195 s |
+| 3 Cable Jungle | 96.2 s | 125 s | 200 s |
+| 4 Power Room | 97.2 s | 125 s | 200 s |
+| 5 Outage Night | 99.9 s | 125 s | 170 s |
+
 `tests/test_level_layouts.py` checks that the scripts reproduce the shipped
 files exactly. Par and SLA follow `layout.par_and_sla`: par is the route time
 plus 25 percent, rounded up to 5 s, and the SLA is par times 1.6 (1.35 for

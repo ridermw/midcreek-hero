@@ -1,10 +1,10 @@
 """Level 2, Hot Aisle: heat vents, part fetches, and diagnosis."""
 
-from tools.levels.layout import Layout
+from tools.levels.layout import Layout, catwalk, pit_run, snag_run, stairs, vent_run
 
 HEADER = {'name': 'Hot Aisle',
- 'sla_seconds': 90,
- 'par_seconds': 55,
+ 'sla_seconds': 195,
+ 'par_seconds': 120,
  'music': 'level2',
  'background': 'hot-aisle',
  'prompts': [{'x': 2, 'text': 'Heat vents blast on a cycle. Jump them or wait'},
@@ -37,18 +37,18 @@ HEADER = {'name': 'Hot Aisle',
             'type': 'diagnose_repair',
             'at': ['H'],
             'required': False,
-            'label': 'Diagnose rack H15'}]}
+            'label': 'Diagnose rack H15'},
+           {'id': 'f3', 'type': 'fetch', 'at': ['N'], 'part_at': 'M', 'part': 'dimm', 'required': True, 'label': 'Install DIMM in N06'}]}
 
 
 def build():
-    L = Layout(182)
+    L = Layout(520)
     S = L.stand
     L.start()
     L.vent(8)
     L.part(14, S, "D")
     L.vent(20)
     L.rack(26, S, "A", "deliver")
-    L.checkpoint(31)
     L.platform(11, 34, 37)
     L.platform(9, 40, 43)
     L.coolant(42, 8)
@@ -70,7 +70,6 @@ def build():
     L.pit(102, 104)
     L.rack(110, S, "G")
     L.rack(118, S, "F", "deliver")
-    L.checkpoint(124)
     L.vent(130)
     L.vent(137)
     L.snag(144)
@@ -80,7 +79,26 @@ def build():
     L.climb_to(158)
     L.climb_to(164)
     L.rack(166, 8, "H", "diagnose")
-    L.exit(176)
+    L.run_to(L.cx(170))
+    x = vent_run(L, 172, 3)
+    L.checkpoint(x + 1)
+    x = stairs(L, x + 6, 3, coolant=True)
+    L.part(x + 2, L.stand, "M")
+    x = catwalk(L, x + 6, 3)
+    x = vent_run(L, x, 2)
+    x = pit_run(L, x, 2)
+    L.rack(x + 3, L.stand, "N", "deliver")
+    x += 9
+    L.checkpoint(x)
+    x = stairs(L, x + 3, 4)
+    x = vent_run(L, x, 3)
+    x = catwalk(L, x + 4, 3, length=5)
+    x = pit_run(L, x, 1)
+    x = stairs(L, x + 4, 3, coolant=True)
+    x = vent_run(L, x, 2)
+    x = snag_run(L, x, 2)
+    L.exit(x + 4)
+    L.trim(x + 8)
     return L, HEADER
 
 
