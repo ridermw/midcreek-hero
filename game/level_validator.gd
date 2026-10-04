@@ -40,11 +40,15 @@ func validate(level: Dictionary) -> Array[String]:
 
 func _lift_shaft_clear(level: Dictionary, base: Vector2i) -> bool:
 	var top := base - LIFT_RISE
-	if top.y < 0:
+	if top.y < 0 or base.x < 1 or base.x + 1 >= level["width"]:
 		return false
 	for y: int in range(top.y, base.y + 1):
-		if level["solids"].has(Vector2i(base.x, y)):
-			return false
+		for x: int in range(base.x - 1, base.x + 2):
+			# The top cell is rider clearance; the deck starts one row below it.
+			if y == top.y and x != base.x:
+				continue
+			if level["solids"].has(Vector2i(x, y)):
+				return false
 	return true
 
 

@@ -76,10 +76,23 @@ func run() -> void:
 	check(validator.reachable_cells(alternate).has(Vector2i(1, 1)), "Ordinary terrain at a lift top remains reachable from an adjacent platform.")
 	var unused_lift := parse_text(FileAccess.get_file_as_string("res://tests/fixtures/power_room.level"))
 	check(validator.validate(unused_lift).is_empty(), "The Power Room fixture has a clear lift shaft.")
-	for row: int in [1, 2, 3]:
-		var obstructed: Dictionary = unused_lift.duplicate(true)
-		obstructed["solids"][Vector2i(20, row)] = "#"
-		check(not validator.validate(obstructed).is_empty(), "An unused lift with a blocked shaft at row %d is invalid even when targets remain reachable." % row)
+	for column: int in [19, 20, 21]:
+		var rows: Array = [1, 2, 3] if column == 20 else [2, 3, 4]
+		for row: int in rows:
+			var obstructed: Dictionary = unused_lift.duplicate(true)
+			obstructed["solids"][Vector2i(column, row)] = "#"
+			check(not validator.validate(obstructed).is_empty(), "A solid at column %d, row %d blocks the lift sweep." % [column, row])
+	for edge: int in [0, 29]:
+		var outside_width: Dictionary = unused_lift.duplicate(true)
+		outside_width["lifts"] = [Vector2i(edge, 4)]
+		check(not validator.validate(outside_width).is_empty(), "A lift at column %d cannot extend its deck outside the level." % edge)
+	var outside_sweep: Dictionary = unused_lift.duplicate(true)
+	outside_sweep["solids"][Vector2i(18, 2)] = "#"
+	check(validator.validate(outside_sweep).is_empty(), "Solids outside the lift footprint do not block its sweep.")
+	for column: int in [19, 21]:
+		var above_deck: Dictionary = unused_lift.duplicate(true)
+		above_deck["solids"][Vector2i(column, 1)] = "#"
+		check(validator.validate(above_deck).is_empty(), "A neighboring ledge above the deck sweep remains valid.")
 	var above_level := parse_text(text)
 	above_level["lifts"].append(Vector2i(1, 2))
 	check(not validator.validate(above_level).is_empty(), "An unused lift cannot travel above the level.")
