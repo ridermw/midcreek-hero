@@ -24,6 +24,7 @@ const Player = preload("res://game/player.gd")
 const Hud = preload("res://game/hud.gd")
 const CablePort = preload("res://game/entities/cable_port.gd")
 const Feel = preload("res://game/feel.gd")
+const SparkArc = preload("res://game/hazards/spark_arc.gd")
 const SpriteLibrary = preload("res://game/sprite_library.gd")
 const HeroAnimations = preload("res://game/animation_library.gd")
 const BACKGROUNDS := {
@@ -56,6 +57,7 @@ var _respawn_pending: bool = false
 var _repair_tick: float = 0.0
 var carried_part: String = ""
 var _diagnose_remaining: float = 0.0
+var _switch_error_remaining: float = 0.0
 var _previous_actions: Dictionary = {}
 var _pressed_actions: Dictionary = {}
 var darkness: CanvasModulate
@@ -63,6 +65,7 @@ var hit_stop_remaining: float = 0.0
 var shake_remaining: float = 0.0
 var _shake_rng := RandomNumberGenerator.new()
 var _flicker_times: Array = []
+var _flicker_rng := RandomNumberGenerator.new()
 var _clock: float = 0.0
 
 @onready var solids: Node2D = $World/Solids
@@ -112,6 +115,9 @@ func load_level(path: String) -> bool:
 	if entities.is_empty():
 		error_message = "%s: %s" % [path, builder.error_message]
 		return false
+	for hazard in entities["hazards"]:
+		if hazard is SparkArc:
+			hazard.sparked.connect(sound.emit.bind("spark"))
 	for task: Dictionary in level["header"]["tasks"]:
 		tasks.add_task(task["id"], task["type"], task["required"], task.get("label", ""))
 	health.died.connect(_request_respawn)
@@ -166,18 +172,21 @@ func _build_darkness() -> void:
 	light.energy = 1.1
 	light.position = Vector2(0, -40)
 	player.add_child(light)
-	_flicker_times = flicker_schedule(4)
+	_flicker_times.clear()
 
 
 func flicker_active_at(time: float) -> bool:
-	while _flicker_times.is_empty() or _flicker_times.back() < time:
-		_flicker_times = flicker_schedule(_flicker_times.size() + 8)
-	for start: float in _flicker_times:
-		if start > time:
-			return false
-		if time < start + FLICKER_SECONDS:
-			return true
-	return false
+	if _flicker_times.is_empty() or (_flicker_times.size() == 2 and time < _flicker_times[0]):
+		# Earlier queries replay the seed rather than retaining the full history.
+		_flicker_rng.seed = hash(String(level["header"]["name"]))
+		_flicker_times = [_flicker_rng.randf_range(6.0, 9.0)]
+	while _flicker_times.back() <= time:
+		var next: float = _flicker_times.back() + _flicker_rng.randf_range(6.0, 9.0)
+		if _flicker_times.size() == 2:
+			_flicker_times.pop_front()
+		_flicker_times.append(next)
+	var start: float = _flicker_times[0]
+	return time >= start and time < start + FLICKER_SECONDS
 
 
 func _update_darkness(delta: float) -> void:
@@ -244,6 +253,7 @@ func step(delta: float) -> void:
 		hit_stop_remaining -= delta
 		player.frozen = hit_stop_remaining > 0.0
 		return
+	_switch_error_remaining = maxf(0.0, _switch_error_remaining - delta)
 	timer.tick(delta)
 	health.tick(delta)
 	var body := player.hit_rect()
@@ -323,6 +333,8 @@ func restore_state(state: Dictionary) -> void:
 			label = "Carrying " + PART_LABELS[part.kind]
 	hud.set_carry(label)
 	_diagnose_remaining = 0.0
+	_switch_error_remaining = 0.0
+	hud.set_prompt("")
 	for group: String in ["racks", "parts", "ports", "switches", "coolant"]:
 		for i: int in range(entities[group].size()):
 			entities[group][i].restore_state(state[group][i])
@@ -368,9 +380,11 @@ func _update_switches(feet: Vector2) -> bool:
 		for other in group:
 			other.set_on(false)
 		sound.emit("timer_warning")
-		hud.set_prompt("Wrong order. Start again at switch 1")
+		_switch_error_remaining = 1.0
 		return true
+	_switch_error_remaining = 0.0
 	panel.set_on(true)
+	hud.set_prompt("")
 	sound.emit("switch")
 	if next == group.size():
 		tasks.complete(panel.task_id)
@@ -380,6 +394,9 @@ func _update_switches(feet: Vector2) -> bool:
 
 func _show_switch_prompt(feet: Vector2) -> void:
 	if player.locked:
+		return
+	if _switch_error_remaining > 0.0:
+		hud.set_prompt("Wrong order. Start again at switch 1")
 		return
 	for panel in entities["switches"]:
 		if not tasks.is_done(panel.task_id) and panel.in_range(feet) and not panel.on:

@@ -71,6 +71,20 @@ func run() -> void:
 	check(cleared, "A slide carries the player under a low tray.")
 	await frames(40)
 	check(not player.motor.sliding and player.body_height() == 64.0, "The player stands after leaving the tray.")
+	player.position = Vector2(250, 319)
+	player.motor.reset()
+	player.input_override = {"direction": 1.0, "slide_pressed": true}
+	await frames(18)
+	check(player.position.x > 310.0 and player.position.x < 490.0 and player.motor.sliding, "The player is sliding under the tray before an action lock.")
+	player.locked = true
+	var locked_x := player.position.x
+	await frames(40)
+	check(absf(player.position.x - locked_x) < 1.0, "An action lock stops horizontal movement during a slide.")
+	check(player.motor.sliding and player.body_height() == 24.0, "A locked player stays low when the tray blocks standing.")
+	player.locked = false
+	player.input_override = {}
+	await frames(60)
+	check(player.position.x > 520.0 and player.body_height() == 64.0, "The player can clear the tray after the action lock ends.")
 	tray.queue_free()
 	await frames(3)
 	player.position = Vector2(700, 319)
@@ -85,6 +99,18 @@ func run() -> void:
 	player.input_override = {}
 	await frames(60)
 	check(not player.motor.climbing and player.is_on_floor(), "Leaving the ladder drops the player back to the floor.")
+	var wall := block(Rect2(900, 60, 32, 260), 1 | 4)
+	player.position = Vector2(890, 200)
+	player.motor.reset()
+	player.input_override = {"direction": 1.0, "jump_held": true}
+	await frames(3)
+	check(player.is_on_wall_only(), "The player touches a wall while airborne before jumping.")
+	var sounds: Array[String] = []
+	player.sound.connect(func(sound_name: String) -> void: sounds.append(sound_name))
+	player.input_override = {"direction": 1.0, "jump_pressed": true, "jump_held": true}
+	await frames(5)
+	check(sounds == ["jump"] and player.velocity.x < 0.0, "A wall jump plays one jump sound while kicking away.")
+	wall.queue_free()
 	player.queue_free()
 	floor_body.queue_free()
 	await process_frame

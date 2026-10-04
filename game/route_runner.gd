@@ -164,7 +164,7 @@ func _validate(step: Variant) -> String:
 		if ("move_left" in step["hold"]) == ("move_right" in step["hold"]):
 			return "until_x needs exactly one of move_left or move_right."
 		return ""
-	return "" if _is_duration(step.get("seconds")) else "hold needs seconds of 0 or more, or until_x."
+	return "" if _is_duration(step.get("seconds")) else "hold needs seconds of 0 or more, or until_x or until_y with max_seconds."
 
 
 static func _is_duration(value: Variant) -> bool:

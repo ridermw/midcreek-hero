@@ -1,5 +1,7 @@
 extends Node2D
 
+signal sparked
+
 const OFF_SECONDS := 1.4
 const WARNING_SECONDS := 0.5
 const ON_SECONDS := 0.6
@@ -58,10 +60,12 @@ func _update_state() -> void:
 		next = "off"
 	elif local < OFF_SECONDS + WARNING_SECONDS:
 		next = "warning"
+	active = next == "on"
 	if next != state:
 		state = next
 		queue_redraw()
-	active = state == "on"
+		if active:
+			sparked.emit()
 	sparks.emitting = active
 
 

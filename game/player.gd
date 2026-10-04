@@ -103,11 +103,12 @@ func _physics_process(delta: float) -> void:
 		"wall_normal_x": get_wall_normal().x if is_on_wall() else 0.0,
 		"ceiling_blocked": motor.sliding and standing_blocked(),
 		"on_ladder": on_ladder,
+		"locked": locked,
 	}
 	velocity = motor.step(input, context, delta)
 	sliding = motor.sliding
 	_set_body_height(SLIDE_HEIGHT if sliding else BODY_SIZE.y)
-	if velocity.y == -PlayerMotor.JUMP_VELOCITY:
+	if motor.jumped:
 		sound.emit("jump")
 	move_and_slide()
 	if not _suppress_landing and not was_on_floor and is_on_floor():
