@@ -76,6 +76,17 @@ func run() -> void:
 	level.player.position.y = 40.0
 	up.apply(level, DT)
 	check(up.done(), "until_y ends when y is at or above the target.")
+	var down := RouteRunner.new([{"hold": ["move_down"], "until_y": 80.0, "max_seconds": 1.0}])
+	level.player.position.y = 40.0
+	down.apply(level, DT)
+	check(down.index == 0 and level.player.input_override.get("vertical") == 1.0, "A descending route holds down until its target is reached.")
+	level.player.position.y = 80.0
+	down.apply(level, DT)
+	check(down.done(), "A descending route ends at its target.")
+	var stuck_down := RouteRunner.new([{"hold": ["move_down"], "until_y": 120.0, "max_seconds": 0.1}])
+	for i: int in range(10):
+		stuck_down.apply(level, DT)
+	check(stuck_down.failed and stuck_down.error_message.contains("y=120"), "A descending route fails when its target cannot be reached.")
 	check(not RouteRunner.new([{"dance": 1}]).error_message.is_empty(), "Unknown step kinds are rejected.")
 	for bad: Dictionary in [
 		{"hold": ["move_right"], "seconds": -1},
@@ -84,6 +95,8 @@ func run() -> void:
 		{"hold": ["move_right"], "seconds": 1, "until_x": 10, "max_seconds": 2},
 		{"hold": ["jump"], "until_x": 10, "max_seconds": 1},
 		{"hold": ["move_left", "move_right"], "until_x": 10, "max_seconds": 1},
+		{"hold": ["jump"], "until_y": 10, "max_seconds": 1},
+		{"hold": ["move_up", "move_down"], "until_y": 10, "max_seconds": 1},
 		{"wait": -0.5},
 		{"tap": "jump", "wait": 1},
 	]:

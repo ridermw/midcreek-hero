@@ -98,6 +98,21 @@ func run() -> void:
 	var away := PlayerMotor.new()
 	away.velocity.y = 400.0
 	check(away.step({"direction": -1.0}, {"on_wall": true, "wall_normal_x": -1.0}, DT).y > PlayerMotor.WALL_SLIDE_SPEED, "No wall slide without pressing into the wall.")
+	for sample: Dictionary in [
+		{"direction": 0.4, "normal": -1.0, "push": -220.0},
+		{"direction": -0.4, "normal": 1.0, "push": 220.0},
+	]:
+		var analog := PlayerMotor.new()
+		analog.velocity.y = 400.0
+		var context := {"on_wall": true, "wall_normal_x": sample["normal"]}
+		var analog_fall := analog.step({"direction": sample["direction"]}, context, DT)
+		check(analog_fall.y == 90.0, "Partial stick input toward either wall slows the fall.")
+		var analog_kick := analog.step({"direction": sample["direction"], "jump_pressed": true}, context, DT)
+		check(analog_kick == Vector2(sample["push"], -460.0), "Partial stick input allows a jump away from either wall.")
+	for direction: float in [0.0, -0.4]:
+		var released := PlayerMotor.new()
+		released.velocity.y = 400.0
+		check(released.step({"direction": direction}, {"on_wall": true, "wall_normal_x": -1.0}, DT).y > 90.0, "Neutral or partial input away from a wall does not slow the fall.")
 	var edge := PlayerMotor.new()
 	edge.step({"direction": 1.0}, {"on_floor": true}, DT)
 	var coyote_kick := edge.step({"direction": 1.0, "jump_pressed": true, "jump_held": true}, {"on_wall": true, "wall_normal_x": -1.0}, DT)

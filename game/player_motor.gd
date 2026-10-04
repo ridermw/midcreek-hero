@@ -73,7 +73,7 @@ func step(input: Dictionary, context: Variant, delta: float) -> Vector2:
 	if _wall_lock <= 0.0:
 		velocity.x = move_toward(velocity.x, direction * RUN_SPEED, ACCELERATION * delta)
 	var normal := float(ctx.get("wall_normal_x", 0.0))
-	var pressing_wall: bool = not on_floor and ctx.get("on_wall", false) and normal != 0.0 and direction == -signf(normal)
+	var pressing_wall: bool = not on_floor and ctx.get("on_wall", false) and normal != 0.0 and signf(direction) == -signf(normal)
 	if pressing_wall and _buffer > 0.0:
 		_buffer = 0.0
 		_coyote = 0.0

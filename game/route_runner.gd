@@ -44,7 +44,9 @@ func apply(level: Object, delta: float) -> void:
 		return
 	var held: Array = step["hold"]
 	if step.has("until_y"):
-		if level.player.position.y <= float(step["until_y"]):
+		var target := float(step["until_y"])
+		var direction := -1.0 if "move_up" in held else 1.0
+		if (level.player.position.y - target) * direction >= 0.0:
 			_advance()
 			apply(level, delta)
 			return
@@ -142,6 +144,8 @@ func _validate(step: Variant) -> String:
 			return "until_y must be a finite number."
 		if not _is_duration(step.get("max_seconds")) or float(step["max_seconds"]) <= 0.0:
 			return "until_y needs a positive max_seconds."
+		if ("move_up" in step["hold"]) == ("move_down" in step["hold"]):
+			return "until_y needs exactly one of move_up or move_down."
 		return ""
 	if step.has("until_x"):
 		if step.has("seconds"):

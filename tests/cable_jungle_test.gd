@@ -42,6 +42,13 @@ func tap(action: StringName) -> void:
 	level.step(DT)
 
 
+func die() -> void:
+	for i: int in range(5):
+		level.health.damage()
+		level.health.tick(1.0)
+	level.step(DT)
+
+
 func run() -> void:
 	var sequence := CablePort.sequence_for("c1")
 	check(sequence.size() == 3, "A reseat sequence has 3 buttons.")
@@ -103,6 +110,27 @@ func run() -> void:
 	for i: int in range(70):
 		level.step(DT)
 	check(level.entities["ports"][0].state == "idle" and not level.tasks.is_done("c1"), "A timeout in the level restarts the sequence.")
+	load_fixture()
+	at(Vector2i(3, 4))
+	level.step(DT)
+	at(Vector2i(15, 4))
+	level.step(DT)
+	tap(&"repair")
+	for button: StringName in sequence:
+		tap(button)
+	check(level.tasks.is_done("c1") and level.entities["ports"][0].done, "The reseat is complete after the first checkpoint.")
+	die()
+	check(not level.tasks.is_done("c1") and not level.entities["ports"][0].done and level.entities["ports"][0].state == "idle", "A respawn undoes a reseat completed after the checkpoint.")
+	at(Vector2i(15, 4))
+	level.step(DT)
+	tap(&"repair")
+	for button: StringName in sequence:
+		tap(button)
+	at(Vector2i(18, 4))
+	level.step(DT)
+	check(level.checkpoints.index == 1 and level.tasks.is_done("c1"), "The next checkpoint records the completed reseat.")
+	die()
+	check(level.tasks.is_done("c1") and level.entities["ports"][0].done, "A reseat completed before the next checkpoint survives a respawn.")
 	level.queue_free()
 	await process_frame
 	print("CABLE_JUNGLE_TEST_COMPLETE: %d checks, %d failures" % [checks, failures])

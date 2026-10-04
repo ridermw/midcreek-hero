@@ -133,7 +133,8 @@ order, press Q at the rack with the amber marker, then hold E. To reseat a
 cable, press E at the port, then press each button the HUD shows within 1 s.
 Slide under a low tray; the slide continues until there is room to stand. Press
 into a wall in the air to slow your fall, and jump to kick off it. A restart at a
-checkpoint undoes pickups, diagnoses, and repairs made after that checkpoint.
+checkpoint undoes pickups, diagnoses, repairs, and cable reseats made after that
+checkpoint.
 
 Progress (stars, best times, unlocked levels, and the chosen technician) is
 saved in `user://save.json`. On the web this is browser storage.
