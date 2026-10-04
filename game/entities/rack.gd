@@ -5,6 +5,10 @@ const RANGE_X := 40.0
 const SIZE := Vector2(40, 96)
 
 var task_id: String = ""
+var kind: String = "repair"
+var repair_seconds: float = REPAIR_SECONDS
+var diagnosed: bool = false
+var part_kind: String = ""
 var done: bool = false
 var progress: float = 0.0
 var art: RefCounted
@@ -17,7 +21,7 @@ func in_range(feet: Vector2) -> bool:
 func work(delta: float) -> bool:
 	if done:
 		return false
-	progress = minf(progress + delta / REPAIR_SECONDS, 1.0)
+	progress = minf(progress + delta / repair_seconds, 1.0)
 	if progress >= 1.0:
 		done = true
 	queue_redraw()
@@ -28,6 +32,15 @@ func cancel() -> void:
 	if not done and progress > 0.0:
 		progress = 0.0
 		queue_redraw()
+
+
+func capture_state() -> Dictionary:
+	return {"done": done, "diagnosed": diagnosed}
+
+
+func restore_state(state: Dictionary) -> void:
+	diagnosed = bool(state["diagnosed"])
+	set_done(bool(state["done"]))
 
 
 func set_done(value: bool) -> void:

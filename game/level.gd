@@ -4,6 +4,8 @@ signal finished(result: Dictionary)
 signal sound(sound_name: String)
 
 const REPAIR_TICK_SECONDS := 0.4
+const DIAGNOSE_SECONDS := 0.8
+const PART_LABELS := {"psu": "PSU", "dimm": "DIMM"}
 
 const Health = preload("res://game/health.gd")
 const SlaTimer = preload("res://game/sla_timer.gd")
@@ -40,6 +42,9 @@ var use_action_override: bool = false
 var action_override: Dictionary = {}
 var _respawn_pending: bool = false
 var _repair_tick: float = 0.0
+var carried_part: String = ""
+var _diagnose_remaining: float = 0.0
+var _previous_actions: Dictionary = {}
 
 @onready var solids: Node2D = $World/Solids
 @onready var entity_root: Node2D = $World/Entities
@@ -94,7 +99,7 @@ func load_level(path: String) -> bool:
 	player.sound.connect(sound.emit)
 	player.respawn(LevelBuilder.cell_to_world(level["player_start"]))
 	timer.start(float(level["header"]["sla_seconds"]))
-	checkpoints.begin(player.position, timer, tasks)
+	checkpoints.begin(player.position, timer, tasks, capture_state())
 	hud.art = art
 	for segment: TextureRect in hud.segments:
 		segment.texture = art.texture("ui", "health-full")
@@ -170,10 +175,18 @@ func step(delta: float) -> void:
 	var feet := player.position
 	for i: int in range(entities["checkpoints"].size()):
 		var node = entities["checkpoints"][i]
-		if node.in_range(feet) and checkpoints.activate(i, node.position, timer, tasks):
+		if node.in_range(feet) and checkpoints.activate(i, node.position, timer, tasks, capture_state()):
 			node.set_reached()
 			sound.emit("checkpoint")
+	for part in entities["parts"]:
+		if not part.taken and carried_part.is_empty() and part.hit_rect().intersects(body):
+			part.take()
+			carried_part = part.task_id
+			hud.set_carry("Carrying " + PART_LABELS[part.kind])
+			sound.emit("pickup")
 	_update_repair(delta, feet)
+	for action: StringName in [&"repair", &"diagnose"]:
+		_previous_actions[action] = _action_held(action)
 	var door = entities["exit"]
 	if tasks.required_done() and not door.open:
 		sound.emit("door_open")
@@ -192,10 +205,45 @@ func _out_of_bounds() -> bool:
 	return feet.y > height + 64.0 or feet.x < -64.0 or feet.x > width + 64.0
 
 
+func capture_state() -> Dictionary:
+	var state := {"carried_part": carried_part}
+	for group: String in ["racks", "parts", "coolant"]:
+		var states: Array = []
+		for node in entities[group]:
+			states.append(node.capture_state())
+		state[group] = states
+	return state
+
+
+func restore_state(state: Dictionary) -> void:
+	if state.is_empty():
+		return
+	carried_part = String(state["carried_part"])
+	var label := ""
+	for part in entities["parts"]:
+		if part.task_id == carried_part:
+			label = "Carrying " + PART_LABELS[part.kind]
+	hud.set_carry(label)
+	_diagnose_remaining = 0.0
+	for group: String in ["racks", "parts", "coolant"]:
+		for i: int in range(entities[group].size()):
+			entities[group][i].restore_state(state[group][i])
+
+
 func _action_held(action: StringName) -> bool:
 	if use_action_override:
 		return bool(action_override.get(action, false))
 	return Input.is_action_pressed(action)
+
+
+func _action_pressed(action: StringName) -> bool:
+	if use_action_override:
+		return _action_held(action) and not _previous_actions.get(action, false)
+	return Input.is_action_just_pressed(action)
+
+
+func _part_label(rack) -> String:
+	return PART_LABELS.get(rack.part_kind, "part")
 
 
 func _update_repair(delta: float, feet: Vector2) -> void:
@@ -207,22 +255,50 @@ func _update_repair(delta: float, feet: Vector2) -> void:
 	for rack in entities["racks"]:
 		if rack != target:
 			rack.cancel()
-	var holding: bool = target != null and _action_held(&"repair")
+	if _diagnose_remaining > 0.0:
+		_diagnose_remaining -= delta
+		player.locked = true
+		player.action = &"secondary"
+		return
+	if target != null and target.kind == "diagnose_repair" and not target.diagnosed and _action_pressed(&"diagnose"):
+		target.diagnosed = true
+		target.queue_redraw()
+		_diagnose_remaining = DIAGNOSE_SECONDS
+		player.locked = true
+		player.action = &"secondary"
+		hud.set_prompt("Diagnosing...")
+		sound.emit("diagnose")
+		return
+	var blocked := ""
+	if target != null and target.kind == "diagnose_repair" and not target.diagnosed:
+		blocked = "Diagnose first (Q / Y)"
+	elif target != null and target.kind == "fetch" and carried_part != target.task_id:
+		blocked = "Bring the %s to this rack" % _part_label(target)
+	var holding: bool = target != null and blocked.is_empty() and _action_held(&"repair")
 	player.locked = holding
 	player.action = &"primary" if holding else &""
 	if target == null:
 		hud.set_prompt(_level_prompt(feet))
+	elif not blocked.is_empty():
+		target.cancel()
+		hud.set_prompt(blocked)
 	elif not holding:
 		target.cancel()
-		hud.set_prompt("Hold E or X to repair")
+		var verb := "install the %s" % _part_label(target) if target.kind == "fetch" else "repair"
+		hud.set_prompt("Hold E or X to " + verb)
 	else:
-		hud.set_prompt("Repairing...")
+		hud.set_prompt("Working...")
 		_repair_tick -= delta
 		if _repair_tick <= 0.0:
 			_repair_tick = REPAIR_TICK_SECONDS
 			sound.emit("repair_tick")
 		if target.work(delta):
-			sound.emit("repair_done")
+			if target.kind == "fetch":
+				carried_part = ""
+				hud.set_carry("")
+				sound.emit("deliver")
+			else:
+				sound.emit("repair_done")
 			_complete_if_all_racks_done(target.task_id)
 
 
@@ -251,8 +327,7 @@ func _respawn() -> void:
 	respawns += 1
 	player.respawn(checkpoints.restore(timer, tasks))
 	health.refill()
-	for rack in entities["racks"]:
-		rack.set_done(tasks.is_done(rack.task_id))
+	restore_state(checkpoints.level_state)
 	hud.refresh_tasks()
 
 

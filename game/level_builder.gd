@@ -5,6 +5,10 @@ const Checkpoint = preload("res://game/entities/checkpoint.gd")
 const Coolant = preload("res://game/entities/coolant.gd")
 const ExitDoor = preload("res://game/entities/exit_door.gd")
 const CableSnag = preload("res://game/hazards/cable_snag.gd")
+const HeatVent = preload("res://game/hazards/heat_vent.gd")
+const Part = preload("res://game/entities/part.gd")
+const RACK_TASKS: Array[String] = ["repair", "diagnose_repair", "fetch"]
+const DELIVER_SECONDS := 0.5
 
 const TILE := 32
 const SOLID_COLORS := {
@@ -12,7 +16,7 @@ const SOLID_COLORS := {
 	"platform": Color(0.36, 0.42, 0.47),
 	"tray": Color(0.55, 0.45, 0.2),
 }
-const HAZARD_SCRIPTS := {"cable_snag": CableSnag}
+const HAZARD_SCRIPTS := {"cable_snag": CableSnag, "heat_vent": HeatVent}
 
 var error_message: String = ""
 var art: RefCounted
@@ -43,21 +47,34 @@ func build_solids(level: Dictionary, parent: Node2D) -> int:
 
 func build_entities(level: Dictionary, parent: Node2D) -> Dictionary:
 	error_message = ""
-	var built := {"racks": [], "hazards": [], "coolant": [], "checkpoints": [], "exit": null}
+	var built := {"racks": [], "parts": [], "hazards": [], "coolant": [], "checkpoints": [], "exit": null}
 	var anchors: Dictionary = level["anchors"]
 	for task: Dictionary in level["header"]["tasks"]:
-		if task["type"] != "repair":
+		if task["type"] not in RACK_TASKS:
 			error_message = "Task type '%s' is not built yet." % task["type"]
 			return {}
+		var part_kind := String(task.get("part", "psu"))
 		for anchor: String in task["at"]:
 			var rack := Rack.new()
 			rack.task_id = task["id"]
+			rack.kind = task["type"]
+			if rack.kind == "fetch":
+				rack.repair_seconds = DELIVER_SECONDS
+				rack.part_kind = part_kind
 			built["racks"].append(_add(parent, rack, anchors[anchor]))
+		if task["type"] == "fetch":
+			var part := Part.new()
+			part.task_id = task["id"]
+			part.kind = part_kind
+			built["parts"].append(_add(parent, part, anchors[task["part_at"]]))
 	for hazard: Dictionary in level["hazards"]:
 		if not HAZARD_SCRIPTS.has(hazard["kind"]):
 			error_message = "Hazard '%s' is not built yet." % hazard["kind"]
 			return {}
-		built["hazards"].append(_add(parent, HAZARD_SCRIPTS[hazard["kind"]].new(), hazard["cell"]))
+		var node: Node2D = HAZARD_SCRIPTS[hazard["kind"]].new()
+		if "cell_x" in node:
+			node.cell_x = hazard["cell"].x
+		built["hazards"].append(_add(parent, node, hazard["cell"]))
 	for cell: Vector2i in level["coolant"]:
 		built["coolant"].append(_add(parent, Coolant.new(), cell))
 	var checkpoint_cells: Array = level["checkpoints"].duplicate()
