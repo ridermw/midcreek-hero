@@ -275,7 +275,7 @@
       canvas.height = 190;
       canvas.className = "help-demo";
       canvas.setAttribute("role", "img");
-      canvas.setAttribute("aria-label", `${help.title} demonstration. ${help.instructions}`);
+      canvas.setAttribute("aria-label", `${help.title} demonstration.`);
       const caption = element("p", "", menu);
       const glyph = element("span", "", caption);
       glyph.className = "control-graphic";

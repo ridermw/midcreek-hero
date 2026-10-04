@@ -63,6 +63,9 @@ try {
   await page.getByRole("button", {name: "Next", exact: true}).click();
   assert.match(await page.locator("#mobile-menu h2").textContent(), /Repair a rack/);
   assert.equal(await menu.evaluate(node => node.scrollTop), 0, "Next must open the new help page at the top.");
+  const demoName = await page.locator("canvas.help-demo").getAttribute("aria-label");
+  assert.equal(demoName, "Repair a rack demonstration.", "The demonstration name must not repeat the task instructions.");
+  assert.equal(await menu.getByText("1. Stand beside a red rack.\n2. Hold Repair until the work completes. Letting go cancels progress.\n3. A green rack is finished.", {exact: true}).count(), 1, "The adjacent text must retain the complete procedure once.");
   const demoBox = await page.locator("canvas.help-demo").boundingBox();
   assert.ok(demoBox.y >= 0 && demoBox.y < 390, "The new demonstration must be visible.");
   assert.equal(await page.evaluate(() => document.activeElement.textContent), "Previous", "Navigation keeps its focus behavior.");
