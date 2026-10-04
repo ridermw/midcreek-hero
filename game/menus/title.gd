@@ -14,5 +14,9 @@ func build(owner_main: Node) -> void:
 	var start := UiKit.button("Start", main.art)
 	start.pressed.connect(func() -> void: main.go_to("character_select"))
 	box.add_child(start)
+	var settings := UiKit.button("Settings", main.art)
+	settings.name = "Settings"
+	settings.pressed.connect(func() -> void: main.go_to("settings"))
+	box.add_child(settings)
 	box.add_child(UiKit.label("Press any key or button", 18, UiKit.MUTED_COLOR))
-	UiKit.link_focus([start])
+	UiKit.link_focus([start, settings])

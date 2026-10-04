@@ -6,6 +6,7 @@ const SpriteLibrary = preload("res://game/sprite_library.gd")
 const HeroAnimations = preload("res://game/animation_library.gd")
 const UiKit = preload("res://game/menus/ui_kit.gd")
 const AudioDirector = preload("res://game/audio_director.gd")
+const RouteRunner = preload("res://game/route_runner.gd")
 const LEVEL_SCENE := preload("res://game/level.tscn")
 const LEVEL_DIR := "res://levels/"
 const SCREENS := {
@@ -13,6 +14,7 @@ const SCREENS := {
 	"character_select": preload("res://game/menus/character_select.gd"),
 	"level_select": preload("res://game/menus/level_select.gd"),
 	"results": preload("res://game/menus/results.gd"),
+	"settings": preload("res://game/menus/settings.gd"),
 }
 
 @export var save_path: String = "user://save.json"
@@ -28,6 +30,8 @@ var _pause_first: Button
 var error_message: String = ""
 var audio: AudioDirector
 var last_sfx: String = ""
+var route_runner: RouteRunner
+var smoke: bool = false
 var _level_files: Dictionary = {}
 var _level_names: Dictionary = {}
 
@@ -49,7 +53,55 @@ func _ready() -> void:
 		return
 	_scan_levels()
 	_build_pause_menu()
-	go_to("title")
+	var smoke_id := route_from_args(OS.get_cmdline_user_args())
+	if OS.has_feature("web"):
+		smoke_id = route_from_query(String(JavaScriptBridge.eval("location.search")))
+	if not smoke_id.is_empty() and _level_files.has(smoke_id):
+		start_smoke(smoke_id)
+	else:
+		go_to("title")
+
+
+static func route_from_query(query: String) -> String:
+	for part: String in query.trim_prefix("?").split("&"):
+		if part.begins_with("route="):
+			var id := part.trim_prefix("route=")
+			if id.length() == 2 and id.is_valid_int():
+				return id
+	return ""
+
+
+static func route_from_args(args: PackedStringArray) -> String:
+	for arg: String in args:
+		if arg.begins_with("--route="):
+			return route_from_query("route=" + arg.trim_prefix("--route="))
+	return ""
+
+
+func start_smoke(level_id: String) -> void:
+	smoke = true
+	start_level(level_id)
+	var path: String = "res://levels/routes/" + _level_files[level_id].get_file().get_basename() + ".route.json"
+	var json := JSON.new()
+	if json.parse(FileAccess.get_file_as_string(path)) == OK:
+		route_runner = RouteRunner.new(json.data)
+
+
+func _quit_smoke() -> void:
+	audio.queue_free()
+	await get_tree().create_timer(0.3).timeout
+	get_tree().quit()
+
+
+func set_volume(key: String, value: float) -> void:
+	save.settings[key] = clampf(value, 0.0, 1.0)
+	audio.set_bus_volume("Music" if key == "music_volume" else "SFX", save.settings[key])
+	save.save()
+
+
+func _physics_process(delta: float) -> void:
+	if route_runner != null and screen_name == "level" and is_instance_valid(screen):
+		route_runner.apply(screen, delta)
 
 
 func music_name() -> String:
@@ -87,6 +139,8 @@ func next_playable(level_id: String) -> String:
 
 
 func go_to(target: String, data: Dictionary = {}) -> void:
+	if target != "level":
+		route_runner = null
 	get_tree().paused = false
 	if pause_menu != null:
 		pause_menu.hide()
@@ -155,6 +209,14 @@ func _on_level_finished(result: Dictionary) -> void:
 
 
 func _show_results(result: Dictionary) -> void:
+	if smoke:
+		print("SMOKE_RESULT %s stars=%d respawns=%d elapsed=%.2f" % [current_level_id, int(result["stars"]), int(result["respawns"]), float(result["elapsed"])])
+		if not OS.has_feature("web"):
+			_quit_smoke.call_deferred()
+	if smoke and OS.has_feature("web"):
+		JavaScriptBridge.eval(
+			"document.title = 'MIDCREEK RESULT %s stars=%d respawns=%d'" % [current_level_id, int(result["stars"]), int(result["respawns"])]
+		)
 	go_to("results", {"level_id": current_level_id, "result": result})
 
 
