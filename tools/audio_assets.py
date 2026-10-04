@@ -27,6 +27,9 @@ def load_sources(audio):
             not isinstance(entry.get(field), str) or not entry[field] for field in fields
         ) or "archive_member" not in entry:
             raise ValueError("sources.json: incomplete or invalid entry")
+        member = entry["archive_member"]
+        if member is not None and (not isinstance(member, str) or not member):
+            raise ValueError("sources.json: archive_member must be null or a nonempty string")
         name = Path(entry["file"])
         if (
             name.is_absolute() or len(name.parts) < 2

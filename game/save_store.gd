@@ -98,6 +98,10 @@ static func _is_number(value: Variant) -> bool:
 	return (value is float or value is int) and is_finite(float(value))
 
 
+static func _is_count(value: Variant) -> bool:
+	return _is_number(value) and float(value) >= 0.0 and float(value) == floorf(float(value))
+
+
 func _is_valid(data: Variant) -> bool:
 	if not data is Dictionary or data.get("version") != 1.0:
 		return false
@@ -117,11 +121,11 @@ func _is_valid(data: Variant) -> bool:
 			if level_id not in LEVEL_IDS or not entry is Dictionary:
 				return false
 			var earned: Variant = entry.get("stars", 0)
-			if not _is_number(earned) or int(earned) < 0 or int(earned) > 3:
+			if not _is_count(earned) or float(earned) > 3.0:
 				return false
 			if entry.has("best_seconds") and not (_is_number(entry["best_seconds"]) and float(entry["best_seconds"]) >= 0.0):
 				return false
-			if entry.has("best_optional") and not (_is_number(entry["best_optional"]) and int(entry["best_optional"]) >= 0):
+			if entry.has("best_optional") and not _is_count(entry["best_optional"]):
 				return false
 	if data.has("settings"):
 		if not data["settings"] is Dictionary:
