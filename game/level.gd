@@ -20,6 +20,7 @@ const Score = preload("res://game/score.gd")
 const Player = preload("res://game/player.gd")
 const Hud = preload("res://game/hud.gd")
 const CablePort = preload("res://game/entities/cable_port.gd")
+const SparkArc = preload("res://game/hazards/spark_arc.gd")
 const SpriteLibrary = preload("res://game/sprite_library.gd")
 const HeroAnimations = preload("res://game/animation_library.gd")
 const BACKGROUNDS := {
@@ -52,6 +53,7 @@ var _respawn_pending: bool = false
 var _repair_tick: float = 0.0
 var carried_part: String = ""
 var _diagnose_remaining: float = 0.0
+var _switch_error_remaining: float = 0.0
 var _previous_actions: Dictionary = {}
 var _pressed_actions: Dictionary = {}
 
@@ -100,6 +102,9 @@ func load_level(path: String) -> bool:
 	if entities.is_empty():
 		error_message = "%s: %s" % [path, builder.error_message]
 		return false
+	for hazard in entities["hazards"]:
+		if hazard is SparkArc:
+			hazard.sparked.connect(sound.emit.bind("spark"))
 	for task: Dictionary in level["header"]["tasks"]:
 		tasks.add_task(task["id"], task["type"], task["required"], task.get("label", ""))
 	health.died.connect(_request_respawn)
@@ -161,6 +166,7 @@ func step(delta: float) -> void:
 	if completed:
 		return
 	_sample_actions()
+	_switch_error_remaining = maxf(0.0, _switch_error_remaining - delta)
 	timer.tick(delta)
 	health.tick(delta)
 	var body := player.hit_rect()
@@ -196,8 +202,9 @@ func step(delta: float) -> void:
 			sound.emit("pickup")
 	var cell := Vector2i(floori(feet.x / LevelBuilder.TILE), floori((feet.y - 1.0) / LevelBuilder.TILE))
 	player.on_ladder = cell in level["ladders"]
-	if not _update_ports(delta, feet):
+	if not _update_switches(feet) and not _update_ports(delta, feet):
 		_update_repair(delta, feet)
+	_show_switch_prompt(feet)
 	var door = entities["exit"]
 	if tasks.required_done() and not door.open:
 		sound.emit("door_open")
@@ -218,7 +225,7 @@ func _out_of_bounds() -> bool:
 
 func capture_state() -> Dictionary:
 	var state := {"carried_part": carried_part}
-	for group: String in ["racks", "parts", "ports", "coolant"]:
+	for group: String in ["racks", "parts", "ports", "switches", "coolant"]:
 		var states: Array = []
 		for node in entities[group]:
 			states.append(node.capture_state())
@@ -236,7 +243,9 @@ func restore_state(state: Dictionary) -> void:
 			label = "Carrying " + PART_LABELS[part.kind]
 	hud.set_carry(label)
 	_diagnose_remaining = 0.0
-	for group: String in ["racks", "parts", "ports", "coolant"]:
+	_switch_error_remaining = 0.0
+	hud.set_prompt("")
+	for group: String in ["racks", "parts", "ports", "switches", "coolant"]:
 		for i: int in range(entities[group].size()):
 			entities[group][i].restore_state(state[group][i])
 
@@ -258,6 +267,51 @@ func _action_pressed(action: StringName) -> bool:
 	if use_action_override:
 		return _pressed_actions.get(action, false)
 	return Input.is_action_just_pressed(action)
+
+
+func _update_switches(feet: Vector2) -> bool:
+	var panel = null
+	for candidate in entities["switches"]:
+		if not tasks.is_done(candidate.task_id) and candidate.in_range(feet):
+			panel = candidate
+			break
+	if panel == null:
+		return false
+	player.locked = false
+	player.action = &""
+	var group: Array = entities["switches"].filter(func(p) -> bool: return p.task_id == panel.task_id)
+	var next := 1
+	for other in group:
+		if other.on:
+			next = maxi(next, other.order + 1)
+	if not _action_pressed(&"repair") or panel.on:
+		return false
+	if panel.order != next:
+		for other in group:
+			other.set_on(false)
+		sound.emit("timer_warning")
+		_switch_error_remaining = 1.0
+		return true
+	_switch_error_remaining = 0.0
+	panel.set_on(true)
+	hud.set_prompt("")
+	sound.emit("switch")
+	if next == group.size():
+		tasks.complete(panel.task_id)
+		sound.emit("repair_done")
+	return true
+
+
+func _show_switch_prompt(feet: Vector2) -> void:
+	if player.locked:
+		return
+	if _switch_error_remaining > 0.0:
+		hud.set_prompt("Wrong order. Start again at switch 1")
+		return
+	for panel in entities["switches"]:
+		if not tasks.is_done(panel.task_id) and panel.in_range(feet) and not panel.on:
+			hud.set_prompt("Throw switch %d: press E or X" % panel.order)
+			return
 
 
 func _update_ports(delta: float, feet: Vector2) -> bool:

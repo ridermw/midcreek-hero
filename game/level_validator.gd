@@ -2,6 +2,7 @@ extends RefCounted
 
 const JUMP_REACH := {0: 4, 1: 4, 2: 3, 3: 2}
 const FALL_REACH := 4
+const LIFT_RISE := Vector2i(0, 3)
 const MIN_TASKS := 3
 const MAX_TASKS := 6
 const CHECKPOINTS := 3
@@ -9,10 +10,6 @@ const CHECKPOINTS := 3
 
 func validate(level: Dictionary) -> Array[String]:
 	var errors: Array[String] = []
-	if not level["lifts"].is_empty():
-		errors.append("Terrain 'lift' is not built yet.")
-	if not errors.is_empty():
-		return errors
 	var task_count: int = level["header"]["tasks"].size()
 	if task_count < MIN_TASKS or task_count > MAX_TASKS:
 		errors.append("Level needs %d to %d tasks, found %d." % [MIN_TASKS, MAX_TASKS, task_count])
@@ -20,6 +17,9 @@ func validate(level: Dictionary) -> Array[String]:
 		errors.append(
 			"Level needs exactly %d checkpoints, found %d." % [CHECKPOINTS, level["checkpoints"].size()]
 		)
+	for lift: Vector2i in level["lifts"]:
+		if not _lift_shaft_clear(level, lift):
+			errors.append("Lift at column %d, row %d needs a clear shaft within the level." % [lift.x + 1, lift.y + 1])
 	var targets := {"player start": level["player_start"], "exit": level["exit"]}
 	for anchor: String in level["anchors"]:
 		targets["anchor " + anchor] = level["anchors"][anchor]
@@ -38,11 +38,25 @@ func validate(level: Dictionary) -> Array[String]:
 	return errors
 
 
+func _lift_shaft_clear(level: Dictionary, base: Vector2i) -> bool:
+	var top := base - LIFT_RISE
+	if top.y < 0 or base.x < 1 or base.x + 1 >= level["width"]:
+		return false
+	for y: int in range(top.y, base.y + 1):
+		for x: int in range(base.x - 1, base.x + 2):
+			# The top cell is rider clearance; the deck starts one row below it.
+			if y == top.y and x != base.x:
+				continue
+			if level["solids"].has(Vector2i(x, y)):
+				return false
+	return true
+
+
 func is_standable(level: Dictionary, cell: Vector2i) -> bool:
 	var solids: Dictionary = level["solids"]
 	if solids.has(cell):
 		return false
-	if cell in level["ladders"] or cell in level["lifts"]:
+	if cell in level["ladders"] or cell in level["lifts"] or (cell + LIFT_RISE) in level["lifts"]:
 		return true
 	return solids.has(cell + Vector2i.DOWN)
 
@@ -75,8 +89,14 @@ func _neighbors(level: Dictionary, cell: Vector2i) -> Array[Vector2i]:
 			limit = JUMP_REACH[rise]
 		for dx: int in range(-limit, limit + 1):
 			var next := Vector2i(cell.x + dx, y)
+			if (next + LIFT_RISE) in level["lifts"]:
+				var terrain: bool = next in level["ladders"] or level["solids"].has(next + Vector2i.DOWN)
+				if not terrain or (dx == 0 and rise > 0):
+					continue
 			if next != cell and next.x >= 0 and next.x < width and is_standable(level, next):
 				result.append(next)
+	if cell in level["lifts"] and _lift_shaft_clear(level, cell):
+		result.append(cell - LIFT_RISE)
 	if cell in level["ladders"]:
 		for step: Vector2i in [Vector2i.UP, Vector2i.DOWN]:
 			if is_standable(level, cell + step):

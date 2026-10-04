@@ -8,6 +8,9 @@ const CableSnag = preload("res://game/hazards/cable_snag.gd")
 const HeatVent = preload("res://game/hazards/heat_vent.gd")
 const MovingSnag = preload("res://game/hazards/moving_snag.gd")
 const CablePort = preload("res://game/entities/cable_port.gd")
+const SparkArc = preload("res://game/hazards/spark_arc.gd")
+const Lift = preload("res://game/entities/lift.gd")
+const SwitchPanel = preload("res://game/entities/switch_panel.gd")
 const Part = preload("res://game/entities/part.gd")
 const RACK_TASKS: Array[String] = ["repair", "diagnose_repair", "fetch"]
 const DELIVER_SECONDS := 0.5
@@ -19,7 +22,7 @@ const SOLID_COLORS := {
 	"platform": Color(0.36, 0.42, 0.47),
 	"tray": Color(0.55, 0.45, 0.2),
 }
-const HAZARD_SCRIPTS := {"cable_snag": CableSnag, "heat_vent": HeatVent, "moving_snag": MovingSnag}
+const HAZARD_SCRIPTS := {"cable_snag": CableSnag, "heat_vent": HeatVent, "moving_snag": MovingSnag, "spark_arc": SparkArc}
 
 var error_message: String = ""
 var art: RefCounted
@@ -53,9 +56,16 @@ func build_solids(level: Dictionary, parent: Node2D) -> int:
 
 func build_entities(level: Dictionary, parent: Node2D) -> Dictionary:
 	error_message = ""
-	var built := {"racks": [], "parts": [], "ports": [], "hazards": [], "coolant": [], "checkpoints": [], "exit": null}
+	var built := {"racks": [], "parts": [], "ports": [], "switches": [], "lifts": [], "hazards": [], "coolant": [], "checkpoints": [], "exit": null}
 	var anchors: Dictionary = level["anchors"]
 	for task: Dictionary in level["header"]["tasks"]:
+		if task["type"] == "reboot":
+			for i: int in range(task["at"].size()):
+				var panel := SwitchPanel.new()
+				panel.task_id = task["id"]
+				panel.order = i + 1
+				built["switches"].append(_add(parent, panel, anchors[task["at"][i]]))
+			continue
 		if task["type"] == "reseat":
 			var port := CablePort.new()
 			port.task_id = task["id"]
@@ -86,6 +96,8 @@ func build_entities(level: Dictionary, parent: Node2D) -> Dictionary:
 		if "cell_x" in node:
 			node.cell_x = hazard["cell"].x
 		built["hazards"].append(_add(parent, node, hazard["cell"]))
+	for cell: Vector2i in level["lifts"]:
+		built["lifts"].append(_add(parent, Lift.new(), cell))
 	for cell: Vector2i in level["coolant"]:
 		built["coolant"].append(_add(parent, Coolant.new(), cell))
 	var checkpoint_cells: Array = level["checkpoints"].duplicate()

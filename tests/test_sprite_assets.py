@@ -99,6 +99,15 @@ class SpriteAssetsTest(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "b frame 1 is blank"):
                 sprite_assets.normalize("b", art)
 
+    def test_keep_object_prompts_edit_in_place(self):
+        asset = {"name": "lamp-on", "group": "tiles", "cell": [32, 48], "frames": 1, "fps": 1,
+                 "keep_object": True, "reference": "art/cel-shift/tiles/generated/lamp-off.png",
+                 "prompt": "Light the lamp green."}
+        text = sprite_assets.prompt_text(asset)
+        self.assertIn("Keep the same object", text)
+        self.assertIn("Change only: Light the lamp green.", text)
+        self.assertNotIn("replace its entire content", text)
+
     def test_normalize_rejects_wrong_size(self):
         with tempfile.TemporaryDirectory() as directory:
             art = Path(directory)
@@ -172,6 +181,37 @@ class SpriteAssetsTest(unittest.TestCase):
             self.assertEqual(manifest["assets"]["a"], {"cell": [8, 8], "fps": 1, "frames": ["frames/a/00.png"]})
             written = json.loads((art / "props/manifest.json").read_text())
             self.assertEqual(written, manifest)
+
+    def test_group_palette_keeps_small_accents(self):
+        with tempfile.TemporaryDirectory() as directory:
+            art = Path(directory)
+            write_catalog(art, [{"name": "rack", "group": "tiles", "cell": [32, 32], "frames": 1, "fps": 1, "prompt": "x"}])
+            frame_dir = art / "tiles/frames/rack"
+            frame_dir.mkdir(parents=True)
+            frame = Image.new("RGBA", (32, 32), (0, 0, 0, 255))
+            for x in range(32):
+                for y in range(32):
+                    frame.putpixel((x, y), (40 + x * 3, 44 + y * 3, 52 + (x + y), 255))
+            frame.putpixel((5, 5), (230, 30, 30, 255))
+            frame.putpixel((6, 5), (230, 30, 30, 255))
+            frame.save(frame_dir / "00.png")
+            sprite_assets.apply_group_palette("tiles", art, colors=16)
+            with Image.open(frame_dir / "00.png") as result:
+                red = result.convert("RGB").getpixel((5, 5))
+            self.assertGreater(red[0], 180)
+            self.assertLess(red[1], 90)
+
+    def test_tiny_palettes_do_not_crash(self):
+        samples = [(i * 10, 255 - i * 10, 40) for i in range(20)]
+        for colors in (1, 2, 3):
+            with self.subTest(colors=colors):
+                palette = sprite_assets._build_palette(samples, colors)
+                entries = palette.getpalette()
+                distinct = {tuple(entries[i:i + 3]) for i in range(0, len(entries), 3)}
+                self.assertLessEqual(len(distinct), colors)
+        few = sprite_assets._build_palette(samples[:3], 16)
+        entries = few.getpalette()
+        self.assertEqual(len({tuple(entries[i:i + 3]) for i in range(0, len(entries), 3)}), 3)
 
     def test_manifest_requires_every_frame(self):
         with tempfile.TemporaryDirectory() as directory:

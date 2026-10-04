@@ -43,6 +43,7 @@ func _initialize() -> void:
 	check(ResourceLoader.exists("res://audio/music/level1.ogg"), "Level 1 music is included.")
 	check(FileAccess.file_exists("res://levels/02-hot-aisle.level"), "Level 2 is included.")
 	check(FileAccess.file_exists("res://levels/03-cable-jungle.level"), "Level 3 is included.")
+	check(FileAccess.file_exists("res://levels/04-power-room.level"), "Level 4 is included.")
 	for texture: String in [
 		"res://art/cel-shift/environment/hot-aisle/far.png",
 		"res://art/cel-shift/environment/outage-night/equipment.png",

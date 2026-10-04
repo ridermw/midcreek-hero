@@ -52,13 +52,50 @@ func reach_level(platform_row: int, platform_x: int) -> Dictionary:
 func run() -> void:
 	var text := fixture_text()
 	check(validator.validate(parse_text(text)).is_empty(), "The controller fixture is valid.")
-	var unsupported_terrain := {"l": "lift"}
-	for symbol: String in unsupported_terrain:
-		var terrain_text := text.replace("---\n.", "---\n" + symbol)
-		check(
-			errors_of(terrain_text).contains("Terrain '%s' is not built yet." % unsupported_terrain[symbol]),
-			"Unsupported terrain '%s' is rejected before level construction." % symbol,
-		)
+	var lifted := text.replace(
+		"---\n..............................\n..............................\n",
+		"---\n...........................E..\n.........................#####\n"
+		+ "..............................\n..............................\n",
+	).replace("..F..E\n", "..F...\n").replace("..C..F", "..Cl.F")
+	check(errors_of(lifted).is_empty(), "A lift reaches a ledge 3 tiles up.")
+	var blocked := lifted.replace(".........................#####\n", "......................#####...\n").replace("...........................E..\n", "........................E.....\n")
+	check(not errors_of(blocked).is_empty(), "A lift top inside a solid is not reachable.")
+	var lift_level := {
+		"width": 3, "height": 6, "player_start": Vector2i(1, 4),
+		"solids": {Vector2i(1, 5): "#"}, "ladders": [], "lifts": [Vector2i(1, 4)],
+	}
+	check(validator.reachable_cells(lift_level).has(Vector2i(1, 1)), "An unobstructed lift reaches its top.")
+	for row: int in [1, 2, 3]:
+		var obstructed: Dictionary = lift_level.duplicate(true)
+		obstructed["solids"][Vector2i(1, row)] = "#"
+		check(not validator.reachable_cells(obstructed).has(Vector2i(1, 1)), "A solid at shaft row %d prevents lift top access." % row)
+	var alternate: Dictionary = lift_level.duplicate(true)
+	alternate["player_start"] = Vector2i(0, 1)
+	alternate["solids"][Vector2i(0, 2)] = "#"
+	alternate["solids"][Vector2i(1, 2)] = "#"
+	check(validator.reachable_cells(alternate).has(Vector2i(1, 1)), "Ordinary terrain at a lift top remains reachable from an adjacent platform.")
+	var unused_lift := parse_text(FileAccess.get_file_as_string("res://tests/fixtures/power_room.level"))
+	check(validator.validate(unused_lift).is_empty(), "The Power Room fixture has a clear lift shaft.")
+	for column: int in [19, 20, 21]:
+		var rows: Array = [1, 2, 3] if column == 20 else [2, 3, 4]
+		for row: int in rows:
+			var obstructed: Dictionary = unused_lift.duplicate(true)
+			obstructed["solids"][Vector2i(column, row)] = "#"
+			check(not validator.validate(obstructed).is_empty(), "A solid at column %d, row %d blocks the lift sweep." % [column, row])
+	for edge: int in [0, 29]:
+		var outside_width: Dictionary = unused_lift.duplicate(true)
+		outside_width["lifts"] = [Vector2i(edge, 4)]
+		check(not validator.validate(outside_width).is_empty(), "A lift at column %d cannot extend its deck outside the level." % edge)
+	var outside_sweep: Dictionary = unused_lift.duplicate(true)
+	outside_sweep["solids"][Vector2i(18, 2)] = "#"
+	check(validator.validate(outside_sweep).is_empty(), "Solids outside the lift footprint do not block its sweep.")
+	for column: int in [19, 21]:
+		var above_deck: Dictionary = unused_lift.duplicate(true)
+		above_deck["solids"][Vector2i(column, 1)] = "#"
+		check(validator.validate(above_deck).is_empty(), "A neighboring ledge above the deck sweep remains valid.")
+	var above_level := parse_text(text)
+	above_level["lifts"].append(Vector2i(1, 2))
+	check(not validator.validate(above_level).is_empty(), "An unused lift cannot travel above the level.")
 	var two_checkpoints := text.replace("..C..F..E", ".....F..E")
 	check(
 		errors_of(two_checkpoints).contains("Level needs exactly 3 checkpoints, found 2."),
