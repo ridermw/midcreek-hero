@@ -289,8 +289,6 @@ func _update_ports(delta: float, feet: Vector2) -> bool:
 			if result == "done":
 				tasks.complete(port.task_id)
 				sound.emit("repair_done")
-				player.locked = false
-				player.action = &""
 			elif result == "ok":
 				sound.emit("repair_tick")
 			else:
