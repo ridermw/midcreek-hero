@@ -306,6 +306,8 @@ resize policy and existing Godot menus. Phone menus expose the actual Godot
 Button and HSlider controls through `game/mobile_bridge.gd`. Menu commands
 include a revision so a command from a replaced screen cannot activate a
 different control.
+If startup fails before a screen exists, the mobile menu shows the original
+startup error with no active controls.
 
 `game/mobile_input.gd` holds mobile state separately from physical input.
 It retains short taps until the next physics frame. All consumers can read
@@ -331,7 +333,7 @@ It captures phone screens and desktop keyboard gameplay. Do not label this
 evidence as physical phone testing.
 
 Verified on 2026-10-04: 52 Python tests, all Godot test scripts through the
-repository runner, 11 mobile input checks, 40 mobile bridge checks, and
+repository runner, 11 mobile input checks, 41 mobile bridge checks, and
 40 exported resource checks passed. The browser run exercised real emulated
 touch events, simultaneous movement and jump, cancellation, audio activation,
 menu error visibility, assistive hold activation, and resize focus retention.

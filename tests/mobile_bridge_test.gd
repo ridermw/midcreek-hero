@@ -10,6 +10,7 @@ func _initialize() -> void:
 
 
 func run() -> void:
+	check_startup_error()
 	var main := MAIN.instantiate()
 	main.save_path = "user://mobile-test.json"
 	root.add_child(main)
@@ -92,6 +93,20 @@ func run() -> void:
 	await create_timer(0.3).timeout
 	DirAccess.remove_absolute("user://mobile-test.json")
 	finish()
+
+
+func check_startup_error() -> void:
+	var failed_main := MAIN.instantiate()
+	failed_main.error_message = "Missing animation manifest."
+	var bridge := preload("res://game/mobile_bridge.gd").new()
+	bridge.main = failed_main
+	root.add_child(bridge)
+	check(bridge.menu_model() == {
+		"screen": "", "paused": false, "revision": 0,
+		"controls": [], "summary": "Missing animation manifest.",
+	}, "A startup failure remains visible in the mobile menu without a screen.")
+	bridge.free()
+	failed_main.free()
 
 
 func exercise_tasks(main: Node, bridge: Node) -> void:

@@ -88,6 +88,9 @@ func menu_model() -> Dictionary:
 	var source: Node = main.pause_menu if get_tree().paused and main.screen_name == "level" else main.screen
 	var model := {"screen": main.screen_name, "paused": get_tree().paused, "revision": revision, "controls": [], "summary": ""}
 	_controls.clear()
+	if not is_instance_valid(source):
+		model["summary"] = main.error_message
+		return model
 	if main.screen_name == "level" and not get_tree().paused:
 		return model
 	var labels: Array[String] = []
