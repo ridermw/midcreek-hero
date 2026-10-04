@@ -89,6 +89,9 @@ Generated source sheets and previews are excluded from Web exports.
 Local primary and diagnostic actions face the rack when it is in range.
 Run the asset-pipeline regression checks with:
 
+Install ffmpeg on your PATH first. The audio conversion regression test
+uses its native Vorbis encoder. CI installs ffmpeg before running this suite.
+
 ```sh
 python3 -m unittest discover -s tests -p 'test_*.py'
 godot --headless --path . --script tests/environment_test.gd
