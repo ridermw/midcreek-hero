@@ -58,20 +58,23 @@ class AssetPipelineTest(unittest.TestCase):
 
     def test_shipped_clips_share_baseline_and_scale(self):
         standing = ("idle", "walk", "run", "primary", "secondary", "signal")
+        # Authored run frames 4 and 8 and jump frames 3 to 5 leave the floor.
+        airborne = {"run": {3, 7}, "jump": {2, 3, 4}}
         for variant in animation_assets.VARIANTS:
             heights = []
             for clip in animation_assets.CLIPS:
                 frames = sorted((animation_assets.ART / "frames" / variant / clip).glob("*.png"))
                 self.assertTrue(frames, f"{variant}/{clip} has frames")
-                bottoms = []
-                for path in frames:
+                for index, path in enumerate(frames):
                     with Image.open(path) as frame:
                         box = frame.getbbox()
-                    bottoms.append(box[3])
+                    with self.subTest(variant=variant, clip=clip, frame=path.name):
+                        self.assertIsNotNone(box, "frames contain visible pixels")
+                        self.assertLessEqual(box[3], 187, "boots do not sink below the floor")
+                        if index not in airborne.get(clip, set()):
+                            self.assertLessEqual(abs(box[3] - 184), 3, "grounded boots sit on the baseline")
                     if clip in standing:
                         heights.append(box[3] - box[1])
-                with self.subTest(variant=variant, clip=clip):
-                    self.assertLessEqual(abs(max(bottoms) - 184), 3, "boots sit on the baseline")
             median = sorted(heights)[len(heights) // 2]
             with self.subTest(variant=variant):
                 self.assertLessEqual(max(heights), median * 1.15)

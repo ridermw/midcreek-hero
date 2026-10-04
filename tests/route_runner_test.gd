@@ -65,6 +65,7 @@ func run() -> void:
 		{"hold": ["move_right"], "seconds": -1},
 		{"hold": ["move_right"], "seconds": "2"},
 		{"hold": ["move_right"], "until_x": 10, "max_seconds": 0},
+		{"hold": ["move_right"], "seconds": 1, "until_x": 10, "max_seconds": 2},
 		{"hold": ["jump"], "until_x": 10, "max_seconds": 1},
 		{"hold": ["move_left", "move_right"], "until_x": 10, "max_seconds": 1},
 		{"wait": -0.5},

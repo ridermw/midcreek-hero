@@ -37,6 +37,11 @@ func play(file_name: String) -> void:
 	level.level_path = level_path
 	root.add_child(level)
 	check(level.error_message.is_empty(), file_name + ": " + level.error_message)
+	if file_name == "01-cold-aisle.route.json":
+		var prompts: Array = level.level["header"]["prompts"]
+		for i: int in range(3):
+			var text: String = prompts[i]["text"]
+			check(text.contains("Pad:"), "Onboarding includes gamepad controls: " + text)
 	var results: Array[Dictionary] = []
 	level.finished.connect(func(result: Dictionary) -> void: results.append(result))
 	var sla := float(level.level["header"]["sla_seconds"])
