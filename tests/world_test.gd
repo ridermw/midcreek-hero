@@ -8,7 +8,7 @@ const WORLD_SCENE := preload("res://game/world.tscn")
 const ACTION_KEYS: Array[Key] = [KEY_E, KEY_Q, KEY_R, KEY_F]
 const ACTION_CLIPS: Array[StringName] = [&"primary", &"secondary", &"reaction", &"signal"]
 const EXPECTED_VARIANTS: Array[StringName] = [&"man-midcreek", &"woman-midcreek"]
-const EXPECTED_COUNTS: Array[int] = [6, 8, 8, 6, 8, 4, 6]
+const EXPECTED_COUNTS: Array[int] = [6, 8, 8, 6, 4, 6, 8, 4, 6]
 
 var checks: int = 0
 var failures: int = 0
@@ -83,7 +83,7 @@ func _test_animation_contract() -> void:
 	)
 	for variant: StringName in EXPECTED_VARIANTS:
 		var frames: SpriteFrames = world.library.variants[variant]
-		check(frames.get_animation_names().size() == 7, "%s has seven clips." % variant)
+		check(frames.get_animation_names().size() == HeroAnimations.CLIPS.size(), "%s has every clip." % variant)
 		for index: int in range(HeroAnimations.CLIPS.size()):
 			var clip: StringName = HeroAnimations.CLIPS[index]
 			var context := "%s/%s" % [variant, clip]
@@ -114,11 +114,11 @@ func _test_animation_contract() -> void:
 			probe.play(clip)
 			probes.append(probe)
 	await create_timer(minf(longest_frame * 1.6, 3.0)).timeout
-	check(probes.size() == 14, "Both normal heroes provide seven authored clips each.")
+	check(probes.size() == 18, "Both normal heroes provide nine authored clips each.")
 	for probe: AnimatedSprite2D in probes:
 		check(bool(probe.get_meta("advanced")), "%s advances a real frame over time." % probe.name)
 		probe.queue_free()
-	check(seen_paths.size() == 92, "All 92 authored frame paths are distinct.")
+	check(seen_paths.size() == 112, "All 112 authored frame paths are distinct.")
 
 
 func _test_movement() -> void:
