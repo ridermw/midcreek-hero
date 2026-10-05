@@ -1,0 +1,35 @@
+{
+  "maximum_bytes": 53477376,
+  "measurement": "Total published files before HTTP compression; 51 MiB rounds the measured release export up to the next whole MiB.",
+  "baseline": {
+    "godot": "4.7.2",
+    "source_commit": "27d267d08837264bcb315a325a48f998a27d1eca",
+    "total_bytes": 52800035,
+    "files": {
+      "index.wasm": 39514754,
+      "index.pck": 12899264,
+      "index.js": 279815,
+      "index.icon.png": 32063,
+      "index.png": 29859,
+      "mobile.js": 15729,
+      "index.apple-touch-icon.png": 10844,
+      "index.audio.worklet.js": 7298,
+      "index.html": 3727,
+      "mobile.css": 3709,
+      "index.audio.position.worklet.js": 2973
+    }
+  },
+  "required_files": [
+    "index.html",
+    "index.js",
+    "index.pck",
+    "index.wasm",
+    "index.audio.position.worklet.js",
+    "index.audio.worklet.js",
+    "index.png",
+    "index.icon.png",
+    "index.apple-touch-icon.png",
+    "mobile.js",
+    "mobile.css"
+  ]
+}

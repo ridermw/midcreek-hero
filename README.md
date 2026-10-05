@@ -125,6 +125,30 @@ godot --headless --path . --script tests/local_action_test.gd
 CI also opens the exported resource pack from outside the project directory.
 It checks that runtime textures remain available and source-art directories
 are absent.
+The export gate loads every declared animation frame, gameplay sprite, viewer
+sprite, background layer, and audio stream. It also scans the exported art tree
+for generated sources, prompts, previews, sheets, and metadata.
+
+`tests/export_budget.json` sets a 51 MiB limit for all published web files.
+The measured Godot 4.7.2 release artifact totals 52800035 bytes. Rounding up to
+the next whole MiB gives a 53477376 byte cap and 677341 bytes of margin.
+This counts file bytes before HTTP compression, not observed network transfer
+or device performance. Additional files and nested directories count too.
+Unreadable directories, symlinks, and nonregular files fail the check rather
+than disappearing from the total.
+The published file list must match the declared runtime files, with `.nojekyll`
+as the only optional entry. Update the declaration when a reviewed change
+intentionally adds a file.
+Intentional asset or engine growth requires a reviewed budget update with a
+new measurement; do not derive or raise the limit automatically.
+
+```sh
+python3 tools/check_export_budget.py build/web
+```
+
+Measure a fresh export before the editor scans its output directory.
+Editor generated `.import` sidecars are not runtime files and intentionally
+fail the published file check; do not exempt them from the upload gate.
 
 ## Play
 

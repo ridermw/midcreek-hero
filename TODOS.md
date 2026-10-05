@@ -481,3 +481,30 @@ of older source sheets. Browser captures used the separately reviewed debug
 probe from PR 15; the production repair assets do not depend on that probe.
 Running artwork continuity, physical device evidence, and the remaining campaign
 work stay open.
+
+## Verified export coverage and size budget
+
+- [x] Replace sample-only resource assurance with loads of every declared
+  animation, gameplay sprite, viewer sprite, background layer, and audio stream.
+  Recursively check the exported art tree for source directories and metadata.
+- [x] Prove the expanded check with a deliberately missing ladder texture.
+  The previous 53 check gate incorrectly passed that pack. The expanded gate
+  rejected it with the exact missing path. The restored full release pack
+  passes 413 checks.
+- [x] Measure the full published release artifact at 52800035 bytes under
+  Godot 4.7.2. Record each file in `tests/export_budget.json`.
+- [x] Enforce a 53477376 byte cap (51 MiB), rounding that baseline up to the
+  next whole MiB. CI counts every published file, including nested additions,
+  and rejects missing or empty required runtime files.
+- [x] Exercise exact-limit success, one-byte-over failure, nested file growth,
+  missing resources, and invalid budget configuration.
+- [x] Reproduce and fix silent omission of an unreadable nested directory.
+  Directory scan errors now fail the size check. Symlinks and nonregular files
+  also fail instead of producing incomplete totals.
+- [x] Reject undeclared published files even when they fit below the byte cap.
+  The recorded per-file baseline, required file list, and rounded cap agree in
+  a regression test. `.nojekyll` remains the only optional published file.
+
+The limit measures file bytes before HTTP compression. It is not a measured
+phone transfer size or a loading performance guarantee. Intentional asset or
+engine growth needs a new measurement and an explicit reviewed budget change.
