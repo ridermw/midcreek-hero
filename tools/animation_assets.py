@@ -159,9 +159,9 @@ def normalize(variant, clip):
         if bounds is None or position[1] + bounds[1] < 1 or position[1] + bounds[3] >= 208:
             raise ValueError(f"{source}: frame {index} cannot fit without clipping")
         frame.alpha_composite(scaled, position)
-        if clip == "climb":
+        if clip in ("climb", "primary"):
             try:
-                frame = align_climb(frame)
+                frame = align_climb(frame) if clip == "climb" else align_repair(frame)
             except ValueError as error:
                 raise ValueError(f"{source}: frame {index}: {error}") from error
         frames.append(frame)
@@ -191,6 +191,20 @@ def normalize(variant, clip):
         raise ValueError(f"{source}: duplicate authored frames")
     write_frames(variant, clip, results)
     print(f"Normalized {variant}/{clip}: {count} distinct transparent frames")
+
+
+def align_repair(frame):
+    bounds = frame.getbbox()
+    if bounds is None or not 181 <= bounds[3] <= 187:
+        raise ValueError("Repair frame has no planted boot contact at the floor baseline")
+    # Only the planted boots anchor repair; the torso and tool move during the action.
+    feet = frame.crop((0, bounds[3] - 16, frame.width, bounds[3])).getbbox()
+    offset = 104 - (feet[0] + feet[2] - 1) // 2
+    if bounds[0] + offset < 0 or bounds[2] + offset > frame.width:
+        raise ValueError("Repair frame cannot align without clipping")
+    aligned = Image.new("RGBA", frame.size)
+    aligned.paste(frame, (offset, 0))
+    return aligned
 
 
 def align_climb(frame):
