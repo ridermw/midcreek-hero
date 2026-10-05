@@ -134,9 +134,8 @@ Restoring an earlier checkpoint returns resources consumed after that checkpoint
 Restoring a later checkpoint must not recreate installed resources.
 Refill sources remain available so charge depletion cannot block completion.
 
-The existing campaign owner owns fatal liquid, death priority, player input
-reset, and shared motion recovery. Integrate that work only after review and
-merge. New liquid is opt in. No existing pit becomes fatal liquid.
+Fatal liquid, death priority, player input reset, and shared motion recovery
+are integrated. New liquid is opt in. No existing pit becomes fatal liquid.
 
 ## Assets and export
 
@@ -174,8 +173,8 @@ Until then, author drafts only in test fixtures or session artifacts.
 Wrap the level rows in a ScrollContainer and scroll to the focused row.
 Test the last row with both keyboard and gamepad focus, plus touch scrolling.
 
-The shared `game/level.gd:_respawn` change follows the fatal primitive merge.
-It must restore progress and effects before motion and player placement.
+The shared `game/level.gd:_respawn` implementation restores progress and effects
+before motion and player placement.
 
 ## Delivery and evidence
 

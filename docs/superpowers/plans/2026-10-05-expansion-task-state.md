@@ -50,7 +50,7 @@ but retains task ownership until the destination completes.
 - [x] Implement only the specified state transitions. Snapshot all mutable
   fields and return a fresh dictionary.
 - [x] Repeat the focused test. Verify old task/checkpoint tests remain green.
-- [ ] Review and commit this unit as the first task implementation.
+- [x] Review and commit this unit as the first task implementation.
 
 Core acceptance sequence:
 
@@ -179,8 +179,8 @@ Timed methods return `invalid_delta` for negative or nonfinite time.
 Snapshots are trusted internal checkpoints restored to the same authored task,
 not external saves or snapshots from a task with a different point count.
 
-The existing campaign owner supplies fatal liquid and death recovery.
-This session supplies new work aggregation and applies effects before
-`reset_motion()`. Do not edit the same `_respawn` block before that merge.
+Fatal liquid and death recovery are integrated. New work aggregation applies
+effects before `reset_motion()`. Original levels retain their existing motion
+behavior during recovery.
 The existing integration owner monitors PRs and merges only after exact head
 checks and five minutes of review quiet.

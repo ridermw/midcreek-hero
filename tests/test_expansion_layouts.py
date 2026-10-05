@@ -6,6 +6,20 @@ from tools.levels.layout import ROOT
 
 
 class ExpansionLayoutTest(unittest.TestCase):
+    def test_final_three_levels_finish_the_approved_campaign(self):
+        expected = {
+            "13-generator-courtyard": ["restore_power", "restore_power", "extinguish_fire"],
+            "14-facility-approach": ["contain_leak", "extinguish_fire", "run_cable"],
+            "15-expansion-site": ["assemble_rack", "contain_leak", "restore_cooling", "run_cable", "extinguish_fire", "restore_power"],
+        }
+        for slug, kinds in expected.items():
+            with self.subTest(level=slug):
+                path = ROOT / "levels" / (slug + ".level")
+                self.assertTrue(path.is_file())
+                header = json.loads(path.read_text().split("\n---\n")[0])
+                self.assertCountEqual([task["type"] for task in header["tasks"]], kinds)
+                self.assertTrue((ROOT / "levels/routes" / (slug + ".route.json")).is_file())
+
     def test_fire_pump_and_rooftop_levels_have_approved_work(self):
         expected = {
             "10-fire-response-hall": ["extinguish_fire", "extinguish_fire", "restore_cooling"],

@@ -1,0 +1,34 @@
+{
+  "engine": "Godot 4.7.2",
+  "native_renderer": "Compatibility OpenGL, Apple M4 Pro",
+  "native_heroes": ["man", "woman"],
+  "browser_renderer": "Chromium WebGL 2.0",
+  "browser_hero": "woman",
+  "levels": [
+    {"id": "13", "full_route_seconds": 63.83, "checkpoint_seconds": [63.42, 51.13, 18.22], "captures": ["13-man-native.png", "13-woman-native.png", "13-woman-browser.png"]},
+    {"id": "14", "full_route_seconds": 34.68, "checkpoint_seconds": [34.42, 17.63, 1.65], "captures": ["14-man-native.png", "14-woman-native.png", "14-woman-browser.png"]},
+    {"id": "15", "full_route_seconds": 104.18, "checkpoint_seconds": [104.03, 46.85, 23.98], "captures": ["15-man-native.png", "15-woman-native.png", "15-woman-browser.png", "15-browser-complete.png"]}
+  ],
+  "hits": 0,
+  "additional_respawns": 0,
+  "browser_errors": [],
+  "final_gates": {
+    "all_level_route_checks": 140,
+    "expansion_checkpoint_checks": 420,
+    "main_flow_checks": 56,
+    "save_checks": 56,
+    "python_tests": 94,
+    "node_tests": 17,
+    "export_pack_checks": 556,
+    "published_bytes": 53204643
+  },
+  "compatibility": "Original levels 01 through 05, their route files, generators, par and SLA remain unchanged from the expansion baseline.",
+  "ending": "Level 15 saves its result, has no next level, and the actual browser completion screen has no Next work order button.",
+  "menu_access": "The real level list reaches the last row using keyboard, gamepad and viewport-local drag events under the engine's supported touch emulation.",
+  "limitations": [
+    "Checkpoint replay evidence is native for both heroes.",
+    "Browser route evidence uses the female hero.",
+    "Touch and gamepad checks use emulation, not physical devices.",
+    "Rendered timing is not a device performance benchmark."
+  ]
+}

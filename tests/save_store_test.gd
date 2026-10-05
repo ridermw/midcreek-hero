@@ -102,7 +102,7 @@ func run() -> void:
 			FileAccess.file_exists("user://test-save.corrupt.json") and invalid.character == "man" and not invalid.is_unlocked("02"),
 			"Invalid content resets the save: " + bad,
 		)
-	check(SaveStore.next_level_id("01") == "02" and SaveStore.next_level_id("05") == "06" and SaveStore.next_level_id("06") == "07" and SaveStore.next_level_id("09") == "10" and SaveStore.next_level_id("12") == "", "Progression extends only through shipped content.")
+	check(SaveStore.next_level_id("01") == "02" and SaveStore.next_level_id("05") == "06" and SaveStore.next_level_id("06") == "07" and SaveStore.next_level_id("09") == "10" and SaveStore.next_level_id("12") == "13" and SaveStore.next_level_id("15") == "", "Progression extends only through shipped content.")
 	for completed: bool in [false, true]:
 		var legacy := {"version": 1, "character": "woman", "unlocked": ["01", "05"], "settings": {"music_volume": 0.4, "control_display": "gamepad"}, "levels": {"01": {"stars": 3, "best_seconds": 42, "best_optional": 1}}}
 		if completed:
@@ -120,7 +120,7 @@ func run() -> void:
 			check(migrated.save(), "Migrated version 1 save writes.")
 			migrated.load_data()
 			check(migrated.levels == expected and migrated.unlocked == unlocks, "Repeated migration does not change saved state.")
-	for completed_id: String in ["06", "08", "11"]:
+	for completed_id: String in ["06", "08", "11", "14"]:
 		var previous_release := {"version": 1, "levels": {completed_id: {"stars": 2}}, "unlocked": ["01", completed_id]}
 		var previous_file := FileAccess.open(PATH, FileAccess.WRITE)
 		previous_file.store_string(JSON.stringify(previous_release))
@@ -128,6 +128,11 @@ func run() -> void:
 		var migrated := SaveStore.new(PATH)
 		migrated.load_data()
 		check(migrated.is_unlocked(SaveStore.next_level_id(completed_id)) and migrated.stars(completed_id) == 2, "A completed expansion level unlocks newly shipped continuation without losing stars.")
+	var final := SaveStore.new(PATH)
+	final.record("15", 3, 110.0, 0)
+	check(final.save(), "The final campaign result saves.")
+	final.load_data()
+	check(final.stars("15") == 3 and final.best_seconds("15") == 110.0 and not final.is_unlocked("16"), "Level 15 persists its result without creating another level.")
 	clear()
 	print("SAVE_STORE_TEST_COMPLETE: %d checks, %d failures" % [checks, failures])
 	quit(1 if failures else 0)

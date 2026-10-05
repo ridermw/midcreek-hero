@@ -449,6 +449,226 @@ def rooftop_air_handlers():
                     "tasks": tasks}
 
 
+def generator_courtyard():
+    layout = WorkLayout(68)
+    low, side, center = layout.stand, 11, 8
+    layout.platform(side + 1, 8, 20)
+    layout.platform(side + 1, 48, 62)
+    layout.platform(center + 1, 28, 40)
+    layout.ladder_cells(10, side)
+    layout.ladder_cells(34, center)
+    layout.ladder_cells(58, side)
+    for column in [5, 30, 50]:
+        layout.checkpoint(column)
+    layout.put(46, low, "f")
+    tasks = [
+        {"id": "west", "type": "restore_power", "required": True,
+         "label": "Connect the west generator branch", "sites": [[32, low]],
+         "resources": [{"kind": "fuse", "cell": [14, side]}]},
+        {"id": "east", "type": "restore_power", "required": True,
+         "label": "Connect the east generator branch", "sites": [[36, low]],
+         "resources": [{"kind": "fuse", "cell": [54, side]}]},
+        {"id": "yard", "type": "extinguish_fire", "required": True,
+         "label": "Clear the east generator access", "sites": [[42, low]],
+         "resources": [{"kind": "extinguisher", "cell": [36, center]}],
+         "effect_cells": [[46, low]]},
+    ]
+    layout.climb(10, side, True)
+    layout.go(14)
+    layout.action()
+    layout.climb(10, low, False)
+    layout.go(32)
+    layout.action()
+    layout.action()
+    layout.action("diagnose", 1.7)
+    layout.action()
+    for seconds in [2.1, 1.2]:
+        layout.climb(34, center, True)
+        layout.go(36)
+        layout.action()
+        layout.climb(34, low, False)
+        layout.go(42)
+        layout.action(seconds=seconds)
+    layout.climb(58, side, True)
+    layout.go(54, across_ladder=True)
+    layout.action()
+    layout.climb(58, low, False)
+    layout.go(36)
+    layout.action()
+    layout.action()
+    layout.action("diagnose", 1.7)
+    layout.action()
+    layout.put(40, low, "E")
+    layout.go(40)
+    return layout, {"name": "Generator Courtyard", "background": "generator-courtyard",
+                    "music": "level4", "par_seconds": 270, "sla_seconds": 540,
+                    "tasks": tasks}
+
+
+def facility_approach():
+    layout = WorkLayout(76)
+    low, service, entry = layout.stand, 12, 11
+    layout.platform(service + 1, 10, 32)
+    layout.platform(entry + 1, 54, 72)
+    layout.ladder_cells(12, service)
+    layout.ladder_cells(30, service)
+    layout.ladder_cells(60, entry)
+    layout.checkpoint(5)
+    layout.checkpoint(42)
+    layout.put(66, entry, "C")
+    for column in range(20, 27):
+        layout.put(column, low, "~")
+    layout.put(48, low, "f")
+    tasks = [
+        {"id": "road", "type": "contain_leak", "required": True,
+         "label": "Drain the facility approach", "sites": [[16, service], [24, service]],
+         "resources": [{"kind": "seal", "cell": [6, low]}],
+         "effect_cells": [[column, low] for column in range(20, 27)]},
+        {"id": "gate", "type": "extinguish_fire", "required": True,
+         "label": "Extinguish the entrance fire", "sites": [[44, low]],
+         "resources": [{"kind": "extinguisher", "cell": [40, low]}],
+         "effect_cells": [[48, low]]},
+        {"id": "entry", "type": "run_cable", "required": True,
+         "label": "Connect the raised facility entrance",
+         "sites": [[56, low], [64, entry], [70, entry]],
+         "resources": [{"kind": "spool", "cell": [52, low]}]},
+    ]
+    layout.go(6)
+    layout.action()
+    layout.climb(12, service, True)
+    layout.go(16)
+    layout.action()
+    layout.action()
+    layout.go(24)
+    layout.action(seconds=3.2)
+    layout.climb(30, low, False)
+    layout.tray(34, 37)
+    layout.route_column = 39
+    for seconds in [2.1, 1.2]:
+        layout.go(40)
+        layout.action()
+        layout.go(44)
+        layout.action(seconds=seconds)
+    layout.go(52)
+    layout.action()
+    layout.go(56)
+    layout.action()
+    layout.climb(60, entry, True)
+    for column in [64, 70]:
+        layout.go(column)
+        layout.action()
+    layout.put(72, entry, "E")
+    layout.go(72)
+    return layout, {"name": "Facility Approach", "background": "facility-approach",
+                    "music": "level5", "par_seconds": 270, "sla_seconds": 540,
+                    "tasks": tasks,
+                    "prompts": [{"x": 34, "action": "slide", "intent": "press",
+                                 "text": "pass through the low clearance", "status": ""}]}
+
+
+def expansion_site():
+    layout = WorkLayout(84, 24)
+    low, middle, high = layout.stand, 14, 7
+    layout.platform(middle + 1, 8, 42)
+    layout.platform(high + 1, 36, 76)
+    layout.ladder_cells(10, middle)
+    layout.ladder_cells(40, high)
+    layout.ladder_cells(72, high)
+    layout.checkpoint(5)
+    layout.put(38, middle, "C")
+    layout.put(62, high, "C")
+    for column in range(18, 27):
+        layout.put(column, low, "~")
+    layout.put(36, middle, "v")
+    layout.put(60, high, "f")
+    tasks = [
+        {"id": "build", "type": "assemble_rack", "required": True,
+         "label": "Assemble the commissioning rack", "sites": [[14, low]],
+         "resources": [{"kind": "chassis", "cell": [6, low]},
+                       {"kind": "psu", "cell": [18, middle]},
+                       {"kind": "dimm", "cell": [30, middle]}]},
+        {"id": "seal", "type": "contain_leak", "required": True,
+         "label": "Drain the construction return route",
+         "sites": [[24, middle], [28, middle]],
+         "resources": [{"kind": "seal", "cell": [20, middle]}],
+         "effect_cells": [[column, low] for column in range(18, 27)]},
+        {"id": "cool", "type": "restore_cooling", "required": True,
+         "label": "Verify the construction cooling loop",
+         "sites": [[32, middle], [22, middle]],
+         "resources": [{"kind": "filter", "cell": [34, middle]}],
+         "effect_cells": [[36, middle]]},
+        {"id": "link", "type": "run_cable", "required": True,
+         "label": "Install the commissioning cable",
+         "sites": [[40, low], [46, high], [70, high]],
+         "resources": [{"kind": "spool", "cell": [42, low]}]},
+        {"id": "safe", "type": "extinguish_fire", "required": True,
+         "label": "Clear the upper work area", "sites": [[56, high]],
+         "resources": [{"kind": "extinguisher", "cell": [52, high]}],
+         "effect_cells": [[60, high]]},
+        {"id": "live", "type": "restore_power", "required": True,
+         "label": "Energize the completed installation", "sites": [[66, high]],
+         "resources": [{"kind": "fuse", "cell": [64, high]}]},
+    ]
+    layout.go(6)
+    layout.action()
+    layout.go(14)
+    layout.action()
+    for column in [18, 30]:
+        layout.climb(10, middle, True)
+        layout.go(column)
+        layout.action()
+        layout.climb(10, low, False)
+        layout.go(14)
+        layout.action()
+    layout.action("diagnose", 1.7)
+    layout.climb(10, middle, True)
+    layout.go(20)
+    layout.action()
+    layout.go(24)
+    layout.action()
+    layout.action()
+    layout.go(28)
+    layout.action(seconds=3.2)
+    layout.go(34)
+    layout.action()
+    layout.go(32)
+    layout.action("diagnose")
+    layout.go(22)
+    layout.action()
+    layout.go(32)
+    layout.action()
+    layout.action(seconds=1.7)
+    layout.climb(40, low, False)
+    layout.go(42)
+    layout.action()
+    layout.go(40)
+    layout.action()
+    layout.climb(40, high, True)
+    layout.go(46)
+    layout.action()
+    for seconds in [2.1, 1.2]:
+        layout.go(52)
+        layout.action()
+        layout.go(56)
+        layout.action(seconds=seconds)
+    layout.go(64)
+    layout.action()
+    layout.go(66)
+    layout.action()
+    layout.action()
+    layout.action("diagnose", 1.7)
+    layout.action()
+    layout.go(70)
+    layout.action()
+    layout.climb(72, low, False)
+    layout.go(34)
+    layout.put(1, low, "E")
+    layout.go(1)
+    return layout, {"name": "Expansion Site", "background": "expansion-site",
+                    "music": "level5", "par_seconds": 360, "sla_seconds": 720,
+                    "tasks": tasks}
+
+
 BUILDERS = {
     "06-cooling-gallery": cooling_gallery,
     "07-operations-suite": operations_suite,
@@ -457,6 +677,9 @@ BUILDERS = {
     "10-fire-response-hall": fire_response_hall,
     "11-pump-station": pump_station,
     "12-rooftop-air-handlers": rooftop_air_handlers,
+    "13-generator-courtyard": generator_courtyard,
+    "14-facility-approach": facility_approach,
+    "15-expansion-site": expansion_site,
 }
 
 
