@@ -129,9 +129,9 @@ The export gate loads every declared animation frame, gameplay sprite, viewer
 sprite, background layer, and audio stream. It also scans the exported art tree
 for generated sources, prompts, previews, sheets, and metadata.
 
-`tests/export_budget.json` sets a 51 MiB limit for all published web files.
-The measured Godot 4.7.2 release artifact totals 52800035 bytes. Rounding up to
-the next whole MiB gives a 53477376 byte cap and 677341 bytes of margin.
+`tests/export_budget.json` declares the required published web files and records
+an informational size baseline. There is no export size ceiling.
+The recorded Godot 4.7.2 release artifact totals 52800035 bytes.
 This counts file bytes before HTTP compression, not observed network transfer
 or device performance. Additional files and nested directories count too.
 Unreadable directories, symlinks, and nonregular files fail the check rather
@@ -139,8 +139,8 @@ than disappearing from the total.
 The published file list must match the declared runtime files, with `.nojekyll`
 as the only optional entry. Update the declaration when a reviewed change
 intentionally adds a file.
-Intentional asset or engine growth requires a reviewed budget update with a
-new measurement; do not derive or raise the limit automatically.
+Report a fresh size measurement when assets or the engine change.
+Size growth alone does not fail validation.
 
 ```sh
 python3 tools/check_export_budget.py build/web

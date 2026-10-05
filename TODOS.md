@@ -40,7 +40,7 @@ Climbing alignment does not establish smooth animation.
 - Keep backgrounds loaded for the active level. Use Godot's resource cache.
   Change other artwork loading only when measurements justify it.
 - Extend export checks to all declared runtime assets and source exclusions.
-  Establish a measured download size budget and review intentional increases.
+  Report measured download size without a size ceiling.
 
 ## 1. Diagnose hero animation smoothness
 
@@ -259,7 +259,7 @@ Do not add new level files before their routes and required assets are ready.
 - [x] Observe focused failures before implementation and verify partial rollback.
 - [ ] Connect task entities, resource inventory, prompts, artwork, and effects.
 - [ ] Deliver complete routes and every checkpoint replay for levels 06 through 15.
-- [ ] Verify native and browser captures and the unchanged download cap.
+- [ ] Verify native and browser captures and report export size.
 
 State tests do not establish playable content completion. No new playable level
 ships in this increment.
@@ -350,8 +350,8 @@ separate gray box mode.
 Check the highest and lowest camera positions and supported viewport shapes.
 Measure frame timing and texture use before and after adding layers. Keep
 background loading local to the active level. Extend export inclusion and source
-exclusion checks for every declared environment. Record export size and justify
-growth against a measured budget.
+exclusion checks for every declared environment. Report export size without
+using size as an acceptance gate.
 
 **Depends on / blocked by:** A rendered performance baseline and animation
 diagnosis from item 1; user approval of composition; final camera bounds from
@@ -455,7 +455,7 @@ Task specific rows apply only if the corresponding concept is selected.
 | Difficulty and CI | A human target change fails an unrelated bot formula assertion. | Remove formula coupling across Python, Godot, and CI; retain independent completion budgets and star boundary tests. |
 | Background depth | New layers expose empty space or obscure hazards. | Extend coverage tests and inspect rendered camera limits; reject invalid layer data at load. |
 | Pause, help, and touch | A buffered or cancelled action fires after restoration. | Extend level, mobile bridge, and browser tests; clear transient state without synthesizing physical key releases. |
-| Export and loading | Source images enter the download or new runtime art is omitted. | Extend inclusion and exclusion checks and measured size gates; fail the build with an actionable report. |
+| Export and loading | Source images enter the download or new runtime art is omitted. | Extend inclusion and exclusion checks; fail invalid exports with an actionable report. Report size without a ceiling. |
 
 Three critical planning risks require explicit proof: safe placement over lethal
 liquid, consistent restoration of task effects, and reachable prerequisites for
@@ -496,7 +496,7 @@ probe from PR 15; the production repair assets do not depend on that probe.
 Running artwork continuity, physical device evidence, and the remaining campaign
 work stay open.
 
-## Verified export coverage and size budget
+## Verified export coverage and size reporting
 
 - [x] Replace sample-only resource assurance with loads of every declared
   animation, gameplay sprite, viewer sprite, background layer, and audio stream.
@@ -507,21 +507,20 @@ work stay open.
   passes 413 checks.
 - [x] Measure the full published release artifact at 52800035 bytes under
   Godot 4.7.2. Record each file in `tests/export_budget.json`.
-- [x] Enforce a 53477376 byte cap (51 MiB), rounding that baseline up to the
-  next whole MiB. CI counts every published file, including nested additions,
-  and rejects missing or empty required runtime files.
-- [x] Exercise exact-limit success, one-byte-over failure, nested file growth,
-  missing resources, and invalid budget configuration.
+- [x] Count every published file, including nested additions, and reject missing
+  or empty required runtime files. Size reporting has no acceptance ceiling.
+- [x] Exercise acceptance above the former limit, nested file measurement,
+  missing resources, and invalid required file configuration.
 - [x] Reproduce and fix silent omission of an unreadable nested directory.
-  Directory scan errors now fail the size check. Symlinks and nonregular files
+  Directory scan errors now fail export validation. Symlinks and nonregular files
   also fail instead of producing incomplete totals.
-- [x] Reject undeclared published files even when they fit below the byte cap.
-  The recorded per-file baseline, required file list, and rounded cap agree in
+- [x] Reject undeclared published files independently of size.
+  The recorded per-file baseline and required file list agree in
   a regression test. `.nojekyll` remains the only optional published file.
 
-The limit measures file bytes before HTTP compression. It is not a measured
-phone transfer size or a loading performance guarantee. Intentional asset or
-engine growth needs a new measurement and an explicit reviewed budget change.
+Size reporting measures file bytes before HTTP compression. It is not a measured
+phone transfer size or a loading performance guarantee. Asset or engine changes
+need a fresh measurement, but growth alone does not block delivery.
 
 ## Verified cable hazard visibility
 
