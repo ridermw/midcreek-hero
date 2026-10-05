@@ -1,36 +1,526 @@
 {
-  "rendered_at": "2026-10-04T02:06:47.429736+00:00",
+  "rendered_at": "2026-10-04T22:35:54.101298+00:00",
   "size": "2048x1024",
   "quality": "high",
   "deployment": "gpt-image-2.5-sunburst",
   "model_name": "gpt-image-2.5-sunburst",
   "model_version": "default",
-  "prompt_char_count": 2689,
-  "prompt": "Edit image 1 into a TRUE PIXEL ART animated sprite sheet for the SAME character.\nImage 1 is the approved character IDENTITY, pixel-art STYLE and PALETTE reference.\nReplace its single pose with a complete 8-frame WALK animation.\nKeep the same face, hair, hard hat, clothing, compact adult RPG proportions,\ndark stepped pixel contours, small square color clusters and shaded material ramps.\nNever switch to smooth cel illustration, vector art, a 3D render or painted concept art.\n\nMAN: clean-shaven, short dark hair below blue hard hat; long slate sleeves to wrists, roomy straight blue jeans. No beard or moustache.\nBoth: blue hard hat/ear defenders, lime hi-vis vest, orange trim, broad silver\nbands, slate shirt, blue denim, brown boots and tool belt. Outfit and character\nsize must remain IDENTICAL across frames.\nNORMAL REAL-WORLD technician: ordinary hand tools only. NO sword, shield, rack panel, magic, spell, glowing trail or combat armor.\n\nEXACT GRID: 4 columns by 2 rows, read left-to-right then top-to-bottom.\nExactly 8 figures, one per equal 512x512 cell. No drawn grid, numbers or labels.\nEach cell uses local coordinates: body centered near x=256, BOOT CONTACT BASELINE\ny=448, standing figure including hat approximately 270 pixels tall. All painted\npixels, including effects/tools/hair, must remain inside x=64..448 and y=96..480.\nCharacter anatomy is drawn at the SAME scale in every frame; don't resize each pose\nto fill the cell. Foot position may change through stride but the floor is fixed.\nCamera/facing stays consistent. Right-facing profile for locomotion; do not\nalternate front and back views or rotate the character through the cycle.\n\nFRAME BREAKDOWN:\nEight-frame RIGHT-FACING PROFILE walk loop: 1 left leg forward/right back contact, 2 weight sinks onto left heel, 3 right leg passes under hips while left supports, 4 rise over left toe/right reaches forward, 5 right forward/left back contact, 6 sink on right heel, 7 left passes under hips while right supports, 8 rise over right toe/left reaches forward. Arms swing opposite legs. Feet alternate, torso remains stable. Every phase differs. Hands empty, tools on belt.\n\nDraw every individual phase as distinct authored pixel artwork. In-between frames\nmust actually move the knees, ankles, elbows and hands through the action; do not\ncopy the same standing pose across the sheet. Keep body volume and costume stable.\nNo motion blur; changing limb silhouettes must carry the motion.\n\nUse actual TRANSPARENT RGBA output. Alpha zero around every figure and in limb\ngaps. Do not draw a checkerboard, white/beige backdrop, ground shadow, scenery,\ncaptions, logos, watermark, duplicate extras or opaque frame cards.",
+  "prompt_char_count": 3309,
+  "prompt": "Replace the single standing pose in image 1 with an eight frame WALK CYCLE.\nUse image 1 only as the character identity reference.\nDo not repeat the reference standing pose. Preserve this exact male technician identity,\npixel art style, blue hard hat, ear defenders, lime vest, orange trim, silver\nbands, long slate sleeves, blue jeans, brown boots, and right hip tool pouch.\nDo not introduce a different character or a different illustration style.\n\nDraw the leg and arm sequence as eight distinct phases of a complete\nRIGHT FACING PROFILE walk cycle. The near leg must actually move from front\nto back in the first half and from back to front in the second half.\nKeep the far leg visibly behind it at overlaps. Preserve the outfit on each\nside rather than mirroring the whole character.\n\nUse an exact 4 column by 2 row grid on a 2048 by 1024 transparent canvas.\nEach 512 by 512 cell contains one complete figure. Read left to right, top\nrow first. In every cell keep the pelvis centered at x=256, the grounded boot\nsole at y=480, and the standing height at 420 pixels. Use one shared scale.\nKeep all pixels within the cell. Keep the head and torso registered between\ncells; only a small vertical weight shift is allowed, not horizontal drift.\n\nFrame 1: near leg forward heel contact, far leg extended behind on its toe.\nFrame 2: weight settles onto the near foot, near knee bends slightly; the far\nfoot lifts behind and begins swinging forward.\nFrame 3: PASSING. The near leg supports directly beneath the hip. The far knee\npasses the near knee, and its foot is lifted from the floor. This is NOT a\nwide stride or a second contact pose.\nFrame 4: near foot rolls onto the toe behind the hip, far knee and lower leg\nreach forward but the far heel is still just above the floor.\nFrame 5: far leg forward heel contact, near leg extended behind on its toe.\nThis reverses which anatomical leg leads compared with frame 1.\nFrame 6: weight settles onto the far foot, far knee bends slightly; the near\nfoot lifts behind and begins swinging forward.\nFrame 7: PASSING. The far leg supports directly beneath the hip. The near knee\npasses the far knee with the near foot lifted, not extended to the front.\nFrame 8: far foot rolls onto its toe behind the hip; near lower leg reaches\nforward, near heel almost touching, ready to continue directly into frame 1.\n\nSwing the arms opposite their legs. Hands are empty; tools remain on the belt.\nPreserve adult proportions, head size, body volume, square pixel clusters,\nstepped outlines, and the existing material palette. Never resize each pose.\nNo blurry outlines, antialiasing, motion trails, added scenery, ground shadows,\ncheckerboards, text, numbered cells, borders, or painted backgrounds.\nOutput real transparent RGBA. Image 2 is the authoritative pose guide. Match each of its eight separate limb poses in the corresponding cell. Cyan marks the near arm and leg. Purple marks the far arm and leg. These guide colors identify limbs only; render all clothing in the normal outfit colors from image 1, not cyan or purple. Image 1 supplies identity and pixel style only. Image 2 supplies the exact movement, opposite arm swing, bent knee passing poses, and front-to-back leg alternation. Replace the colored stick figures with the technician, not copies of the first pose.",
   "operation": "edit",
   "source_image": "art/cel-shift/sprites/individual/man-midcreek/01-ready.png",
-  "reference_images": [],
+  "reference_images": [
+    "art/cel-shift/animations/generated/walk-pose-guide.png"
+  ],
   "mask": null,
   "inputs": [
     {
       "role": "source",
       "path": "art/cel-shift/sprites/individual/man-midcreek/01-ready.png",
       "sha256": "f54dbaab724e0770a05e623848125c7b455bad2f34955ac0cc1aa1ee89cb4d77"
+    },
+    {
+      "role": "reference",
+      "path": "art/cel-shift/animations/generated/walk-pose-guide.png",
+      "sha256": "fed551b1a30a2ef36e5cfa255595d68aa9a5b890202e491e64678e5662023708"
     }
   ],
   "background": "transparent",
   "output_format": "png",
   "usage": {
-    "input_tokens": 780,
+    "input_tokens": 2382,
     "input_tokens_details": {
-      "image_tokens": 169,
-      "text_tokens": 611
+      "image_tokens": 1627,
+      "text_tokens": 755
     },
     "output_tokens": 1180,
     "output_tokens_details": {
       "image_tokens": 1180,
       "text_tokens": 0
     },
-    "total_tokens": 1960
+    "total_tokens": 3562
+  },
+  "tool": "mock-ui-gen",
+  "tool_version": "0.2.5",
+  "purpose": "Eight frame right facing walk with alternating near and far legs.",
+  "phases": [
+    "Near heel contacts; far foot pushes off behind.",
+    "Near leg supports; far foot lifts behind.",
+    "Near leg supports below the hip; far knee passes forward.",
+    "Near toe pushes off; far foot reaches forward.",
+    "Far heel contacts; near foot pushes off behind.",
+    "Far leg supports; near foot lifts behind.",
+    "Far leg supports below the hip; near knee passes forward.",
+    "Far toe pushes off; near foot reaches forward."
+  ],
+  "postprocessing": [
+    "Whole sheet candidates repeated the same anatomical leg and were rejected.",
+    "Masked edits corrected individual poses 4 through 8 using the colored limb guide.",
+    "The final source keeps unmasked pixels from the selected whole sheet candidate.",
+    "Generated edits shortened supporting legs. The source edit restores lower body extent from the pelvis to one shared source floor baseline without moving the torso.",
+    "Canonical source cells remain 512x512. Runtime normalization uses one fixed 512-to-171 scale and the published animation palette.",
+    "Map canonical source pixels to this hero's walking color ramps from commit 15a3bf1 before runtime normalization.",
+    "Generator records below describe the base image and masked edits, not a single generation of the final composite.",
+    "Intermediate crop and mask paths are logical provenance names; their original input hashes are retained."
+  ],
+  "canonical_source": "art/cel-shift/animations/generated/man-midcreek/walk.png",
+  "canonical_source_sha256": "8ce6862c51339203ec92bb36661ec48a08d0b4909cff4fcce297fe5e90f07afe",
+  "normalization": "python3 tools/animation_assets.py normalize --variant man-midcreek --clip walk",
+  "pose_edits": [
+    {
+      "frame": 4,
+      "generation": {
+        "rendered_at": "2026-10-04T22:57:01.315821+00:00",
+        "size": "1024x1024",
+        "quality": "high",
+        "deployment": "gpt-image-2.5-sunburst",
+        "model_name": "gpt-image-2.5-sunburst",
+        "model_version": "default",
+        "prompt_char_count": 1129,
+        "prompt": "Change the limb pose in image 1, a pixel art game sprite. Preserve the face,\nhelmet, hair, vest, belt, pouch, proportions, palette and pixel treatment.\nMatch image 2's pose; cyan identifies near limbs, purple identifies far limbs.\nUse the character's normal clothing colors in the output, not guide colors.\n\nThis is the end of the first step, immediately BEFORE the far foot contacts.\nThe lighter NEAR leg is BEHIND the hip, rolling onto its toe and pushing off.\nNear knee x=230,y=385. Near boot x=212,y=480, heel raised, toe on the floor.\nThe darker FAR leg reaches FORWARD toward image right. Far knee x=315,y=380.\nFar boot x=315,y=460 with the heel still above the floor.\nThe far leg is behind the near leg wherever they overlap.\nDo not extend the light near leg forward. The DARK far leg is reaching forward.\n\nThe near arm swings FORWARD toward image right, opposite the trailing near leg.\nThe far arm swings backward. Keep hands empty and the torso fixed.\nNo scenery, labels, ground shadows, background or effects.\nOutput 1024 by 1024 transparent RGBA. Coordinates describe the 512 by 512 input;\ndouble them for the output.\n",
+        "operation": "edit",
+        "source_image": "intermediate/man-walk-4-input.png",
+        "reference_images": [
+          "intermediate/man-walk-4-guide.png"
+        ],
+        "mask": "intermediate/man-walk-4-mask.png",
+        "inputs": [
+          {
+            "role": "source",
+            "path": "intermediate/man-walk-4-input.png",
+            "sha256": "649247137d136a321dc405b172fff285f2fe06c93f06a8465e703e31ccfe0850"
+          },
+          {
+            "role": "reference",
+            "path": "intermediate/man-walk-4-guide.png",
+            "sha256": "0b35da0b430d28a1db9b1f2236af33ccfbd2d83ec70e5a703c00e7d5dcaa7363"
+          },
+          {
+            "role": "mask",
+            "path": "intermediate/man-walk-4-mask.png",
+            "sha256": "0644042d16a74e18a9548e78ae2efa2f989c779ec9210416bd1a687a60f8fb12"
+          }
+        ],
+        "background": "transparent",
+        "output_format": "png",
+        "usage": {
+          "input_tokens": 2341,
+          "input_tokens_details": {
+            "image_tokens": 2048,
+            "text_tokens": 293
+          },
+          "output_tokens": 1756,
+          "output_tokens_details": {
+            "image_tokens": 1756,
+            "text_tokens": 0
+          },
+          "total_tokens": 4097
+        }
+      }
+    },
+    {
+      "frame": 5,
+      "generation": {
+        "rendered_at": "2026-10-04T22:58:23.448232+00:00",
+        "size": "1024x1024",
+        "quality": "high",
+        "deployment": "gpt-image-2.5-sunburst",
+        "model_name": "gpt-image-2.5-sunburst",
+        "model_version": "default",
+        "prompt_char_count": 1242,
+        "prompt": "Change only the legs below the belt in image 1, a pixel art game sprite.\nPreserve the face, hair, torso, arms, hands, outfit, belt and tool pouch.\n\nThis is the OPPOSITE CONTACT pose to frame 1. The FAR leg is forward and the\nNEAR leg trails behind. Do not repeat the near leg leading from frame 1.\nThe darker FAR thigh slopes forward toward image right. Far knee x=300,y=390.\nIts dark far shin continues to the brown far boot at x=336,y=480, making heel\ncontact with the floor.\nThe lighter NEAR leg attaches to the visible tool pouch hip and slopes BACK\ntoward image left, passing IN FRONT OF the far leg at the hips.\nNear knee x=215,y=385. Near boot x=176,y=480, heel raised with the toe pushing off.\nKeep the near leg lighter and in front at overlaps; keep the far leg darker\nand behind. The boots face right. Do not mirror the character or equipment.\n\nImage 2 gives the exact pose. Cyan marks near limbs and purple marks far limbs;\nrender the original blue jeans and brown boots instead of those guide colors.\nKeep the existing stepped pixel outlines and material shading.\nNo text, background, scenery, ground shadows or effects.\nOutput 1024 by 1024 transparent RGBA. Coordinates describe the 512 by 512 input;\ndouble them for the output.\n",
+        "operation": "edit",
+        "source_image": "intermediate/man-walk-5-input.png",
+        "reference_images": [
+          "intermediate/man-walk-5-guide.png"
+        ],
+        "mask": "intermediate/man-walk-5-mask.png",
+        "inputs": [
+          {
+            "role": "source",
+            "path": "intermediate/man-walk-5-input.png",
+            "sha256": "b1c2072a7bedd8b0a936de7c620d41c51dc697d7093c9064eff16c7e9a71b57c"
+          },
+          {
+            "role": "reference",
+            "path": "intermediate/man-walk-5-guide.png",
+            "sha256": "25ed4ebc05929e0dcb3b88eea31ac71471af1953b8689f700b769fa5f232b801"
+          },
+          {
+            "role": "mask",
+            "path": "intermediate/man-walk-5-mask.png",
+            "sha256": "046abe7d1d26e9da2051e42bad534534bdb7162d3feaa3d34828640f99366c5e"
+          }
+        ],
+        "background": "transparent",
+        "output_format": "png",
+        "usage": {
+          "input_tokens": 2372,
+          "input_tokens_details": {
+            "image_tokens": 2048,
+            "text_tokens": 324
+          },
+          "output_tokens": 1756,
+          "output_tokens_details": {
+            "image_tokens": 1756,
+            "text_tokens": 0
+          },
+          "total_tokens": 4128
+        }
+      }
+    },
+    {
+      "frame": 6,
+      "generation": {
+        "rendered_at": "2026-10-04T22:50:54.167480+00:00",
+        "size": "1024x1024",
+        "quality": "high",
+        "deployment": "gpt-image-2.5-sunburst",
+        "model_name": "gpt-image-2.5-sunburst",
+        "model_version": "default",
+        "prompt_char_count": 1344,
+        "prompt": "Change only the legs below the belt in image 1, a pixel art game sprite.\nKeep the upper body, face,\noutfit, scale, arms, hands, belt and tool pouch unchanged.\n\nThis is the opposite loading pose to frame 2. SWAP WHICH LEG IS PLANTED:\nthe FAR leg supports the body and the NEAR leg lifts behind the body.\nDo not keep the near leg straight on the floor.\n\nDraw the darker FAR leg behind the near leg. It extends slightly forward\nfrom the far hip to its knee at x=290,y=390. Its boot is planted on the floor\nat x=300,y=480, accepting the weight.\n\nDraw the lighter NEAR leg on the visible tool pouch side IN FRONT OF it.\nThe near thigh slopes BACK toward image left from the pelvis.\nIts near knee bends at x=205,y=365. Its shin folds back with its boot at\nx=190,y=450, lifted 30 pixels clear of the floor and trailing BEHIND the hip.\nThe visible light blue bent thigh and lifted boot must be the near leg.\nThe straight planted leg must be the darker far leg.\n\nImage 2 is the exact pose guide. Cyan identifies near limbs; purple identifies\nfar limbs. Render actual blue jeans and brown boots, not the guide colors.\nPreserve stepped pixel outlines, denim shading, and the original transparency.\nNo labels, scenery, ground shadows, background, or effects.\nOutput 1024 by 1024. Coordinates above refer to the 512 by 512 input; double\nthem for the output.",
+        "operation": "edit",
+        "source_image": "intermediate/man-walk-6-input.png",
+        "reference_images": [
+          "intermediate/man-walk-6-guide.png"
+        ],
+        "mask": "intermediate/man-walk-6-mask.png",
+        "inputs": [
+          {
+            "role": "source",
+            "path": "intermediate/man-walk-6-input.png",
+            "sha256": "deb3d5ea581693702190d72f65cf44dbbc4d0a351decf54f72bc70a31a108908"
+          },
+          {
+            "role": "reference",
+            "path": "intermediate/man-walk-6-guide.png",
+            "sha256": "a9d5468afad8e73c7aef027dd588e205a988c17b0697a085717c80ccfad9fddb"
+          },
+          {
+            "role": "mask",
+            "path": "intermediate/man-walk-6-mask.png",
+            "sha256": "046abe7d1d26e9da2051e42bad534534bdb7162d3feaa3d34828640f99366c5e"
+          }
+        ],
+        "background": "transparent",
+        "output_format": "png",
+        "usage": {
+          "input_tokens": 2399,
+          "input_tokens_details": {
+            "image_tokens": 2048,
+            "text_tokens": 351
+          },
+          "output_tokens": 1756,
+          "output_tokens_details": {
+            "image_tokens": 1756,
+            "text_tokens": 0
+          },
+          "total_tokens": 4155
+        }
+      }
+    },
+    {
+      "frame": 7,
+      "generation": {
+        "rendered_at": "2026-10-04T22:44:31.884748+00:00",
+        "size": "1024x1024",
+        "quality": "high",
+        "deployment": "gpt-image-2.5-sunburst",
+        "model_name": "gpt-image-2.5-sunburst",
+        "model_version": "default",
+        "prompt_char_count": 1632,
+        "prompt": "Change only the legs below the belt in image 1. Keep the face, helmet, torso,\narms, hand, belt and tool pouch unchanged. Keep the scale and boot baseline.\n\nSWAP WHICH LEG IS LIFTED. The current picture lifts the far leg while the\nnear leg stays straight on the floor. That is the wrong pose.\n\nThe required pose is the opposite passing pose:\n- The NEAR leg, on the visible tool pouch side, is the SWINGING leg.\n- Bend that near thigh upward and FORWARD toward image right.\n- The near knee is in front of the torso at approximately x=306, y=362.\n- Bend the near shin backward from that knee. Its boot hangs at x=250,\n  y=423, clearly above the floor.\n- Draw that lifted near thigh and shin IN FRONT OF the supporting far leg,\n  using the lighter lit denim of the visible side.\n- The FAR leg is the SUPPORTING leg. Draw it straight down beneath the pelvis,\n  with the far knee near x=255, y=391 and its boot on the floor at x=256, y=480.\n- Make this supporting far leg darker because it is behind the lifted near leg.\n- Do not leave a straight light blue near leg in front. Do not raise the far\n  knee again. Do not put both boots on the ground.\n\nImage 2 is the exact required pose guide. Cyan identifies the near limbs,\npurple the far limbs. Do not use those guide colors in the finished art:\nuse the existing blue jeans and brown boots with stepped pixel outlines.\nThe cyan near thigh must cross in front of the purple supporting leg.\nNo new props, labels, text, background, shadows or effects.\nOutput one complete 1024 by 1024 transparent RGBA sprite. The coordinates\nabove refer to the 512 by 512 input; double them for the output.",
+        "operation": "edit",
+        "source_image": "intermediate/passing-seven.png",
+        "reference_images": [
+          "intermediate/passing-seven-guide.png"
+        ],
+        "mask": "intermediate/passing-seven-mask.png",
+        "inputs": [
+          {
+            "role": "source",
+            "path": "intermediate/passing-seven.png",
+            "sha256": "50ec2e6c90e6abce3db4dad5bbfac54d1028d7a541042aca4e2168f20465af7d"
+          },
+          {
+            "role": "reference",
+            "path": "intermediate/passing-seven-guide.png",
+            "sha256": "9d14c2ca8f266b377a97944946fd46392d285d60a6a5cbc62b564cc1eb62567e"
+          },
+          {
+            "role": "mask",
+            "path": "intermediate/passing-seven-mask.png",
+            "sha256": "046abe7d1d26e9da2051e42bad534534bdb7162d3feaa3d34828640f99366c5e"
+          }
+        ],
+        "background": "transparent",
+        "output_format": "png",
+        "usage": {
+          "input_tokens": 2465,
+          "input_tokens_details": {
+            "image_tokens": 2048,
+            "text_tokens": 417
+          },
+          "output_tokens": 1756,
+          "output_tokens_details": {
+            "image_tokens": 1756,
+            "text_tokens": 0
+          },
+          "total_tokens": 4221
+        }
+      }
+    },
+    {
+      "frame": 8,
+      "generation": {
+        "rendered_at": "2026-10-04T22:59:43.287645+00:00",
+        "size": "1024x1024",
+        "quality": "high",
+        "deployment": "gpt-image-2.5-sunburst",
+        "model_name": "gpt-image-2.5-sunburst",
+        "model_version": "default",
+        "prompt_char_count": 1185,
+        "prompt": "Change the limb pose in image 1, a pixel art game sprite. Preserve the face,\nhelmet, hair, vest, belt, pouch, proportions, palette and pixel treatment.\nMatch image 2's pose; cyan identifies near limbs, purple identifies far limbs.\nUse the character's normal clothing colors in the output, not guide colors.\n\nThis is the end of the SECOND step, immediately BEFORE the near foot contacts.\nThe lighter NEAR leg reaches FORWARD toward image right, in front of the far\nleg wherever they overlap. Near knee x=315,y=380. Near boot x=315,y=460,\nheel still above the floor, about to extend into frame 1.\nThe darker FAR leg trails BEHIND the hip. Far knee x=230,y=385.\nFar boot x=212,y=480, heel raised and toe pushing off the floor.\nThe near leg reaches; the far leg follows through behind.\n\nThe near arm swings BACK toward image left, opposite the forward near leg.\nThe far arm swings forward. Do not leave both the near arm and near leg forward.\nKeep hands empty and the torso fixed. No mirroring of the torso or equipment.\nNo scenery, labels, ground shadows, background or effects.\nOutput 1024 by 1024 transparent RGBA. Coordinates describe the 512 by 512 input;\ndouble them for the output.\n",
+        "operation": "edit",
+        "source_image": "intermediate/man-walk-8-input.png",
+        "reference_images": [
+          "intermediate/man-walk-8-guide.png"
+        ],
+        "mask": "intermediate/man-walk-8-mask.png",
+        "inputs": [
+          {
+            "role": "source",
+            "path": "intermediate/man-walk-8-input.png",
+            "sha256": "dff0698219ad0697da9b0c180bb29bc7d0c12b01c05eb37a8fed13c34c55fe58"
+          },
+          {
+            "role": "reference",
+            "path": "intermediate/man-walk-8-guide.png",
+            "sha256": "10b97614a49b223ee7eb77f039d666f5f98b4eab86183c6bc64dd874a1b8dc00"
+          },
+          {
+            "role": "mask",
+            "path": "intermediate/man-walk-8-mask.png",
+            "sha256": "0644042d16a74e18a9548e78ae2efa2f989c779ec9210416bd1a687a60f8fb12"
+          }
+        ],
+        "background": "transparent",
+        "output_format": "png",
+        "usage": {
+          "input_tokens": 2355,
+          "input_tokens_details": {
+            "image_tokens": 2048,
+            "text_tokens": 307
+          },
+          "output_tokens": 1756,
+          "output_tokens_details": {
+            "image_tokens": 1756,
+            "text_tokens": 0
+          },
+          "total_tokens": 4111
+        }
+      }
+    }
+  ],
+  "source_palette": {
+    "reference_commit": "15a3bf1",
+    "colors": [
+      [
+        0,
+        1,
+        0
+      ],
+      [
+        3,
+        5,
+        12
+      ],
+      [
+        6,
+        9,
+        16
+      ],
+      [
+        7,
+        15,
+        33
+      ],
+      [
+        7,
+        55,
+        138
+      ],
+      [
+        14,
+        7,
+        5
+      ],
+      [
+        19,
+        32,
+        53
+      ],
+      [
+        23,
+        16,
+        13
+      ],
+      [
+        29,
+        48,
+        74
+      ],
+      [
+        30,
+        84,
+        176
+      ],
+      [
+        32,
+        52,
+        81
+      ],
+      [
+        32,
+        56,
+        90
+      ],
+      [
+        38,
+        64,
+        100
+      ],
+      [
+        40,
+        21,
+        12
+      ],
+      [
+        40,
+        66,
+        104
+      ],
+      [
+        44,
+        73,
+        110
+      ],
+      [
+        45,
+        34,
+        27
+      ],
+      [
+        48,
+        76,
+        115
+      ],
+      [
+        48,
+        83,
+        129
+      ],
+      [
+        49,
+        81,
+        120
+      ],
+      [
+        53,
+        84,
+        126
+      ],
+      [
+        63,
+        34,
+        19
+      ],
+      [
+        63,
+        85,
+        113
+      ],
+      [
+        73,
+        50,
+        34
+      ],
+      [
+        85,
+        52,
+        33
+      ],
+      [
+        95,
+        62,
+        39
+      ],
+      [
+        117,
+        70,
+        39
+      ],
+      [
+        118,
+        75,
+        42
+      ],
+      [
+        120,
+        56,
+        24
+      ],
+      [
+        138,
+        67,
+        26
+      ],
+      [
+        160,
+        145,
+        114
+      ],
+      [
+        174,
+        178,
+        141
+      ],
+      [
+        177,
+        111,
+        60
+      ],
+      [
+        197,
+        208,
+        58
+      ],
+      [
+        208,
+        78,
+        11
+      ],
+      [
+        224,
+        141,
+        69
+      ],
+      [
+        243,
+        102,
+        7
+      ],
+      [
+        243,
+        164,
+        92
+      ],
+      [
+        252,
+        178,
+        96
+      ]
+    ]
   }
 }

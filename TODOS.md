@@ -146,11 +146,45 @@ descent to the full route shifted later moving hazard timing and caused hits,
 so the production route remains unchanged. Its full completion check still
 passes in 96.22 seconds without hits.
 
-Walking remains a separate asset task. The user identified repeated anatomical
-legs in pairs 2/6 and 3/7. All four opposite phase pairs require verification:
-1/5 contact, 2/6 loading, 3/7 passing, and 4/8 push off and reach.
-Do not treat distinct file hashes or different arm poses as proof that the
-legs alternate.
+### Verified walking asset correction
+
+- [x] Reproduce the repeated anatomical legs identified by the user in pairs
+  2/6 and 3/7. Whole sheet generation continued the defect and was rejected.
+- [x] Correct the opposite leg roles with individual masked pose edits.
+  Check all four pairs for both heroes: 1/5 contact, 2/6 loading, 3/7 passing,
+  and 4/8 push off and forward reach. Preserve the torso and equipment rather
+  than mirroring the whole figure.
+- [x] Keep source authoring corrections separate from runtime normalization.
+  Restore shortened source leg extent to one shared source floor reference.
+  The normalizer still applies one fixed scale to every source cell.
+- [x] Remove the measured three pixel head step between opposite sheet rows.
+  The head registration regression failed for all eight opposite phase pairs
+  before source correction. Paired phases now differ by at most one raster pixel.
+- [x] Add and observe a failing contact regression: the old female passing
+  poses had two grounded feet. Both heroes now pass the one grounded foot check.
+  This check does not replace visual verification of anatomical leg identity.
+- [x] Add a measured depth-value guard for all four opposite pairs. Independent
+  review found that the female 4/8 pair still repeated the near leg; this
+  regression failed for that pair before its masked occlusion correction.
+  Every pair now reverses the depth-value cue. Visual occlusion review remains
+  required because the value cue is a proxy, not an anatomical classifier.
+- [x] Preserve the published animation palette when normalizing replacements.
+  The palette preservation and invalid palette regressions failed before the
+  implementation and now pass.
+- [x] Preserve the previous walking shade budgets of 39 colors for the man and
+  37 for the woman. A regression caught the draft's excessive shade density.
+  Canonical source pixels now use the original walking color ramps.
+- [x] Retain actual generator records, timestamps, model versions, input hashes,
+  and prompts for the base generations and masked edits. Append the source
+  retouch history and canonical source hashes instead of replacing provenance.
+- [x] Capture complete native walking cycles for the
+  [man](docs/evidence/animation-cadence/walk-man.png) and
+  [woman](docs/evidence/animation-cadence/walk-woman.png).
+  Eight frames, 10 fps, movement rules, and the shared palette remain unchanged.
+- [ ] Complete the exported browser motion checks.
+
+Running and repair artwork still require separate continuity work.
+Different frame hashes or different arm poses are not proof that legs alternate.
 
 ## 2. Select additional environments and tasks
 

@@ -165,11 +165,21 @@ def normalize(variant, clip):
             except ValueError as error:
                 raise ValueError(f"{source}: frame {index}: {error}") from error
         frames.append(frame)
-    samples = [pixel[:3] for frame in frames for pixel in frame.getdata() if pixel[3]]
-    palette_source = Image.new("RGB", (256, (len(samples) + 255) // 256), samples[0])
-    palette_source.putdata(samples)
-    palette = palette_source.quantize(colors=96, method=Image.Quantize.MEDIANCUT,
-                                      dither=Image.Dither.NONE)
+    palette_path = ART / "palette.png"
+    if palette_path.exists():
+        with Image.open(palette_path) as swatch:
+            if swatch.height != 1 or not 1 <= swatch.width <= 96 or swatch.mode != "RGB":
+                raise ValueError(f"{palette_path}: palette must be an RGB row of 1 to 96 colors; found {swatch.mode} {swatch.size}")
+            colors = [swatch.getpixel((x, 0)) for x in range(swatch.width)]
+        palette = Image.new("P", (1, 1))
+        palette.putpalette([channel for color in colors for channel in color]
+                           + list(colors[0]) * (256 - len(colors)))
+    else:
+        samples = [pixel[:3] for frame in frames for pixel in frame.getdata() if pixel[3]]
+        palette_source = Image.new("RGB", (256, (len(samples) + 255) // 256), samples[0])
+        palette_source.putdata(samples)
+        palette = palette_source.quantize(colors=96, method=Image.Quantize.MEDIANCUT,
+                                          dither=Image.Dither.NONE)
     results, hashes = [], []
     for frame in frames:
         result = frame.convert("RGB").quantize(palette=palette, dither=Image.Dither.NONE).convert("RGBA")

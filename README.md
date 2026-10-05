@@ -92,9 +92,11 @@ Source dimensions and transparency must match the layer contract.
 In gameplay, the distant layer scales uniformly to cover the level height,
 including the highest camera position. Equipment keeps its original scale.
 
-All animation prompts share one geometry: 512x512 source cells, a boot
-baseline at y=448, and a standing height of approximately 270 pixels. The
-normalizer uses one fixed 512-to-171 scale and writes 208x208 frames.
+Animation source sheets use 512x512 cells. The normalizer uses one fixed
+512-to-171 scale and writes 208x208 frames. It reuses the published animation
+palette when present, so replacing one clip does not recolor other clips.
+An initial generation without a palette selects at most 96 colors.
+Invalid palette data fails before frames or previews are replaced.
 Ponytail guidance applies only to the woman. The normalizer checks all frame
 hashes before it writes files, so duplicate artwork cannot overwrite prior
 frames or previews.
@@ -321,6 +323,26 @@ Changing direction or stopping does not restart the pose.
 Climb normalization aligns the blue hard hat with the ladder axis in every
 frame. It preserves the shared scale and boot baseline, and rejects artwork
 that has no alignment anchor or would be clipped.
+
+The walk clip has eight poses. Its opposite halves exchange the near and far
+legs without mirroring the torso or equipment:
+
+| Pair | First half | Opposite half |
+|---|---|---|
+| 1 / 5 | Near heel contacts | Far heel contacts |
+| 2 / 6 | Near leg supports; far foot lifts | Far leg supports; near foot lifts |
+| 3 / 7 | Near leg supports; far knee passes | Far leg supports; near knee passes |
+| 4 / 8 | Near toe pushes off; far foot reaches | Far toe pushes off; near foot reaches |
+
+The near leg is the leg closest to the camera. Passing poses have one grounded
+foot. Different frame hashes alone do not prove that the legs alternate.
+Rendered cycles are recorded for the [man](docs/evidence/animation-cadence/walk-man.png)
+and [woman](docs/evidence/animation-cadence/walk-woman.png).
+The walking update keeps eight frames, 10 fps, the existing palette, and the
+same movement rules. Its source colors stay within the previous walking ramps:
+39 colors for the man and 37 for the woman. The leg-depth value check covers
+all four pairs, but it supplements visual occlusion review rather than replacing
+it. Running remains a separate clip.
 
 Held repairs loop on the sprite's render clock. They do not wait for a physics
 tick to restart. The player keeps a private animation configuration, so this

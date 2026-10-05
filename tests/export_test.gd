@@ -1,6 +1,7 @@
 extends SceneTree
 
 const SOURCE_DIRECTORIES: Array[String] = [
+	"res://docs/evidence",
 	"res://art/cel-shift/animations/generated",
 	"res://art/cel-shift/animations/previews",
 	"res://art/cel-shift/environment/generated",
@@ -29,6 +30,8 @@ var failures: int = 0
 
 
 func _initialize() -> void:
+	var animations = load("res://game/animation_library.gd").new()
+	check(animations.load_manifest(), "Every declared animation frame loads from the export: " + animations.error_message)
 	for path: String in [
 		"res://docs/evidence/animation-cadence/before.json",
 		"res://docs/evidence/animation-cadence/after.json",
