@@ -148,15 +148,13 @@ Generate missing environment and task art through the existing MockUI pipeline.
 Retain source prompts, generator records, and normalization provenance.
 Missing required art must stop production loading with a visible error.
 
-The release download cap remains 53477376 bytes. The recorded baseline is
-52800035 bytes, leaving 677341 bytes. Measure new exports before committing
-to additional textures. Use small reusable environment elements and shared
-paths rather than ten duplicated texture sets. If required art exceeds the
-cap, report measured bytes and the visual tradeoff. Do not raise the cap.
-Measure shared texture reuse first, then fewer unique layers if needed.
+The user removed the export size ceiling on October 5. The recorded baseline
+is 52800035 bytes. Measure and report new exports; size alone does not block
+delivery. Preserve required file checks, runtime asset completeness, source
+exclusion, and file validation. Reuse environment elements where appropriate,
+but retain each approved environment's identity.
 Do not count recoloring or replacing an environment with unrelated scenery as
-successful delivery. A budget overrun remains a blocker if reuse breaks the
-approved environment identity.
+successful delivery.
 
 ## Campaign compatibility
 
