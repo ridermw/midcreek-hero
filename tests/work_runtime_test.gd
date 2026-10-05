@@ -106,6 +106,9 @@ func run() -> void:
 		hold(level, 24, "repair", 60)
 		var partial: Dictionary = level.capture_state()
 		check(level.entities["work"][1].order.unit.intensity < 2.1, "Held action partially suppresses fire.")
+		var flame = level.entities["hazards"][0]
+		check("intensity" in flame and is_equal_approx(flame.intensity, level.entities["work"][1].order.unit.intensity), "Visible fire intensity follows partial task progress.")
+		check(flame.hit_rect().size.y < 56.0 and flame.hit_rect().size.y > 0.0, "Partial fire retains damage only within its reduced flame height.")
 		hold(level, 24, "repair", 90)
 		check(level.hud.prompt["status"].contains("Refill") and level.entities["hazards"][0].active, "Empty charge preserves remaining fire and names refill.")
 		act(level, 20, "repair")
@@ -113,6 +116,7 @@ func run() -> void:
 		check(level.tasks.is_done("fire") and not level.entities["hazards"][0].active, "Refill permits completion and disables bound fire.")
 		level.restore_state(partial)
 		check(level.entities["hazards"][0].active and level.entities["work"][1].order.unit.charge > 0.9, "Rollback restores fire intensity and available charge together.")
+		check("intensity" in flame and is_equal_approx(flame.intensity, level.entities["work"][1].order.unit.intensity), "Checkpoint restoration reapplies visible fire intensity.")
 		act(level, 36, "repair")
 		act(level, 40, "repair")
 		act(level, 40, "repair")
