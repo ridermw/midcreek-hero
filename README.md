@@ -347,6 +347,16 @@ it. Running remains a separate clip.
 Held repairs loop on the sprite's render clock. They do not wait for a physics
 tick to restart. The player keeps a private animation configuration, so this
 does not change the shared clips used by the art viewer and help.
+Repair normalization registers the planted boot span on the sprite pivot.
+It translates each frame by whole pixels without resizing, recoloring, moving
+the floor baseline, or clipping the reaching tool. Torso and tool motion remain
+part of the authored poses. This corrects sideways stance drift, not every
+possible pose discontinuity.
+The lower band must contain only the planted boots. The woman's individual
+boots still vary by up to 3 texture pixels within that centered stance.
+Idle and diagnosis transitions use their existing anchors and remain outside
+this registration correction. Preview sheets now match the published frames;
+older previews used a different palette.
 
 To reproduce walking, running, repair, ascent, descent, and a climb stop and
 reversal for both heroes in Level 3, then
