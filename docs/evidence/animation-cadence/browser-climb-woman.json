@@ -1,0 +1,812 @@
+{
+  "hero": "woman",
+  "held": {
+    "character": "woman",
+    "climbing": true,
+    "clip": "climb",
+    "elapsed": 9.60000000000006,
+    "error": "",
+    "facing_left": false,
+    "frame": 5,
+    "hits": 0,
+    "level_id": "03",
+    "locked": false,
+    "paused": false,
+    "physics_frame": 6358,
+    "playback_speed": 0,
+    "playing": false,
+    "position": [
+      1228.80200195312,
+      297.424011230469
+    ],
+    "progress": 0.551141381263733,
+    "respawns": 0,
+    "screen": "level",
+    "velocity": [
+      0,
+      0
+    ]
+  },
+  "still": {
+    "character": "woman",
+    "climbing": true,
+    "clip": "climb",
+    "elapsed": 9.90000000000007,
+    "error": "",
+    "facing_left": false,
+    "frame": 5,
+    "hits": 0,
+    "level_id": "03",
+    "locked": false,
+    "paused": false,
+    "physics_frame": 6376,
+    "playback_speed": 0,
+    "playing": false,
+    "position": [
+      1228.80200195312,
+      297.424011230469
+    ],
+    "progress": 0.551141381263733,
+    "respawns": 0,
+    "screen": "level",
+    "velocity": [
+      0,
+      0
+    ]
+  },
+  "down": {
+    "character": "woman",
+    "climbing": true,
+    "clip": "climb",
+    "elapsed": 10.0833333333334,
+    "error": "",
+    "facing_left": false,
+    "frame": 5,
+    "hits": 0,
+    "level_id": "03",
+    "locked": false,
+    "paused": false,
+    "physics_frame": 6387,
+    "playback_speed": -2.109375,
+    "playing": true,
+    "position": [
+      1228.80200195312,
+      298.924011230469
+    ],
+    "progress": 0.551141381263733,
+    "respawns": 0,
+    "screen": "level",
+    "velocity": [
+      0,
+      90
+    ]
+  },
+  "up": {
+    "character": "woman",
+    "climbing": true,
+    "clip": "climb",
+    "elapsed": 10.8833333333335,
+    "error": "",
+    "facing_left": false,
+    "frame": 0,
+    "hits": 0,
+    "level_id": "03",
+    "locked": false,
+    "paused": false,
+    "physics_frame": 6435,
+    "playback_speed": 2.109375,
+    "playing": true,
+    "position": [
+      1228.80200195312,
+      352.924011230469
+    ],
+    "progress": 0.864068806171417,
+    "respawns": 0,
+    "screen": "level",
+    "velocity": [
+      0,
+      -90
+    ]
+  },
+  "final": {
+    "character": "woman",
+    "climbing": true,
+    "clip": "climb",
+    "elapsed": 11.5500000000002,
+    "error": "",
+    "facing_left": false,
+    "frame": 0,
+    "hits": 0,
+    "level_id": "03",
+    "locked": false,
+    "paused": false,
+    "physics_frame": 6475,
+    "playback_speed": 0,
+    "playing": false,
+    "position": [
+      1228.80200195312,
+      294.424011230469
+    ],
+    "progress": 0.113618865609169,
+    "respawns": 0,
+    "screen": "level",
+    "velocity": [
+      0,
+      0
+    ]
+  },
+  "traces": [
+    {
+      "step": {
+        "hold": [
+          "move_right"
+        ],
+        "until_x": 226,
+        "max_seconds": 8
+      },
+      "state": {
+        "character": "woman",
+        "climbing": false,
+        "clip": "run",
+        "elapsed": 1.23333333333333,
+        "error": "",
+        "facing_left": false,
+        "frame": 5,
+        "hits": 0,
+        "level_id": "03",
+        "locked": false,
+        "paused": false,
+        "physics_frame": 5856,
+        "playback_speed": 1,
+        "playing": true,
+        "position": [
+          226.888900756836,
+          416
+        ],
+        "progress": 0.28745624423027,
+        "respawns": 0,
+        "screen": "level",
+        "velocity": [
+          180,
+          0
+        ]
+      }
+    },
+    {
+      "step": {
+        "hold": [
+          "move_right",
+          "slide"
+        ],
+        "seconds": 0.1
+      },
+      "state": {
+        "character": "woman",
+        "climbing": false,
+        "clip": "slide",
+        "elapsed": 1.35,
+        "error": "",
+        "facing_left": false,
+        "frame": 1,
+        "hits": 0,
+        "level_id": "03",
+        "locked": false,
+        "paused": false,
+        "physics_frame": 5863,
+        "playback_speed": 1,
+        "playing": true,
+        "position": [
+          255.888870239258,
+          416
+        ],
+        "progress": 1.19209291327138e-8,
+        "respawns": 0,
+        "screen": "level",
+        "velocity": [
+          260,
+          0
+        ]
+      }
+    },
+    {
+      "step": {
+        "hold": [
+          "move_right"
+        ],
+        "until_x": 478,
+        "max_seconds": 8
+      },
+      "state": {
+        "character": "woman",
+        "climbing": false,
+        "clip": "run",
+        "elapsed": 2.23333333333333,
+        "error": "",
+        "facing_left": false,
+        "frame": 1,
+        "hits": 0,
+        "level_id": "03",
+        "locked": false,
+        "paused": false,
+        "physics_frame": 5916,
+        "playback_speed": 1,
+        "playing": true,
+        "position": [
+          479.22265625,
+          416
+        ],
+        "progress": 0.16666667163372,
+        "respawns": 0,
+        "screen": "level",
+        "velocity": [
+          180,
+          0
+        ]
+      }
+    },
+    {
+      "step": {
+        "wait": 0
+      },
+      "state": {
+        "character": "woman",
+        "climbing": false,
+        "clip": "run",
+        "elapsed": 2.26666666666666,
+        "error": "",
+        "facing_left": false,
+        "frame": 1,
+        "hits": 0,
+        "level_id": "03",
+        "locked": false,
+        "paused": false,
+        "physics_frame": 5918,
+        "playback_speed": 1,
+        "playing": true,
+        "position": [
+          484.833770751953,
+          416
+        ],
+        "progress": 0.633333325386047,
+        "respawns": 0,
+        "screen": "level",
+        "velocity": [
+          156.66667175293,
+          0
+        ]
+      }
+    },
+    {
+      "step": {
+        "hold": [
+          "move_right"
+        ],
+        "until_x": 560,
+        "max_seconds": 8
+      },
+      "state": {
+        "character": "woman",
+        "climbing": false,
+        "clip": "run",
+        "elapsed": 2.7,
+        "error": "",
+        "facing_left": false,
+        "frame": 7,
+        "hits": 0,
+        "level_id": "03",
+        "locked": false,
+        "paused": false,
+        "physics_frame": 5944,
+        "playback_speed": 1,
+        "playing": true,
+        "position": [
+          561.667114257812,
+          416
+        ],
+        "progress": 0.700000047683716,
+        "respawns": 0,
+        "screen": "level",
+        "velocity": [
+          180,
+          0
+        ]
+      }
+    },
+    {
+      "step": {
+        "hold": [
+          "move_right",
+          "jump"
+        ],
+        "seconds": 0.45
+      },
+      "state": {
+        "character": "woman",
+        "climbing": false,
+        "clip": "jump",
+        "elapsed": 3.16666666666666,
+        "error": "",
+        "facing_left": false,
+        "frame": 4,
+        "hits": 0,
+        "level_id": "03",
+        "locked": false,
+        "paused": false,
+        "physics_frame": 5972,
+        "playback_speed": 1,
+        "playing": true,
+        "position": [
+          645.69091796875,
+          307.933868408203
+        ],
+        "progress": 0.333333551883698,
+        "respawns": 0,
+        "screen": "level",
+        "velocity": [
+          180,
+          20
+        ]
+      }
+    },
+    {
+      "step": {
+        "hold": [
+          "move_right"
+        ],
+        "until_x": 896,
+        "max_seconds": 8
+      },
+      "state": {
+        "character": "woman",
+        "climbing": false,
+        "clip": "run",
+        "elapsed": 4.56666666666666,
+        "error": "",
+        "facing_left": false,
+        "frame": 5,
+        "hits": 0,
+        "level_id": "03",
+        "locked": false,
+        "paused": false,
+        "physics_frame": 6056,
+        "playback_speed": 1,
+        "playing": true,
+        "position": [
+          897.69091796875,
+          415.925231933594
+        ],
+        "progress": 0.766209602355957,
+        "respawns": 0,
+        "screen": "level",
+        "velocity": [
+          180,
+          0
+        ]
+      }
+    },
+    {
+      "step": {
+        "wait": 0.35
+      },
+      "state": {
+        "character": "woman",
+        "climbing": false,
+        "clip": "idle",
+        "elapsed": 4.93333333333332,
+        "error": "",
+        "facing_left": false,
+        "frame": 1,
+        "hits": 0,
+        "level_id": "03",
+        "locked": false,
+        "paused": false,
+        "physics_frame": 6078,
+        "playback_speed": 1,
+        "playing": true,
+        "position": [
+          910.802001953125,
+          415.925231933594
+        ],
+        "progress": 0.299947887659073,
+        "respawns": 0,
+        "screen": "level",
+        "velocity": [
+          0,
+          0
+        ]
+      }
+    },
+    {
+      "step": {
+        "tap": "repair"
+      },
+      "state": {
+        "character": "woman",
+        "climbing": false,
+        "clip": "primary",
+        "elapsed": 4.96666666666665,
+        "error": "",
+        "facing_left": false,
+        "frame": 0,
+        "hits": 0,
+        "level_id": "03",
+        "locked": true,
+        "paused": false,
+        "physics_frame": 6080,
+        "playback_speed": 1,
+        "playing": true,
+        "position": [
+          910.802001953125,
+          415.925231933594
+        ],
+        "progress": 0,
+        "respawns": 0,
+        "screen": "level",
+        "velocity": [
+          0,
+          0
+        ]
+      }
+    },
+    {
+      "step": {
+        "wait": 0.15
+      },
+      "state": {
+        "character": "woman",
+        "climbing": false,
+        "clip": "primary",
+        "elapsed": 5.11666666666665,
+        "error": "",
+        "facing_left": false,
+        "frame": 1,
+        "hits": 0,
+        "level_id": "03",
+        "locked": true,
+        "paused": false,
+        "physics_frame": 6089,
+        "playback_speed": 1,
+        "playing": true,
+        "position": [
+          910.802001953125,
+          415.925231933594
+        ],
+        "progress": 0.499940007925034,
+        "respawns": 0,
+        "screen": "level",
+        "velocity": [
+          0,
+          0
+        ]
+      }
+    },
+    {
+      "step": {
+        "tap": "diagnose"
+      },
+      "state": {
+        "character": "woman",
+        "climbing": false,
+        "clip": "primary",
+        "elapsed": 5.16666666666665,
+        "error": "",
+        "facing_left": false,
+        "frame": 1,
+        "hits": 0,
+        "level_id": "03",
+        "locked": true,
+        "paused": false,
+        "physics_frame": 6092,
+        "playback_speed": 1,
+        "playing": true,
+        "position": [
+          910.802001953125,
+          415.925231933594
+        ],
+        "progress": 0.999920010566711,
+        "respawns": 0,
+        "screen": "level",
+        "velocity": [
+          0,
+          0
+        ]
+      }
+    },
+    {
+      "step": {
+        "wait": 0.15
+      },
+      "state": {
+        "character": "woman",
+        "climbing": false,
+        "clip": "primary",
+        "elapsed": 5.31666666666665,
+        "error": "",
+        "facing_left": false,
+        "frame": 3,
+        "hits": 0,
+        "level_id": "03",
+        "locked": true,
+        "paused": false,
+        "physics_frame": 6101,
+        "playback_speed": 1,
+        "playing": true,
+        "position": [
+          910.802001953125,
+          415.925231933594
+        ],
+        "progress": 0.499860018491745,
+        "respawns": 0,
+        "screen": "level",
+        "velocity": [
+          0,
+          0
+        ]
+      }
+    },
+    {
+      "step": {
+        "tap": "diagnose"
+      },
+      "state": {
+        "character": "woman",
+        "climbing": false,
+        "clip": "primary",
+        "elapsed": 5.34999999999999,
+        "error": "",
+        "facing_left": false,
+        "frame": 3,
+        "hits": 0,
+        "level_id": "03",
+        "locked": true,
+        "paused": false,
+        "physics_frame": 6103,
+        "playback_speed": 1,
+        "playing": true,
+        "position": [
+          910.802001953125,
+          415.925231933594
+        ],
+        "progress": 0.833180010318756,
+        "respawns": 0,
+        "screen": "level",
+        "velocity": [
+          0,
+          0
+        ]
+      }
+    },
+    {
+      "step": {
+        "wait": 0.15
+      },
+      "state": {
+        "character": "woman",
+        "climbing": false,
+        "clip": "primary",
+        "elapsed": 5.51666666666665,
+        "error": "",
+        "facing_left": false,
+        "frame": 5,
+        "hits": 0,
+        "level_id": "03",
+        "locked": true,
+        "paused": false,
+        "physics_frame": 6113,
+        "playback_speed": 1,
+        "playing": true,
+        "position": [
+          910.802001953125,
+          415.925231933594
+        ],
+        "progress": 0.499780029058456,
+        "respawns": 0,
+        "screen": "level",
+        "velocity": [
+          0,
+          0
+        ]
+      }
+    },
+    {
+      "step": {
+        "tap": "jump"
+      },
+      "state": {
+        "character": "woman",
+        "climbing": false,
+        "clip": "primary",
+        "elapsed": 5.54999999999999,
+        "error": "",
+        "facing_left": false,
+        "frame": 5,
+        "hits": 0,
+        "level_id": "03",
+        "locked": true,
+        "paused": false,
+        "physics_frame": 6115,
+        "playback_speed": 1,
+        "playing": true,
+        "position": [
+          910.802001953125,
+          415.925231933594
+        ],
+        "progress": 0.833100020885468,
+        "respawns": 0,
+        "screen": "level",
+        "velocity": [
+          0,
+          0
+        ]
+      }
+    },
+    {
+      "step": {
+        "wait": 0.15
+      },
+      "state": {
+        "character": "woman",
+        "climbing": false,
+        "clip": "idle",
+        "elapsed": 5.69999999999999,
+        "error": "",
+        "facing_left": false,
+        "frame": 0,
+        "hits": 0,
+        "level_id": "03",
+        "locked": false,
+        "paused": false,
+        "physics_frame": 6124,
+        "playback_speed": 1,
+        "playing": true,
+        "position": [
+          910.802001953125,
+          415.925231933594
+        ],
+        "progress": 0.79996794462204,
+        "respawns": 0,
+        "screen": "level",
+        "velocity": [
+          0,
+          0
+        ]
+      }
+    },
+    {
+      "step": {
+        "wait": 0.2
+      },
+      "state": {
+        "character": "woman",
+        "climbing": false,
+        "clip": "idle",
+        "elapsed": 5.91666666666665,
+        "error": "",
+        "facing_left": false,
+        "frame": 2,
+        "hits": 0,
+        "level_id": "03",
+        "locked": false,
+        "paused": false,
+        "physics_frame": 6137,
+        "playback_speed": 1,
+        "playing": true,
+        "position": [
+          910.802001953125,
+          415.925231933594
+        ],
+        "progress": 0.0999157726764679,
+        "respawns": 0,
+        "screen": "level",
+        "velocity": [
+          0,
+          0
+        ]
+      }
+    },
+    {
+      "step": {
+        "hold": [
+          "move_right"
+        ],
+        "until_x": 1228,
+        "max_seconds": 8
+      },
+      "state": {
+        "character": "woman",
+        "climbing": false,
+        "clip": "run",
+        "elapsed": 7.76666666666664,
+        "error": "",
+        "facing_left": false,
+        "frame": 0,
+        "hits": 0,
+        "level_id": "03",
+        "locked": false,
+        "paused": false,
+        "physics_frame": 6248,
+        "playback_speed": 1,
+        "playing": true,
+        "position": [
+          1230.69091796875,
+          415.925231933594
+        ],
+        "progress": 0.265696555376053,
+        "respawns": 0,
+        "screen": "level",
+        "velocity": [
+          180,
+          0
+        ]
+      }
+    },
+    {
+      "step": {
+        "wait": 0.3
+      },
+      "state": {
+        "character": "woman",
+        "climbing": false,
+        "clip": "idle",
+        "elapsed": 8.06666666666665,
+        "error": "",
+        "facing_left": false,
+        "frame": 0,
+        "hits": 0,
+        "level_id": "03",
+        "locked": false,
+        "paused": false,
+        "physics_frame": 6266,
+        "playback_speed": 1,
+        "playing": true,
+        "position": [
+          1243.80200195312,
+          415.925231933594
+        ],
+        "progress": 0.899963915348053,
+        "respawns": 0,
+        "screen": "level",
+        "velocity": [
+          0,
+          0
+        ]
+      }
+    },
+    {
+      "step": {
+        "hold": [
+          "move_up"
+        ],
+        "until_y": 300,
+        "max_seconds": 8
+      },
+      "state": {
+        "character": "woman",
+        "climbing": true,
+        "clip": "climb",
+        "elapsed": 9.38333333333338,
+        "error": "",
+        "facing_left": false,
+        "frame": 3,
+        "hits": 0,
+        "level_id": "03",
+        "locked": false,
+        "paused": false,
+        "physics_frame": 6345,
+        "playback_speed": 2.109375,
+        "playing": true,
+        "position": [
+          1243.80200195312,
+          298.924011230469
+        ],
+        "progress": 0.655383884906769,
+        "respawns": 0,
+        "screen": "level",
+        "velocity": [
+          0,
+          -90
+        ]
+      }
+    }
+  ]
+}

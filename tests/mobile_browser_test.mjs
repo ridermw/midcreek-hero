@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import {mkdir, writeFile} from "node:fs/promises";
+import {connectBrowser} from "./browser_cdp.mjs";
 
 // Use only the dedicated agent-browser session started for this test.
 const [endpoint, url, output] = process.argv.slice(2);
@@ -7,38 +8,9 @@ assert.ok(endpoint?.startsWith("ws://127.0.0.1:"), "Supply the agent-browser CDP
 assert.ok(url?.startsWith("http://127.0.0.1:"), "Supply the local game URL.");
 assert.ok(output, "Supply an evidence directory.");
 await mkdir(output, {recursive: true});
-const socket = new WebSocket(endpoint);
-await new Promise((resolve, reject) => { socket.onopen = resolve; socket.onerror = reject; });
-let sequence = 0;
-const requests = new Map();
-const errors = [];
+const browser = await connectBrowser(endpoint, url);
+const {cdp, evaluate, errors} = browser;
 const regressions = [];
-socket.onmessage = event => {
-  const message = JSON.parse(event.data);
-  if (message.method === "Runtime.exceptionThrown") errors.push(message.params.exceptionDetails);
-  const request = requests.get(message.id);
-  if (!request) return;
-  requests.delete(message.id);
-  if (message.error) request.reject(new Error(JSON.stringify(message.error)));
-  else request.resolve(message.result);
-};
-function send(method, params = {}, sessionId) {
-  return new Promise((resolve, reject) => {
-    const id = ++sequence;
-    requests.set(id, {resolve, reject});
-    socket.send(JSON.stringify({id, method, params, sessionId}));
-  });
-}
-const targets = await send("Target.getTargets");
-const target = targets.targetInfos.find(item => item.type === "page" && item.url.startsWith(url));
-assert.ok(target, "Open the game in the dedicated agent-browser session first.");
-const {sessionId} = await send("Target.attachToTarget", {targetId: target.targetId, flatten: true});
-const cdp = (method, params) => send(method, params, sessionId);
-async function evaluate(expression) {
-  const result = await cdp("Runtime.evaluate", {expression, returnByValue: true, awaitPromise: true});
-  if (result.exceptionDetails) throw new Error(JSON.stringify(result.exceptionDetails));
-  return result.result.value;
-}
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 async function wait(expression) {
   for (let i = 0; i < 100; i++) {
@@ -134,15 +106,15 @@ try {
     });
   })()`), true, "Controls and prompt do not cover the game image.");
   await screenshot("phone-gameplay");
-  await wait('document.querySelector("#mobile-prompt").textContent === "Run with Left and Right."');
+  await wait('document.querySelector(\'[data-action="move_right"]\')?.classList.contains("guidance-cue") && document.querySelector("#mobile-prompt .hint-visible")?.textContent === "Hold"');
   const repeatedMutations = await evaluate(`new Promise(resolve => {
-    const node = document.querySelector("#mobile-prompt");
+    const node = document.querySelector('#mobile-prompt [role="status"]');
     let count = 0;
     const observer = new MutationObserver(records => { count += records.length; });
     observer.observe(node, {childList: true, characterData: true, subtree: true});
     setTimeout(() => { observer.disconnect(); resolve({count, text: node.textContent}); }, 350);
   })`);
-  assert.equal(repeatedMutations.text, "Run with Left and Right.", "The prompt remains stable during the announcement check.");
+  assert.equal(repeatedMutations.text, "Hold Right to run right", "The graphical prompt keeps its stable accessible description.");
   if (repeatedMutations.count !== 0) regressions.push("Unchanged live prompt mutates repeatedly.");
   const right = await point('[data-action="move_right"]');
   const left = await point('[data-action="move_left"]');
@@ -243,6 +215,5 @@ try {
   assert.deepEqual(errors, [], "No browser script exceptions.");
   console.log("MOBILE_BROWSER_TEST_COMPLETE: phone menus, settings, orientation, real multitouch, cancellation, all actions and restart passed.");
 } finally {
-  await send("Target.detachFromTarget", {sessionId});
-  socket.close();
+  await browser.disconnect();
 }
