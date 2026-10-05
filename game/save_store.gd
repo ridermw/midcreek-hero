@@ -1,6 +1,6 @@
 extends RefCounted
 
-const LEVEL_IDS: Array[String] = ["01", "02", "03", "04", "05"]
+const LEVEL_IDS: Array[String] = ["01", "02", "03", "04", "05", "06"]
 const DEFAULT_SETTINGS := {"music_volume": 0.8, "sfx_volume": 0.9}
 const CONTROL_DISPLAYS := ["keyboard", "gamepad", "touch"]
 
@@ -45,6 +45,10 @@ func load_data() -> void:
 	for level_id: Variant in data.get("unlocked", []):
 		if String(level_id) not in unlocked:
 			unlocked.append(String(level_id))
+	for level_id: String in LEVEL_IDS.slice(4):
+		var next := next_level_id(level_id)
+		if stars(level_id) > 0 and not next.is_empty() and next not in unlocked:
+			unlocked.append(next)
 	for key: String in data.get("settings", {}):
 		var value: Variant = data["settings"][key]
 		if key == "control_display":

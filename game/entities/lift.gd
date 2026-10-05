@@ -44,6 +44,14 @@ func _physics_process(delta: float) -> void:
 	position.y = base_y - offset_at(_time)
 
 
+func reset_motion() -> void:
+	_time = 0.0
+	sync_to_physics = false
+	position.y = base_y
+	reset_physics_interpolation()
+	sync_to_physics = true
+
+
 func _draw() -> void:
 	if art != null and art.has("tiles", "lift"):
 		draw_texture(art.texture("tiles", "lift"), Vector2(-32, 0))

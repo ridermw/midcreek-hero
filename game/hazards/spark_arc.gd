@@ -58,6 +58,15 @@ func hit_rect() -> Rect2:
 	return Rect2(position + Vector2(-SIZE.x / 2.0, -28), SIZE)
 
 
+func reset_motion() -> void:
+	_time = 0.0
+	_frame = 0
+	_started = false
+	sparks.restart()
+	_update_state()
+	queue_redraw()
+
+
 func _update_state() -> void:
 	var local := fmod(_time + offset, CYCLE)
 	var next := "on"

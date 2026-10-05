@@ -27,6 +27,13 @@ func validate(level: Dictionary) -> Array[String]:
 		targets["checkpoint %d" % (i + 1)] = level["checkpoints"][i]
 	for i: int in range(level["coolant"].size()):
 		targets["coolant %d" % (i + 1)] = level["coolant"][i]
+	for task: Dictionary in level["header"]["tasks"]:
+		for i: int in range(task.get("sites", []).size()):
+			var cell: Array = task["sites"][i]
+			targets["task %s site %d" % [task["id"], i + 1]] = Vector2i(cell[0], cell[1])
+		for i: int in range(task.get("resources", []).size()):
+			var cell: Array = task["resources"][i]["cell"]
+			targets["task %s resource %d" % [task["id"], i + 1]] = Vector2i(cell[0], cell[1])
 	var reachable := reachable_cells(level)
 	for target_name: String in targets:
 		var cell: Vector2i = targets[target_name]

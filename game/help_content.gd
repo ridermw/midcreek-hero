@@ -66,4 +66,51 @@ static func pages() -> Array:
 		]},
 		{"id": "reseat", "title": "Reseat a cable", "instructions": "1. Stand at a cable port and press Repair to begin.\n2. Press only the button currently shown, within one second.\n3. Complete three prompts. A wrong or late press resets the sequence; start again with Repair.", "steps": cable_steps},
 		{"id": "switch", "title": "Reboot ordered switches", "instructions": "1. Find the numbered switch panels.\n2. Press Repair at switch 1, then 2, then 3.\n3. Wrong order resets the group. Start again at switch 1.", "steps": switches},
+	] + expansion_pages()
+
+
+static func expansion_pages() -> Array:
+	var done := Prompt.make("", "", "", "Task complete")
+	var valve := [prop("valve", 340, "work")]
+	var cabinet := [prop("switch-off", 340)]
+	return [
+		{"id": "run_cable", "title": "Run a cable", "instructions": "1. Press Repair at the labeled spool source.\n2. Press Repair at the source, numbered anchors, then destination.\n3. Placed anchors remain installed. A wrong point names the next point.", "steps": [
+			step(1.2, "primary", 280, 280, [prop("spool", 340, "work")], Prompt.make("repair", "press", "collect the spool")),
+			step(1.2, "primary", 280, 280, cabinet, Prompt.make("repair", "press", "connect point 1")),
+			step(1.2, "primary", 280, 280, cabinet, Prompt.make("repair", "press", "secure numbered anchors, then destination")),
+			step(1.2, "idle", 280, 280, [prop("switch-on", 340)], done),
+		]},
+		{"id": "assemble_rack", "title": "Assemble a rack", "instructions": "1. Collect the labeled chassis, PSU, and DIMM one at a time.\n2. Press Repair at the rack to install each part. Chassis comes first.\n3. Hold Diagnose to test. Interrupting the test keeps installed parts.", "steps": [
+			step(1.2, "primary", 280, 280, [prop("chassis", 340, "work")], Prompt.make("repair", "press", "install chassis first")),
+			step(1.2, "primary", 280, 280, [prop("chassis", 340, "work"), prop("psu", 400, "props"), prop("dimm", 450, "props")], Prompt.make("repair", "press", "install the matching PSU and DIMM")),
+			step(1.5, "secondary", 280, 280, [prop("rack-fault", 340)], Prompt.make("diagnose", "hold", "test assembled rack")),
+			step(1.2, "idle", 280, 280, [prop("rack-ok", 340)], done),
+		]},
+		{"id": "extinguish_fire", "title": "Extinguish a fire", "instructions": "1. Collect the labeled extinguisher. Stay at the safe service position.\n2. Hold Repair to suppress the fire. Release keeps partial progress.\n3. When charge runs out, press Repair at its source to refill, then return.", "steps": [
+			step(1.2, "primary", 280, 280, [prop("extinguisher", 340, "work")], Prompt.make("repair", "press", "collect extinguisher")),
+			step(2.0, "primary", 280, 280, [prop("fire", 420, "work")], Prompt.make("repair", "hold", "suppress from the safe position")),
+			step(1.2, "primary", 280, 280, [prop("extinguisher", 340, "work")], Prompt.make("repair", "press", "refill at the source")),
+			step(1.2, "primary", 280, 280, [prop("fire", 420, "work")], Prompt.make("repair", "hold", "finish suppression")),
+			step(1.2, "idle", 280, 280, [], done),
+		]},
+		{"id": "restore_cooling", "title": "Restore cooling", "instructions": "1. Collect the filter. Press Diagnose at the controller.\n2. Press Repair at the valve, then return and install the filter.\n3. Hold Repair to verify the fan. Completion disables the bound heat vent.", "steps": [
+			step(1.2, "secondary", 280, 280, valve, Prompt.make("diagnose", "press", "diagnose the controller")),
+			step(1.2, "primary", 280, 280, valve, Prompt.make("repair", "press", "open the local valve")),
+			step(1.2, "primary", 280, 280, [prop("filter", 340, "work")], Prompt.make("repair", "press", "install filter at the controller")),
+			step(1.5, "primary", 280, 280, valve, Prompt.make("repair", "hold", "start and verify the fan")),
+			step(1.2, "idle", 280, 280, valve, done),
+		]},
+		{"id": "contain_leak", "title": "Contain a leak", "instructions": "1. Collect the seal. Press Repair to close the supply valve.\n2. Press Repair again to install the seal, then go to the drain.\n3. Hold Repair to drain. Partial drainage persists; the floor remains solid.", "steps": [
+			step(1.2, "primary", 280, 280, valve, Prompt.make("repair", "press", "close leak supply")),
+			step(1.2, "primary", 280, 280, [prop("seal", 340, "work")], Prompt.make("repair", "press", "install the seal")),
+			step(3.0, "primary", 280, 280, valve, Prompt.make("repair", "hold", "operate the drain")),
+			step(1.2, "idle", 280, 280, valve, done),
+		]},
+		{"id": "restore_power", "title": "Restore a power branch", "instructions": "1. Collect the fuse. Press Repair to isolate the branch.\n2. Press Repair to install the fuse. Hold Diagnose for continuity.\n3. Press Repair to energize. The green indicator confirms completion.", "steps": [
+			step(1.2, "primary", 280, 280, cabinet, Prompt.make("repair", "press", "isolate the branch")),
+			step(1.2, "primary", 280, 280, [prop("fuse", 340, "work")], Prompt.make("repair", "press", "install the fuse")),
+			step(1.5, "secondary", 280, 280, cabinet, Prompt.make("diagnose", "hold", "test continuity")),
+			step(1.2, "primary", 280, 280, cabinet, Prompt.make("repair", "press", "energize the branch")),
+			step(1.2, "idle", 280, 280, [prop("switch-on", 340)], done),
+		]},
 	]

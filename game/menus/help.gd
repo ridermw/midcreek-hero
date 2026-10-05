@@ -5,6 +5,7 @@ const Content = preload("res://game/help_content.gd")
 const Demo = preload("res://game/help_demo.gd")
 const Graphic = preload("res://game/control_graphic.gd")
 const Prompt = preload("res://game/control_prompt.gd")
+const WorkSchema = preload("res://game/tasks/work_schema.gd")
 var main: Node
 var page_index := 0
 var pages := Content.pages()
@@ -46,6 +47,10 @@ func _show_page() -> void:
 	_column.add_child(UiKit.label("How to Play · %d / %d" % [page_index + 1, pages.size()], 22, UiKit.MUTED_COLOR))
 	var page: Dictionary = pages[page_index]
 	_column.add_child(UiKit.label(page["title"], 30))
+	if page["id"] in WorkSchema.TYPES and not main.art.has("work", "spool"):
+		if not main.art.load_group("work"):
+			_column.add_child(UiKit.label(main.art.error_message, 18))
+			return
 	if page["id"] == "controls":
 		var grid := GridContainer.new()
 		grid.columns = 2

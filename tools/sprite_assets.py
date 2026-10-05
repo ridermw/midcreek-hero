@@ -25,7 +25,11 @@ STYLE = (
 
 
 def load_catalog(art=ART):
-    return json.loads((art / "catalog.json").read_text())
+    catalog = json.loads((art / "catalog.json").read_text())
+    work = art / "work/catalog.json"
+    if work.exists():
+        catalog["assets"].extend(json.loads(work.read_text())["assets"])
+    return catalog
 
 
 def asset_entry(name, art=ART):

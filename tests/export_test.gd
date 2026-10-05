@@ -34,6 +34,7 @@ func _initialize() -> void:
 	check(animations.load_manifest(), "Every declared animation frame loads from the export: " + animations.error_message)
 	var sprites = load("res://game/sprite_library.gd").new()
 	check(sprites.load_all(), "Every declared gameplay sprite loads from the export: " + sprites.error_message)
+	check(sprites.load_group("work"), "Every declared work sprite loads from the export: " + sprites.error_message)
 	var viewer_manifest: Variant = JSON.parse_string(FileAccess.get_file_as_string("res://art/cel-shift/sprites/manifest.json"))
 	if viewer_manifest is Dictionary and viewer_manifest.get("variants") is Dictionary:
 		for variant: String in viewer_manifest["variants"]:
@@ -42,18 +43,30 @@ func _initialize() -> void:
 				check(load(path) is Texture2D, "Declared viewer texture loads: " + path)
 	else:
 		check(false, "The viewer manifest declares runtime variants.")
-	var level_script = load("res://game/level.gd")
-	for directory: String in level_script.BACKGROUNDS.values():
-		for layer: String in level_script.PARALLAX:
-			var path: String = directory + layer + ".png"
-			check(load(path) is Texture2D, "Declared background layer loads: " + path)
+	var backgrounds = load("res://game/background_set.gd").new()
+	var environment_root := "res://art/cel-shift/environment/"
+	for directory: String in DirAccess.get_directories_at(environment_root):
+		if not FileAccess.file_exists(environment_root + directory + "/manifest.json"):
+			continue
+		check(backgrounds.load_set(directory), "Declared environment loads: " + directory + ": " + backgrounds.error_message)
+	for file: String in DirAccess.get_files_at("res://levels"):
+		if not file.ends_with(".level"):
+			continue
+		var parser = load("res://game/level_parser.gd").new()
+		var definition: Dictionary = parser.parse(FileAccess.get_file_as_string("res://levels/" + file), file)
+		check(not definition.is_empty(), "Exported level parses: " + file)
+		if not definition.is_empty():
+			check(backgrounds.load_set(definition["header"]["background"]), "Level environment is included: " + file)
+			if not file.begins_with("00-"):
+				var route := "res://levels/routes/" + file.trim_suffix(".level") + ".route.json"
+				check(FileAccess.file_exists(route), "Playable level route is included: " + route)
 	var audio = load("res://game/audio_director.gd")
 	for path: String in audio.MUSIC.values():
 		check(load(path) is AudioStreamOggVorbis, "Declared music stream has the runtime type: " + path)
 	for path: String in audio.SFX.values():
 		check(load(path) is AudioStream, "Declared audio stream loads: " + path)
 	check_source_tree("res://art/cel-shift")
-	for group: String in ["animations", "tiles", "hazards", "props", "ui"]:
+	for group: String in ["animations", "tiles", "hazards", "props", "ui", "work"]:
 		var palette := "res://art/cel-shift/%s/palette.png" % group
 		check(not ResourceLoader.exists(palette), "Build palette stays outside the download: " + palette)
 	for path: String in [
@@ -81,6 +94,7 @@ func _initialize() -> void:
 	check(FileAccess.file_exists("res://levels/03-cable-jungle.level"), "Level 3 is included.")
 	check(FileAccess.file_exists("res://levels/04-power-room.level"), "Level 4 is included.")
 	check(FileAccess.file_exists("res://levels/05-outage-night.level"), "Level 5 is included.")
+	check(FileAccess.file_exists("res://levels/06-cooling-gallery.level"), "Cooling Gallery is included.")
 	check(ResourceLoader.exists("res://audio/music/level5.ogg"), "Level 5 music is included.")
 	for texture: String in [
 		"res://art/cel-shift/environment/hot-aisle/far.png",

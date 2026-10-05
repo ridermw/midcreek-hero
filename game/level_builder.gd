@@ -14,6 +14,11 @@ const Lift = preload("res://game/entities/lift.gd")
 const SwitchPanel = preload("res://game/entities/switch_panel.gd")
 const Drone = preload("res://game/hazards/drone.gd")
 const Part = preload("res://game/entities/part.gd")
+const WorkStation = preload("res://game/entities/work_station.gd")
+const WorkResource = preload("res://game/entities/work_resource.gd")
+const WorkOrder = preload("res://game/tasks/work_order.gd")
+const WorkInventory = preload("res://game/tasks/work_inventory.gd")
+const Fire = preload("res://game/hazards/fire.gd")
 const RACK_TASKS: Array[String] = ["repair", "diagnose_repair", "fetch"]
 const DELIVER_SECONDS := 0.5
 
@@ -24,10 +29,11 @@ const SOLID_COLORS := {
 	"platform": Color(0.36, 0.42, 0.47),
 	"tray": Color(0.55, 0.45, 0.2),
 }
-const HAZARD_SCRIPTS := {"cable_snag": CableSnag, "heat_vent": HeatVent, "moving_snag": MovingSnag, "spark_arc": SparkArc, "drone": Drone, "electrified_liquid": ElectrifiedLiquid}
+const HAZARD_SCRIPTS := {"cable_snag": CableSnag, "heat_vent": HeatVent, "moving_snag": MovingSnag, "spark_arc": SparkArc, "drone": Drone, "electrified_liquid": ElectrifiedLiquid, "fire": Fire}
 
 var error_message: String = ""
 var art: RefCounted
+var inventory := WorkInventory.new()
 
 
 static func cell_to_world(cell: Vector2i) -> Vector2:
@@ -59,16 +65,43 @@ func build_solids(level: Dictionary, parent: Node2D) -> int:
 func build_entities(level: Dictionary, parent: Node2D) -> Dictionary:
 	error_message = ""
 	if art != null:
+		if level["header"]["tasks"].any(func(task: Dictionary) -> bool: return task["type"] in WorkOrder.UNITS):
+			for asset: String in ["spool", "chassis", "filter", "seal", "fuse", "extinguisher", "valve", "fire"]:
+				if not art.has("work", asset) or art.frame_count("work", asset) != (4 if asset == "fire" else 1):
+					error_message = "Pending artwork: missing or incomplete work/" + asset
+					return {}
 		for hazard: Dictionary in level["hazards"]:
+			if hazard["kind"] == "fire" and (not art.has("work", "fire") or art.frame_count("work", "fire") != 4):
+				error_message = "Pending artwork: work/fire requires four frames."
+				return {}
 			if hazard["kind"] == "electrified_liquid" and not art.has("hazards", "electrified-liquid"):
 				error_message = "Pending artwork: missing required hazards/electrified-liquid animation."
 				return {}
 			if hazard["kind"] == "electrified_liquid" and art.frame_count("hazards", "electrified-liquid") != ElectrifiedLiquid.FRAME_COUNT:
 				error_message = "Pending artwork: hazards/electrified-liquid requires four frames."
 				return {}
-	var built := {"racks": [], "parts": [], "ports": [], "switches": [], "lifts": [], "hazards": [], "liquids": [], "coolant": [], "checkpoints": [], "exit": null}
+	var built := {"racks": [], "parts": [], "ports": [], "switches": [], "lifts": [], "hazards": [], "liquids": [], "work": [], "work_resources": [], "coolant": [], "checkpoints": [], "exit": null}
 	var anchors: Dictionary = level["anchors"]
 	for task: Dictionary in level["header"]["tasks"]:
+		if task["type"] in WorkOrder.UNITS:
+			var station := WorkStation.new()
+			station.order = WorkOrder.new(task, inventory)
+			station.art = art
+			if not station.order.error_message.is_empty():
+				error_message = station.order.error_message
+				station.free()
+				return {}
+			for cell: Array in task["sites"]:
+				station.sites.append(cell_to_world(Vector2i(cell[0], cell[1])))
+			parent.add_child(station)
+			built["work"].append(station)
+			for i: int in range(task["resources"].size()):
+				var source := WorkResource.new()
+				source.order = station.order
+				source.index = i
+				var cell: Array = task["resources"][i]["cell"]
+				built["work_resources"].append(_add(parent, source, Vector2i(cell[0], cell[1])))
+			continue
 		if task["type"] == "reboot":
 			for i: int in range(task["at"].size()):
 				var panel := SwitchPanel.new()
@@ -108,6 +141,12 @@ func build_entities(level: Dictionary, parent: Node2D) -> Dictionary:
 		built["hazards"].append(_add(parent, node, hazard["cell"]))
 		if node is ElectrifiedLiquid:
 			built["liquids"].append(node)
+	for station: WorkStation in built["work"]:
+		for cell: Array in station.order.definition.get("effect_cells", []):
+			var point := cell_to_world(Vector2i(cell[0], cell[1]))
+			for hazard: Node2D in built["hazards"]:
+				if hazard.position == point:
+					station.effects.append(hazard)
 	for cell: Vector2i in level["lifts"]:
 		built["lifts"].append(_add(parent, Lift.new(), cell))
 	for cell: Vector2i in level["coolant"]:

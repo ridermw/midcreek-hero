@@ -1,0 +1,26 @@
+{
+  "level": "06-cooling-gallery",
+  "engine": "Godot 4.7.2",
+  "native_renderer": "Compatibility OpenGL, Apple M4 Pro",
+  "browser_renderer": "Chromium WebGL 2.0 through isolated agent-browser contexts",
+  "route_input": "Authored RouteRunner input through production physics; no position injection",
+  "heroes": ["man", "woman"],
+  "full_route_seconds": 41.83,
+  "hits": 0,
+  "respawns": 0,
+  "native_checkpoint_replays": [
+    {"checkpoint": 0, "seconds": 41.63, "hits": 0, "additional_respawns": 0},
+    {"checkpoint": 1, "seconds": 26.68, "hits": 0, "additional_respawns": 0},
+    {"checkpoint": 2, "seconds": 17.30, "hits": 0, "additional_respawns": 0}
+  ],
+  "checkpoint_replay_heroes": ["man", "woman"],
+  "native_screenshots": ["06-man-native.png", "06-woman-native.png"],
+  "browser_screenshots": ["06-woman-browser.png", "06-browser-complete.png"],
+  "export_pack_checks": 514,
+  "published_bytes": 53144695,
+  "limitations": [
+    "Checkpoint replay assertions are native, not browser assertions.",
+    "No physical phone or controller validation.",
+    "Authored par and SLA are not derived from automated route timings."
+  ]
+}

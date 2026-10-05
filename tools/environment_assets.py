@@ -7,6 +7,11 @@ from pathlib import Path
 
 from PIL import Image
 
+if __package__:
+    from .sprite_assets import _build_palette
+else:
+    from sprite_assets import _build_palette
+
 ROOT = Path(__file__).resolve().parents[1]
 ART = ROOT / "art/cel-shift/environment"
 LAYERS = {
@@ -48,13 +53,55 @@ SETS = {
     },
 }
 SOURCE_SIZE = (1280, 720)
+EXPANSION_SETS = {
+    "cooling-gallery": {
+        "far": "A cooling gallery with tall pale chiller housings, cyan pipe loops along the ceiling and blue service lighting.",
+        "equipment": "Chilled water distribution pipes, a large round pump, blue valve wheels and finned cooling units.",
+    },
+    "operations-suite": {
+        "far": "A data center operations suite with observation windows, wall monitor arrays without text and recessed ceiling lights.",
+        "equipment": "Operator desks with small teal monitor screens, equipment test benches and mobile diagnostic carts.",
+    },
+    "fiber-exchange": {
+        "far": "A fiber exchange room with tall optical distribution frames, suspended cable baskets and violet work lights.",
+        "equipment": "Fiber patch panels, coils of thin orange optical fiber and structured cable distribution frames.",
+    },
+    "loading-yard": {
+        "far": "An outdoor facility loading yard at daylight, warehouse loading doors, a parked box truck in strict side view, fences and distant trees.",
+        "equipment": "Shipping crates, pallet stacks and a low loading dock with wheel stops. No vehicles moving.",
+    },
+    "fire-response-hall": {
+        "far": "A fire response corridor with fire rated doors, red pipework, wall mounted safety cabinets and emergency lighting. No flames.",
+        "equipment": "Red hose reels, extinguisher cabinets, suppression cylinders and metal safety barriers.",
+    },
+    "pump-station": {
+        "far": "An industrial pump station with large water pipes rising vertically, inspection windows and blue concrete walls.",
+        "equipment": "Two large centrifugal pumps, thick blue pipes, pressure gauges without text and shutoff valve wheels.",
+    },
+    "rooftop-air-handlers": {
+        "far": "A flat data center rooftop in daylight, distant city buildings below a pale sky, low parapet walls and ventilation ducts.",
+        "equipment": "Large rooftop air handler cabinets, circular fan housings and low grey ventilation ducts.",
+    },
+    "generator-courtyard": {
+        "far": "An outdoor generator courtyard with concrete acoustic walls, security fencing and tall exhaust stacks against a pale sky.",
+        "equipment": "Enclosed standby diesel generator units, fuel tanks and electrical distribution cabinets.",
+    },
+    "facility-approach": {
+        "far": "A data center facility approach in daylight, glass entrance facade, trees, a parking area with side view parked cars and security fencing.",
+        "equipment": "Low security bollards, planted tree beds and a small gatehouse in strict side elevation.",
+    },
+    "expansion-site": {
+        "far": "A data center expansion construction site, exposed steel frame bays, unfinished wall panels and a stationary crane silhouette against daylight sky.",
+        "equipment": "Stacked building panels, cable drums, portable construction barriers and unfinished utility cabinets.",
+    },
+}
 
 
 def prompt_text(name, layer):
     return (
         "Edit image 1: replace its entire content with a new background layer described below. "
         "Keep unchanged from image 1: the pixel art style, the pixel scale, the outline treatment "
-        f"and the side view camera.\n\n{STYLE}\n\n{LAYER_RULES[layer]}\n\nSCENE: {SETS[name][layer]}"
+        f"and the side view camera.\n\n{STYLE}\n\n{LAYER_RULES[layer]}\n\nSCENE: {(SETS | EXPANSION_SETS)[name][layer]}"
     )
 
 
@@ -88,6 +135,8 @@ def normalize(layer, art=ART, name=None):
     source_size, output_size = LAYERS[layer]
     if name is not None:
         source_size = SOURCE_SIZE
+    if name in EXPANSION_SETS:
+        output_size = (320, 180)
     base = art / name if name else art
     source = base / "generated" / f"{layer}.png"
     with Image.open(source) as image:
@@ -107,22 +156,65 @@ def normalize(layer, art=ART, name=None):
             raise ValueError(f"{source}: normalization lost transparent or visible pixels")
         result.putalpha(alpha)
         result.paste((0, 0, 0, 0), mask=alpha.point(lambda value: 255 if value == 0 else 0))
+    if name in EXPANSION_SETS:
+        alpha = result.getchannel("A")
+        result = result.convert("RGB").quantize(colors=96, dither=Image.Dither.NONE).convert("RGBA")
+        result.putalpha(alpha)
+        result.paste((0, 0, 0, 0), mask=alpha.point(lambda value: 255 if value == 0 else 0))
     output = (art / name / f"{layer}.png") if name else (art / "layers" / f"{layer}.png")
     output.parent.mkdir(parents=True, exist_ok=True)
     result.save(output)
     print(f"Normalized {layer}: {output_size[0]}x{output_size[1]}")
 
 
+def normalize_set(name, art=ART):
+    if name not in EXPANSION_SETS:
+        raise ValueError("Compact set normalization only accepts expansion environments")
+    paths = [art / name / f"{layer}.png" for layer in ("far", "equipment")]
+    for layer in ("far", "equipment"):
+        normalize(layer, art, name)
+    images = []
+    colors = set()
+    for path in paths:
+        with Image.open(path) as image:
+            rgba = image.convert("RGBA")
+        images.append(rgba)
+        colors.update(pixel[:3] for pixel in rgba.getdata() if pixel[3])
+    palette = _build_palette(sorted(colors), 96)
+    for path, image in zip(paths, images):
+        alpha = image.getchannel("A")
+        output = image.convert("RGB").quantize(palette=palette, dither=Image.Dither.NONE).convert("RGBA")
+        output.putalpha(alpha)
+        output.paste((0, 0, 0, 0), mask=alpha.point(lambda value: 255 if value == 0 else 0))
+        output.save(path)
+    layers = []
+    for layer, scroll, tint, coverage in [
+        ("far", 0.2, [0.42, 0.47, 0.56], "level"),
+        ("equipment", 0.6, [0.55, 0.6, 0.68], "native"),
+    ]:
+        layers.append({
+            "name": layer.capitalize(),
+            "texture": f"res://art/cel-shift/environment/{name}/{layer}.png",
+            "scroll": scroll, "tint": tint, "coverage": coverage, "scale": 2,
+        })
+    (art / name / "manifest.json").write_text(
+        json.dumps({"version": 1, "layers": layers}, indent=2) + "\n"
+    )
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("operation", choices=("normalize", "render"))
     parser.add_argument("--layer", choices=LAYERS)
-    parser.add_argument("--set", dest="name", choices=SETS)
+    parser.add_argument("--set", dest="name", choices=SETS | EXPANSION_SETS)
     args = parser.parse_args()
     if args.operation == "render":
         if not args.name or args.layer not in ("far", "equipment"):
             parser.error("render needs --set and --layer far or equipment")
         render(args.name, args.layer)
+        return
+    if args.name in EXPANSION_SETS and args.layer is None:
+        normalize_set(args.name)
         return
     layers = (args.layer,) if args.layer else (("far", "equipment") if args.name else LAYERS)
     for layer in layers:

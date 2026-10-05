@@ -13,6 +13,8 @@ const DARK_COLOR := Color(0.3, 0.32, 0.4)
 const FLICKER_COLOR := Color(0.12, 0.12, 0.18)
 const FLICKER_SECONDS := 1.2
 const ControlPrompt = preload("res://game/control_prompt.gd")
+const WorkInventory = preload("res://game/tasks/work_inventory.gd")
+const WorkSchema = preload("res://game/tasks/work_schema.gd")
 
 const Health = preload("res://game/health.gd")
 const SlaTimer = preload("res://game/sla_timer.gd")
@@ -30,15 +32,7 @@ const Feel = preload("res://game/feel.gd")
 const SparkArc = preload("res://game/hazards/spark_arc.gd")
 const SpriteLibrary = preload("res://game/sprite_library.gd")
 const HeroAnimations = preload("res://game/animation_library.gd")
-const BACKGROUNDS := {
-	"cold-aisle": "res://art/cel-shift/environment/layers/",
-	"hot-aisle": "res://art/cel-shift/environment/hot-aisle/",
-	"cable-jungle": "res://art/cel-shift/environment/cable-jungle/",
-	"power-room": "res://art/cel-shift/environment/power-room/",
-	"outage-night": "res://art/cel-shift/environment/outage-night/",
-}
-const PARALLAX := {"far": 0.2, "equipment": 0.6}
-const BACKGROUND_TINT := {"far": Color(0.42, 0.47, 0.56), "equipment": Color(0.55, 0.6, 0.68)}
+const BackgroundSet = preload("res://game/background_set.gd")
 
 @export_file("*.level") var level_path: String = "res://levels/00-graybox.level"
 @export_enum("man", "woman") var character: String = "man"
@@ -60,6 +54,7 @@ var _respawn_pending: bool = false
 var _fatal_remaining := 0.0
 var _repair_tick: float = 0.0
 var carried_part: String = ""
+var work_inventory := WorkInventory.new()
 var _diagnose_remaining: float = 0.0
 var _switch_error_remaining: float = 0.0
 var _previous_actions: Dictionary = {}
@@ -106,6 +101,10 @@ func load_level(path: String) -> bool:
 	if not art.load_all():
 		error_message = art.error_message
 		return false
+	if level["header"]["tasks"].any(func(task: Dictionary) -> bool: return task["type"] in WorkSchema.TYPES) or level["hazards"].any(func(hazard: Dictionary) -> bool: return hazard["kind"] == "fire"):
+		if not art.load_group("work"):
+			error_message = art.error_message
+			return false
 	if not animations.load_manifest():
 		error_message = animations.error_message
 		return false
@@ -117,6 +116,7 @@ func load_level(path: String) -> bool:
 		_build_darkness()
 	var builder := LevelBuilder.new()
 	builder.art = art
+	builder.inventory = work_inventory
 	builder.build_solids(level, solids)
 	entities = builder.build_entities(level, entity_root)
 	if entities.is_empty():
@@ -216,25 +216,24 @@ func _sparks(at: Vector2) -> void:
 
 
 func _build_background(background: String) -> bool:
-	if not BACKGROUNDS.has(background):
-		error_message = "Pending artwork: unknown background set: " + background
+	var definition := BackgroundSet.new()
+	if not definition.load_set(background):
+		error_message = definition.error_message
 		return false
 	var floor_y := float(level["height"] * LevelBuilder.TILE)
-	var z := -30
-	for layer: String in PARALLAX:
-		var path: String = BACKGROUNDS[background] + layer + ".png"
-		if not ResourceLoader.exists(path):
-			error_message = "Pending artwork: missing background layer: " + path
-			return false
-		var texture := load(path) as Texture2D
-		var background_scale := maxf(1.0, floor_y / texture.get_height()) if layer == "far" else 1.0
+	var z := -10 * (definition.layers.size() + 1)
+	for layer: Dictionary in definition.layers:
+		var texture: Texture2D = layer["texture"]
+		var background_scale: float = layer["scale"]
+		if layer["coverage"] == "level":
+			background_scale = maxf(background_scale, floor_y / texture.get_height())
 		var parallax := Parallax2D.new()
-		parallax.name = layer.capitalize()
-		parallax.scroll_scale = Vector2(PARALLAX[layer], 1.0)
+		parallax.name = layer["name"]
+		parallax.scroll_scale = Vector2(layer["scroll"], 1.0)
 		parallax.repeat_size = Vector2(texture.get_width() * background_scale, 0)
 		parallax.repeat_times = 3
 		parallax.z_index = z
-		parallax.modulate = BACKGROUND_TINT[layer]
+		parallax.modulate = layer["tint"]
 		var sprite := Sprite2D.new()
 		sprite.texture = texture
 		sprite.centered = false
@@ -313,16 +312,19 @@ func step(delta: float) -> void:
 			node.set_reached()
 			sound.emit("checkpoint")
 	for part in entities["parts"]:
-		if not part.taken and carried_part.is_empty() and part.hit_rect().intersects(body):
+		if not part.taken and carried_part.is_empty() and work_inventory.carried.is_empty() and part.hit_rect().intersects(body):
 			part.take()
 			carried_part = part.task_id
 			hud.set_carry("Carrying " + PART_LABELS[part.kind])
 			sound.emit("pickup")
 	var cell := Vector2i(floori(feet.x / LevelBuilder.TILE), floori((feet.y - 1.0) / LevelBuilder.TILE))
 	player.on_ladder = cell in level["ladders"]
-	if not _update_switches(feet) and not _update_ports(delta, feet):
-		_update_repair(delta, feet)
-	_show_switch_prompt(feet)
+	if entities["work"].is_empty():
+		if not _update_switches(feet) and not _update_ports(delta, feet):
+			_update_repair(delta, feet)
+		_show_switch_prompt(feet)
+	else:
+		_update_work_interaction(delta, feet)
 	var door = entities["exit"]
 	if tasks.required_done() and not door.open:
 		sound.emit("door_open")
@@ -342,8 +344,8 @@ func _out_of_bounds() -> bool:
 
 
 func capture_state() -> Dictionary:
-	var state := {"carried_part": carried_part}
-	for group: String in ["racks", "parts", "ports", "switches", "coolant"]:
+	var state := {"carried_part": carried_part, "work_inventory": work_inventory.capture_state()}
+	for group: String in ["racks", "parts", "ports", "switches", "coolant", "work", "work_resources", "liquids"]:
 		var states: Array = []
 		for node in entities[group]:
 			states.append(node.capture_state())
@@ -355,6 +357,7 @@ func restore_state(state: Dictionary) -> void:
 	if state.is_empty():
 		return
 	carried_part = String(state["carried_part"])
+	work_inventory.restore_state(state["work_inventory"])
 	var label := ""
 	for part in entities["parts"]:
 		if part.task_id == carried_part:
@@ -363,9 +366,96 @@ func restore_state(state: Dictionary) -> void:
 	_diagnose_remaining = 0.0
 	_switch_error_remaining = 0.0
 	hud.set_prompt(ControlPrompt.make())
-	for group: String in ["racks", "parts", "ports", "switches", "coolant"]:
+	for group: String in ["racks", "parts", "ports", "switches", "coolant", "work", "work_resources", "liquids"]:
 		for i: int in range(entities[group].size()):
 			entities[group][i].restore_state(state[group][i])
+	for station in entities["work"]:
+		station.apply_effects()
+	_refresh_work_sources()
+
+
+func _refresh_work_sources() -> void:
+	for source in entities["work_resources"]:
+		source.queue_redraw()
+	if not work_inventory.carried.is_empty():
+		hud.set_carry("Carrying %s (%s)" % [work_inventory.items[work_inventory.carried], work_inventory.carried])
+	elif carried_part.is_empty():
+		hud.set_carry("")
+
+
+func _update_work_interaction(delta: float, feet: Vector2) -> void:
+	for station in entities["work"]:
+		station.queue_redraw()
+	# Legacy targets keep their priority, but a selected target never falls through.
+	for panel in entities["switches"]:
+		if not tasks.is_done(panel.task_id) and not panel.on and panel.in_range(feet):
+			_cancel_work()
+			_update_switches(feet)
+			_show_switch_prompt(feet)
+			return
+	for port in entities["ports"]:
+		if not port.done and (port.state == "active" or port.in_range(feet)):
+			_cancel_work()
+			_update_ports(delta, feet)
+			return
+	for rack in entities["racks"]:
+		if not rack.done and rack.in_range(feet):
+			_cancel_work()
+			_update_repair(delta, feet)
+			return
+	var target = null
+	var site := -1
+	var source_target = null
+	var distance := INF
+	for station in entities["work"]:
+		if station.order.done:
+			continue
+		var candidate: int = station.site_in_range(feet)
+		if candidate >= 0 and feet.distance_squared_to(station.sites[candidate]) < distance:
+			target = station
+			site = candidate
+			distance = feet.distance_squared_to(station.sites[candidate])
+	for source in entities["work_resources"]:
+		if source.available() and source.in_range(feet) and feet.distance_squared_to(source.position) < distance:
+			source_target = source
+			distance = feet.distance_squared_to(source.position)
+	player.locked = false
+	player.action = &""
+	for rack in entities["racks"]:
+		rack.cancel()
+	for station in entities["work"]:
+		if station != target or source_target != null:
+			station.order.cancel()
+	if source_target != null:
+		if not carried_part.is_empty():
+			hud.set_prompt(ControlPrompt.make("", "", "", "Deliver the carried part first"))
+			return
+		var kind: String = source_target.order.definition["resources"][source_target.index]["kind"]
+		var verb := "Refill extinguisher" if source_target.is_refill() else "Collect " + kind
+		if not work_inventory.carried.is_empty() and not source_target.is_refill():
+			verb = "Return carried item and collect " + kind
+		hud.set_prompt(ControlPrompt.make("repair", "press", verb))
+		if _action_pressed(&"repair"):
+			source_target.order.collect(source_target.index)
+			_refresh_work_sources()
+			sound.emit("pickup")
+		return
+	if target == null:
+		hud.set_prompt(_level_prompt(feet))
+		return
+	var result: Dictionary = target.order.step(site, _action_held(&"repair"), _action_pressed(&"repair"), _action_held(&"diagnose"), _action_pressed(&"diagnose"), delta)
+	player.locked = result["locked"]
+	player.action = result["action"]
+	hud.set_prompt(result["prompt"])
+	target.apply_effects()
+	_refresh_work_sources()
+	if result["completed"] and tasks.complete(target.order.definition["id"]):
+		sound.emit("repair_done")
+
+
+func _cancel_work() -> void:
+	for station in entities["work"]:
+		station.order.cancel()
 
 
 func _action_held(action: StringName) -> bool:
@@ -621,9 +711,13 @@ func _respawn() -> void:
 	_respawn_pending = false
 	sound.emit("fail")
 	respawns += 1
-	player.respawn(checkpoints.restore(timer, tasks))
-	health.refill()
+	var spawn := checkpoints.restore(timer, tasks)
 	restore_state(checkpoints.level_state)
+	if not entities["work"].is_empty():
+		for node in entities["hazards"] + entities["lifts"]:
+			node.reset_motion()
+	player.respawn(spawn)
+	health.refill()
 	if fatal:
 		pending_presses.clear()
 		_replayed_presses.clear()

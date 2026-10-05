@@ -1,0 +1,88 @@
+{
+  "version": 1,
+  "assets": {
+    "spool": {
+      "cell": [
+        32,
+        32
+      ],
+      "fps": 1,
+      "frames": [
+        "frames/spool/00.png"
+      ]
+    },
+    "chassis": {
+      "cell": [
+        32,
+        96
+      ],
+      "fps": 1,
+      "frames": [
+        "frames/chassis/00.png"
+      ]
+    },
+    "filter": {
+      "cell": [
+        24,
+        24
+      ],
+      "fps": 1,
+      "frames": [
+        "frames/filter/00.png"
+      ]
+    },
+    "seal": {
+      "cell": [
+        24,
+        24
+      ],
+      "fps": 1,
+      "frames": [
+        "frames/seal/00.png"
+      ]
+    },
+    "fuse": {
+      "cell": [
+        24,
+        24
+      ],
+      "fps": 1,
+      "frames": [
+        "frames/fuse/00.png"
+      ]
+    },
+    "extinguisher": {
+      "cell": [
+        24,
+        48
+      ],
+      "fps": 1,
+      "frames": [
+        "frames/extinguisher/00.png"
+      ]
+    },
+    "valve": {
+      "cell": [
+        32,
+        48
+      ],
+      "fps": 1,
+      "frames": [
+        "frames/valve/00.png"
+      ]
+    },
+    "fire": {
+      "cell": [
+        32,
+        64
+      ],
+      "fps": 8,
+      "frames": [
+        "frames/fire/00.png",
+        "frames/fire/01.png",
+        "frames/fire/02.png",
+        "frames/fire/03.png"
+      ]
+    }
+  }
+}

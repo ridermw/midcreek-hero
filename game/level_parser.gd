@@ -2,6 +2,7 @@ extends RefCounted
 
 const TaskSystem = preload("res://game/task_system.gd")
 const ControlPrompt = preload("res://game/control_prompt.gd")
+const WorkSchema = preload("res://game/tasks/work_schema.gd")
 
 const SOLIDS := {"#": "floor", "=": "platform", "T": "tray"}
 const HAZARDS := {
@@ -10,6 +11,7 @@ const HAZARDS := {
 	"v": "heat_vent",
 	"k": "spark_arc",
 	"d": "drone",
+	"f": "fire",
 	"~": "electrified_liquid",
 }
 const RESERVED_UPPER: Array[String] = ["C", "E", "P", "T"]
@@ -172,6 +174,10 @@ func _check_tasks(level: Dictionary) -> String:
 	var anchors: Dictionary = level["anchors"]
 	var used := {}
 	var task_ids := {}
+	var work_cells := {}
+	var effect_cells := {}
+	for cell: Vector2i in anchors.values():
+		work_cells[cell] = true
 	var required := 0
 	for task: Variant in level["header"]["tasks"]:
 		if not task is Dictionary:
@@ -183,10 +189,8 @@ func _check_tasks(level: Dictionary) -> String:
 			not id is String
 			or not type is String
 			or not task.get("required") is bool
-			or not at is Array
-			or at.is_empty()
 		):
-			return "Each task needs string id, string type, bool required, and a non-empty 'at' array."
+			return "Each task needs string id, string type, and bool required."
 		if id.is_empty():
 			return "Task id must not be empty."
 		if task_ids.has(id):
@@ -196,6 +200,30 @@ func _check_tasks(level: Dictionary) -> String:
 			return "Task '%s' label must be a string." % id
 		if type not in TaskSystem.TYPES:
 			return "Task '%s' has unknown type '%s'." % [id, type]
+		if type in WorkSchema.TYPES:
+			var problem := WorkSchema.validate(task, level)
+			if not problem.is_empty():
+				return "Task '%s': %s" % [id, problem]
+			var placements: Array = task["sites"].duplicate()
+			for resource: Dictionary in task["resources"]:
+				placements.append(resource["cell"])
+			for coordinate: Array in placements:
+				var cell := Vector2i(coordinate[0], coordinate[1])
+				if work_cells.has(cell) or effect_cells.has(cell):
+					return "Task '%s' overlaps another interaction or bound hazard." % id
+				work_cells[cell] = true
+			for coordinate: Array in task.get("effect_cells", []):
+				var cell := Vector2i(coordinate[0], coordinate[1])
+				if effect_cells.has(cell):
+					return "Task '%s' binds another task's hazard." % id
+				if work_cells.has(cell):
+					return "Task '%s' binds a hazard on another interaction." % id
+				effect_cells[cell] = true
+			if task["required"]:
+				required += 1
+			continue
+		if not at is Array or at.is_empty():
+			return "Task '%s' needs a non-empty 'at' array." % id
 		var references: Array = at.duplicate()
 		if type == "fetch":
 			if not task.get("part_at") is String:
