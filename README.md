@@ -1,7 +1,7 @@
 # Midcreek Hero
 
 A pixel art side scroller set in a data center. You play a technician who runs,
-jumps, slides, and climbs through 6 levels, avoids hazards, and completes
+jumps, slides, and climbs through 9 levels, avoids hazards, and completes
 work orders before the service level agreement (SLA) timer runs out.
 
 **[Play in the browser](https://ridermw.github.io/midcreek-hero/)**
@@ -159,7 +159,8 @@ The [expansion design](docs/superpowers/specs/2026-10-05-campaign-expansion-desi
 defines their task mapping and compatibility requirements.
 Cooling Gallery is playable as level 06. Its upper service gallery contains
 cooling controls and leak isolation work. Drain the lower gallery, then return
-through it to install the cable. Levels 07 through 15 remain in development.
+through it to install the cable. Operations Suite, Fiber Exchange, and Loading
+Yard are playable as levels 07 through 09. Levels 10 through 15 remain in development.
 The original five level definitions, routes, and targets remain unchanged.
 
 Expansion resources have task labels. Press Repair at a source to collect its
@@ -378,13 +379,19 @@ human difficulty targets. Their current values remain unchanged:
 | 4 Power Room | 97.2 s | 125 s | 200 s |
 | 5 Outage Night | 99.9 s | 125 s | 170 s |
 | 6 Cooling Gallery | 41.8 s | 210 s | 420 s |
+| 7 Operations Suite | 64.2 s | 210 s | 420 s |
+| 8 Fiber Exchange | 56.9 s | 210 s | 420 s |
+| 9 Loading Yard | 61.3 s | 240 s | 480 s |
 
-`python3 -m tools.levels.expansion` reproduces Cooling Gallery and its route.
-Its independent route budget is 180 seconds. The expansion route check runs
+`python3 -m tools.levels.expansion` reproduces all shipped expansion levels and
+their routes. The independent budgets are 180 seconds for 06 through 08 and
+200 seconds for 09. The expansion route check runs
 both heroes through the full level and again from every saved checkpoint.
 These automated timings do not establish human difficulty.
 The [Cooling Gallery evidence](docs/evidence/campaign-expansion/06-receipt.json)
 records native and browser results, capture paths, and validation limits.
+The [07 through 09 evidence](docs/evidence/campaign-expansion/07-09-receipt.json)
+records the next three environments and the Loading Yard recovery regression.
 
 `tests/test_level_layouts.py` checks that the scripts reproduce the shipped
 files exactly. Change par or SLA only after collecting player observations.

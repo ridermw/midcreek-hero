@@ -45,6 +45,13 @@ func _initialize() -> void:
 		check(false, "The viewer manifest declares runtime variants.")
 	var backgrounds = load("res://game/background_set.gd").new()
 	var environment_root := "res://art/cel-shift/environment/"
+	var level_files := DirAccess.get_files_at("res://levels")
+	for id: String in load("res://game/save_store.gd").LEVEL_IDS:
+		var matching := 0
+		for filename: String in level_files:
+			if filename.begins_with(id + "-") and filename.ends_with(".level"):
+				matching += 1
+		check(matching == 1, "Every playable campaign id has exactly one exported level: " + id)
 	for directory: String in DirAccess.get_directories_at(environment_root):
 		if not FileAccess.file_exists(environment_root + directory + "/manifest.json"):
 			continue

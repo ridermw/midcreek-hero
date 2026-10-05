@@ -69,7 +69,7 @@ jobs:
 
       - name: Play every level route through the main scene
         run: |
-          for n in 01 02 03 04 05 06; do
+          for n in 01 02 03 04 05 06 07 08 09; do
             timeout 120s godot --headless --fixed-fps 60 --path . -- --route=$n 2>&1 | tee "$RUNNER_TEMP/smoke-$n.log"
             python3 tools/check_route_result.py "$n" "$RUNNER_TEMP/smoke-$n.log"
             ! grep -E '^(SCRIPT ERROR|ERROR|USER ERROR|Parse Error)' "$RUNNER_TEMP/smoke-$n.log"

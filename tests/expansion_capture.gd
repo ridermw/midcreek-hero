@@ -32,6 +32,8 @@ func run() -> void:
 		for frame: int in range(18000):
 			runner.apply(level, 1.0 / 60.0)
 			await physics_frame
+			if frame % 600 == 0:
+				print("CAPTURE_PROGRESS %s %s frame=%d step=%d position=%s" % [slug, hero, frame, runner.index, level.player.position])
 			var count: int = level.tasks.completed_ids().size()
 			if count != captured:
 				captured = count
