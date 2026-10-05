@@ -139,7 +139,14 @@ Physical phone evidence and player difficulty observations also remain unresolve
   Each hero holds one unchanged position and sprite phase for 36 render samples
   during the stop, then resumes with reversed playback. Neither segment takes
   damage or respawns.
-- [ ] Finish exported browser coverage of the corrected ascent and descent.
+- [x] Verify exported ascent, descent, stop, and return for both heroes through
+  ordinary emulated gamepad input. The recovered check centers the body clear
+  of the upper landing before descent. Both heroes return within 3 world pixels
+  of the held rung, stay attached to the ladder, and stop playback with no hits
+  or respawns. Evidence: [man](docs/evidence/animation-cadence/browser-climb-man.json)
+  and [woman](docs/evidence/animation-cadence/browser-climb-woman.json).
+  This confirms the playback correction, not perfect artwork continuity or
+  physical controller behavior.
 
 The climb test uses an isolated prefix of the authored Level 3 route. Adding
 descent to the full route shifted later moving hazard timing and caused hits,
@@ -181,7 +188,19 @@ passes in 96.22 seconds without hits.
   [man](docs/evidence/animation-cadence/walk-man.png) and
   [woman](docs/evidence/animation-cadence/walk-woman.png).
   Eight frames, 10 fps, movement rules, and the shared palette remain unchanged.
-- [ ] Complete the exported browser motion checks.
+- [x] Verify exported walking through normal game input with an emulated
+  gamepad. Both heroes display all eight frames while moving right and left,
+  then stop and pause without replaying released input. All 32 captures match
+  every opaque source pixel. Published browser frames cover
+  [man right](docs/evidence/animation-cadence/browser-man-right.png),
+  [man left](docs/evidence/animation-cadence/browser-man-left.png),
+  [woman right](docs/evidence/animation-cadence/browser-woman-right.png), and
+  [woman left](docs/evidence/animation-cadence/browser-woman-left.png).
+- [x] Verify the optional browser probe is absent from ordinary URLs and from
+  a real release export, even when its query flag is supplied.
+- [x] Run the existing emulated phone input regression with the shared CDP
+  helper. Correct its stale expectation of a text prompt without changing
+  the delivered graphical prompt behavior.
 
 Running and repair artwork still require separate continuity work.
 Different frame hashes or different arm poses are not proof that legs alternate.

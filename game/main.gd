@@ -43,11 +43,14 @@ var help_menu: CanvasLayer
 var help_view: Control
 var notice_message := ""
 var notice_label: Label
+var animation_probe_enabled := false
 
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	InputSetup.install()
+	var query := String(JavaScriptBridge.eval("location.search")) if OS.has_feature("web") else ""
+	animation_probe_enabled = wants_animation_probe(query, OS.has_feature("debug"))
 	save = SaveStore.new(save_path)
 	save.load_data()
 	var notices := CanvasLayer.new()
@@ -77,7 +80,7 @@ func _ready() -> void:
 	_build_pause_menu()
 	var smoke_id := route_from_args(OS.get_cmdline_user_args())
 	if OS.has_feature("web"):
-		smoke_id = route_from_query(String(JavaScriptBridge.eval("location.search")))
+		smoke_id = route_from_query(query)
 	if not smoke_id.is_empty() and _level_files.has(smoke_id):
 		start_smoke(smoke_id)
 	else:
@@ -98,6 +101,35 @@ static func route_from_args(args: PackedStringArray) -> String:
 		if arg.begins_with("--route="):
 			return route_from_query("route=" + arg.trim_prefix("--route="))
 	return ""
+
+
+static func wants_animation_probe(query: String, debug_build: bool) -> bool:
+	return debug_build and "animation_probe=1" in query.trim_prefix("?").split("&")
+
+
+func animation_probe_state() -> Dictionary:
+	var state := {"screen": screen_name, "character": save.character, "paused": get_tree().paused, "error": error_message}
+	if screen_name != "level" or not is_instance_valid(screen):
+		return state
+	var player = screen.player
+	var sprite: AnimatedSprite2D = player.sprite
+	state.merge({
+		"level_id": current_level_id, "character": screen.character, "error": screen.error_message,
+		"position": [player.position.x, player.position.y],
+		"velocity": [player.velocity.x, player.velocity.y],
+		"clip": String(sprite.animation), "frame": sprite.frame, "progress": sprite.frame_progress,
+		"playing": sprite.is_playing(), "playback_speed": sprite.get_playing_speed(),
+		"physics_frame": Engine.get_physics_frames(), "elapsed": screen.timer.elapsed,
+		"facing_left": sprite.flip_h,
+		"climbing": player.motor.climbing, "locked": player.locked,
+		"hits": screen.health.hits_taken, "respawns": screen.respawns,
+	}, true)
+	return state
+
+
+func _publish_animation_probe() -> void:
+	if animation_probe_enabled and OS.has_feature("web"):
+		JavaScriptBridge.eval("window.midcreekAnimationProbe = %s; undefined" % JSON.stringify(animation_probe_state()))
 
 
 func _end_smoke() -> void:
@@ -177,6 +209,8 @@ func smoke_status() -> String:
 
 
 func _physics_process(delta: float) -> void:
+	if animation_probe_enabled:
+		_publish_animation_probe.call_deferred()
 	if route_runner != null and screen_name == "level" and is_instance_valid(screen) and not get_tree().paused:
 		route_runner.apply(screen, delta)
 		_smoke_report += delta

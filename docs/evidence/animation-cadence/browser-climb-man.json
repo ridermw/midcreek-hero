@@ -1,0 +1,812 @@
+{
+  "hero": "man",
+  "held": {
+    "character": "man",
+    "climbing": true,
+    "clip": "climb",
+    "elapsed": 9.60000000000006,
+    "error": "",
+    "facing_left": false,
+    "frame": 5,
+    "hits": 0,
+    "level_id": "03",
+    "locked": false,
+    "paused": false,
+    "physics_frame": 6361,
+    "playback_speed": 0,
+    "playing": false,
+    "position": [
+      1228.52429199219,
+      297.424011230469
+    ],
+    "progress": 0.551141381263733,
+    "respawns": 0,
+    "screen": "level",
+    "velocity": [
+      0,
+      0
+    ]
+  },
+  "still": {
+    "character": "man",
+    "climbing": true,
+    "clip": "climb",
+    "elapsed": 9.91666666666674,
+    "error": "",
+    "facing_left": false,
+    "frame": 5,
+    "hits": 0,
+    "level_id": "03",
+    "locked": false,
+    "paused": false,
+    "physics_frame": 6380,
+    "playback_speed": 0,
+    "playing": false,
+    "position": [
+      1228.52429199219,
+      297.424011230469
+    ],
+    "progress": 0.551141381263733,
+    "respawns": 0,
+    "screen": "level",
+    "velocity": [
+      0,
+      0
+    ]
+  },
+  "down": {
+    "character": "man",
+    "climbing": true,
+    "clip": "climb",
+    "elapsed": 10.1000000000001,
+    "error": "",
+    "facing_left": false,
+    "frame": 5,
+    "hits": 0,
+    "level_id": "03",
+    "locked": false,
+    "paused": false,
+    "physics_frame": 6391,
+    "playback_speed": -2.109375,
+    "playing": true,
+    "position": [
+      1228.52429199219,
+      300.424011230469
+    ],
+    "progress": 0.269902616739273,
+    "respawns": 0,
+    "screen": "level",
+    "velocity": [
+      0,
+      90
+    ]
+  },
+  "up": {
+    "character": "man",
+    "climbing": true,
+    "clip": "climb",
+    "elapsed": 10.8833333333335,
+    "error": "",
+    "facing_left": false,
+    "frame": 1,
+    "hits": 0,
+    "level_id": "03",
+    "locked": false,
+    "paused": false,
+    "physics_frame": 6438,
+    "playback_speed": 2.109375,
+    "playing": true,
+    "position": [
+      1228.52429199219,
+      351.424011230469
+    ],
+    "progress": 0.145307555794716,
+    "respawns": 0,
+    "screen": "level",
+    "velocity": [
+      0,
+      -90
+    ]
+  },
+  "final": {
+    "character": "man",
+    "climbing": true,
+    "clip": "climb",
+    "elapsed": 11.5333333333335,
+    "error": "",
+    "facing_left": false,
+    "frame": 5,
+    "hits": 0,
+    "level_id": "03",
+    "locked": false,
+    "paused": false,
+    "physics_frame": 6477,
+    "playback_speed": 0,
+    "playing": false,
+    "position": [
+      1228.52429199219,
+      295.924011230469
+    ],
+    "progress": 0.83238011598587,
+    "respawns": 0,
+    "screen": "level",
+    "velocity": [
+      0,
+      0
+    ]
+  },
+  "traces": [
+    {
+      "step": {
+        "hold": [
+          "move_right"
+        ],
+        "until_x": 226,
+        "max_seconds": 8
+      },
+      "state": {
+        "character": "man",
+        "climbing": false,
+        "clip": "run",
+        "elapsed": 1.23333333333333,
+        "error": "",
+        "facing_left": false,
+        "frame": 5,
+        "hits": 0,
+        "level_id": "03",
+        "locked": false,
+        "paused": false,
+        "physics_frame": 5859,
+        "playback_speed": 1,
+        "playing": true,
+        "position": [
+          226.888900756836,
+          416
+        ],
+        "progress": 0.299626916646957,
+        "respawns": 0,
+        "screen": "level",
+        "velocity": [
+          180,
+          0
+        ]
+      }
+    },
+    {
+      "step": {
+        "hold": [
+          "move_right",
+          "slide"
+        ],
+        "seconds": 0.1
+      },
+      "state": {
+        "character": "man",
+        "climbing": false,
+        "clip": "slide",
+        "elapsed": 1.36666666666667,
+        "error": "",
+        "facing_left": false,
+        "frame": 1,
+        "hits": 0,
+        "level_id": "03",
+        "locked": false,
+        "paused": false,
+        "physics_frame": 5867,
+        "playback_speed": 1,
+        "playing": true,
+        "position": [
+          258.888885498047,
+          416
+        ],
+        "progress": 1.19209291327138e-8,
+        "respawns": 0,
+        "screen": "level",
+        "velocity": [
+          260,
+          0
+        ]
+      }
+    },
+    {
+      "step": {
+        "hold": [
+          "move_right"
+        ],
+        "until_x": 478,
+        "max_seconds": 8
+      },
+      "state": {
+        "character": "man",
+        "climbing": false,
+        "clip": "run",
+        "elapsed": 2.26666666666666,
+        "error": "",
+        "facing_left": false,
+        "frame": 1,
+        "hits": 0,
+        "level_id": "03",
+        "locked": false,
+        "paused": false,
+        "physics_frame": 5921,
+        "playback_speed": 1,
+        "playing": true,
+        "position": [
+          483.889343261719,
+          416
+        ],
+        "progress": 0.633333325386047,
+        "respawns": 0,
+        "screen": "level",
+        "velocity": [
+          180,
+          0
+        ]
+      }
+    },
+    {
+      "step": {
+        "wait": 0
+      },
+      "state": {
+        "character": "man",
+        "climbing": false,
+        "clip": "run",
+        "elapsed": 2.31666666666666,
+        "error": "",
+        "facing_left": false,
+        "frame": 2,
+        "hits": 0,
+        "level_id": "03",
+        "locked": false,
+        "paused": false,
+        "physics_frame": 5924,
+        "playback_speed": 1,
+        "playing": true,
+        "position": [
+          491.722686767578,
+          416
+        ],
+        "progress": 0.333333343267441,
+        "respawns": 0,
+        "screen": "level",
+        "velocity": [
+          133.333343505859,
+          0
+        ]
+      }
+    },
+    {
+      "step": {
+        "hold": [
+          "move_right"
+        ],
+        "until_x": 560,
+        "max_seconds": 8
+      },
+      "state": {
+        "character": "man",
+        "climbing": false,
+        "clip": "run",
+        "elapsed": 2.71666666666666,
+        "error": "",
+        "facing_left": false,
+        "frame": 5,
+        "hits": 0,
+        "level_id": "03",
+        "locked": false,
+        "paused": false,
+        "physics_frame": 5948,
+        "playback_speed": 1,
+        "playing": true,
+        "position": [
+          561.389404296875,
+          416
+        ],
+        "progress": 0.133333370089531,
+        "respawns": 0,
+        "screen": "level",
+        "velocity": [
+          180,
+          0
+        ]
+      }
+    },
+    {
+      "step": {
+        "hold": [
+          "move_right",
+          "jump"
+        ],
+        "seconds": 0.45
+      },
+      "state": {
+        "character": "man",
+        "climbing": false,
+        "clip": "jump",
+        "elapsed": 3.18333333333333,
+        "error": "",
+        "facing_left": false,
+        "frame": 4,
+        "hits": 0,
+        "level_id": "03",
+        "locked": false,
+        "paused": false,
+        "physics_frame": 5976,
+        "playback_speed": 1,
+        "playing": true,
+        "position": [
+          645.413208007812,
+          307.933868408203
+        ],
+        "progress": 0.333333551883698,
+        "respawns": 0,
+        "screen": "level",
+        "velocity": [
+          180,
+          20
+        ]
+      }
+    },
+    {
+      "step": {
+        "hold": [
+          "move_right"
+        ],
+        "until_x": 896,
+        "max_seconds": 8
+      },
+      "state": {
+        "character": "man",
+        "climbing": false,
+        "clip": "run",
+        "elapsed": 4.58333333333332,
+        "error": "",
+        "facing_left": false,
+        "frame": 5,
+        "hits": 0,
+        "level_id": "03",
+        "locked": false,
+        "paused": false,
+        "physics_frame": 6060,
+        "playback_speed": 1,
+        "playing": true,
+        "position": [
+          897.413208007812,
+          415.925231933594
+        ],
+        "progress": 0.766666769981384,
+        "respawns": 0,
+        "screen": "level",
+        "velocity": [
+          180,
+          0
+        ]
+      }
+    },
+    {
+      "step": {
+        "wait": 0.35
+      },
+      "state": {
+        "character": "man",
+        "climbing": false,
+        "clip": "idle",
+        "elapsed": 4.93333333333332,
+        "error": "",
+        "facing_left": false,
+        "frame": 1,
+        "hits": 0,
+        "level_id": "03",
+        "locked": false,
+        "paused": false,
+        "physics_frame": 6081,
+        "playback_speed": 1,
+        "playing": true,
+        "position": [
+          910.524291992188,
+          415.925231933594
+        ],
+        "progress": 0.200000092387199,
+        "respawns": 0,
+        "screen": "level",
+        "velocity": [
+          0,
+          0
+        ]
+      }
+    },
+    {
+      "step": {
+        "tap": "repair"
+      },
+      "state": {
+        "character": "man",
+        "climbing": false,
+        "clip": "idle",
+        "elapsed": 4.96666666666665,
+        "error": "",
+        "facing_left": false,
+        "frame": 1,
+        "hits": 0,
+        "level_id": "03",
+        "locked": false,
+        "paused": false,
+        "physics_frame": 6083,
+        "playback_speed": 1,
+        "playing": true,
+        "position": [
+          910.524291992188,
+          415.925231933594
+        ],
+        "progress": 0.400000095367432,
+        "respawns": 0,
+        "screen": "level",
+        "velocity": [
+          0,
+          0
+        ]
+      }
+    },
+    {
+      "step": {
+        "wait": 0.15
+      },
+      "state": {
+        "character": "man",
+        "climbing": false,
+        "clip": "primary",
+        "elapsed": 5.11666666666665,
+        "error": "",
+        "facing_left": false,
+        "frame": 1,
+        "hits": 0,
+        "level_id": "03",
+        "locked": true,
+        "paused": false,
+        "physics_frame": 6092,
+        "playback_speed": 1,
+        "playing": true,
+        "position": [
+          910.524291992188,
+          415.925231933594
+        ],
+        "progress": 0.333333373069763,
+        "respawns": 0,
+        "screen": "level",
+        "velocity": [
+          0,
+          0
+        ]
+      }
+    },
+    {
+      "step": {
+        "tap": "diagnose"
+      },
+      "state": {
+        "character": "man",
+        "climbing": false,
+        "clip": "primary",
+        "elapsed": 5.16666666666665,
+        "error": "",
+        "facing_left": false,
+        "frame": 1,
+        "hits": 0,
+        "level_id": "03",
+        "locked": true,
+        "paused": false,
+        "physics_frame": 6095,
+        "playback_speed": 1,
+        "playing": true,
+        "position": [
+          910.524291992188,
+          415.925231933594
+        ],
+        "progress": 0.833333432674408,
+        "respawns": 0,
+        "screen": "level",
+        "velocity": [
+          0,
+          0
+        ]
+      }
+    },
+    {
+      "step": {
+        "wait": 0.15
+      },
+      "state": {
+        "character": "man",
+        "climbing": false,
+        "clip": "primary",
+        "elapsed": 5.31666666666665,
+        "error": "",
+        "facing_left": false,
+        "frame": 3,
+        "hits": 0,
+        "level_id": "03",
+        "locked": true,
+        "paused": false,
+        "physics_frame": 6104,
+        "playback_speed": 1,
+        "playing": true,
+        "position": [
+          910.524291992188,
+          415.925231933594
+        ],
+        "progress": 0.333333492279053,
+        "respawns": 0,
+        "screen": "level",
+        "velocity": [
+          0,
+          0
+        ]
+      }
+    },
+    {
+      "step": {
+        "tap": "diagnose"
+      },
+      "state": {
+        "character": "man",
+        "climbing": false,
+        "clip": "primary",
+        "elapsed": 5.34999999999999,
+        "error": "",
+        "facing_left": false,
+        "frame": 3,
+        "hits": 0,
+        "level_id": "03",
+        "locked": true,
+        "paused": false,
+        "physics_frame": 6106,
+        "playback_speed": 1,
+        "playing": true,
+        "position": [
+          910.524291992188,
+          415.925231933594
+        ],
+        "progress": 0.666666865348816,
+        "respawns": 0,
+        "screen": "level",
+        "velocity": [
+          0,
+          0
+        ]
+      }
+    },
+    {
+      "step": {
+        "wait": 0.15
+      },
+      "state": {
+        "character": "man",
+        "climbing": false,
+        "clip": "primary",
+        "elapsed": 5.49999999999999,
+        "error": "",
+        "facing_left": false,
+        "frame": 5,
+        "hits": 0,
+        "level_id": "03",
+        "locked": true,
+        "paused": false,
+        "physics_frame": 6115,
+        "playback_speed": 1,
+        "playing": true,
+        "position": [
+          910.524291992188,
+          415.925231933594
+        ],
+        "progress": 0.166606888175011,
+        "respawns": 0,
+        "screen": "level",
+        "velocity": [
+          0,
+          0
+        ]
+      }
+    },
+    {
+      "step": {
+        "tap": "jump"
+      },
+      "state": {
+        "character": "man",
+        "climbing": false,
+        "clip": "primary",
+        "elapsed": 5.53333333333332,
+        "error": "",
+        "facing_left": false,
+        "frame": 5,
+        "hits": 0,
+        "level_id": "03",
+        "locked": true,
+        "paused": false,
+        "physics_frame": 6117,
+        "playback_speed": 1,
+        "playing": true,
+        "position": [
+          910.524291992188,
+          415.925231933594
+        ],
+        "progress": 0.499926894903183,
+        "respawns": 0,
+        "screen": "level",
+        "velocity": [
+          0,
+          0
+        ]
+      }
+    },
+    {
+      "step": {
+        "wait": 0.15
+      },
+      "state": {
+        "character": "man",
+        "climbing": false,
+        "clip": "idle",
+        "elapsed": 5.69999999999999,
+        "error": "",
+        "facing_left": false,
+        "frame": 0,
+        "hits": 0,
+        "level_id": "03",
+        "locked": false,
+        "paused": false,
+        "physics_frame": 6127,
+        "playback_speed": 1,
+        "playing": true,
+        "position": [
+          910.524291992188,
+          415.925231933594
+        ],
+        "progress": 0.899963915348053,
+        "respawns": 0,
+        "screen": "level",
+        "velocity": [
+          0,
+          0
+        ]
+      }
+    },
+    {
+      "step": {
+        "wait": 0.2
+      },
+      "state": {
+        "character": "man",
+        "climbing": false,
+        "clip": "idle",
+        "elapsed": 5.93333333333332,
+        "error": "",
+        "facing_left": false,
+        "frame": 2,
+        "hits": 0,
+        "level_id": "03",
+        "locked": false,
+        "paused": false,
+        "physics_frame": 6141,
+        "playback_speed": 1,
+        "playing": true,
+        "position": [
+          910.524291992188,
+          415.925231933594
+        ],
+        "progress": 0.299907773733139,
+        "respawns": 0,
+        "screen": "level",
+        "velocity": [
+          0,
+          0
+        ]
+      }
+    },
+    {
+      "step": {
+        "hold": [
+          "move_right"
+        ],
+        "until_x": 1228,
+        "max_seconds": 8
+      },
+      "state": {
+        "character": "man",
+        "climbing": false,
+        "clip": "run",
+        "elapsed": 7.78333333333331,
+        "error": "",
+        "facing_left": false,
+        "frame": 0,
+        "hits": 0,
+        "level_id": "03",
+        "locked": false,
+        "paused": false,
+        "physics_frame": 6252,
+        "playback_speed": 1,
+        "playing": true,
+        "position": [
+          1230.41320800781,
+          415.925231933594
+        ],
+        "progress": 0.265696555376053,
+        "respawns": 0,
+        "screen": "level",
+        "velocity": [
+          180,
+          0
+        ]
+      }
+    },
+    {
+      "step": {
+        "wait": 0.3
+      },
+      "state": {
+        "character": "man",
+        "climbing": false,
+        "clip": "idle",
+        "elapsed": 8.08333333333331,
+        "error": "",
+        "facing_left": false,
+        "frame": 0,
+        "hits": 0,
+        "level_id": "03",
+        "locked": false,
+        "paused": false,
+        "physics_frame": 6270,
+        "playback_speed": 1,
+        "playing": true,
+        "position": [
+          1243.52429199219,
+          415.925231933594
+        ],
+        "progress": 0.899963915348053,
+        "respawns": 0,
+        "screen": "level",
+        "velocity": [
+          0,
+          0
+        ]
+      }
+    },
+    {
+      "step": {
+        "hold": [
+          "move_up"
+        ],
+        "until_y": 300,
+        "max_seconds": 8
+      },
+      "state": {
+        "character": "man",
+        "climbing": true,
+        "clip": "climb",
+        "elapsed": 9.40000000000005,
+        "error": "",
+        "facing_left": false,
+        "frame": 3,
+        "hits": 0,
+        "level_id": "03",
+        "locked": false,
+        "paused": false,
+        "physics_frame": 6349,
+        "playback_speed": 2.109375,
+        "playing": true,
+        "position": [
+          1243.52429199219,
+          298.924011230469
+        ],
+        "progress": 0.655383884906769,
+        "respawns": 0,
+        "screen": "level",
+        "velocity": [
+          0,
+          -90
+        ]
+      }
+    }
+  ]
+}
