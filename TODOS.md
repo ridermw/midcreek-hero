@@ -205,24 +205,24 @@ passes in 96.22 seconds without hits.
 Running and repair artwork still require separate continuity work.
 Different frame hashes or different arm poses are not proof that legs alternate.
 
-## 2. Select additional environments and tasks
+## 2. Implement approved additional environments and tasks
 
-- [ ] **What:** Select the new environments and task types, then define their
-  behavior and acceptance checks.
+- [ ] **What:** Add ten levels with the approved environments and all six new
+  task types. Preserve the existing five levels and sliding.
 
-**Why:** The direction contains ten environments and six task concepts, but no
-  final selection. Treating concepts as approved content would create unintended
-  scope and incomplete recovery rules.
+**Why:** The user approved all ten environments and six task types on October 5.
+The new work belongs in levels 06 through 15, not revisions of existing levels.
 
-**Context:** Environment candidates are Cooling Gallery, Operations Suite, Fiber
+**Context:** Approved environments are Cooling Gallery, Operations Suite, Fiber
 Exchange, Loading Yard, Fire Response Hall, Pump Station, Rooftop Air Handlers,
 Generator Courtyard, Facility Approach, and Expansion Site. The outdoor concepts
 include facility scenery, trees, vehicles, parking, and construction. The proposed
 background protest cameo is optional and is not an enemy encounter.
 
-Task candidates are running a cable, assembling a rack from multiple components,
+Approved tasks are running a cable, assembling a rack from multiple components,
 extinguishing a fire, restoring cooling, containing a leak, and restoring a power
-branch. These are proposals, not selected additions. Start with
+branch. The [expansion design](docs/superpowers/specs/2026-10-05-campaign-expansion-design.md)
+records mapping, resource rules, effects, and checkpoint contracts. Start with
 `game/task_system.gd`, `game/level_parser.gd`, `game/level_builder.gd`,
 `game/level.gd`, and `tools/levels/`.
 
@@ -241,15 +241,28 @@ Checkpoint restoration
     +--> Resume a completable route
 ```
 
-**Acceptance:** Obtain explicit content selections. Give each selected
+**Acceptance:** Give each approved
 environment distinct route geometry and work, not only different colors. Cover
 blocked, active, interrupted, complete, and restored task states. Verify one
 target owns the displayed prompt and action when targets overlap. Verify keyboard,
 gamepad, and touch access. Provide a complete route and safe checkpoint routes.
 
-**Depends on / blocked by:** User selection; measured traversal dimensions from
+**Depends on / blocked by:** Measured traversal dimensions from
 item 4; the accepted death and recovery contracts; asset decisions from item 5.
-Selection must precede final estimates and asset production.
+Fatal liquid and death recovery remain owned by the existing campaign session.
+The new session owns new work state, level content, progression, and backgrounds.
+Do not add new level files before their routes and required assets are ready.
+
+### Task state increment
+
+- [x] Add isolated state units for all six approved tasks.
+- [x] Observe focused failures before implementation and verify partial rollback.
+- [ ] Connect task entities, resource inventory, prompts, artwork, and effects.
+- [ ] Deliver complete routes and every checkpoint replay for levels 06 through 15.
+- [ ] Verify native and browser captures and the unchanged download cap.
+
+State tests do not establish playable content completion. No new playable level
+ships in this increment.
 
 ## 3. Decide the role of sliding
 
@@ -259,11 +272,12 @@ Selection must precede final estimates and asset production.
 **Why:** The user does not see a clear reason for the move. Additional forced
 sliding sections would not resolve that concern by themselves.
 
-**Context:** Sliding currently clears low trays and passes under drones. Start
+**Context:** The October 5 request retains sliding and existing level behavior.
+Sliding currently clears low trays and passes under drones. Start
 with `game/player_motor.gd`, `game/player.gd`, `tools/levels/layout.py`,
 `tools/levels/level3.py`, `tools/levels/level5.py`, and `game/help_content.gd`.
 The plan proposes visibly useful service openings, shortcuts, or optional work
-areas. Retention has not been decided.
+areas. Do not remove or rework the existing move during this expansion.
 
 **Acceptance:** Obtain the decision before revising slide dependent geometry.
 If retained, make clearance and route benefit visible and teach the action.
@@ -412,7 +426,7 @@ download budget or a device performance result.
 - A new currency, upgrade economy, or automatic difficulty adjustment.
 - A general task scripting framework, a second physics engine, or a custom
   texture cache without a demonstrated need.
-- Treating proposed environments, task rules, or sketch dimensions as approved.
+- Adding unapproved environments or replacing existing levels with new content.
 
 ## Review failure coverage
 

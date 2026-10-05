@@ -152,6 +152,25 @@ fail the published file check; do not exempt them from the upload gate.
 
 ## Play
 
+### Campaign expansion status
+
+Ten additional environments are approved for levels 06 through 15.
+The [expansion design](docs/superpowers/specs/2026-10-05-campaign-expansion-design.md)
+defines their task mapping and compatibility requirements.
+The current playable campaign still contains five levels.
+New task state units cover cable installation, rack assembly, fire suppression,
+cooling restoration, leak containment, and power restoration.
+These units are not yet connected to playable levels or production artwork.
+
+Run their focused checks with:
+
+```sh
+tools/godot_test.sh tests/cable_work_test.gd CABLE_WORK_TEST
+tools/godot_test.sh tests/rack_work_test.gd RACK_WORK_TEST
+tools/godot_test.sh tests/fire_work_test.gd FIRE_WORK_TEST
+tools/godot_test.sh tests/service_work_test.gd SERVICE_WORK_TEST
+```
+
 Open the [web build](https://ridermw.github.io/midcreek-hero/) or run
 `godot --path .`. The game starts on the title screen. Choose a technician,
 then choose a work order. Finish every required task before the SLA timer
