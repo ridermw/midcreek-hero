@@ -1,6 +1,5 @@
 {
-  "maximum_bytes": 53477376,
-  "measurement": "Total published files before HTTP compression; 51 MiB rounds the measured release export up to the next whole MiB.",
+  "measurement": "Total published files before HTTP compression. Informational only; no size ceiling.",
   "baseline": {
     "godot": "4.7.2",
     "source_commit": "27d267d08837264bcb315a325a48f998a27d1eca",

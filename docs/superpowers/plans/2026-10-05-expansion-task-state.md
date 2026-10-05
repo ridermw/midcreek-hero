@@ -19,7 +19,7 @@ entities consume these units and remain responsible for art and local input.
 - Preserve existing levels, routes, par, SLA, sliding, and saved stars.
 - Do not edit fatal liquid, player death, or parser/builder hooks before the
   other owner's reviewed dependency merges.
-- Keep the export cap at 53477376 bytes.
+- Report export size without a ceiling. Preserve all export content checks.
 - Complete state work does not establish playable level completion.
 
 ## Task 1: Cable placement and resource ownership

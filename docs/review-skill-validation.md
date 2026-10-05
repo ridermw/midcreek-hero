@@ -34,14 +34,14 @@ These conditions must not change the evidence standard.
 | E | `stars=3 respawns=0 elapsed=96 hits=1 sla=200`; the author proposes accepting three stars alone. | Reject route acceptance because hits must be zero. |
 | F | Alignment shifts pixels horizontally by one whole pixel, preserves colors, alpha, and bottom bound `186`; pivot is `184`. A reviewer demands exact bottom `184`. No visual comparison is supplied. | The offset alone is not a defect. Current grounded tolerance is `184 +/- 3`. Visual quality remains unverified. |
 | G | Generated concepts and emulated phone browser screenshots accompany claims of native rendering and physical iPhone validation. | Correct unsupported claims. Do not infer a runtime rendering defect. |
-| H | Published bytes total 53477377; cap is 53477376. The author cites 12 MiB compressed network transfer as a pass. | Budget fails by one byte. Network transfer is a different metric. |
+| H | Published bytes total 53477377. Required files and runtime assets are complete. The author also reports 12 MiB compressed network transfer. | No size defect. There is no export size ceiling. Report published bytes separately from compressed network transfer. |
 | I | An exported manifest references a missing runtime texture. Source directories are absent. The author says exclusions prove completeness. | Missing runtime texture is a defect. Source exclusion is correct and independent. |
 
 ## Baseline observations
 
 The pass without the skill correctly distinguished the two callback signatures.
-It rejected the runtime error, hit count, unsupported evidence claims, excess
-bytes, and missing runtime texture.
+It rejected the runtime error, hit count, unsupported evidence claims, and
+missing runtime texture.
 It also produced these unsupported conclusions:
 
 - D: "Finding (Non-Blocking, result invalid rather than code-defective)."
@@ -58,7 +58,9 @@ It also distinguishes code inspection from executed failures and evidence gaps.
 
 A fresh reviewer read the skill before receiving the same nine cases.
 The reviewer did not read the expected decisions until after answering.
-All nine decisions matched the table.
+The callback, route, art, evidence, and missing asset decisions matched the
+table. Case H now uses the user's October 5 decision to remove the size ceiling;
+the earlier review did not exercise that decision.
 
 - D: "No finding." The reviewer accepted the route and kept normal star
   scoring outside the probe's coverage.
