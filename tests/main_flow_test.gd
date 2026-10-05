@@ -85,7 +85,7 @@ func run() -> void:
 	main.quit_after_smoke = false
 	main.start_smoke("02")
 	await process_frame
-	main.screen.finished.emit({"elapsed": 1.0, "hits": 0, "respawns": 0, "stars": 3, "optional_done": 0, "optional_total": 0})
+	main.screen.finished.emit({"elapsed": 1.0, "sla_seconds": 195.0, "hits": 0, "respawns": 0, "stars": 3, "optional_done": 0, "optional_total": 0})
 	await process_frame
 	check(main.save.stars("02") == 0 and not main.save.is_unlocked("03"), "A smoke run does not change saved progress.")
 	main.start_smoke("01")

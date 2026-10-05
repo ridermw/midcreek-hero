@@ -92,9 +92,11 @@ Source dimensions and transparency must match the layer contract.
 In gameplay, the distant layer scales uniformly to cover the level height,
 including the highest camera position. Equipment keeps its original scale.
 
-All animation prompts share one geometry: 512x512 source cells, a boot
-baseline at y=448, and a standing height of approximately 270 pixels. The
-normalizer uses one fixed 512-to-171 scale and writes 208x208 frames.
+Animation source sheets use 512x512 cells. The normalizer uses one fixed
+512-to-171 scale and writes 208x208 frames. It reuses the published animation
+palette when present, so replacing one clip does not recolor other clips.
+An initial generation without a palette selects at most 96 colors.
+Invalid palette data fails before frames or previews are replaced.
 Ponytail guidance applies only to the woman. The normalizer checks all frame
 hashes before it writes files, so duplicate artwork cannot overwrite prior
 frames or previews.
@@ -252,8 +254,8 @@ repository root to rewrite its files, then run the route test:
     python3 -m tools.levels.level3
     tools/godot_test.sh tests/route_test.gd ROUTE_TEST
 
-Each level has 3 checkpoints, 3 to 6 work orders, and a par of 2 to 4 minutes.
-`tests/route_test.gd` enforces the par range and the par and SLA rule:
+Each level has 3 checkpoints and 3 to 6 work orders. Par and SLA are authored
+human difficulty targets. Their current values remain unchanged:
 
 | Level | Route time | Par | SLA |
 |---|---|---|---|
@@ -264,9 +266,26 @@ Each level has 3 checkpoints, 3 to 6 work orders, and a par of 2 to 4 minutes.
 | 5 Outage Night | 99.9 s | 125 s | 170 s |
 
 `tests/test_level_layouts.py` checks that the scripts reproduce the shipped
-files exactly. Par and SLA follow `layout.par_and_sla`: par is the route time
-plus 25 percent, rounded up to 5 s, and the SLA is par times 1.6 (1.35 for
-level 5).
+files exactly. Change par or SLA only after collecting player observations.
+Changing these targets does not recalculate earned stars.
+
+Automated route timing is separate. `tests/route_budgets.json` assigns each
+route a 110 second completion budget. The baseline routes take 93.17 to
+99.87 seconds, leaving at least 10 seconds of timing margin.
+These budgets are not player targets or device performance measurements.
+Review a budget change when intended geometry or task changes alter a route.
+
+Both the Godot route test and CI require completion within the independent
+budget and before the authored SLA, with no hits, respawns, or runtime errors.
+The smoke checker accepts all three star ratings. Star boundary tests remain
+separate in `tests/sla_timer_test.gd`.
+`tools/check_route_result.py <level-id> <smoke-log>` applies the CI check.
+To verify that par no longer determines route acceptance without changing any
+level file, run:
+
+```sh
+ROUTE_ONLY=03 ROUTE_PAR_SECONDS=1 tools/godot_test.sh tests/route_test.gd ROUTE_TEST
+```
 
 ## Core platformer
 
@@ -297,9 +316,53 @@ Technician clips: idle, walk, run, jump, slide, primary, secondary, reaction,
 signal, and climb for the man and the woman. Climb is drawn from behind with
 alternating hands and feet; it plays while the technician moves on a ladder and
 holds its pose while the technician stops on one.
+One alternating hand cycle covers the two rungs in a 32 pixel ladder tile.
+Playback follows movement speed and reverses during descent. At the unchanged
+90 pixels per second climbing speed, a full cycle takes about 0.356 seconds.
+Changing direction or stopping does not restart the pose.
 Climb normalization aligns the blue hard hat with the ladder axis in every
 frame. It preserves the shared scale and boot baseline, and rejects artwork
 that has no alignment anchor or would be clipped.
+
+The walk clip has eight poses. Its opposite halves exchange the near and far
+legs without mirroring the torso or equipment:
+
+| Pair | First half | Opposite half |
+|---|---|---|
+| 1 / 5 | Near heel contacts | Far heel contacts |
+| 2 / 6 | Near leg supports; far foot lifts | Far leg supports; near foot lifts |
+| 3 / 7 | Near leg supports; far knee passes | Far leg supports; near knee passes |
+| 4 / 8 | Near toe pushes off; far foot reaches | Far toe pushes off; near foot reaches |
+
+The near leg is the leg closest to the camera. Passing poses have one grounded
+foot. Different frame hashes alone do not prove that the legs alternate.
+Rendered cycles are recorded for the [man](docs/evidence/animation-cadence/walk-man.png)
+and [woman](docs/evidence/animation-cadence/walk-woman.png).
+The walking update keeps eight frames, 10 fps, the existing palette, and the
+same movement rules. Its source colors stay within the previous walking ramps:
+39 colors for the man and 37 for the woman. The leg-depth value check covers
+all four pairs, but it supplements visual occlusion review rather than replacing
+it. Running remains a separate clip.
+
+Held repairs loop on the sprite's render clock. They do not wait for a physics
+tick to restart. The player keeps a private animation configuration, so this
+does not change the shared clips used by the art viewer and help.
+
+To reproduce walking, running, repair, ascent, descent, and a climb stop and
+reversal for both heroes in Level 3, then
+capture both repair help demonstrations:
+
+```sh
+mkdir -p /tmp/midcreek-motion
+godot --path . --script tests/animation_probe.gd -- --output=/tmp/midcreek-motion
+```
+
+The probe uses repeatable input and writes frame, physics, camera, and timing
+samples to `native-trace.json`. It also writes two help screenshots. Use a
+separate run with `--write-movie /tmp/midcreek-motion/actions.avi --fixed-fps 60`
+before `--` to record all twelve action cases and the help demonstrations.
+Movie mode fixes the simulation rate; do not use its timing as a device
+performance measurement. The probe does not change saved progress.
 
 To regenerate the square app icon from the title without changing its pixels:
 

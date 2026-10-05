@@ -2,6 +2,7 @@
 
 import configparser
 import json
+from statistics import mean
 import tempfile
 import unittest
 from pathlib import Path
@@ -90,6 +91,67 @@ class AssetPipelineTest(unittest.TestCase):
             with self.subTest(variant=variant):
                 self.assertLessEqual(max(heights), median * 1.15)
                 self.assertGreaterEqual(min(heights), median * 0.85)
+
+    def test_walk_passing_poses_have_one_grounded_foot(self):
+        for variant in animation_assets.VARIANTS:
+            for index in (2, 6):
+                path = animation_assets.ART / "frames" / variant / "walk" / f"{index:02}.png"
+                with Image.open(path) as frame:
+                    bottom = frame.getbbox()[3]
+                    contact = [
+                        x for x in range(frame.width)
+                        if any(frame.getpixel((x, y))[3] for y in range(bottom - 3, bottom))
+                    ]
+                spans = sum(i == 0 or x != contact[i - 1] + 1 for i, x in enumerate(contact))
+                with self.subTest(variant=variant, frame=index + 1):
+                    self.assertEqual(spans, 1, "The passing leg lifts clear while the other foot supports the body.")
+
+    def test_walk_preserves_its_existing_shade_budget(self):
+        for variant, limit in (("man-midcreek", 39), ("woman-midcreek", 37)):
+            colors = set()
+            for path in (animation_assets.ART / "frames" / variant / "walk").glob("*.png"):
+                with Image.open(path) as frame:
+                    colors.update(pixel[:3] for pixel in frame.getdata() if pixel[3])
+            with self.subTest(variant=variant):
+                self.assertLessEqual(len(colors), limit, "Keep the measured per-hero walking shade budget.")
+
+    def walk_denim_depth_delta(self, path):
+        with Image.open(path) as source:
+            frame = source.convert("RGBA")
+        bottom = frame.getbbox()[3]
+        # Below-belt denim value supplements, but does not replace, visual occlusion review.
+        pixels = [
+            (x, 0.299 * r + 0.587 * g + 0.114 * b)
+            for y in range(bottom - 56, bottom)
+            for x in range(frame.width)
+            for r, g, b, a in [frame.getpixel((x, y))]
+            if a and b > r + 15 and b > 70
+        ]
+        self.assertTrue(pixels, f"{path}: visible denim is required")
+        center = mean(x for x, _ in pixels)
+        rear = [value for x, value in pixels if x < center]
+        front = [value for x, value in pixels if x >= center]
+        self.assertTrue(rear and front, f"{path}: both leg regions are required")
+        return mean(front) - mean(rear)
+
+    def test_walk_opposite_phases_exchange_leg_depth(self):
+        for variant in animation_assets.VARIANTS:
+            frames = animation_assets.ART / "frames" / variant / "walk"
+            deltas = [self.walk_denim_depth_delta(frames / f"{i:02}.png") for i in range(8)]
+            for i in range(4):
+                with self.subTest(variant=variant, pair=(i + 1, i + 5)):
+                    self.assertLess(deltas[i] * deltas[i + 4], 0, "Opposite phases exchange the lit near leg and darker far leg.")
+
+    def test_walk_opposite_phases_keep_head_registration(self):
+        for variant in animation_assets.VARIANTS:
+            frames = animation_assets.ART / "frames" / variant / "walk"
+            tops = []
+            for i in range(8):
+                with Image.open(frames / f"{i:02}.png") as frame:
+                    tops.append(frame.getbbox()[1])
+            for i in range(4):
+                with self.subTest(variant=variant, pair=(i + 1, i + 5)):
+                    self.assertLessEqual(abs(tops[i] - tops[i + 4]), 1, "Opposite gait phases share head registration within one raster pixel.")
 
     @staticmethod
     def pouch_offset(path):
@@ -347,6 +409,39 @@ class AssetPipelineTest(unittest.TestCase):
             self.assertEqual(len(set(pixels)), 6)
             for extension in ("png", "gif"):
                 self.assertTrue((art / "previews/man-midcreek" / f"idle.{extension}").is_file())
+
+    def test_animation_normalization_preserves_the_published_palette(self):
+        with tempfile.TemporaryDirectory() as directory:
+            art = Path(directory)
+            generated = art / "generated/man-midcreek"
+            generated.mkdir(parents=True)
+            source = animation_assets.ART / "generated/man-midcreek/idle.png"
+            (generated / "idle.png").write_bytes(source.read_bytes())
+            swatch = Image.new("RGB", (2, 1))
+            swatch.putdata([(0, 0, 0), (255, 255, 255)])
+            swatch.save(art / "palette.png")
+            with patch.object(animation_assets, "ART", art):
+                animation_assets.normalize("man-midcreek", "idle")
+            for path in (art / "frames/man-midcreek/idle").glob("*.png"):
+                with Image.open(path) as frame:
+                    colors = {pixel[:3] for pixel in frame.getdata() if pixel[3]}
+                self.assertLessEqual(colors, {(0, 0, 0), (255, 255, 255)})
+
+    def test_invalid_published_palette_does_not_replace_animation_frames(self):
+        with tempfile.TemporaryDirectory() as directory:
+            art = Path(directory)
+            generated = art / "generated/man-midcreek"
+            generated.mkdir(parents=True)
+            source = animation_assets.ART / "generated/man-midcreek/idle.png"
+            (generated / "idle.png").write_bytes(source.read_bytes())
+            Image.new("RGB", (2, 2)).save(art / "palette.png")
+            saved = art / "frames/man-midcreek/idle/00.png"
+            saved.parent.mkdir(parents=True)
+            saved.write_bytes(b"previous frame")
+            with patch.object(animation_assets, "ART", art):
+                with self.assertRaisesRegex(ValueError, "palette"):
+                    animation_assets.normalize("man-midcreek", "idle")
+            self.assertEqual(saved.read_bytes(), b"previous frame")
 
 
 if __name__ == "__main__":

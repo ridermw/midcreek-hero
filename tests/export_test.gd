@@ -1,6 +1,7 @@
 extends SceneTree
 
 const SOURCE_DIRECTORIES: Array[String] = [
+	"res://docs/evidence",
 	"res://art/cel-shift/animations/generated",
 	"res://art/cel-shift/animations/previews",
 	"res://art/cel-shift/environment/generated",
@@ -29,6 +30,18 @@ var failures: int = 0
 
 
 func _initialize() -> void:
+	var animations = load("res://game/animation_library.gd").new()
+	check(animations.load_manifest(), "Every declared animation frame loads from the export: " + animations.error_message)
+	for group: String in ["animations", "tiles", "hazards", "props", "ui"]:
+		var palette := "res://art/cel-shift/%s/palette.png" % group
+		check(not ResourceLoader.exists(palette), "Build palette stays outside the download: " + palette)
+	for path: String in [
+		"res://docs/evidence/animation-cadence/before.json",
+		"res://docs/evidence/animation-cadence/after.json",
+		"res://tests/route_budgets.json",
+	]:
+		check(not FileAccess.file_exists(path), "Diagnostic data stays outside the download: " + path)
+	check(not ResourceLoader.exists("res://tests/animation_probe.gd"), "The native capture probe is excluded.")
 	for path: String in SOURCE_DIRECTORIES:
 		check(not DirAccess.dir_exists_absolute(path), "Source artwork is excluded: " + path)
 	for path: String in RUNTIME_TEXTURES:

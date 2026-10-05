@@ -126,11 +126,11 @@ func run() -> void:
 	player.hurt_remaining = 0.0
 	player.action = &"primary"
 	player.update_animation()
-	await player.sprite.animation_finished
+	await create_timer(0.65).timeout
 	player.update_animation()
 	check(
 		player.sprite.is_playing() and player.sprite.frame == 0,
-		"A held repair restarts its completed animation.",
+		"A held repair loops without stopping its animation.",
 	)
 	player.sprite.set_frame_and_progress(2, 0.5)
 	player.update_animation()

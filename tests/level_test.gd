@@ -109,6 +109,7 @@ func run() -> void:
 	at(Vector2i(29, 2))
 	level.step(DT)
 	check(level.completed and results.size() == 1, "Standing at the open exit finishes the level.")
+	check(results[0].get("sla_seconds") == 120.0, "Results include the authored SLA for later reporting.")
 	check("door_open" in sounds and "win" in sounds and "fail" in sounds and "heal" in sounds, "Exit, win, fail, and heal sounds play.")
 	check(
 		results[0]["stars"] == 2 and results[0]["respawns"] == 2 and results[0]["hits"] == 6,

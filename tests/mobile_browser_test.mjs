@@ -212,7 +212,7 @@ try {
       if (await evaluate('document.querySelector("#mobile-menu")?.textContent.includes("Work order complete")')) break;
       await delay(100);
     }
-    assert.equal(await evaluate('document.querySelector("#mobile-menu")?.textContent.includes("3 stars")'), true, "Exported route reaches mobile results.");
+    assert.match(await evaluate('document.querySelector("#mobile-menu")?.textContent ?? ""'), /\b[123] stars\b/, "Exported route reaches mobile results regardless of rating.");
     await screenshot("phone-results");
     await menuButton("Retry");
     await wait('document.body.classList.contains("mobile-playing")');

@@ -596,6 +596,7 @@ func _finish() -> void:
 	var par := float(level["header"]["par_seconds"])
 	var result := {
 		"elapsed": timer.elapsed,
+		"sla_seconds": float(level["header"]["sla_seconds"]),
 		"hits": health.hits_taken,
 		"respawns": respawns,
 		"stars": Score.stars(timer.elapsed, par, health.hits_taken),

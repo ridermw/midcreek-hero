@@ -1,6 +1,7 @@
 """Check that the level layout scripts reproduce the shipped levels and routes."""
 
 import importlib
+import json
 import unittest
 
 from tools.levels import layout
@@ -33,10 +34,19 @@ class LevelLayoutTest(unittest.TestCase):
                         self.assertTrue(prompt["status"])
                     self.assertNotRegex(prompt["text"] + prompt["status"], r"Pad:|E or X|E / X|Q / Y|C or Shift|hold E|Press Q")
 
-    def test_par_and_sla_follow_the_plan_rule(self):
-        self.assertEqual(layout.par_and_sla(42.3), (55, 90))
-        self.assertEqual(layout.par_and_sla(35.88), (45, 75))
-        self.assertEqual(layout.par_and_sla(55.98, 1.35), (70, 95))
+    def test_current_authored_targets_are_preserved(self):
+        for name, targets in zip(LEVELS, [(120, 195), (120, 195), (125, 200), (125, 200), (125, 170)]):
+            header = importlib.import_module(f"tools.levels.{name}").build()[1]
+            with self.subTest(level=name):
+                self.assertEqual((header["par_seconds"], header["sla_seconds"]), targets)
+
+    def test_each_recorded_route_has_a_positive_independent_budget(self):
+        budgets = json.loads((layout.ROOT / "tests/route_budgets.json").read_text())
+        self.assertEqual(set(budgets), {slug[:2] for slug in LEVELS.values()})
+        for level, seconds in budgets.items():
+            with self.subTest(level=level):
+                self.assertIs(type(seconds), int)
+                self.assertGreater(seconds, 0)
 
     def test_scripts_reproduce_shipped_levels(self):
         for module_name, slug in LEVELS.items():
