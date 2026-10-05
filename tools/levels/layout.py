@@ -66,9 +66,10 @@ class Layout:
         self.run_to(self.cx(col) - 70)
         self.jump()
 
-    def mover(self, col, jump_col):
+    def mover(self, col, jump_col, jump_offset=0):
+        # Pixel offsets depend on patrol phase; remeasure after any earlier route edit.
         self.put(col, self.stand, "m")
-        self.run_to(self.cx(jump_col))
+        self.run_to(self.cx(jump_col) + jump_offset)
         self.jump()
 
     def drone(self, col):
@@ -237,10 +238,10 @@ def arc_run(L, x, count, spacing=8):
     return x + 3 + count * spacing
 
 
-def mover_run(L, x, count, spacing=12, lead=3):
+def mover_run(L, x, count, spacing=12, lead=3, jump_offset=0):
     for i in range(count):
         col = x + 6 + i * spacing
-        L.mover(col, col - lead)
+        L.mover(col, col - lead, jump_offset)
     return x + 6 + count * spacing
 
 

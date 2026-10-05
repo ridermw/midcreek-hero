@@ -47,7 +47,7 @@ def build():
     L.port(23, "A", SEQUENCES["c3"])
     L.vent(29)
     L.tray(38, 43)
-    L.mover(50, 47)
+    L.mover(50, 48)
     L.part(55, S, "K")
     L.lift_up(59, 61, 75)
     L.rack(66, 9, "D", "diagnose")

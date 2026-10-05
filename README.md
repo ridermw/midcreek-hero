@@ -306,6 +306,13 @@ slide with a wait or a step without slide before triggering it again. The
 motor buffers a slide press for 0.1 s, so a press just before a slide ends
 starts the next slide with no gap. Every route must finish with no damage.
 
+Cable hazards use double pixel scale so the wires are visible before contact.
+The damage rectangle matches the combined opaque frame bounds: 64 by 16 world
+pixels for stationary cables and 64 by 22 for moving cables.
+Patrol range, patrol speed, animation timing, and damage amount are unchanged.
+Recorded moving cable approaches use measured launch positions; changing a
+launch offset changes route input, not level geometry or the timing targets.
+
 ## Level layouts
 
 `tools/levels/level1.py` to `level5.py` build each level grid and its route
