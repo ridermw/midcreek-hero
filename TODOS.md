@@ -258,8 +258,8 @@ Do not add new level files before their routes and required assets are ready.
 - [x] Add isolated state units for all six approved tasks.
 - [x] Observe focused failures before implementation and verify partial rollback.
 - [x] Connect task entities, resource inventory, prompts, artwork, and effects.
-- [ ] Deliver complete routes and every checkpoint replay for levels 06 through 15.
-- [ ] Verify native and browser captures and report export size.
+- [x] Deliver complete routes and every checkpoint replay for levels 06 through 15.
+- [x] Verify native and browser captures and report export size.
 
 Level 06, Cooling Gallery, now includes its authored route, three checkpoints,
 runtime artwork, and save migration from completed level 05. Both heroes finish
@@ -272,7 +272,10 @@ Levels 10 through 12 now have authored routes and pass native checkpoint replay
 for both heroes. Fire suppression requires a reachable refill station; Pump
 Station returns through the drained floor; the rooftop route uses a lower
 maintenance passage between equipment platforms.
-Levels 13 through 15 remain to be authored and verified.
+Levels 13 through 15 complete the approved campaign. Their authored routes and
+all checkpoint replays pass for both heroes. Expansion Site combines all six
+mechanics and returns through the drained construction floor. Level 15 saves
+its result without offering a nonexistent next level.
 
 ## 3. Decide the role of sliding
 

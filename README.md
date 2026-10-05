@@ -1,7 +1,7 @@
 # Midcreek Hero
 
 A pixel art side scroller set in a data center. You play a technician who runs,
-jumps, slides, and climbs through 12 levels, avoids hazards, and completes
+jumps, slides, and climbs through 15 levels, avoids hazards, and completes
 work orders before the service level agreement (SLA) timer runs out.
 
 **[Play in the browser](https://ridermw.github.io/midcreek-hero/)**
@@ -161,8 +161,9 @@ Cooling Gallery is playable as level 06. Its upper service gallery contains
 cooling controls and leak isolation work. Drain the lower gallery, then return
 through it to install the cable. Operations Suite, Fiber Exchange, and Loading
 Yard are playable as levels 07 through 09. Fire Response Hall, Pump Station,
-and Rooftop Air Handlers are playable as levels 10 through 12.
-Levels 13 through 15 remain in development.
+and Rooftop Air Handlers are playable as levels 10 through 12. Generator
+Courtyard, Facility Approach, and Expansion Site complete levels 13 through 15.
+Expansion Site combines all six expansion mechanics. Level 15 ends the campaign.
 The original five level definitions, routes, and targets remain unchanged.
 
 Expansion resources have task labels. Press Repair at a source to collect its
@@ -387,10 +388,14 @@ human difficulty targets. Their current values remain unchanged:
 | 10 Fire Response Hall | 83.2 s | 240 s | 480 s |
 | 11 Pump Station | 40.4 s | 240 s | 480 s |
 | 12 Rooftop Air Handlers | 58.1 s | 270 s | 540 s |
+| 13 Generator Courtyard | 63.8 s | 270 s | 540 s |
+| 14 Facility Approach | 34.7 s | 270 s | 540 s |
+| 15 Expansion Site | 104.2 s | 360 s | 720 s |
 
 `python3 -m tools.levels.expansion` reproduces all shipped expansion levels and
 their routes. The independent budgets are 180 seconds for 06 through 08 and
-200 seconds for 09 and 11, and 220 seconds for 10 and 12.
+200 seconds for 09 and 11, 220 seconds for 10 and 12 through 14, and 300
+seconds for 15.
 The expansion route check runs
 both heroes through the full level and again from every saved checkpoint.
 These automated timings do not establish human difficulty.
@@ -401,6 +406,9 @@ records the next three environments and the Loading Yard recovery regression.
 The [10 through 12 evidence](docs/evidence/campaign-expansion/10-12-receipt.json)
 records fire suppression, pump drainage, and rooftop traversal. Fire artwork
 and its damage bounds shrink with suppression progress and restore together.
+The [final campaign evidence](docs/evidence/campaign-expansion/13-15-receipt.json)
+records Generator Courtyard, Facility Approach, Expansion Site, and the final
+completion screen. All ten expansion levels pass both hero checkpoint replays.
 
 `tests/test_level_layouts.py` checks that the scripts reproduce the shipped
 files exactly. Change par or SLA only after collecting player observations.

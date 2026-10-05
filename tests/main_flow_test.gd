@@ -135,6 +135,50 @@ func run() -> void:
 				await process_frame
 			check(last.has_focus(), device + " navigation reaches the last unlocked level.")
 			check(scrolls[0].get_global_rect().encloses(last.get_global_rect()), device + " navigation keeps the whole last button visible.")
+		main.level_button("01").grab_focus()
+		await process_frame
+		await process_frame
+		var area: Rect2 = scrolls[0].get_global_rect()
+		var previous_touch := Input.emulate_touch_from_mouse
+		var previous_mouse := Input.emulate_mouse_from_touch
+		Input.emulate_touch_from_mouse = true
+		Input.emulate_mouse_from_touch = true
+		check(DisplayServer.is_touchscreen_available(), "The test enables the engine's supported touchscreen emulation.")
+		for gesture: int in range(4):
+			var start := Vector2(area.end.x - 35, area.end.y - 30)
+			var touch := InputEventMouseButton.new()
+			touch.button_index = MOUSE_BUTTON_LEFT
+			touch.button_mask = MOUSE_BUTTON_MASK_LEFT
+			touch.position = start
+			touch.global_position = start
+			touch.pressed = true
+			root.push_input(touch, true)
+			await process_frame
+			var drag := InputEventMouseMotion.new()
+			drag.button_mask = MOUSE_BUTTON_MASK_LEFT
+			drag.position = start - Vector2(0, 280)
+			drag.global_position = drag.position
+			drag.relative = Vector2(0, -280)
+			root.push_input(drag, true)
+			await process_frame
+			touch.position = drag.position
+			touch.global_position = drag.position
+			touch.button_mask = 0
+			touch.pressed = false
+			root.push_input(touch, true)
+			await process_frame
+		check(scrolls[0].scroll_vertical > 0, "Touch gestures scroll the real level list.")
+		check(scrolls[0].get_global_rect().encloses(last.get_global_rect()), "Touch scrolling exposes the last unlocked level.")
+		Input.emulate_touch_from_mouse = previous_touch
+		Input.emulate_mouse_from_touch = previous_mouse
+	main.start_level("15")
+	await process_frame
+	check(main.screen.error_message.is_empty(), "The final campaign level loads.")
+	main.screen.finished.emit({"elapsed": 110.0, "hits": 0, "respawns": 0, "stars": 3, "optional_done": 0, "optional_total": 0})
+	await process_frame
+	check(main.screen_name == "results" and main.save.stars("15") == 3 and main.next_playable("15").is_empty(), "Final results save the score and end progression.")
+	var final_buttons: Array[Node] = main.screen.find_children("*", "Button", true, false)
+	check(not final_buttons.any(func(button: Button) -> bool: return button.text == "Next work order"), "The final result does not offer a nonexistent next level.")
 	main.queue_free()
 	for i: int in range(4):
 		await process_frame
