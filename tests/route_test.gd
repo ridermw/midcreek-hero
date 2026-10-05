@@ -78,6 +78,13 @@ func play(file_name: String) -> void:
 		await physics_frame
 		frames += 1
 		if trace and (runner.index != step_index or level.health.hits_taken != last_hits or level.respawns != last_respawns):
+			if level.health.hits_taken != last_hits:
+				for hazard in level.entities["hazards"]:
+					if hazard.position.distance_to(level.player.position) < 120:
+						print("CONTACT player=%s body=%s hazard=%s at=%s rect=%s" % [
+							level.player.position, level.player.hit_rect(), hazard.get_script().resource_path,
+							hazard.position, hazard.hit_rect(),
+						])
 			print("TRACE f=%d step=%d pos=%s hits=%d respawns=%d tasks=%s" % [
 				frames, runner.index, level.player.position.round(), level.health.hits_taken,
 				level.respawns, level.tasks.completed_ids()

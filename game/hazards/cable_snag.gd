@@ -1,6 +1,7 @@
 extends Node2D
 
-const SIZE := Vector2(28, 10)
+const SIZE := Vector2(64, 16)
+const ART_RECT := Rect2(-32, -32, 64, 32)
 
 var active: bool = true
 var art: RefCounted
@@ -24,6 +25,6 @@ func hit_rect() -> Rect2:
 func _draw() -> void:
 	if art != null:
 		var frame: int = maxi(_frame, 0)
-		draw_texture(art.texture("hazards", "cable-snag", frame), Vector2(-16, -16))
+		draw_texture_rect(art.texture("hazards", "cable-snag", frame), ART_RECT, false)
 		return
 	draw_rect(Rect2(-SIZE.x / 2.0, -SIZE.y, SIZE.x, SIZE.y), Color(0.95, 0.55, 0.1))

@@ -25,7 +25,7 @@
   {"hold": ["move_right"], "until_x": 1186, "max_seconds": 8},
   {"hold": ["move_right", "slide"], "seconds": 0.1},
   {"hold": ["move_right"], "until_x": 1438, "max_seconds": 8},
-  {"hold": ["move_right"], "until_x": 1520, "max_seconds": 8},
+  {"hold": ["move_right"], "until_x": 1552, "max_seconds": 8},
   {"hold": ["move_right", "jump"], "seconds": 0.45},
   {"hold": ["move_right"], "until_x": 1898, "max_seconds": 8},
   {"wait": 0.2},

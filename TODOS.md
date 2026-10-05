@@ -508,3 +508,39 @@ work stay open.
 The limit measures file bytes before HTTP compression. It is not a measured
 phone transfer size or a loading performance guarantee. Intentional asset or
 engine growth needs a new measurement and an explicit reviewed budget change.
+
+## Verified cable hazard visibility
+
+- [x] Render stationary and moving cables at double pixel scale with nearest
+  sampling. Keep the existing artwork, palette, and frame cadence.
+- [x] Match collision rectangles to the combined opaque frame bounds:
+  64 by 16 world pixels for stationary cables, 64 by 22 for moving cables.
+  The visibility regression failed four checks before the correction.
+- [x] Reproduce the larger footprint's effect on recorded routes.
+  Level 3 and Level 5 initially took damage; do not weaken that gate.
+  Real physics traces separated late takeoff from landing over a moving cable.
+- [x] Adjust only the affected recorded launch positions. Level 3 changes
+  three launch points by -32, -6, and +8 pixels. Level 5 changes one by +32.
+  Generated level geometry, hazard positions, patrol range, movement speed,
+  authored par and SLA, and independent route budgets remain unchanged.
+- [x] Verify all five complete routes without hits or respawns.
+  Completion times remain 93.17, 95.73, 96.22, 97.20, and 99.87 seconds.
+- [x] Capture stationary and moving cable silhouettes in actual native levels.
+  The alpha-bound check matches every declared cable frame.
+- [x] Capture both cable types in exported browser gameplay with no hits or
+  respawns: [stationary](docs/evidence/cables/stationary-browser.png) and
+  [moving](docs/evidence/cables/moving-browser.png).
+- [ ] Collect physical device and player readability observations.
+
+This improves cable size and visibility. It does not establish new human
+difficulty targets. `ROUTE_TRACE=1` now includes nearby hazard rectangles when
+a hit occurs so future traversal failures can be diagnosed without changing
+the damage or route acceptance rules.
+
+The launch offsets depend on the current upstream route and patrol phase.
+Recheck them after earlier route edits. A real physics sweep verified both
+tuned Level 3 launches with offsets of -3 and +3 pixels around the selected
+point (one physics tick in either direction). The -6 pixel launch still passes
+at -6 additional pixels but fails at +6; the +8 pixel launch passes at +6
+additional pixels but fails at -6. These are measured scripted-route margins,
+not a human difficulty result.

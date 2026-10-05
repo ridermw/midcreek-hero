@@ -1,0 +1,158 @@
+{
+  "engine": "Godot 4.7.2",
+  "physics_hz": 60,
+  "level": "03-cable-jungle",
+  "method": "Replay the complete authored route with one launch target shifted; stop at completion or first hit. No geometry or physics changes.",
+  "results": [
+    {
+      "complete": true,
+      "elapsed": 96.2166666666625,
+      "error": "",
+      "hits": 0,
+      "launch_x": 6628.0,
+      "position": [
+        14371.548828125,
+        415.925231933594
+      ],
+      "respawns": 0,
+      "shift": -6,
+      "step": 82,
+      "stopped_at_step": 147
+    },
+    {
+      "complete": true,
+      "elapsed": 96.2166666666625,
+      "error": "",
+      "hits": 0,
+      "launch_x": 6631.0,
+      "position": [
+        14371.548828125,
+        415.925231933594
+      ],
+      "respawns": 0,
+      "shift": -3,
+      "step": 82,
+      "stopped_at_step": 147
+    },
+    {
+      "complete": true,
+      "elapsed": 96.2166666666625,
+      "error": "",
+      "hits": 0,
+      "launch_x": 6634.0,
+      "position": [
+        14371.548828125,
+        415.925231933594
+      ],
+      "respawns": 0,
+      "shift": 0,
+      "step": 82,
+      "stopped_at_step": 147
+    },
+    {
+      "complete": true,
+      "elapsed": 96.2166666666625,
+      "error": "",
+      "hits": 0,
+      "launch_x": 6637.0,
+      "position": [
+        14371.548828125,
+        415.925231933594
+      ],
+      "respawns": 0,
+      "shift": 3,
+      "step": 82,
+      "stopped_at_step": 147
+    },
+    {
+      "complete": false,
+      "elapsed": 49.8333333333318,
+      "error": "",
+      "hits": 1,
+      "launch_x": 6640.0,
+      "position": [
+        6646.5244140625,
+        399.590850830078
+      ],
+      "respawns": 0,
+      "shift": 6,
+      "step": 82,
+      "stopped_at_step": 83
+    },
+    {
+      "complete": false,
+      "elapsed": 90.3833333333295,
+      "error": "",
+      "hits": 1,
+      "launch_x": 13170.0,
+      "position": [
+        13318.9404296875,
+        399.590850830078
+      ],
+      "respawns": 0,
+      "shift": -6,
+      "step": 141,
+      "stopped_at_step": 143
+    },
+    {
+      "complete": true,
+      "elapsed": 96.2166666666625,
+      "error": "",
+      "hits": 0,
+      "launch_x": 13173.0,
+      "position": [
+        14371.548828125,
+        415.925231933594
+      ],
+      "respawns": 0,
+      "shift": -3,
+      "step": 141,
+      "stopped_at_step": 147
+    },
+    {
+      "complete": true,
+      "elapsed": 96.2166666666625,
+      "error": "",
+      "hits": 0,
+      "launch_x": 13176.0,
+      "position": [
+        14371.548828125,
+        415.925231933594
+      ],
+      "respawns": 0,
+      "shift": 0,
+      "step": 141,
+      "stopped_at_step": 147
+    },
+    {
+      "complete": true,
+      "elapsed": 96.2166666666625,
+      "error": "",
+      "hits": 0,
+      "launch_x": 13179.0,
+      "position": [
+        14371.548828125,
+        415.925231933594
+      ],
+      "respawns": 0,
+      "shift": 3,
+      "step": 141,
+      "stopped_at_step": 147
+    },
+    {
+      "complete": true,
+      "elapsed": 96.2166666666625,
+      "error": "",
+      "hits": 0,
+      "launch_x": 13182.0,
+      "position": [
+        14371.548828125,
+        415.925231933594
+      ],
+      "respawns": 0,
+      "shift": 6,
+      "step": 141,
+      "stopped_at_step": 147
+    }
+  ]
+}

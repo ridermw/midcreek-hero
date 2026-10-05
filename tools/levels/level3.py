@@ -48,7 +48,7 @@ def build():
     L.tray(50, 56)
     L.part(60, S, "D")
     L.pit(64, 66)
-    L.mover(72, 69)
+    L.mover(72, 68)
     L.checkpoint(78)
     L.tray(84, 90)
     L.rack(96, S, "B", "deliver")
@@ -62,7 +62,9 @@ def build():
     x = ladder_tower(L, 152, 7, rack="Q")
     L.checkpoint(x)
     x = tray_run(L, x + 4, 2)
-    x = mover_run(L, x, 2, lead=4)
+    L.mover(x + 6, x + 2)
+    L.mover(x + 18, x + 14, jump_offset=-6)
+    x += 30
     x = catwalk(L, x + 2, 3)
     L.port(x + 3, "U", SEQUENCES["c4"])
     x += 9
@@ -73,7 +75,7 @@ def build():
     x = catwalk(L, x + 2, 2)
     x = stairs(L, x + 4, 3)
     x = pit_run(L, x, 2)
-    x = mover_run(L, x, 1, lead=2)
+    x = mover_run(L, x, 1, lead=2, jump_offset=8)
     x = snag_run(L, x + 2, 2)
     L.exit(x + 4)
     L.trim(x + 8)
