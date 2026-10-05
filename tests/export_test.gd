@@ -32,6 +32,9 @@ var failures: int = 0
 func _initialize() -> void:
 	var animations = load("res://game/animation_library.gd").new()
 	check(animations.load_manifest(), "Every declared animation frame loads from the export: " + animations.error_message)
+	for group: String in ["animations", "tiles", "hazards", "props", "ui"]:
+		var palette := "res://art/cel-shift/%s/palette.png" % group
+		check(not ResourceLoader.exists(palette), "Build palette stays outside the download: " + palette)
 	for path: String in [
 		"res://docs/evidence/animation-cadence/before.json",
 		"res://docs/evidence/animation-cadence/after.json",
