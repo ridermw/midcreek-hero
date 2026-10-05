@@ -153,6 +153,61 @@ class AssetPipelineTest(unittest.TestCase):
                 with self.subTest(variant=variant, pair=(i + 1, i + 5)):
                     self.assertLessEqual(abs(tops[i] - tops[i + 4]), 1, "Opposite gait phases share head registration within one raster pixel.")
 
+    def test_repair_planted_stance_stays_on_its_pivot(self):
+        for variant in animation_assets.VARIANTS:
+            centers = []
+            for index in range(6):
+                with Image.open(animation_assets.ART / "frames" / variant / "primary" / f"{index:02}.png") as frame:
+                    bottom = frame.getbbox()[3]
+                    feet = frame.crop((0, bottom - 16, frame.width, bottom)).getbbox()
+                    centers.append((feet[0] + feet[2] - 1) / 2)
+            with self.subTest(variant=variant):
+                self.assertLessEqual(max(centers) - min(centers), 0.5, "The repair stance midpoint stays registered across phases and the loop boundary.")
+                self.assertTrue(all(abs(center - 104) <= 0.5 for center in centers))
+
+    def test_repair_alignment_preserves_pixels_baseline_and_tool_reach(self):
+        frame = Image.new("RGBA", (208, 208))
+        frame.paste((15, 80, 180, 255), (118, 35, 135, 51))
+        frame.paste((180, 200, 20, 255), (114, 52, 141, 125))
+        frame.paste((60, 40, 20, 255), (110, 125, 122, 184))
+        frame.paste((60, 40, 20, 255), (130, 125, 142, 184))
+        frame.paste((200, 200, 200, 255), (138, 85, 184, 90))
+        result = animation_assets.align_repair(frame)
+        self.assertEqual(sorted(frame.getcolors(208 * 208)), sorted(result.getcolors(208 * 208)))
+        self.assertEqual(result.getbbox()[3], 184)
+        self.assertEqual(result.getpixel((161, 86)), (200, 200, 200, 255))
+        self.assertEqual(result.tobytes(), animation_assets.align_repair(result).tobytes())
+
+    def test_repair_alignment_rejects_missing_contact_and_clipping(self):
+        with self.assertRaisesRegex(ValueError, "contact"):
+            animation_assets.align_repair(Image.new("RGBA", (208, 208)))
+        frame = Image.new("RGBA", (208, 208))
+        frame.paste((60, 40, 20, 255), (10, 170, 30, 184))
+        frame.putpixel((207, 60), (200, 200, 200, 255))
+        with self.assertRaisesRegex(ValueError, "clipping"):
+            animation_assets.align_repair(frame)
+
+    def test_normalize_primary_registers_planted_stance(self):
+        with tempfile.TemporaryDirectory() as directory:
+            art = Path(directory)
+            generated = art / "generated/man-midcreek"
+            generated.mkdir(parents=True)
+            sheet = Image.new("RGBA", (1536, 1024))
+            for index, center in enumerate((220, 245, 270, 300, 260, 240)):
+                x, y = index % 3 * 512, index // 3 * 512
+                sheet.paste((30, 80, 180, 255), (x + center - 25, y + 90, x + center + 25, y + 150))
+                sheet.paste((180, 200, 20, 255), (x + center - 30, y + 150, x + center + 30, y + 320))
+                for foot in (-30, 15):
+                    sheet.paste((60, 40, 20, 255), (x + center + foot, y + 320, x + center + foot + 15, y + 448))
+                sheet.paste((200, 200, 200, 255), (x + center + 30, y + 180, x + center + 55 + index * 6, y + 190))
+            sheet.save(generated / "primary.png")
+            with patch.object(animation_assets, "ART", art):
+                animation_assets.normalize("man-midcreek", "primary")
+            for path in (art / "frames/man-midcreek/primary").glob("*.png"):
+                with Image.open(path) as frame:
+                    feet = frame.crop((0, 168, 208, 184)).getbbox()
+                self.assertLessEqual(abs((feet[0] + feet[2] - 1) / 2 - 104), 0.5)
+
     @staticmethod
     def pouch_offset(path):
         """Horizontal offset of the brown tool pouch from the figure center, at belt height."""
