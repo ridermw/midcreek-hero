@@ -23,6 +23,7 @@ var sliding: bool = false
 var hurt_remaining: float = 0.0
 var on_ladder: bool = false
 var frozen: bool = false
+var dead: bool = false
 var _pending_jump: bool = false
 var _pending_slide: bool = false
 var _shape: RectangleShape2D
@@ -112,6 +113,8 @@ func standing_blocked() -> bool:
 
 
 func _physics_process(delta: float) -> void:
+	if dead:
+		return
 	if frozen:
 		# Keep jump and slide presses during hit stop; replay each once on the next frame.
 		if not locked:
@@ -190,6 +193,11 @@ func hit_rect() -> Rect2:
 
 
 func respawn(at: Vector2) -> void:
+	dead = false
+	_pending_jump = false
+	_pending_slide = false
+	input_override.erase("jump_pressed")
+	input_override.erase("slide_pressed")
 	position = at
 	velocity = Vector2.ZERO
 	motor.reset()

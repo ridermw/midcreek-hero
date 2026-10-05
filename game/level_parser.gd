@@ -10,6 +10,7 @@ const HAZARDS := {
 	"v": "heat_vent",
 	"k": "spark_arc",
 	"d": "drone",
+	"~": "electrified_liquid",
 }
 const RESERVED_UPPER: Array[String] = ["C", "E", "P", "T"]
 const HEADER_STRINGS: Array[String] = ["name", "music", "background"]
@@ -161,6 +162,9 @@ func _check_grid(level: Dictionary) -> String:
 		return "Missing exit 'E'."
 	if level["checkpoints"].size() > MAX_CHECKPOINTS:
 		return "More than %d checkpoints." % MAX_CHECKPOINTS
+	for hazard: Dictionary in level["hazards"]:
+		if hazard["kind"] == "electrified_liquid" and level["solids"].get(hazard["cell"] + Vector2i.DOWN) != "floor":
+			return "Electrified liquid requires solid floor directly below it."
 	return ""
 
 

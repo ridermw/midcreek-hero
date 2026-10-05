@@ -332,6 +332,20 @@ Patrol range, patrol speed, animation timing, and damage amount are unchanged.
 Recorded moving cable approaches use measured launch positions; changing a
 launch offset changes route input, not level geometry or the timing targets.
 
+New content can use `~` for electrified liquid. Each liquid cell requires a
+solid floor cell directly below it. Contact sets health to zero immediately,
+even during damage invulnerability. The hero shows a death reaction for
+0.5 seconds, then restores the checkpoint once. Ordinary damage is unchanged.
+Draining liquid disables its damage without removing the floor.
+The five existing levels do not use this hazard.
+
+Run the focused fatal contact and real physics checks:
+
+```sh
+tools/godot_test.sh tests/fatal_liquid_test.gd FATAL_LIQUID_TEST
+tools/godot_test.sh tests/liquid_physics_test.gd LIQUID_PHYSICS_TEST
+```
+
 ## Level layouts
 
 `tools/levels/level1.py` to `level5.py` build each level grid and its route
