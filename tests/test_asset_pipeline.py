@@ -162,7 +162,7 @@ class AssetPipelineTest(unittest.TestCase):
                     feet = frame.crop((0, bottom - 16, frame.width, bottom)).getbbox()
                     centers.append((feet[0] + feet[2] - 1) / 2)
             with self.subTest(variant=variant):
-                self.assertLessEqual(max(centers) - min(centers), 1, "The repair stance midpoint stays registered across phases and the loop boundary.")
+                self.assertLessEqual(max(centers) - min(centers), 0.5, "The repair stance midpoint stays registered across phases and the loop boundary.")
                 self.assertTrue(all(abs(center - 104) <= 0.5 for center in centers))
 
     def test_repair_alignment_preserves_pixels_baseline_and_tool_reach(self):
