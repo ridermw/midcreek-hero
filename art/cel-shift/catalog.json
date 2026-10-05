@@ -326,6 +326,18 @@
       "fit": "bottom"
     },
     {
+      "name": "electrified-liquid",
+      "group": "hazards",
+      "cell": [
+        32,
+        16
+      ],
+      "frames": 4,
+      "fps": 8,
+      "prompt": "A horizontal side-view tile of shallow electrically live cyan water lying ABOVE a solid industrial floor, not a hole or pit. The water occupies the lower half of the tile from left edge to right edge, with a straight level surface, blue ripples, and a thin yellow-and-black diagonal warning stripe along the bottom. Small jagged white and electric blue arcs crackle above the water in four distinct phases. Keep the liquid surface, warning stripe, size and position identical in every phase; only ripples and sparks move. Tile the water and warning stripe seamlessly left to right; no rounded end caps, container walls, signs, lettering, floor scenery or perspective. Keep empty space above the sparks transparent. Cyan water, white electrical sparks and yellow warning paint must be distinct at the tiny final 32 by 16 pixel scale.",
+      "fit": "fill"
+    },
+    {
       "name": "spark-arc",
       "group": "hazards",
       "cell": [

@@ -16,6 +16,21 @@ def write_catalog(art, assets):
 
 
 class SpriteAssetsTest(unittest.TestCase):
+    def test_electrified_liquid_has_required_production_frames(self):
+        matches = [asset for asset in sprite_assets.load_catalog()["assets"] if asset["name"] == "electrified-liquid"]
+        self.assertEqual(len(matches), 1, "Fatal liquid requires an authored production asset.")
+        asset = matches[0]
+        self.assertEqual((asset["group"], asset["cell"], asset["frames"], asset["fps"]), ("hazards", [32, 16], 4, 8))
+        manifest = json.loads((sprite_assets.ART / "hazards/manifest.json").read_text())
+        self.assertIn("electrified-liquid", manifest["assets"])
+        paths = manifest["assets"]["electrified-liquid"]["frames"]
+        self.assertEqual(len(paths), 4)
+        for relative in paths:
+            with Image.open(sprite_assets.ART / "hazards" / relative) as frame:
+                self.assertEqual(frame.size, (32, 16))
+                self.assertTrue(set(frame.getchannel("A").tobytes()) <= {0, 255})
+                self.assertIsNotNone(frame.getbbox())
+
     def test_layout_fits_limits_and_aspect(self):
         for cell, frames in (((32, 32), 1), ((12, 12), 1), ((32, 96), 1), ((32, 64), 4),
                              ((480, 120), 1), ((160, 32), 1), ((16, 16), 4), ((32, 16), 2)):

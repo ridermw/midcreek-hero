@@ -7,6 +7,7 @@ signal sound(sound_name: String)
 
 const REPAIR_TICK_SECONDS := 0.4
 const DIAGNOSE_SECONDS := 0.8
+const FATAL_REACTION_SECONDS := 0.5
 const PART_LABELS := {"psu": "PSU", "dimm": "DIMM"}
 const DARK_COLOR := Color(0.3, 0.32, 0.4)
 const FLICKER_COLOR := Color(0.12, 0.12, 0.18)
@@ -56,6 +57,7 @@ var respawns: int = 0
 var use_action_override: bool = false
 var action_override: Dictionary = {}
 var _respawn_pending: bool = false
+var _fatal_remaining := 0.0
 var _repair_tick: float = 0.0
 var carried_part: String = ""
 var _diagnose_remaining: float = 0.0
@@ -253,6 +255,19 @@ func _physics_process(delta: float) -> void:
 func step(delta: float) -> void:
 	if completed:
 		return
+	if _fatal_remaining > 0.0:
+		_fatal_remaining = maxf(0.0, _fatal_remaining - delta)
+		if is_zero_approx(_fatal_remaining):
+			_fatal_remaining = 0.0
+			_respawn()
+			hud.update_timer()
+			camera.position = player.position
+		return
+	var body := player.hit_rect()
+	for hazard in entities["hazards"]:
+		if "fatal" in hazard and hazard.fatal and hazard.active and hazard.hit_rect().intersects(body):
+			_begin_fatal_death()
+			return
 	_sample_actions()
 	_update_darkness(delta)
 	_update_shake(delta)
@@ -270,7 +285,6 @@ func step(delta: float) -> void:
 	_switch_error_remaining = maxf(0.0, _switch_error_remaining - delta)
 	timer.tick(delta)
 	health.tick(delta)
-	var body := player.hit_rect()
 	for hazard in entities["hazards"]:
 		hazard.advance(delta)
 		if hazard.active and hazard.hit_rect().intersects(body) and health.damage():
@@ -575,16 +589,54 @@ func _complete_if_all_racks_done(task_id: String) -> void:
 
 
 func _request_respawn() -> void:
-	_respawn_pending = true
+	if _fatal_remaining <= 0.0:
+		_respawn_pending = true
+
+
+func _begin_fatal_death() -> void:
+	if player.dead:
+		return
+	_fatal_remaining = FATAL_REACTION_SECONDS
+	_respawn_pending = false
+	hit_stop_remaining = 0.0
+	shake_remaining = 0.0
+	camera.offset = Vector2.ZERO
+	freeze_world(true)
+	player.dead = true
+	player.locked = true
+	player.velocity = Vector2.ZERO
+	player.motor.reset()
+	player.hurt_remaining = FATAL_REACTION_SECONDS
+	player.sprite.speed_scale = 1.0
+	player.update_animation()
+	player.sprite.play(&"reaction")
+	player.sprite.set_frame_and_progress(0, 0.0)
+	health.fatal_damage()
+	sound.emit("hit")
+	hud.set_prompt(ControlPrompt.make("", "", "", "Electrified liquid"))
 
 
 func _respawn() -> void:
+	var fatal := player.dead
 	_respawn_pending = false
 	sound.emit("fail")
 	respawns += 1
 	player.respawn(checkpoints.restore(timer, tasks))
 	health.refill()
 	restore_state(checkpoints.level_state)
+	if fatal:
+		pending_presses.clear()
+		_replayed_presses.clear()
+		_previous_actions.clear()
+		_pressed_actions.clear()
+		action_override.clear()
+		_repair_tick = 0.0
+		if mobile_input != null:
+			mobile_input.clear()
+		player.locked = false
+		player.action = &""
+		freeze_world(false)
+		player.update_animation()
 	hud.refresh_tasks()
 
 
