@@ -1,0 +1,32 @@
+{
+  "engine": "Godot 4.7.2",
+  "native_renderer": "Compatibility OpenGL, Apple M4 Pro",
+  "native_heroes": ["man", "woman"],
+  "native_input": "RouteInput physics callback at priority -200, independent of screenshot waits",
+  "browser_renderer": "Chromium WebGL 2.0",
+  "browser_hero": "woman",
+  "browser_input": "Production main scene smoke routes",
+  "levels": [
+    {"id": "10", "full_route_seconds": 83.23, "checkpoint_seconds": [82.98, 41.13, 10.78], "captures": ["10-man-native.png", "10-woman-native.png", "10-woman-browser.png"]},
+    {"id": "11", "full_route_seconds": 40.35, "checkpoint_seconds": [40.00, 27.43, 19.30], "captures": ["11-man-native.png", "11-woman-native.png", "11-woman-browser.png"]},
+    {"id": "12", "full_route_seconds": 58.10, "checkpoint_seconds": [57.82, 36.87, 12.23], "captures": ["12-man-native.png", "12-woman-native.png", "12-woman-browser.png"]}
+  ],
+  "hits": 0,
+  "additional_respawns": 0,
+  "browser_errors": [],
+  "export_pack_checks": 544,
+  "published_bytes": 53181791,
+  "capture_notes": [
+    "Initial capture runs were rejected after a native route failure and a bounded timeout.",
+    "Input now advances on physics ticks rather than the screenshot coroutine.",
+    "Both heroes subsequently completed all three rendered routes.",
+    "Partial fire captures show positive intensity at or below half of the initial intensity.",
+    "A bounded completion grace period lets the final physics action settle."
+  ],
+  "limitations": [
+    "Checkpoint replay evidence is native for both heroes.",
+    "Browser route evidence uses the female hero.",
+    "No physical phone or controller validation.",
+    "Fixed simulation timing and a render cap do not establish device performance."
+  ]
+}

@@ -268,7 +268,11 @@ Native replay from each checkpoint also completes without additional respawns.
 Levels 07 through 09 now have authored routes and pass native checkpoint replay
 for both heroes. Their distinct layouts use separate component stores, upper
 and lower fiber routes, and covered loading platforms around a service trench.
-Levels 10 through 15 remain to be authored and verified.
+Levels 10 through 12 now have authored routes and pass native checkpoint replay
+for both heroes. Fire suppression requires a reachable refill station; Pump
+Station returns through the drained floor; the rooftop route uses a lower
+maintenance passage between equipment platforms.
+Levels 13 through 15 remain to be authored and verified.
 
 ## 3. Decide the role of sliding
 

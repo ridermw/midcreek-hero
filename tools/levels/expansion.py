@@ -278,11 +278,185 @@ def loading_yard():
                     "tasks": tasks}
 
 
+def fire_response_hall():
+    layout = WorkLayout(68)
+    low, upper = layout.stand, 11
+    layout.platform(upper + 1, 8, 60)
+    for column in [10, 26, 46, 58]:
+        layout.ladder_cells(column, upper)
+    layout.checkpoint(5)
+    layout.checkpoint(32)
+    layout.put(50, upper, "C")
+    layout.put(18, low, "f")
+    layout.put(42, low, "f")
+    layout.put(52, low, "v")
+    tasks = [
+        {"id": "bay-a", "type": "extinguish_fire", "required": True,
+         "label": "Extinguish the first equipment bay", "sites": [[14, low]],
+         "resources": [{"kind": "extinguisher", "cell": [24, upper]}],
+         "effect_cells": [[18, low]]},
+        {"id": "bay-b", "type": "extinguish_fire", "required": True,
+         "label": "Extinguish the second equipment bay", "sites": [[38, low]],
+         "resources": [{"kind": "extinguisher", "cell": [30, upper]}],
+         "effect_cells": [[42, low]]},
+        {"id": "extract", "type": "restore_cooling", "required": True,
+         "label": "Restart the extraction fan", "sites": [[48, upper], [56, upper]],
+         "resources": [{"kind": "filter", "cell": [34, upper]}],
+         "effect_cells": [[52, low]]},
+    ]
+    for source, service, access in [(24, 14, 10), (30, 38, 26)]:
+        layout.climb(access, upper, True)
+        layout.go(source, across_ladder=True)
+        layout.action()
+        layout.climb(access, low, False)
+        layout.go(service)
+        layout.action(seconds=2.1)
+        layout.climb(access, upper, True)
+        layout.go(source, across_ladder=True)
+        layout.action()
+        layout.climb(access, low, False)
+        layout.go(service)
+        layout.action(seconds=1.2)
+    layout.climb(46, upper, True)
+    layout.go(34, across_ladder=True)
+    layout.action()
+    layout.go(48, across_ladder=True)
+    layout.action("diagnose")
+    layout.go(56)
+    layout.action()
+    layout.go(48)
+    layout.action()
+    layout.action(seconds=1.7)
+    layout.climb(58, low, False)
+    layout.exit(64)
+    return layout, {"name": "Fire Response Hall", "background": "fire-response-hall",
+                    "music": "level4", "par_seconds": 240, "sla_seconds": 480,
+                    "tasks": tasks}
+
+
+def pump_station():
+    layout = WorkLayout(64)
+    low, upper = layout.stand, 11
+    layout.platform(upper + 1, 8, 58)
+    for column in [10, 30, 54]:
+        layout.ladder_cells(column, upper)
+    layout.checkpoint(5)
+    layout.put(28, upper, "C")
+    layout.put(44, upper, "C")
+    for column in list(range(12, 27)) + list(range(34, 49)):
+        layout.put(column, low, "~")
+    layout.put(56, low, "v")
+    tasks = [
+        {"id": "west", "type": "contain_leak", "required": True,
+         "label": "Drain the west pump floor", "sites": [[18, upper], [22, upper]],
+         "resources": [{"kind": "seal", "cell": [14, upper]}],
+         "effect_cells": [[column, low] for column in range(12, 27)]},
+        {"id": "east", "type": "contain_leak", "required": True,
+         "label": "Drain the east pump floor", "sites": [[38, upper], [42, upper]],
+         "resources": [{"kind": "seal", "cell": [34, upper]}],
+         "effect_cells": [[column, low] for column in range(34, 49)]},
+        {"id": "pumps", "type": "restore_cooling", "required": True,
+         "label": "Restore pump ventilation", "sites": [[52, upper], [56, upper]],
+         "resources": [{"kind": "filter", "cell": [50, upper]}],
+         "effect_cells": [[56, low]]},
+    ]
+    layout.climb(10, upper, True)
+    for source, valve, drain in [(14, 18, 22), (34, 38, 42)]:
+        layout.go(source, across_ladder=True)
+        layout.action()
+        layout.go(valve)
+        layout.action()
+        layout.action()
+        layout.go(drain)
+        layout.action(seconds=3.2)
+    layout.go(50)
+    layout.action()
+    layout.go(52)
+    layout.action("diagnose")
+    layout.go(56, across_ladder=True)
+    layout.action()
+    layout.go(52, across_ladder=True)
+    layout.action()
+    layout.action(seconds=1.7)
+    layout.climb(54, low, False)
+    layout.put(4, low, "E")
+    layout.go(4)
+    return layout, {"name": "Pump Station", "background": "pump-station",
+                    "music": "level2", "par_seconds": 240, "sla_seconds": 480,
+                    "tasks": tasks}
+
+
+def rooftop_air_handlers():
+    layout = WorkLayout(70)
+    low, roof = layout.stand, 8
+    for first, last in [(6, 22), (28, 44), (50, 64)]:
+        layout.platform(roof + 1, first, last)
+    for column in [10, 32, 56]:
+        layout.ladder_cells(column, roof)
+    layout.checkpoint(5)
+    layout.checkpoint(30)
+    layout.put(52, roof, "C")
+    layout.put(20, roof, "v")
+    tasks = [
+        {"id": "air", "type": "restore_cooling", "required": True,
+         "label": "Start the west air handler", "sites": [[18, roof], [14, roof]],
+         "resources": [{"kind": "filter", "cell": [6, low]}],
+         "effect_cells": [[20, roof]]},
+        {"id": "roof", "type": "run_cable", "required": True,
+         "label": "Connect the separated roof sections",
+         "sites": [[32, low], [38, roof], [54, roof]],
+         "resources": [{"kind": "spool", "cell": [34, low]}]},
+        {"id": "east", "type": "restore_power", "required": True,
+         "label": "Energize the east roof branch", "sites": [[62, roof]],
+         "resources": [{"kind": "fuse", "cell": [50, low]}]},
+    ]
+    layout.go(6)
+    layout.action()
+    layout.climb(10, roof, True)
+    layout.go(18)
+    layout.action("diagnose")
+    layout.go(14)
+    layout.action()
+    layout.go(18)
+    layout.action()
+    layout.action(seconds=1.7)
+    layout.climb(10, low, False)
+    layout.tray(24, 26)
+    layout.route_column = 28
+    layout.go(34)
+    layout.action()
+    layout.go(32)
+    layout.action()
+    layout.climb(32, roof, True)
+    layout.go(38)
+    layout.action()
+    layout.climb(32, low, False)
+    layout.go(50)
+    layout.action()
+    layout.climb(56, roof, True)
+    layout.go(52, across_ladder=True)
+    layout.go(54)
+    layout.action()
+    layout.go(62, across_ladder=True)
+    layout.action()
+    layout.action()
+    layout.action("diagnose", 1.7)
+    layout.action()
+    layout.climb(56, low, False)
+    layout.exit(66)
+    return layout, {"name": "Rooftop Air Handlers", "background": "rooftop-air-handlers",
+                    "music": "level4", "par_seconds": 270, "sla_seconds": 540,
+                    "tasks": tasks}
+
+
 BUILDERS = {
     "06-cooling-gallery": cooling_gallery,
     "07-operations-suite": operations_suite,
     "08-fiber-exchange": fiber_exchange,
     "09-loading-yard": loading_yard,
+    "10-fire-response-hall": fire_response_hall,
+    "11-pump-station": pump_station,
+    "12-rooftop-air-handlers": rooftop_air_handlers,
 }
 
 

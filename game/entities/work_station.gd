@@ -30,6 +30,8 @@ func restore_state(state: Dictionary) -> void:
 
 func apply_effects() -> void:
 	for hazard: Node2D in effects:
+		if order.definition["type"] == "extinguish_fire":
+			hazard.intensity = order.unit.intensity
 		if hazard.has_method("set_enabled"):
 			hazard.set_enabled(not order.done)
 		else:
