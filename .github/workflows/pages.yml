@@ -87,6 +87,7 @@ jobs:
           test -s build/web/mobile.js
           test -s build/web/mobile.css
           touch build/web/.nojekyll
+          python3 tools/check_export_budget.py build/web
 
       - name: Check exported runtime resources
         run: |
