@@ -23,6 +23,17 @@ func damage() -> bool:
 	return true
 
 
+func fatal_damage() -> bool:
+	if segments == 0:
+		return false
+	segments = 0
+	hits_taken += 1
+	_invulnerable_remaining = 0.0
+	changed.emit(segments)
+	died.emit()
+	return true
+
+
 func heal() -> void:
 	if segments == 0 or segments == MAX_SEGMENTS:
 		return

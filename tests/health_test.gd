@@ -39,6 +39,26 @@ func run() -> void:
 	health.refill()
 	check(health.segments == 5 and not health.is_invulnerable(), "refill restores full health.")
 	check(health.hits_taken == 6, "refill keeps hits_taken for the star score.")
+	check(health.has_method("fatal_damage"), "Fatal liquid has a separate damage path.")
+	if health.has_method("fatal_damage"):
+		for protected: bool in [false, true]:
+			var victim := Health.new()
+			var fatal_deaths := [0]
+			var values: Array[int] = []
+			victim.died.connect(func() -> void: fatal_deaths[0] += 1)
+			victim.changed.connect(func(value: int) -> void: values.append(value))
+			if protected:
+				victim.damage()
+				check(victim.is_invulnerable(), "The fatal contact fixture is protected by ordinary invulnerability.")
+			var prior_hits := victim.hits_taken
+			check(victim.fatal_damage(), "Fatal contact lands regardless of ordinary invulnerability.")
+			check(victim.segments == 0 and values.back() == 0, "Fatal contact immediately empties health and updates listeners.")
+			check(victim.hits_taken == prior_hits + 1 and fatal_deaths[0] == 1, "One fatal contact records one hit and one death.")
+			check(not victim.fatal_damage() and not victim.damage(), "Overlapping contacts do not repeat damage after death.")
+			victim.heal()
+			check(victim.segments == 0 and fatal_deaths[0] == 1, "Healing cannot cancel fatal contact.")
+			victim.refill()
+			check(victim.segments == 5 and victim.damage(), "Checkpoint recovery restores ordinary damage behavior.")
 	print("HEALTH_TEST_COMPLETE: %d checks, %d failures" % [checks, failures])
 	quit(1 if failures else 0)
 
