@@ -1,6 +1,6 @@
 extends RefCounted
 
-const LEVEL_IDS: Array[String] = ["01", "02", "03", "04", "05", "06"]
+const LEVEL_IDS: Array[String] = ["01", "02", "03", "04", "05", "06", "07", "08", "09"]
 const DEFAULT_SETTINGS := {"music_volume": 0.8, "sfx_volume": 0.9}
 const CONTROL_DISPLAYS := ["keyboard", "gamepad", "touch"]
 

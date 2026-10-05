@@ -1,0 +1,54 @@
+{
+  "engine": "Godot 4.7.2",
+  "native": {
+    "renderer": "Compatibility OpenGL on Apple M4 Pro",
+    "simulation_fps": 60,
+    "heroes": ["man", "woman"],
+    "capture_script": "tests/expansion_capture.gd",
+    "note": "The first Fiber Exchange capture stalled. It was stopped and repeated successfully with disabled VSync and a 120 fps render cap. This is not a device performance benchmark."
+  },
+  "browser": {
+    "renderer": "Chromium WebGL 2.0",
+    "hero": "woman",
+    "input": "Production main scene smoke routes",
+    "errors": []
+  },
+  "levels": [
+    {
+      "id": "07",
+      "name": "Operations Suite",
+      "full_route_seconds": 64.23,
+      "native_checkpoint_seconds": [62.75, 44.55, 4.33],
+      "hits": 0,
+      "additional_respawns": 0,
+      "captures": ["07-man-native.png", "07-woman-native.png", "07-woman-browser.png"]
+    },
+    {
+      "id": "08",
+      "name": "Fiber Exchange",
+      "full_route_seconds": 56.93,
+      "native_checkpoint_seconds": [56.58, 41.12, 24.63],
+      "hits": 0,
+      "additional_respawns": 0,
+      "captures": ["08-man-native.png", "08-woman-native.png", "08-woman-browser.png"]
+    },
+    {
+      "id": "09",
+      "name": "Loading Yard",
+      "full_route_seconds": 61.33,
+      "native_checkpoint_seconds": [61.07, 42.10, 37.83],
+      "hits": 0,
+      "additional_respawns": 0,
+      "captures": ["09-man-native.png", "09-woman-native.png", "09-woman-browser.png"],
+      "recovery_regression": "Both heroes fail to latch the far checkpoint when attempting the undrained trench shortcut."
+    }
+  ],
+  "export_checks": 532,
+  "published_bytes": 53162051,
+  "limitations": [
+    "Checkpoint replay evidence is native for both heroes.",
+    "Browser route evidence uses the female hero.",
+    "No physical phone or controller validation.",
+    "Automated route timing is not human difficulty calibration."
+  ]
+}

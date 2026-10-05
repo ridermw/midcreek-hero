@@ -109,11 +109,32 @@ func run() -> void:
 	var scrolls: Array[Node] = main.screen.find_children("*", "ScrollContainer", true, false)
 	check(scrolls.size() == 1, "Level selection scrolls without moving its title or Back control.")
 	if scrolls.size() == 1:
-		var last: Button = main.level_button("06")
+		var last: Button = main.level_button(main.level_ids().back())
 		last.grab_focus()
 		await process_frame
 		await process_frame
 		check(scrolls[0].get_global_rect().intersects(last.get_global_rect()), "The last unlocked level scrolls into view on focus.")
+		for device: String in ["keyboard", "gamepad"]:
+			main.level_button("01").grab_focus()
+			await process_frame
+			for step: int in range(main.level_ids().size() - 1):
+				var navigation: InputEvent
+				if device == "keyboard":
+					var key := InputEventKey.new()
+					key.keycode = KEY_DOWN
+					navigation = key
+				else:
+					var button := InputEventJoypadButton.new()
+					button.button_index = JOY_BUTTON_DPAD_DOWN
+					navigation = button
+				navigation.pressed = true
+				Input.parse_input_event(navigation)
+				await process_frame
+				navigation.pressed = false
+				Input.parse_input_event(navigation)
+				await process_frame
+			check(last.has_focus(), device + " navigation reaches the last unlocked level.")
+			check(scrolls[0].get_global_rect().encloses(last.get_global_rect()), device + " navigation keeps the whole last button visible.")
 	main.queue_free()
 	for i: int in range(4):
 		await process_frame

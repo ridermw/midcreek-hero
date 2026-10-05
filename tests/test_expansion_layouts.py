@@ -1,10 +1,32 @@
 import unittest
+import json
 
-from tools.levels.expansion import cooling_gallery
+from tools.levels.expansion import BUILDERS, cooling_gallery
 from tools.levels.layout import ROOT
 
 
 class ExpansionLayoutTest(unittest.TestCase):
+    def test_all_authored_expansion_levels_and_routes_reproduce(self):
+        for slug, build in BUILDERS.items():
+            with self.subTest(level=slug):
+                layout, header = build()
+                level, route = layout.render(header)
+                self.assertEqual(level, (ROOT / "levels" / (slug + ".level")).read_text())
+                self.assertEqual(route, (ROOT / "levels/routes" / (slug + ".route.json")).read_text())
+
+    def test_next_three_levels_have_the_approved_work_mapping(self):
+        expected = {
+            "07-operations-suite": ["assemble_rack", "run_cable", "restore_power"],
+            "08-fiber-exchange": ["run_cable", "run_cable", "assemble_rack"],
+            "09-loading-yard": ["assemble_rack", "contain_leak", "restore_power"],
+        }
+        for slug, kinds in expected.items():
+            with self.subTest(level=slug):
+                path = ROOT / "levels" / (slug + ".level")
+                self.assertTrue(path.is_file(), "The authored level must exist.")
+                header = json.loads(path.read_text().split("\n---\n")[0])
+                self.assertCountEqual([task["type"] for task in header["tasks"]], kinds)
+                self.assertTrue((ROOT / "levels/routes" / (slug + ".route.json")).is_file())
     def test_cooling_gallery_reproduces_its_level_and_route(self):
         layout, header = cooling_gallery()
         level, route = layout.render(header)
