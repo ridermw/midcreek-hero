@@ -3,13 +3,19 @@ extends RefCounted
 signal task_completed(id: String)
 signal all_required_done
 
-const TYPES: Array[String] = ["repair", "diagnose_repair", "fetch", "reseat", "reboot"]
+const TYPES: Array[String] = ["repair", "diagnose_repair", "fetch", "reseat", "reboot", "run_cable", "assemble_rack", "extinguish_fire", "restore_cooling", "contain_leak", "restore_power"]
 const TYPE_LABELS := {
 	"repair": "Repair rack",
 	"diagnose_repair": "Diagnose and repair",
 	"fetch": "Fetch part",
 	"reseat": "Reseat cable",
 	"reboot": "Reboot switch",
+	"run_cable": "Run cable",
+	"assemble_rack": "Assemble rack",
+	"extinguish_fire": "Extinguish fire",
+	"restore_cooling": "Restore cooling",
+	"contain_leak": "Contain leak",
+	"restore_power": "Restore power branch",
 }
 
 var _tasks: Dictionary[String, Dictionary] = {}

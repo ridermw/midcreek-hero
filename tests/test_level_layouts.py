@@ -52,7 +52,7 @@ class LevelLayoutTest(unittest.TestCase):
 
     def test_each_recorded_route_has_a_positive_independent_budget(self):
         budgets = json.loads((layout.ROOT / "tests/route_budgets.json").read_text())
-        self.assertEqual(set(budgets), {slug[:2] for slug in LEVELS.values()})
+        self.assertEqual(set(budgets), {path.name[:2] for path in (layout.ROOT / "levels/routes").glob("*.route.json")})
         for level, seconds in budgets.items():
             with self.subTest(level=level):
                 self.assertIs(type(seconds), int)

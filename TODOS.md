@@ -257,12 +257,15 @@ Do not add new level files before their routes and required assets are ready.
 
 - [x] Add isolated state units for all six approved tasks.
 - [x] Observe focused failures before implementation and verify partial rollback.
-- [ ] Connect task entities, resource inventory, prompts, artwork, and effects.
+- [x] Connect task entities, resource inventory, prompts, artwork, and effects.
 - [ ] Deliver complete routes and every checkpoint replay for levels 06 through 15.
 - [ ] Verify native and browser captures and report export size.
 
-State tests do not establish playable content completion. No new playable level
-ships in this increment.
+Level 06, Cooling Gallery, now includes its authored route, three checkpoints,
+runtime artwork, and save migration from completed level 05. Both heroes finish
+the native and exported browser routes in 41.83 seconds without hits or respawns.
+Native replay from each checkpoint also completes without additional respawns.
+Levels 07 through 15 remain to be authored and verified.
 
 ## 3. Decide the role of sliding
 
@@ -418,6 +421,27 @@ The exported resource check caught diagnostic traces entering the download.
 An explicit `docs/evidence/*` exclusion removed 917752 bytes from the debug
 resource pack. All 46 resource checks now pass. This is not a production
 download budget or a device performance result.
+
+## Follow up: continuous cable pile movement
+
+- [ ] Make every cable pile obstacle move continuously during gameplay,
+  including the currently stationary piles. The user named Mario mushrooms
+  as the movement reference on October 5.
+
+Define movement speed, direction changes, and terrain edge behavior before
+implementation. Preserve visible collision bounds. Update affected route timing
+and verify safe checkpoint recovery for both heroes.
+This is a recorded follow up, not part of the current expansion change.
+
+## Follow up: pass security drones only by sliding
+
+- [ ] Prevent the hero from jumping over security drones. Sliding underneath
+  must be the only way to pass them. The user requested this on October 5.
+
+Use visible drone geometry and matching collision bounds. Verify that ordinary
+jumps and wall jumps cannot bypass a drone, while sliding provides safe
+clearance for both heroes. Update affected routes and checkpoint recovery checks.
+This is a recorded follow up, not part of the current expansion change.
 
 ## NOT in scope
 

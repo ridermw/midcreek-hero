@@ -11,6 +11,15 @@ func build(owner_main: Node) -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	var box := UiKit.column(self)
 	box.add_child(UiKit.label("Work orders", 30))
+	var scroll := ScrollContainer.new()
+	scroll.custom_minimum_size = Vector2(620, 350)
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	scroll.follow_focus = true
+	box.add_child(scroll)
+	var rows := VBoxContainer.new()
+	rows.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	rows.add_theme_constant_override("separation", 14)
+	scroll.add_child(rows)
 	var ordered: Array = []
 	for level_id: String in main.level_ids():
 		var row := HBoxContainer.new()
@@ -25,7 +34,8 @@ func build(owner_main: Node) -> void:
 		for star: int in range(3):
 			var icon_name := "star-on" if star < main.save.stars(level_id) else "star-off"
 			row.add_child(UiKit.icon(main.art.texture("ui", icon_name), 1))
-		box.add_child(row)
+		rows.add_child(row)
+		play.focus_entered.connect(func() -> void: scroll.ensure_control_visible.call_deferred(play))
 		buttons[level_id] = play
 		ordered.append(play)
 	var back := UiKit.button("Back", main.art)

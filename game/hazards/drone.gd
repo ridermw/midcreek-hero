@@ -43,6 +43,16 @@ func hit_rect() -> Rect2:
 	return Rect2(position + Vector2(-SIZE.x / 2.0, -HOVER - SIZE.y / 2.0 + bob), SIZE)
 
 
+func reset_motion() -> void:
+	position.x = origin_x
+	direction = 1.0
+	bob = 0.0
+	_time = 0.0
+	_frame = 0
+	reset_physics_interpolation()
+	queue_redraw()
+
+
 func _draw() -> void:
 	var center := Vector2(0, -HOVER + bob)
 	if art != null and art.has("hazards", "drone"):

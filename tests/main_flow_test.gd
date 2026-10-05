@@ -100,6 +100,20 @@ func run() -> void:
 	var reloaded_settings := preload("res://game/save_store.gd").new(SAVE_PATH)
 	reloaded_settings.load_data()
 	check(is_equal_approx(float(reloaded_settings.settings["sfx_volume"]), 0.6), "Volume settings persist.")
+	main.start_level("06")
+	await process_frame
+	check(main.screen.error_message.is_empty() and main.music_name() == "level1", "Cooling Gallery loads its work and a declared music track.")
+	main.save.unlocked.assign(main.level_ids())
+	main.go_to("level_select")
+	await process_frame
+	var scrolls: Array[Node] = main.screen.find_children("*", "ScrollContainer", true, false)
+	check(scrolls.size() == 1, "Level selection scrolls without moving its title or Back control.")
+	if scrolls.size() == 1:
+		var last: Button = main.level_button("06")
+		last.grab_focus()
+		await process_frame
+		await process_frame
+		check(scrolls[0].get_global_rect().intersects(last.get_global_rect()), "The last unlocked level scrolls into view on focus.")
 	main.queue_free()
 	for i: int in range(4):
 		await process_frame

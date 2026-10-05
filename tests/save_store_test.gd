@@ -102,7 +102,24 @@ func run() -> void:
 			FileAccess.file_exists("user://test-save.corrupt.json") and invalid.character == "man" and not invalid.is_unlocked("02"),
 			"Invalid content resets the save: " + bad,
 		)
-	check(SaveStore.next_level_id("01") == "02" and SaveStore.next_level_id("05") == "", "next_level_id follows the level order.")
+	check(SaveStore.next_level_id("01") == "02" and SaveStore.next_level_id("05") == "06" and SaveStore.next_level_id("06") == "", "Progression extends only through shipped content.")
+	for completed: bool in [false, true]:
+		var legacy := {"version": 1, "character": "woman", "unlocked": ["01", "05"], "settings": {"music_volume": 0.4, "control_display": "gamepad"}, "levels": {"01": {"stars": 3, "best_seconds": 42, "best_optional": 1}}}
+		if completed:
+			legacy["levels"]["05"] = {"stars": 1}
+		var legacy_file := FileAccess.open(PATH, FileAccess.WRITE)
+		legacy_file.store_string(JSON.stringify(legacy))
+		legacy_file.close()
+		var migrated := SaveStore.new(PATH)
+		migrated.load_data()
+		check(migrated.is_unlocked("06") == completed, "Only completed level 05 unlocks the new campaign.")
+		check(migrated.character == "woman" and migrated.stars("01") == 3 and migrated.best_seconds("01") == 42 and migrated.best_optional("01") == 1 and migrated.settings["control_display"] == "gamepad", "Migration preserves existing character, scores, and settings.")
+		var expected := migrated.levels.duplicate(true)
+		var unlocks := migrated.unlocked.duplicate()
+		for cycle: int in range(2):
+			check(migrated.save(), "Migrated version 1 save writes.")
+			migrated.load_data()
+			check(migrated.levels == expected and migrated.unlocked == unlocks, "Repeated migration does not change saved state.")
 	clear()
 	print("SAVE_STORE_TEST_COMPLETE: %d checks, %d failures" % [checks, failures])
 	quit(1 if failures else 0)

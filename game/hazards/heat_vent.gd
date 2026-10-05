@@ -14,6 +14,7 @@ var cell_x: int = 0:
 var offset: float = 0.0
 var state: String = "off"
 var active: bool = false
+var enabled: bool = true
 var art: RefCounted
 var _time: float = 0.0
 var _frame: int = -1
@@ -39,10 +40,24 @@ func _update_state() -> void:
 		next = "off"
 	elif local < OFF_SECONDS + WARNING_SECONDS:
 		next = "warning"
+	if not enabled:
+		next = "off"
 	if next != state:
 		state = next
 		queue_redraw()
 	active = state == "on"
+
+
+func set_enabled(value: bool) -> void:
+	enabled = value
+	_update_state()
+
+
+func reset_motion() -> void:
+	_time = 0.0
+	_frame = 0
+	_update_state()
+	queue_redraw()
 
 
 func _draw() -> void:

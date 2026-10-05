@@ -20,7 +20,15 @@ func run() -> void:
 		var title: Node = main.screen
 		main.open_help()
 		check(main.help_view != null and main.screen == title, "Title help preserves its return screen.")
-		check(main.help_view.page_count() == 6, "Help pages cover controls and five work tasks.")
+		check(main.help_view.page_count() == 12, "Help pages cover controls, original tasks, and all six expansion tasks.")
+		var authored: Array = main.help_view.pages.duplicate(true)
+		main.help_view.pages[1] = authored[6]
+		main.help_view.page_index = 1
+		main.help_view._show_page()
+		check(main.art.has("work", "spool"), "Expansion help loads its art by task identity, not page position.")
+		main.help_view.pages = authored
+		main.help_view.page_index = 0
+		main.help_view._show_page()
 		var browser: Dictionary = main.mobile.menu_model()
 		check(browser["screen"] == "help" and browser.has("help"), "Phone receives the same help model.")
 		check(browser["help"]["controls"].size() == 9, "Phone controls include movement, tasks and pause.")
@@ -37,7 +45,8 @@ func run() -> void:
 		main.open_help()
 		check(paused and not main.pause_menu.visible and main.screen == level, "Help overlays, rather than replaces or resumes, the paused level.")
 		main.mobile.enabled = true
-		for page: int in range(1, 6):
+		var taught: Array[String] = []
+		for page: int in range(1, main.help_view.page_count()):
 			check(activate(main.mobile, main.mobile.menu_model(), "Next"), "Phone Next navigates the real help view.")
 			browser = main.mobile.menu_model()
 			var demo: Dictionary = browser["help"]["demo"]
@@ -49,8 +58,10 @@ func run() -> void:
 			check(native == looped, "Task demonstration loops predictably.")
 			check(main.help_view.demo.snapshot(1.4) != native, "Task demonstration advances its existing hero frames or phase.")
 			check(main.help_view.demo.snapshot(8.0, true) == native, "Reduced-motion demonstration is static, with instructions retained.")
-			check(browser["help"]["id"] in ["repair", "fetch", "diagnose_repair", "reseat", "switch"], "Only the five existing tasks are taught.")
+			taught.append(browser["help"]["id"])
 			await check_stable_demo_layout(main.help_view)
+		for task: String in ["repair", "fetch", "diagnose_repair", "reseat", "switch", "run_cable", "assemble_rack", "extinguish_fire", "restore_cooling", "contain_leak", "restore_power"]:
+			check(task in taught, "Help teaches task " + task)
 		main.route_runner = preload("res://game/route_runner.gd").new([{"wait": 0.1}])
 		await create_timer(0.2).timeout
 		check(level.timer.elapsed == elapsed and level.player.position == position and level.tasks.completed_ids() == task_state, "Time, position and task state remain intact during help.")

@@ -1,7 +1,7 @@
 # Midcreek Hero
 
 A pixel art side scroller set in a data center. You play a technician who runs,
-jumps, slides, and climbs through 5 data halls, avoids hazards, and completes
+jumps, slides, and climbs through 6 levels, avoids hazards, and completes
 work orders before the service level agreement (SLA) timer runs out.
 
 **[Play in the browser](https://ridermw.github.io/midcreek-hero/)**
@@ -40,7 +40,7 @@ This choice changes the displayed controls, not which input devices work.
 Without a saved choice, detected phones use Touch and other devices use Keyboard.
 
 Open How to Play from the title screen for graphical controls and animated
-examples of all five work order types. During a level, press Escape and open
+examples of the five original and six expansion work order types. During a level, press Escape and open
 How to Play from the pause menu. Back returns to the pause menu without
 restarting the level or resuming the timer.
 Action hints show one control for the selected display. The control pulses
@@ -157,10 +157,20 @@ fail the published file check; do not exempt them from the upload gate.
 Ten additional environments are approved for levels 06 through 15.
 The [expansion design](docs/superpowers/specs/2026-10-05-campaign-expansion-design.md)
 defines their task mapping and compatibility requirements.
-The current playable campaign still contains five levels.
-New task state units cover cable installation, rack assembly, fire suppression,
-cooling restoration, leak containment, and power restoration.
-These units are not yet connected to playable levels or production artwork.
+Cooling Gallery is playable as level 06. Its upper service gallery contains
+cooling controls and leak isolation work. Drain the lower gallery, then return
+through it to install the cable. Levels 07 through 15 remain in development.
+The original five level definitions, routes, and targets remain unchanged.
+
+Expansion resources have task labels. Press Repair at a source to collect its
+item. If the inventory slot is occupied, the prompt offers an explicit exchange
+that returns the previous item to its source. Installed components and partial
+cable, fire, and drainage work survive interruptions. Checkpoint restoration
+restores resources, task progress, and bound hazard effects together.
+
+A version 1 save with at least one star on level 05 unlocks level 06.
+An unlocked but unfinished level 05 does not. Existing scores, settings, and
+the selected hero remain unchanged. The level list scrolls to the focused row.
 
 Run their focused checks with:
 
@@ -169,6 +179,8 @@ tools/godot_test.sh tests/cable_work_test.gd CABLE_WORK_TEST
 tools/godot_test.sh tests/rack_work_test.gd RACK_WORK_TEST
 tools/godot_test.sh tests/fire_work_test.gd FIRE_WORK_TEST
 tools/godot_test.sh tests/service_work_test.gd SERVICE_WORK_TEST
+tools/godot_test.sh tests/work_runtime_test.gd WORK_RUNTIME_TEST
+tools/godot_test.sh tests/expansion_route_test.gd EXPANSION_ROUTE_TEST
 ```
 
 Open the [web build](https://ridermw.github.io/midcreek-hero/) or run
@@ -365,6 +377,14 @@ human difficulty targets. Their current values remain unchanged:
 | 3 Cable Jungle | 96.2 s | 125 s | 200 s |
 | 4 Power Room | 97.2 s | 125 s | 200 s |
 | 5 Outage Night | 99.9 s | 125 s | 170 s |
+| 6 Cooling Gallery | 41.8 s | 210 s | 420 s |
+
+`python3 -m tools.levels.expansion` reproduces Cooling Gallery and its route.
+Its independent route budget is 180 seconds. The expansion route check runs
+both heroes through the full level and again from every saved checkpoint.
+These automated timings do not establish human difficulty.
+The [Cooling Gallery evidence](docs/evidence/campaign-expansion/06-receipt.json)
+records native and browser results, capture paths, and validation limits.
 
 `tests/test_level_layouts.py` checks that the scripts reproduce the shipped
 files exactly. Change par or SLA only after collecting player observations.

@@ -22,6 +22,12 @@ func hit_rect() -> Rect2:
 	return Rect2(position + Vector2(-SIZE.x / 2.0, -SIZE.y), SIZE)
 
 
+func reset_motion() -> void:
+	_time = 0.0
+	_frame = 0
+	queue_redraw()
+
+
 func _draw() -> void:
 	if art != null:
 		var frame: int = maxi(_frame, 0)
