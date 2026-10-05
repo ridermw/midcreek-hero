@@ -32,6 +32,27 @@ var failures: int = 0
 func _initialize() -> void:
 	var animations = load("res://game/animation_library.gd").new()
 	check(animations.load_manifest(), "Every declared animation frame loads from the export: " + animations.error_message)
+	var sprites = load("res://game/sprite_library.gd").new()
+	check(sprites.load_all(), "Every declared gameplay sprite loads from the export: " + sprites.error_message)
+	var viewer_manifest: Variant = JSON.parse_string(FileAccess.get_file_as_string("res://art/cel-shift/sprites/manifest.json"))
+	if viewer_manifest is Dictionary and viewer_manifest.get("variants") is Dictionary:
+		for variant: String in viewer_manifest["variants"]:
+			for entry: Dictionary in viewer_manifest["variants"][variant]["frames"]:
+				var path := "res://art/cel-shift/sprites/" + String(entry["file"])
+				check(load(path) is Texture2D, "Declared viewer texture loads: " + path)
+	else:
+		check(false, "The viewer manifest declares runtime variants.")
+	var level_script = load("res://game/level.gd")
+	for directory: String in level_script.BACKGROUNDS.values():
+		for layer: String in level_script.PARALLAX:
+			var path: String = directory + layer + ".png"
+			check(load(path) is Texture2D, "Declared background layer loads: " + path)
+	var audio = load("res://game/audio_director.gd")
+	for path: String in audio.MUSIC.values():
+		check(load(path) is AudioStreamOggVorbis, "Declared music stream has the runtime type: " + path)
+	for path: String in audio.SFX.values():
+		check(load(path) is AudioStream, "Declared audio stream loads: " + path)
+	check_source_tree("res://art/cel-shift")
 	for group: String in ["animations", "tiles", "hazards", "props", "ui"]:
 		var palette := "res://art/cel-shift/%s/palette.png" % group
 		check(not ResourceLoader.exists(palette), "Build palette stays outside the download: " + palette)
@@ -78,6 +99,18 @@ func _initialize() -> void:
 		)
 	print("EXPORT_TEST_COMPLETE: %d checks, %d failures" % [checks, failures])
 	quit(1 if failures else 0)
+
+
+func check_source_tree(path: String) -> void:
+	for directory: String in DirAccess.get_directories_at(path):
+		check(directory not in ["generated", "prompts", "previews", "sheets"], "Source directory is absent: " + path.path_join(directory))
+		check_source_tree(path.path_join(directory))
+	for file: String in DirAccess.get_files_at(path):
+		check(
+			not file.ends_with(".metadata.json") and not file.ends_with(".mock.md")
+			and file not in ["catalog.json", "palette.png", "preview.png", "preview.html"],
+			"Source file is absent: " + path.path_join(file),
+		)
 
 
 func check(condition: bool, message: String) -> void:
