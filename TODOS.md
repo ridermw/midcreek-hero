@@ -447,3 +447,37 @@ Three critical planning risks require explicit proof: safe placement over lethal
 liquid, consistent restoration of task effects, and reachable prerequisites for
 tasks that change access. Without the planned checks, each could fail silently.
 They are not claims of defects in currently shipped features.
+
+## Verified repair artwork registration
+
+- [x] Reproduce planted stance drift separately from playback and physics.
+  Across six repair frames, the man's boot span center varies by 17 texture
+  pixels and the woman's by 10. The rendered physics position remains fixed.
+- [x] Observe failing shipped artwork and normalization regressions before
+  correcting the registration.
+- [x] Register the lower boot span at the x=104 pivot with integer translation.
+  All twelve published frames preserve their exact pixel colors and counts,
+  vertical baseline, scale, authored six frame count, and 10 fps cadence.
+  Normalization rejects missing floor contact or clipped artwork before writes.
+- [x] Verify native gameplay and both selected hero help demonstrations.
+- [x] Verify ordinary emulated gamepad repair in the exported debug game.
+  Both heroes display all six frames without moving, taking hits, or respawning.
+  Every opaque source pixel matches the browser captures:
+  [man](docs/evidence/animation-cadence/repair-man-browser.png),
+  [woman](docs/evidence/animation-cadence/repair-woman-browser.png).
+  The corresponding JSON traces preserve input outcome and player state.
+
+This is a registration correction, not proof of perfect repair artwork.
+The woman's individual boot edges still vary by up to 3 texture pixels within
+the centered stance. Idle and diagnosis transitions use different existing
+anchors and remain unverified. Torso and tool poses still need visual judgment.
+The lower 16 pixel band must contain only planted boots; future source art
+must respect that assumption.
+
+Runtime pixel colors remain unchanged. The previews also replace stale
+versions whose colors differed from the published frames. Future normalization
+reproduces the corrected geometry, not necessarily the existing color reduction
+of older source sheets. Browser captures used the separately reviewed debug
+probe from PR 15; the production repair assets do not depend on that probe.
+Running artwork continuity, physical device evidence, and the remaining campaign
+work stay open.
