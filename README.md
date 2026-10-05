@@ -202,6 +202,43 @@ check the mobile results screen. This adds about 100 seconds.
 This is emulated phone testing. It does not replace physical iPhone or Android
 testing. Native mobile exports are not part of this feature.
 
+### Exported animation checks
+
+Use a debug export for the animation probe:
+
+```sh
+godot --headless --path . --export-debug Web build/web/index.html
+cp web/mobile.js web/mobile.css build/web/
+```
+
+Serve it with the preview server above. Open a dedicated `agent-browser` session,
+then run these checks with Node 22 or newer and the asset tool dependencies:
+
+```sh
+npx agent-browser --session midcreek-animation open http://127.0.0.1:18765/
+npx agent-browser --session midcreek-animation get cdp-url
+node tests/animation_browser_test.mjs <cdp-websocket-url> http://127.0.0.1:18765/ <evidence-directory> &&
+python3 tests/animation_browser_frames.py <evidence-directory>
+npx agent-browser --session midcreek-animation close
+```
+
+Use only a dedicated test browser. The script clears game storage for the
+supplied origin in that browser. It does not copy or use a normal browser profile.
+It drives an emulated gamepad through the game's normal input path, captures all
+eight walking frames for each hero in both directions, and checks pause and
+release behavior. The image check compares every opaque source pixel against
+the captured frames. This is browser evidence, not a physical controller test.
+
+Only debug web exports accept `?animation_probe=1`. That option publishes a
+read only snapshot at `window.midcreekAnimationProbe`; it cannot control the
+player. Ordinary URLs and release exports do not publish it.
+The shared CDP helper bounds requests and closes connections after failures.
+The committed `docs/evidence/animation-cadence/browser-*.png` sheets are copies
+of the image checker's `{hero}-{direction}-sheet.png` outputs.
+`browser-walking.json` summarizes the recorded cases. Its release gate result,
+engine version, and asset commit are separately recorded observations, not
+fields produced by the image checker.
+
 ## Levels
 
 | # | Name | New mechanics | Hazards |

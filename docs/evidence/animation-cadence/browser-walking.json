@@ -1,0 +1,98 @@
+{
+  "engine": "Godot 4.7.2",
+  "asset_commit": "b52049551c9f64ceae36007764ea5fbfc46af7a4",
+  "browser": "Microsoft Edge 154, headless",
+  "viewport": [
+    960,
+    720
+  ],
+  "device_pixel_ratio": 1,
+  "input": "Emulated standard gamepad through the normal Godot input path",
+  "physical_device_evidence": false,
+  "cases": [
+    {
+      "hero": "man",
+      "direction": "right",
+      "started_at": "2026-10-05T02:42:56.052Z",
+      "frames": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "start_world_x": 48,
+      "end_world_x": 181.2,
+      "hits": 0,
+      "respawns": 0
+    },
+    {
+      "hero": "man",
+      "direction": "left",
+      "started_at": "2026-10-05T02:42:57.996Z",
+      "frames": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "start_world_x": 181.2,
+      "end_world_x": 48.0,
+      "hits": 0,
+      "respawns": 0
+    },
+    {
+      "hero": "woman",
+      "direction": "right",
+      "started_at": "2026-10-05T02:43:01.685Z",
+      "frames": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "start_world_x": 48,
+      "end_world_x": 181.2,
+      "hits": 0,
+      "respawns": 0
+    },
+    {
+      "hero": "woman",
+      "direction": "left",
+      "started_at": "2026-10-05T02:43:03.630Z",
+      "frames": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "start_world_x": 181.2,
+      "end_world_x": 48.0,
+      "hits": 0,
+      "respawns": 0
+    }
+  ],
+  "world_positions_rounded_to": 0.01,
+  "opaque_pixel_comparison": "Every opaque source pixel matches in all 32 captured frames, including horizontal mirroring for left movement.",
+  "pause_and_released_input": "passed",
+  "ordinary_url_probe_absent": true,
+  "release_url_probe_absent": true,
+  "emulated_controller_hook_removed": true,
+  "browser_script_exceptions": 0,
+  "runtime_console_errors": 0
+}
