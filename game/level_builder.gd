@@ -5,6 +5,7 @@ const Checkpoint = preload("res://game/entities/checkpoint.gd")
 const Coolant = preload("res://game/entities/coolant.gd")
 const ExitDoor = preload("res://game/entities/exit_door.gd")
 const CableSnag = preload("res://game/hazards/cable_snag.gd")
+const ElectrifiedLiquid = preload("res://game/hazards/electrified_liquid.gd")
 const HeatVent = preload("res://game/hazards/heat_vent.gd")
 const MovingSnag = preload("res://game/hazards/moving_snag.gd")
 const CablePort = preload("res://game/entities/cable_port.gd")
@@ -23,7 +24,7 @@ const SOLID_COLORS := {
 	"platform": Color(0.36, 0.42, 0.47),
 	"tray": Color(0.55, 0.45, 0.2),
 }
-const HAZARD_SCRIPTS := {"cable_snag": CableSnag, "heat_vent": HeatVent, "moving_snag": MovingSnag, "spark_arc": SparkArc, "drone": Drone}
+const HAZARD_SCRIPTS := {"cable_snag": CableSnag, "heat_vent": HeatVent, "moving_snag": MovingSnag, "spark_arc": SparkArc, "drone": Drone, "electrified_liquid": ElectrifiedLiquid}
 
 var error_message: String = ""
 var art: RefCounted
@@ -57,7 +58,15 @@ func build_solids(level: Dictionary, parent: Node2D) -> int:
 
 func build_entities(level: Dictionary, parent: Node2D) -> Dictionary:
 	error_message = ""
-	var built := {"racks": [], "parts": [], "ports": [], "switches": [], "lifts": [], "hazards": [], "coolant": [], "checkpoints": [], "exit": null}
+	if art != null:
+		for hazard: Dictionary in level["hazards"]:
+			if hazard["kind"] == "electrified_liquid" and not art.has("hazards", "electrified-liquid"):
+				error_message = "Pending artwork: missing required hazards/electrified-liquid animation."
+				return {}
+			if hazard["kind"] == "electrified_liquid" and art.frame_count("hazards", "electrified-liquid") != ElectrifiedLiquid.FRAME_COUNT:
+				error_message = "Pending artwork: hazards/electrified-liquid requires four frames."
+				return {}
+	var built := {"racks": [], "parts": [], "ports": [], "switches": [], "lifts": [], "hazards": [], "liquids": [], "coolant": [], "checkpoints": [], "exit": null}
 	var anchors: Dictionary = level["anchors"]
 	for task: Dictionary in level["header"]["tasks"]:
 		if task["type"] == "reboot":
@@ -97,6 +106,8 @@ func build_entities(level: Dictionary, parent: Node2D) -> Dictionary:
 		if "cell_x" in node:
 			node.cell_x = hazard["cell"].x
 		built["hazards"].append(_add(parent, node, hazard["cell"]))
+		if node is ElectrifiedLiquid:
+			built["liquids"].append(node)
 	for cell: Vector2i in level["lifts"]:
 		built["lifts"].append(_add(parent, Lift.new(), cell))
 	for cell: Vector2i in level["coolant"]:

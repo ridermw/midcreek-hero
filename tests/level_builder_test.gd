@@ -68,6 +68,32 @@ func run() -> void:
 		and builder.error_message == "Task type 'dance' is not built yet.",
 		"Unsupported task types are reported.",
 	)
+	var liquid_fixture := fixture.duplicate(true)
+	liquid_fixture["hazards"][0]["kind"] = "electrified_liquid"
+	var liquid_root := Node2D.new()
+	var liquid_built := builder.build_entities(liquid_fixture, liquid_root)
+	check(
+		not liquid_built.is_empty() and liquid_built["hazards"][0].fatal,
+		"Explicit gray box construction supports fatal liquid without removing solid terrain.",
+	)
+	liquid_root.free()
+	builder.art = preload("res://game/sprite_library.gd").new()
+	var missing_art_root := Node2D.new()
+	check(
+		builder.build_entities(liquid_fixture, missing_art_root).is_empty()
+		and builder.error_message.contains("electrified-liquid"),
+		"Missing production liquid artwork fails before gameplay instead of using gray box art.",
+	)
+	missing_art_root.free()
+	check(builder.art.load_all(), "The production sprite library loads for a malformed liquid clip fixture.")
+	builder.art._frames["hazards/electrified-liquid"] = [builder.art.texture("hazards", "heat-vent", 0)]
+	var short_clip_root := Node2D.new()
+	check(
+		builder.build_entities(liquid_fixture, short_clip_root).is_empty()
+		and builder.error_message.contains("four frames"),
+		"A partial production liquid clip fails before playback.",
+	)
+	short_clip_root.free()
 	for node: Node in [solids, graybox_solids, entities, other]:
 		node.queue_free()
 	await process_frame

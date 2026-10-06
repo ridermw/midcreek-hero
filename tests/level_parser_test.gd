@@ -90,6 +90,16 @@ func run() -> void:
 		level["anchors"] == {"A": Vector2i(2, 2), "D": Vector2i(4, 2), "B": Vector2i(8, 2), "F": Vector2i(10, 2)},
 		"Anchors are recorded.",
 	)
+	var liquid_grid := grid_with(2, "P.A.D.C.B~FE")
+	var liquid_level := parser.parse(level_text(VALID_HEADER, liquid_grid), "liquid.level")
+	check(
+		not liquid_level.is_empty() and liquid_level["hazards"][0]["kind"] == "electrified_liquid",
+		"Live liquid parses as a hazard above continuous solid ground.",
+	)
+	liquid_grid[3] = "#########.##"
+	expect_error(level_text(VALID_HEADER, liquid_grid), "Electrified liquid requires solid floor")
+	liquid_grid[3] = "#########=##"
+	expect_error(level_text(VALID_HEADER, liquid_grid), "Electrified liquid requires solid floor")
 	var header_lines := JSON.stringify(VALID_HEADER, "  ").split("\n").size()
 	expect_error("\n".join(PackedStringArray(VALID_GRID)), "Missing '---'")
 	expect_error("{not json\n---\n" + "\n".join(PackedStringArray(VALID_GRID)), "Invalid header JSON")

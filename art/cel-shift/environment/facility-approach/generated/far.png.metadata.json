@@ -1,0 +1,36 @@
+{
+  "rendered_at": "2026-10-05T14:20:33.384860+00:00",
+  "size": "1280x720",
+  "quality": "high",
+  "deployment": "gpt-image-2.5-sunburst",
+  "model_name": "gpt-image-2.5-sunburst",
+  "model_version": "default",
+  "prompt_char_count": 869,
+  "prompt": "Edit image 1: replace its entire content with a new background layer described below. Keep unchanged from image 1: the pixel art style, the pixel scale, the outline treatment and the side view camera.\n\nStrict side-on orthographic elevation, NOT isometric, for a pixel art data center side scroller. Horizontal seams must match perfectly at the left and right edges for repetition. Selective dark pixel outlines, short stepped shading ramps, deliberate square pixel clusters at approximately 2x2 pixels. Match detailed RPG sprite backgrounds, not smooth cel shaded illustration. No text, words, numerals, logos, UI, watermark, characters or border.\n\nOpaque background. Distant architecture only. Lower 150 pixels are floor.\n\nSCENE: A data center facility approach in daylight, glass entrance facade, trees, a parking area with side view parked cars and security fencing.",
+  "operation": "edit",
+  "source_image": "art/cel-shift/environment/layers/far.png",
+  "reference_images": [],
+  "mask": null,
+  "inputs": [
+    {
+      "role": "source",
+      "path": "art/cel-shift/environment/layers/far.png",
+      "sha256": "02bdf23379fbf3f3c53685eeed59f1a512e1eadfba90ced3e610828f751a31c1"
+    }
+  ],
+  "background": "opaque",
+  "output_format": "png",
+  "usage": {
+    "input_tokens": 767,
+    "input_tokens_details": {
+      "image_tokens": 576,
+      "text_tokens": 191
+    },
+    "output_tokens": 947,
+    "output_tokens_details": {
+      "image_tokens": 947,
+      "text_tokens": 0
+    },
+    "total_tokens": 1714
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "version": 1,
+  "layers": [
+    {
+      "name": "Far",
+      "texture": "res://art/cel-shift/environment/generator-courtyard/far.png",
+      "scroll": 0.2,
+      "tint": [
+        0.42,
+        0.47,
+        0.56
+      ],
+      "coverage": "level",
+      "scale": 2
+    },
+    {
+      "name": "Equipment",
+      "texture": "res://art/cel-shift/environment/generator-courtyard/equipment.png",
+      "scroll": 0.6,
+      "tint": [
+        0.55,
+        0.6,
+        0.68
+      ],
+      "coverage": "native",
+      "scale": 2
+    }
+  ]
+}

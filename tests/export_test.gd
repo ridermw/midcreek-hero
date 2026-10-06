@@ -42,11 +42,20 @@ func _initialize() -> void:
 				check(load(path) is Texture2D, "Declared viewer texture loads: " + path)
 	else:
 		check(false, "The viewer manifest declares runtime variants.")
-	var level_script = load("res://game/level.gd")
-	for directory: String in level_script.BACKGROUNDS.values():
-		for layer: String in level_script.PARALLAX:
-			var path: String = directory + layer + ".png"
-			check(load(path) is Texture2D, "Declared background layer loads: " + path)
+	var backgrounds = load("res://game/background_set.gd").new()
+	var environment_root := "res://art/cel-shift/environment/"
+	for directory: String in DirAccess.get_directories_at(environment_root):
+		if not FileAccess.file_exists(environment_root + directory + "/manifest.json"):
+			continue
+		check(backgrounds.load_set(directory), "Declared environment loads: " + directory + ": " + backgrounds.error_message)
+	for file: String in DirAccess.get_files_at("res://levels"):
+		if not file.ends_with(".level"):
+			continue
+		var parser = load("res://game/level_parser.gd").new()
+		var definition: Dictionary = parser.parse(FileAccess.get_file_as_string("res://levels/" + file), file)
+		check(not definition.is_empty(), "Exported level parses: " + file)
+		if not definition.is_empty():
+			check(backgrounds.load_set(definition["header"]["background"]), "Level environment is included: " + file)
 	var audio = load("res://game/audio_director.gd")
 	for path: String in audio.MUSIC.values():
 		check(load(path) is AudioStreamOggVorbis, "Declared music stream has the runtime type: " + path)

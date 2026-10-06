@@ -51,6 +51,19 @@
         "frames/moving-snag/03.png"
       ]
     },
+    "electrified-liquid": {
+      "cell": [
+        32,
+        16
+      ],
+      "fps": 8,
+      "frames": [
+        "frames/electrified-liquid/00.png",
+        "frames/electrified-liquid/01.png",
+        "frames/electrified-liquid/02.png",
+        "frames/electrified-liquid/03.png"
+      ]
+    },
     "spark-arc": {
       "cell": [
         64,

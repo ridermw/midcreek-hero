@@ -28,6 +28,20 @@ func run() -> void:
 		check(equipment.scale == Vector2.ONE, file + " foreground racks retain their authored scale.")
 		level.queue_free()
 		await process_frame
+	var fixture := "user://expansion-background.level"
+	var file := FileAccess.open(fixture, FileAccess.WRITE)
+	file.store_string(FileAccess.get_file_as_string("res://levels/01-cold-aisle.level").replace('"cold-aisle"', '"cooling-gallery"'))
+	file.close()
+	var expansion := LEVEL_SCENE.instantiate()
+	expansion.level_path = fixture
+	root.add_child(expansion)
+	check(expansion.error_message.is_empty(), "A new environment loads through its ordered manifest.")
+	if expansion.error_message.is_empty():
+		var equipment := expansion.get_node("World/Equipment").get_child(0) as Sprite2D
+		check(equipment.texture.get_size() == Vector2(320, 180) and equipment.scale == Vector2(2, 2), "Compact art retains the intended world size.")
+	expansion.queue_free()
+	await process_frame
+	DirAccess.remove_absolute(fixture)
 	print("BACKGROUND_COVERAGE_TEST_COMPLETE: %d checks, %d failures" % [checks, failures])
 	quit(1 if failures else 0)
 
