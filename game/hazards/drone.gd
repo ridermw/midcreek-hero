@@ -1,5 +1,7 @@
 extends Node2D
 
+const Patrol = preload("res://game/hazards/patrol.gd")
+
 const RANGE := 160.0
 const SPEED := 70.0
 const HOVER := 52.0
@@ -8,8 +10,10 @@ const SIZE := Vector2(24, 16)
 
 var active: bool = true
 var art: RefCounted
-var origin_x: float = 0.0
-var direction: float = 1.0
+var patrol: Patrol
+var direction: float:
+	get:
+		return patrol.direction if patrol != null else 1.0
 var bob: float = 0.0
 var _time: float = 0.0
 var _frame: int = -1
@@ -20,17 +24,11 @@ func _ready() -> void:
 
 
 func setup() -> void:
-	origin_x = position.x
+	patrol = Patrol.new(position.x, position.x - RANGE, position.x + RANGE, SPEED)
 
 
 func advance(delta: float) -> void:
-	position.x += direction * SPEED * delta
-	if position.x >= origin_x + RANGE:
-		position.x = origin_x + RANGE
-		direction = -1.0
-	elif position.x <= origin_x - RANGE:
-		position.x = origin_x - RANGE
-		direction = 1.0
+	position.x = patrol.step(delta)
 	_time += delta
 	bob = sin(_time * TAU) * BOB
 	var next := int(_time * 8.0) % 4
@@ -44,8 +42,8 @@ func hit_rect() -> Rect2:
 
 
 func reset_motion() -> void:
-	position.x = origin_x
-	direction = 1.0
+	patrol.reset()
+	position.x = patrol.x
 	bob = 0.0
 	_time = 0.0
 	_frame = 0

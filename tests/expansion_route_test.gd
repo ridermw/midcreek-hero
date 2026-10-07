@@ -37,13 +37,8 @@ func run() -> void:
 			level.queue_free()
 			await process_frame
 			for checkpoint: Dictionary in saved:
-				var retry := make_level(filename, hero)
-				retry.checkpoints.index = checkpoint["index"]
-				retry.checkpoints.spawn_position = checkpoint["spawn"]
-				retry.checkpoints._timer_value = checkpoint["time"]
-				retry.checkpoints._completed.assign(checkpoint["done"])
-				retry.checkpoints.level_state = checkpoint["state"].duplicate(true)
-				retry._respawn()
+				await idle_after_restore(filename, hero, checkpoint)
+				var retry := restore(filename, hero, checkpoint)
 				var gap: String = KNOWN_GAPS.get("%s-%d" % [filename.substr(0, 2), checkpoint["index"]], "")
 				await play(retry, Runner.new(steps.slice(checkpoint["route"])), float(budgets[filename.substr(0, 2)]), false, gap)
 				retry.queue_free()
@@ -64,6 +59,29 @@ func selected_prefixes(only: String) -> PackedStringArray:
 	for number: int in range(1, 16):
 		all.append("%02d" % number)
 	return all
+
+
+# Decision 1A: a restored hero who holds still for 2 s is never hit.
+func idle_after_restore(filename: String, hero: String, checkpoint: Dictionary) -> void:
+	var level := restore(filename, hero, checkpoint)
+	var runner := Runner.new([{"wait": 2.0}])
+	for frame: int in range(120):
+		runner.apply(level, 1.0 / 60.0)
+		await physics_frame
+	check(level.health.hits_taken == 0 and level.respawns == 1, "%s %s idles 2 s after checkpoint %d restore without hits (hits=%d)." % [filename, hero, checkpoint["index"], level.health.hits_taken])
+	level.queue_free()
+	await process_frame
+
+
+func restore(filename: String, hero: String, checkpoint: Dictionary) -> Node:
+	var level := make_level(filename, hero)
+	level.checkpoints.index = checkpoint["index"]
+	level.checkpoints.spawn_position = checkpoint["spawn"]
+	level.checkpoints._timer_value = checkpoint["time"]
+	level.checkpoints._completed.assign(checkpoint["done"])
+	level.checkpoints.level_state = checkpoint["state"].duplicate(true)
+	level._respawn()
+	return level
 
 
 func make_level(filename: String, hero: String) -> Node:

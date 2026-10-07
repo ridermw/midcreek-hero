@@ -1,5 +1,6 @@
 extends RefCounted
 
+const CableSnag = preload("res://game/hazards/cable_snag.gd")
 const JUMP_REACH := {0: 4, 1: 4, 2: 3, 3: 2}
 const FALL_REACH := 4
 const LIFT_RISE := Vector2i(0, 3)
@@ -20,6 +21,11 @@ func validate(level: Dictionary) -> Array[String]:
 	for lift: Vector2i in level["lifts"]:
 		if not _lift_shaft_clear(level, lift):
 			errors.append("Lift at column %d, row %d needs a clear shaft within the level." % [lift.x + 1, lift.y + 1])
+	for hazard: Dictionary in level["hazards"]:
+		if hazard["kind"] == "cable_snag":
+			var bounds := CableSnag.span(level, hazard["cell"])
+			if bounds.y - bounds.x < CableSnag.MIN_SPAN:
+				errors.append("Cable pile at column %d needs at least 32 px of floor to patrol." % (hazard["cell"].x + 1))
 	var targets := {"player start": level["player_start"], "exit": level["exit"]}
 	for anchor: String in level["anchors"]:
 		targets["anchor " + anchor] = level["anchors"][anchor]

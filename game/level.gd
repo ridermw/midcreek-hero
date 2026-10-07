@@ -707,15 +707,20 @@ func _begin_fatal_death() -> void:
 
 
 func _respawn() -> void:
+	# Respawn order:
+	#   checkpoints.restore()  -> timer, completed tasks, spawn point
+	#   restore_state()        -> task progress and effects (fire, liquid, power)
+	#   reset_motion()         -> hazards and lifts return to authored safe states;
+	#                             a hazard disabled by restored progress stays disabled
+	#   player.respawn()       -> health refill, transient input cleared
 	var fatal := player.dead
 	_respawn_pending = false
 	sound.emit("fail")
 	respawns += 1
 	var spawn := checkpoints.restore(timer, tasks)
 	restore_state(checkpoints.level_state)
-	if not entities["work"].is_empty():
-		for node in entities["hazards"] + entities["lifts"]:
-			node.reset_motion()
+	for node in entities["hazards"] + entities["lifts"]:
+		node.reset_motion()
 	player.respawn(spawn)
 	health.refill()
 	if fatal:
