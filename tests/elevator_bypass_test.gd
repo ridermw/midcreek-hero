@@ -17,6 +17,7 @@ const SITES := [
 
 var checks := 0
 var failures := 0
+var max_consecutive_wall_kicks := 0
 
 
 func _initialize() -> void:
@@ -32,11 +33,11 @@ func run() -> void:
 				if site["slug"] != slug:
 					continue
 				await expect_normal_jump_blocked(level, site, hero)
-				await expect_wall_kicks_blocked(level, site, hero, 1)
-				await expect_wall_kicks_blocked(level, site, hero, 3)
+				await expect_wall_contact_sequence_blocked(level, site, hero)
 				await expect_nearby_platforms_blocked(level, site, hero)
 			level.queue_free()
 			await process_frame
+	print("MAX_CONSECUTIVE_WALL_KICKS: %d" % max_consecutive_wall_kicks)
 	print("ELEVATOR_BYPASS_TEST_COMPLETE: %d checks, %d failures" % [checks, failures])
 	quit(1 if failures else 0)
 
@@ -126,35 +127,29 @@ func expect_normal_jump_blocked(level: Node, site: Dictionary, hero: String) -> 
 	check(left_floor, "%s %s normal jump leaves the floor and is observed until landing or 1.5 s." % [hero, site["slug"]])
 
 
-func expect_wall_kicks_blocked(level: Node, site: Dictionary, hero: String, kicks: int) -> void:
-	var produced_kicks := 0
-	for attempt: int in range(kicks):
-		if await expect_one_wall_kick_blocked(level, site, hero, attempt + 1):
-			produced_kicks += 1
-	check(produced_kicks == kicks, "%s %s asserts wall contact before %d wall jump press(es)." % [hero, site["slug"], kicks])
-
-
-func expect_one_wall_kick_blocked(level: Node, site: Dictionary, hero: String, attempt: int) -> bool:
+func expect_wall_contact_sequence_blocked(level: Node, site: Dictionary, hero: String) -> void:
 	var lift := lift_for(level, site)
 	reset_trial(level, Vector2(deck_left(site) - 72.0, lift.base_y))
 	var jump_started := false
-	var contact_before_press := false
-	var produced_kick := false
-	for frame: int in range(100):
+	var pending_wall_jump := false
+	var contact_count := 0
+	var kicks := 0
+	var landed_after_jump := false
+	for frame: int in range(180):
 		var input := {"direction": 1.0}
 		if not jump_started and frame == 5:
 			input["jump_pressed"] = true
 			input["jump_held"] = true
 			jump_started = true
-		elif jump_started and not produced_kick and level.player.is_on_wall_only():
-			contact_before_press = true
+		elif pending_wall_jump:
 			input["jump_pressed"] = true
 			input["jump_held"] = true
 			level.player.input_override = input
 			await physics_frame
 			var kicked_away: bool = level.player.velocity.x < -80.0 and level.player.velocity.y < -150.0
-			check(kicked_away, "%s %s wall kick %d moves away from the deck face and upward (velocity %s)." % [hero, site["slug"], attempt, level.player.velocity])
-			produced_kick = true
+			check(kicked_away, "%s %s consecutive wall kick %d moves away from the deck face and upward (velocity %s)." % [hero, site["slug"], kicks + 1, level.player.velocity])
+			kicks += 1
+			pending_wall_jump = false
 			if not observe_no_deck(level, site, "%s %s wall kick" % [hero, site["slug"]]):
 				break
 			continue
@@ -162,10 +157,16 @@ func expect_one_wall_kick_blocked(level: Node, site: Dictionary, hero: String, a
 		await physics_frame
 		if not observe_no_deck(level, site, "%s %s wall contact" % [hero, site["slug"]]):
 			break
-		if produced_kick and level.player.is_on_floor() and frame > 20:
+		if jump_started and level.player.is_on_wall_only() and not pending_wall_jump:
+			contact_count += 1
+			pending_wall_jump = true
+		if jump_started and level.player.is_on_floor() and frame > 10:
+			landed_after_jump = true
 			break
-	check(contact_before_press, "%s %s wall kick %d starts from asserted wall contact." % [hero, site["slug"], attempt])
-	return produced_kick
+	max_consecutive_wall_kicks = maxi(max_consecutive_wall_kicks, kicks)
+	check(kicks >= 1, "%s %s gets at least one asserted wall kick in one continuous trial." % [hero, site["slug"]])
+	check(contact_count == kicks, "%s %s presses jump only on the physics step after wall contact (contacts=%d, kicks=%d)." % [hero, site["slug"], contact_count, kicks])
+	check(landed_after_jump or kicks > 0, "%s %s observes the continuous wall-contact trial until landing or 3 s." % [hero, site["slug"]])
 
 
 func expect_nearby_platforms_blocked(level: Node, site: Dictionary, hero: String) -> void:

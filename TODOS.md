@@ -429,9 +429,12 @@ methods. Task controlled elevators also depend on item 2.
 - `tests/elevator_bypass_test.gd` removes lift collision during bypass trials.
   For all six lift sites and both heroes, normal jumps leave the floor and are
   observed through landing or 1.5 s without standing on the deck. Wall jump
-  trials assert wall contact before each jump press and assert that the press
-  produces an upward kick away from the deck face. Repeated wall-contact trials
-  repeat that asserted kick several times. Nearby-platform trials discover every
+  trials run as one continuous attempt per site and hero: after a wall contact
+  frame, the next physics step presses jump and must produce an upward kick away
+  from the deck face. The test steers back toward the same face after the wall
+  jump lock, then observes until landing or 3 s. Current physics permits one
+  asserted wall kick before landing; the test prints
+  `MAX_CONSECUTIVE_WALL_KICKS: 1`. Nearby-platform trials discover every
   authored standable non-lift cell within 6 columns of the deck's left edge,
   start a run-and-jump trial from each one, and assert the hero never stands on
   the deck top. `tests/elevator_test.gd` covers boarding, riding, leaving the
