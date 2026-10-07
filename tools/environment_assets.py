@@ -15,7 +15,7 @@ else:
 ROOT = Path(__file__).resolve().parents[1]
 ART = ROOT / "art/cel-shift/environment"
 LAYERS = {
-    "far": ((1280, 720), (640, 224)),
+    "far": ((1280, 720), (640, 360)),
     "equipment": ((1280, 720), (640, 360)),
     "floor": ((1536, 512), (640, 96)),
 }
@@ -150,9 +150,8 @@ def campaign_background_heights():
 
 
 def normalized_size(layer, name=None):
-    if layer == "far":
-        key = COLD_AISLE if name is None else name
-        height = campaign_background_heights()[key]
+    if layer == "far" and name is not None:
+        height = campaign_background_heights()[name]
         return (640, int(height / FAR_WORLD_PX_PER_TEXEL))
     if layer == "equipment" and name in EXPANSION_SETS:
         return (320, 180)
@@ -166,7 +165,9 @@ def layer_texture_path(name, layer):
 
 
 def write_manifest(name, art=ART):
-    target = art / COLD_AISLE / "manifest.json" if name is None else art / name / "manifest.json"
+    if name is None:
+        name = COLD_AISLE
+    target = art / name / "manifest.json"
     layers = []
     for layer, scroll, tint, scale in [
         ("far", 0.2, [0.42, 0.47, 0.56], FAR_WORLD_PX_PER_TEXEL),
@@ -186,7 +187,7 @@ def normalize(layer, art=ART, name=None):
     output_size_for = normalized_size(layer, name)
     if name is not None:
         source_size = SOURCE_SIZE
-    base = art / name if name else art
+    base = art if name in (None, COLD_AISLE) else art / name
     source = base / "generated" / f"{layer}.png"
     with Image.open(source) as image:
         if image.size != source_size:
@@ -243,7 +244,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("operation", choices=("normalize", "render"))
     parser.add_argument("--layer", choices=LAYERS)
-    parser.add_argument("--set", dest="name", choices=SETS | EXPANSION_SETS)
+    parser.add_argument("--set", dest="name", choices={COLD_AISLE: {}} | SETS | EXPANSION_SETS)
     args = parser.parse_args()
     if args.operation == "render":
         if not args.name or args.layer not in ("far", "equipment"):
@@ -251,7 +252,11 @@ def main():
         render(args.name, args.layer)
         return
     if args.name and args.layer is None:
-        if args.name in EXPANSION_SETS:
+        if args.name == COLD_AISLE:
+            for layer in ("far", "equipment"):
+                normalize(layer, ART, args.name)
+            write_manifest(args.name)
+        elif args.name in EXPANSION_SETS:
             normalize_set(args.name)
         else:
             for layer in ("far", "equipment"):
@@ -262,6 +267,9 @@ def main():
     for layer in layers:
         normalize(layer, ART, args.name)
     if args.layer in (None, "far", "equipment"):
+        if args.name is None:
+            for layer in (("far", "equipment") if args.layer is None else (args.layer,)):
+                normalize(layer, ART, COLD_AISLE)
         write_manifest(args.name)
 
 

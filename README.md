@@ -83,9 +83,10 @@ python3 tools/environment_assets.py normalize
 ```
 
 Use `--layer far`, `--layer equipment`, or `--layer floor` to normalize one
-layer. The command writes `environment/layers/` under `art/cel-shift/` (the
-cold aisle set). The other level sets use `render --set <name> --layer far`
-or `--layer equipment`, then `normalize --set <name>`.
+layer. The command keeps `environment/layers/` for the older data hall art
+test and writes the runtime cold aisle set under `environment/cold-aisle/`.
+Other level sets use `render --set <name> --layer far` or `--layer equipment`,
+then `normalize --set <name>`.
 It uses nearest-neighbor sampling. Far layers use 2.0 world px per texel and
 are normalized to exactly half of the campaign level height, so runtime load
 rejects a far texture whose scaled height does not match the level. Equipment

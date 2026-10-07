@@ -3,7 +3,7 @@
   "layers": [
     {
       "name": "Far",
-      "texture": "res://art/cel-shift/environment/layers/far.png",
+      "texture": "res://art/cel-shift/environment/cold-aisle/far.png",
       "scroll": 0.2,
       "tint": [
         0.42,
@@ -15,7 +15,7 @@
     },
     {
       "name": "Equipment",
-      "texture": "res://art/cel-shift/environment/layers/equipment.png",
+      "texture": "res://art/cel-shift/environment/cold-aisle/equipment.png",
       "scroll": 0.6,
       "tint": [
         0.55,
