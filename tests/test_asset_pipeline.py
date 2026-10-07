@@ -547,7 +547,7 @@ class AssetPipelineTest(unittest.TestCase):
 
     def test_background_sets_cover_every_level(self):
         self.assertEqual(
-            set(environment_assets.SETS), {"hot-aisle", "cable-jungle", "power-room", "outage-night"}
+            set(environment_assets.SETS), {"cold-aisle", "hot-aisle", "cable-jungle", "power-room", "outage-night"}
         )
         for name, prompts in environment_assets.SETS.items():
             with self.subTest(name=name):
@@ -555,6 +555,18 @@ class AssetPipelineTest(unittest.TestCase):
                 text = environment_assets.prompt_text(name, "equipment")
                 self.assertIn("Edit image 1", text)
                 self.assertIn("Keep unchanged", text)
+
+
+    def test_cold_aisle_has_set_specific_render_and_normalize_contract(self):
+        self.assertIn("cold", environment_assets.prompt_text("cold-aisle", "far").lower())
+        with tempfile.TemporaryDirectory() as directory:
+            art = Path(directory)
+            generated = art / "cold-aisle/generated"
+            generated.mkdir(parents=True)
+            Image.new("RGBA", (1280, 720), (20, 40, 60, 255)).save(generated / "far.png")
+            environment_assets.normalize("far", art, "cold-aisle")
+            with Image.open(art / "cold-aisle/far.png") as result:
+                self.assertEqual(result.size, environment_assets.normalized_size("far", "cold-aisle"))
 
     def test_named_set_normalizes_into_its_own_directory(self):
         with tempfile.TemporaryDirectory() as directory:

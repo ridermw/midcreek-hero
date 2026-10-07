@@ -39,6 +39,10 @@ LAYER_RULES = {
     ),
 }
 SETS = {
+    COLD_AISLE: {
+        "far": "A cold aisle data hall: blue white service lighting, sealed server rack fronts in the distance, perforated floor tiles, overhead cable trays and cool air plenums.",
+        "equipment": "Front faces of server racks and service carts in a cold aisle: blue and green status lights, blank panels, cable trays and diagnostic equipment. No text.",
+    },
     "hot-aisle": {
         "far": "A hot aisle containment corridor: warm amber lighting, exhaust ceiling ducts, heat haze shimmer drawn as pixel ripples, orange warning stripes on pale walls.",
         "equipment": "The hot exhaust side of server racks: dense rear fans, red and orange status lights, thick power cables, a few portable floor fans and heat warning signs without text.",
@@ -187,8 +191,10 @@ def normalize(layer, art=ART, name=None):
     output_size_for = normalized_size(layer, name)
     if name is not None:
         source_size = SOURCE_SIZE
-    base = art if name in (None, COLD_AISLE) else art / name
+    base = art if name is None else art / name
     source = base / "generated" / f"{layer}.png"
+    if name == COLD_AISLE and not source.exists():
+        source = art / "generated" / f"{layer}.png"
     with Image.open(source) as image:
         if image.size != source_size:
             raise ValueError(f"{source}: wrong size {image.size}, expected {source_size}")
@@ -244,7 +250,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("operation", choices=("normalize", "render"))
     parser.add_argument("--layer", choices=LAYERS)
-    parser.add_argument("--set", dest="name", choices={COLD_AISLE: {}} | SETS | EXPANSION_SETS)
+    parser.add_argument("--set", dest="name", choices=SETS | EXPANSION_SETS)
     args = parser.parse_args()
     if args.operation == "render":
         if not args.name or args.layer not in ("far", "equipment"):
