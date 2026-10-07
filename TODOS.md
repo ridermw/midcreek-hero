@@ -468,9 +468,11 @@ obscuring hazards or worsening motion quality.
 **Context:** Start with `game/level.gd`, `tools/environment_assets.py`,
 `tests/background_coverage_test.gd`, `tests/test_asset_pipeline.py`,
 `tests/export_test.gd`, and `export_presets.cfg`. The earlier sketch proposed a
-distant shell and four rack bands. That count and its speed factors are not
-approved. The user approved ordered per environment manifests, not a replacement
-for all asset tools.
+distant shell and four rack bands. The October 6 plan review approved four
+ordered layers instead: shell 0.1, far 0.2, racks 0.4, and equipment 0.6
+scroll (decisions 12A to 16A in the backlog plan; 14A sets texel sizes and 15A
+the 92 px floor-connected height limit). The user approved ordered per
+environment manifests, not a replacement for all asset tools.
 
 Define layer order, texture path, scroll factor, tint, and coverage behavior in a
 validated manifest. Keep background racks as artwork within layers, not
@@ -514,10 +516,12 @@ Decision 12A rejects deriving the new layers from existing far art.
   before any new layer. The 16.7 ms criterion needs a capable desktop
   measurement; this host can only show relative change.
 - Unblock steps: install a `mockui` build that supports `--model sunburst`,
-  `--background`, and `--strict-prompt`; add `shell` and `racks` prompts and
-  layer rules to `tools/environment_assets.py`; write the failing manifest
-  tests; run `python tools/environment_assets.py render` and `normalize` for
-  each set; then run the probe for the third point on a capable desktop.
+  `--background`, and `--strict-prompt`; add `shell` and `racks` to the
+  `--layer` choices, prompts, and layer rules in `tools/environment_assets.py`;
+  write the failing manifest tests; for each set run
+  `python tools/environment_assets.py render --set <set> --layer shell`, the
+  same with `--layer racks`, then `python tools/environment_assets.py normalize
+  --set <set>`; then run the probe for the third point on a capable desktop.
 
 ## 5a. Correct background object scale
 
