@@ -47,7 +47,7 @@ def build():
     L.port(23, "A", SEQUENCES["c3"])
     L.vent(29)
     L.tray(38, 43)
-    L.mover(50, 48)
+    L.mover(50)
     L.part(55, S, "K")
     L.lift_up(59, 61, 75)
     L.rack(66, 9, "D", "diagnose")
@@ -66,7 +66,8 @@ def build():
     L.checkpoint(144)
     L.arc(149)
     L.vent(155)
-    L.snag(160)
+    # A vent jump lands near x=5068; the patrolling pile must not reach that landing.
+    L.snag(162)
     x = drone_run(L, 164, 2)
     x = ladder_tower(L, x + 2, 7)
     x = lift_deck(L, x + 2, length=12, hazard="vent")

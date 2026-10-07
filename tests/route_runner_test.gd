@@ -10,6 +10,10 @@ class FakePlayer:
 	var position := Vector2.ZERO
 	var use_override := false
 	var input_override: Dictionary = {}
+	var grounded := true
+
+	func is_on_floor() -> bool:
+		return grounded
 
 
 class FakeLevel:
@@ -91,6 +95,18 @@ func run() -> void:
 	slide_runner.apply(level, DT)
 	motor.step(level.player.input_override, true, DT)
 	check(motor.sliding, "Releasing slide before another tap starts a new slide.")
+	var airborne := RouteRunner.new([{"hold": ["move_right", "slide"], "seconds": 0.05}, {"hold": ["move_right"], "seconds": 1.0}])
+	level.player.grounded = false
+	var pressed_in_air := false
+	for i: int in range(5):
+		airborne.apply(level, DT)
+		pressed_in_air = pressed_in_air or level.player.input_override.has("slide_pressed")
+	check(not pressed_in_air, "A route slide press waits while the hero is in the air.")
+	level.player.grounded = true
+	airborne.apply(level, DT)
+	check(level.player.input_override.get("slide_pressed") == true, "A waiting route slide press happens on landing, even in the next step.")
+	airborne.apply(level, DT)
+	check(not level.player.input_override.has("slide_pressed"), "A landed slide press happens once.")
 	check(RouteRunner.new([{"hold": ["move_up"], "until_y": 100, "max_seconds": 1}]).error_message.is_empty(), "until_y is a valid stop condition.")
 	var up := RouteRunner.new([{"hold": ["move_up"], "until_y": 50.0, "max_seconds": 1.0}])
 	level.player.position.y = 80.0

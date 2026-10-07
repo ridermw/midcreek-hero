@@ -48,7 +48,7 @@
   {"hold": ["move_right", "jump"], "seconds": 0.45},
   {"hold": ["move_right"], "until_x": 4554, "max_seconds": 8},
   {"hold": ["move_right", "jump"], "seconds": 0.45},
-  {"hold": ["move_right"], "until_x": 4786, "max_seconds": 8},
+  {"hold": ["move_right"], "until_hazard": 4848, "gap": 62, "max_seconds": 12},
   {"hold": ["move_right", "jump"], "seconds": 0.45},
   {"hold": ["move_right"], "until_x": 5034, "max_seconds": 8},
   {"wait": 0.2},
@@ -102,9 +102,9 @@
   {"hold": ["move_right", "jump"], "seconds": 0.45},
   {"hold": ["move_right"], "until_x": 10602, "max_seconds": 8},
   {"hold": ["move_right", "jump"], "seconds": 0.45},
-  {"hold": ["move_right"], "until_x": 10994, "max_seconds": 8},
+  {"hold": ["move_right"], "until_hazard": 11056, "gap": 62, "max_seconds": 12},
   {"hold": ["move_right", "jump"], "seconds": 0.45},
-  {"hold": ["move_right"], "until_x": 11250, "max_seconds": 8},
+  {"hold": ["move_right"], "until_hazard": 11312, "gap": 62, "max_seconds": 12},
   {"hold": ["move_right", "jump"], "seconds": 0.45},
   {"hold": ["move_right"], "until_x": 11696, "max_seconds": 8}
 ]

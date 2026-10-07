@@ -53,7 +53,11 @@ class Layout:
 
     def snag(self, col):
         self.put(col, self.stand, "s")
-        self.run_to(self.cx(col) - 62)
+        self.jump_pile(col)
+
+    def jump_pile(self, col):
+        # The runner waits in place until a run up and jump over the patrolling pile is clear.
+        self.route.append({"hold": ["move_right"], "until_hazard": self.cx(col), "gap": 62, "max_seconds": 12})
         self.jump()
 
     def vent(self, col, row=None):
@@ -66,11 +70,9 @@ class Layout:
         self.run_to(self.cx(col) - 70)
         self.jump()
 
-    def mover(self, col, jump_col, jump_offset=0):
-        # Pixel offsets depend on patrol phase; remeasure after any earlier route edit.
+    def mover(self, col):
         self.put(col, self.stand, "m")
-        self.run_to(self.cx(jump_col) + jump_offset)
-        self.jump()
+        self.jump_pile(col)
 
     def drone(self, col):
         self.put(col, self.stand, "d")
@@ -238,10 +240,9 @@ def arc_run(L, x, count, spacing=8):
     return x + 3 + count * spacing
 
 
-def mover_run(L, x, count, spacing=12, lead=3, jump_offset=0):
+def mover_run(L, x, count, spacing=12):
     for i in range(count):
-        col = x + 6 + i * spacing
-        L.mover(col, col - lead, jump_offset)
+        L.mover(x + 6 + i * spacing)
     return x + 6 + count * spacing
 
 

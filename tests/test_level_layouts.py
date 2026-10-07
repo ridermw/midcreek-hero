@@ -16,15 +16,14 @@ LEVELS = {
 
 
 class LevelLayoutTest(unittest.TestCase):
-    def test_moving_cable_launch_offset_changes_route_not_geometry(self):
-        original = layout.Layout(20)
-        shifted = layout.Layout(20)
-        original.mover(10, 7)
-        shifted.mover(10, 7, jump_offset=8)
-        self.assertEqual(original.grid, shifted.grid)
-        self.assertEqual(original.route[0]["until_x"], 240)
-        self.assertEqual(shifted.route[0]["until_x"], 248)
-        self.assertEqual(original.route[1:], shifted.route[1:])
+    def test_cable_piles_wait_for_a_clear_jump_over_their_authored_x(self):
+        for kind in ("snag", "mover"):
+            with self.subTest(kind=kind):
+                level = layout.Layout(20)
+                getattr(level, kind)(10)
+                self.assertEqual(level.grid[level.stand][10], "s" if kind == "snag" else "m")
+                self.assertEqual(level.route[0], {"hold": ["move_right"], "until_hazard": 336, "gap": 62, "max_seconds": 12})
+                self.assertEqual(level.route[1], {"hold": ["move_right", "jump"], "seconds": 0.45})
 
     def test_authored_guidance_carries_one_explicit_action(self):
         actions = {"move_left", "move_right", "move_up", "move_down", "jump", "slide", "repair", "diagnose", "pause"}

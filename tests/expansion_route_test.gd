@@ -4,10 +4,8 @@ extends SceneTree
 const LEVEL = preload("res://game/level.tscn")
 const Runner = preload("res://game/route_runner.gd")
 # Strict known gaps: a listed replay must still take hits and pass every other check.
-const KNOWN_GAPS := {
-	"03-0": "PR2 (1A): level 03 hazards restart at authored phase; checkpoint 0 replay takes hits.",
-	"03-1": "PR2 (1A): level 03 hazards restart at authored phase; checkpoint 1 replay takes hits.",
-}
+# Key "<level>-<checkpoint index>": reason and owning change. Empty when none remain.
+const KNOWN_GAPS := {}
 var checks := 0
 var failures := 0
 var saved: Array[Dictionary] = []
