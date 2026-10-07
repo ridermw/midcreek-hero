@@ -1,11 +1,13 @@
 extends AnimatableBody2D
 
-const RISE := 96.0
-const SPEED := 48.0
-const PAUSE := 0.5
+const RISE_TILES := 5
+const TILE := 32.0
+const RISE := RISE_TILES * TILE
+const SPEED := 64.0
+const PAUSE := 1.0
 const TRAVEL := RISE / SPEED
 const PERIOD := 2.0 * (PAUSE + TRAVEL)
-const SIZE := Vector2(64, 16)
+const SIZE := Vector2(96, 16)
 
 var art: RefCounted
 var base_y: float = 0.0
@@ -54,6 +56,6 @@ func reset_motion() -> void:
 
 func _draw() -> void:
 	if art != null and art.has("tiles", "lift"):
-		draw_texture(art.texture("tiles", "lift"), Vector2(-32, 0))
+		draw_texture_rect(art.texture("tiles", "lift"), Rect2(-SIZE.x / 2.0, 0, SIZE.x, SIZE.y), false)
 	else:
-		draw_rect(Rect2(-32, 0, 64, 16), Color(0.85, 0.7, 0.15))
+		draw_rect(Rect2(-SIZE.x / 2.0, 0, SIZE.x, SIZE.y), Color(0.85, 0.7, 0.15))

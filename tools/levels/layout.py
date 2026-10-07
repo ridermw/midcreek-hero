@@ -10,6 +10,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 TILE = 32
+LIFT_RISE_TILES = 5
 
 
 class Layout:
@@ -142,13 +143,17 @@ class Layout:
 
     def lift_up(self, col, first, last):
         self.put(col, self.stand, "l")
+        top_row = self.stand - LIFT_RISE_TILES
         for x in range(first, last + 1):
-            for row in range(self.stand - 2, self.stand + 1):
+            for row in range(top_row + 1, self.stand + 1):
                 self.put(x, row, "#")
         self.run_to(self.cx(col) - 6)
         self.route.append({"wait": 0.2})
-        self.route.append({"hold": ["move_up"], "until_y": (self.stand + 1) * TILE - 96 + 2, "max_seconds": 8})
+        self.route.append({"hold": ["move_up"], "until_y": (self.stand + 1) * TILE - LIFT_RISE_TILES * TILE + 2, "max_seconds": 10})
         self.run_to(first * TILE + 24)
+
+    def lift_top_row(self):
+        return self.stand - LIFT_RISE_TILES
 
     def ladder(self, col, top_row, first, last):
         for row in range(top_row, self.stand + 1):
@@ -262,7 +267,7 @@ def ladder_tower(L, x, top_row, rack=None, length=6):
 
 def lift_deck(L, x, length=14, rack=None, hazard=None, mode="repair"):
     L.lift_up(x, x + 2, x + 2 + length)
-    deck_row = L.stand - 3
+    deck_row = L.lift_top_row()
     if hazard == "arc":
         L.arc(x + 2 + length // 2, deck_row)
     elif hazard == "vent":

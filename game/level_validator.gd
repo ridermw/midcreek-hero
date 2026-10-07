@@ -1,9 +1,10 @@
 extends RefCounted
 
 const CableSnag = preload("res://game/hazards/cable_snag.gd")
+const Lift = preload("res://game/entities/lift.gd")
 const JUMP_REACH := {0: 4, 1: 4, 2: 3, 3: 2}
 const FALL_REACH := 4
-const LIFT_RISE := Vector2i(0, 3)
+const LIFT_RISE := Vector2i(0, Lift.RISE_TILES)
 const MIN_TASKS := 3
 const MAX_TASKS := 6
 const CHECKPOINTS := 3

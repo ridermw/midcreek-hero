@@ -45,6 +45,13 @@ func panels() -> Array:
 	return level.entities["switches"]
 
 
+func lift_constants() -> Dictionary:
+	var lift := Lift.new()
+	var constants: Dictionary = lift.get_script().get_script_constant_map()
+	lift.free()
+	return constants
+
+
 func run() -> void:
 	var arc := SparkArc.new()
 	arc.position = LevelBuilder.cell_to_world(Vector2i(4, 4))
@@ -59,10 +66,13 @@ func run() -> void:
 	check(arc.hit_rect() == Rect2(arc.position + Vector2(-32, -28), Vector2(64, 24)), "The arc covers 64x24 centered on its cell.")
 	arc.free()
 
-	check(Lift.offset_at(0.0) == 0.0 and Lift.offset_at(0.4) == 0.0, "A lift pauses 0.5 s at the bottom.")
-	check(is_equal_approx(Lift.offset_at(1.5), 48.0), "A lift rises at 48 px/s.")
-	check(is_equal_approx(Lift.offset_at(2.5), 96.0) and is_equal_approx(Lift.offset_at(2.9), 96.0), "A lift pauses 0.5 s at the top, 3 tiles up.")
-	check(is_equal_approx(Lift.offset_at(4.0), 48.0) and is_equal_approx(Lift.offset_at(5.0), 0.0), "A lift returns down over 2 s.")
+	var constants := lift_constants()
+	check(constants.get("RISE_TILES", 0) == 5 and is_equal_approx(Lift.RISE, 160.0), "A lift rises 5 tiles / 160 px.")
+	check(is_equal_approx(Lift.SPEED, 64.0) and is_equal_approx(Lift.PAUSE, 1.0), "A lift moves at 64 px/s and pauses 1.0 s.")
+	check(Lift.offset_at(0.0) == 0.0 and Lift.offset_at(0.9) == 0.0, "A lift pauses 1.0 s at the bottom.")
+	check(is_equal_approx(Lift.offset_at(2.0), 64.0), "A lift rises at 64 px/s.")
+	check(is_equal_approx(Lift.offset_at(3.5), 160.0) and is_equal_approx(Lift.offset_at(4.4), 160.0), "A lift pauses 1.0 s at the top, 5 tiles up.")
+	check(is_equal_approx(Lift.offset_at(5.5), 96.0) and is_equal_approx(Lift.offset_at(7.0), 0.0), "A lift returns down over 2.5 s for a 7.0 s period.")
 
 	load_fixture()
 	check(level.entities["hazards"][0].active, "The fixture includes an initially active arc.")
@@ -91,7 +101,7 @@ func run() -> void:
 	check(level.error_message.is_empty(), "The power fixture loads: " + level.error_message)
 	check(panels().size() == 3 and level.entities["lifts"].size() == 1, "Switch panels and lifts are built.")
 	check(panels()[0].order == 1 and panels()[2].order == 3, "Panels know their order.")
-	at(Vector2i(12, 4))
+	at(Vector2i(12, 6))
 	level.step(DT)
 	check(level.hud.prompt_model()["description"].contains("switch 2"), "The accessible hint names the panel number.")
 	tap(&"repair")
@@ -104,30 +114,30 @@ func run() -> void:
 		level.step(DT)
 	check(level.hud.prompt_model()["description"].contains("Throw switch 2"), "The normal switch prompt returns after the error.")
 	tap(&"repair")
-	at(Vector2i(2, 4))
+	at(Vector2i(2, 6))
 	for i: int in range(90):
 		level.step(DT)
 	check(not level.hud.prompt_label.text.contains("Wrong order"), "Leaving the switch clears its expired error feedback.")
-	for cell: Vector2i in [Vector2i(10, 4), Vector2i(12, 4)]:
+	for cell: Vector2i in [Vector2i(10, 6), Vector2i(12, 6)]:
 		at(cell)
 		level.step(DT)
 		tap(&"repair")
 	check(panels()[0].on and panels()[1].on and "switch" in sounds, "Switches turn on in order.")
-	at(Vector2i(10, 4))
+	at(Vector2i(10, 6))
 	level.step(DT)
 	tap(&"repair")
 	check(panels()[0].on and panels()[1].on, "Pressing a lit switch again changes nothing.")
-	at(Vector2i(14, 4))
+	at(Vector2i(14, 6))
 	level.step(DT)
 	tap(&"repair")
 	check(level.tasks.is_done("b1"), "The third switch in order reboots the switch.")
 	load_fixture()
-	at(Vector2i(12, 4))
+	at(Vector2i(12, 6))
 	tap(&"repair")
-	at(Vector2i(10, 4))
+	at(Vector2i(10, 6))
 	tap(&"repair")
 	check(panels()[0].on and not level.hud.prompt_label.text.contains("Wrong order"), "A successful switch clears stale error feedback.")
-	at(Vector2i(14, 4))
+	at(Vector2i(14, 6))
 	tap(&"repair")
 	for i: int in range(5):
 		level.health.damage()
@@ -135,12 +145,12 @@ func run() -> void:
 	level.step(DT)
 	check(not level.hud.prompt_label.text.contains("Wrong order"), "Respawning clears stale switch feedback.")
 	load_fixture()
-	at(Vector2i(10, 4))
+	at(Vector2i(10, 6))
 	level.step(DT)
 	tap(&"repair")
-	at(Vector2i(7, 4))
+	at(Vector2i(7, 6))
 	level.step(DT)
-	at(Vector2i(12, 4))
+	at(Vector2i(12, 6))
 	level.step(DT)
 	tap(&"repair")
 	for i: int in range(5):
@@ -155,7 +165,7 @@ func run() -> void:
 		if rack.task_id == "r2":
 			rack_near = rack
 	rack_near.position = panels()[2].position + Vector2(30, 0)
-	at(Vector2i(14, 4))
+	at(Vector2i(14, 6))
 	level.player.position.x += 20.0
 	level.action_override = {&"repair": true}
 	for i: int in range(130):
@@ -168,9 +178,9 @@ func run() -> void:
 	var lift: Node2D = level.entities["lifts"][0]
 	level.player.position = lift.position + Vector2(0, -1)
 	var start_y: float = level.player.position.y
-	for i: int in range(170):
+	for i: int in range(260):
 		await physics_frame
-	check(level.player.position.y < start_y - 80.0 and level.player.is_on_floor(), "The player rides a lift up.")
+	check(level.player.position.y < start_y - 140.0 and level.player.is_on_floor(), "The player rides a lift up 5 tiles.")
 	var lift_y: float = lift.position.y
 	level.hit_stop_remaining = 0.05
 	level.freeze_world(true)

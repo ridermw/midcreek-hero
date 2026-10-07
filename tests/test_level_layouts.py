@@ -43,6 +43,29 @@ class LevelLayoutTest(unittest.TestCase):
                         self.assertTrue(prompt["status"])
                     self.assertNotRegex(prompt["text"] + prompt["status"], r"Pad:|E or X|E / X|Q / Y|C or Shift|hold E|Press Q")
 
+
+    def test_lift_runtime_and_generator_rise_stay_in_sync(self):
+        lift_source = (layout.ROOT / "game/entities/lift.gd").read_text()
+        marker = "const RISE_TILES := "
+        self.assertIn(marker, lift_source)
+        runtime_rise = int(lift_source.split(marker, 1)[1].splitlines()[0])
+        self.assertEqual(runtime_rise, 5)
+        self.assertEqual(layout.LIFT_RISE_TILES, runtime_rise)
+        self.assertEqual(layout.LIFT_RISE_TILES * layout.TILE, 160)
+
+    def test_lift_up_builds_a_five_tile_second_story_and_route_target(self):
+        level = layout.Layout(80)
+        level.lift_up(20, 22, 28)
+        self.assertEqual(level.grid[level.stand][20], "l")
+        top_row = level.stand - layout.LIFT_RISE_TILES
+        self.assertEqual(top_row, 7)
+        for x in range(22, 29):
+            with self.subTest(column=x):
+                self.assertEqual(level.grid[top_row][x], ".")
+                self.assertEqual(level.grid[top_row + 1][x], "#")
+                self.assertEqual(level.grid[level.stand][x], "#")
+        self.assertEqual(level.route[-2], {"hold": ["move_up"], "until_y": (level.stand + 1) * layout.TILE - 160 + 2, "max_seconds": 10})
+
     def test_current_authored_targets_are_preserved(self):
         for name, targets in zip(LEVELS, [(120, 195), (120, 195), (125, 200), (125, 200), (125, 170)]):
             header = importlib.import_module(f"tools.levels.{name}").build()[1]
