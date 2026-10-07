@@ -51,7 +51,7 @@ class AnimationAnchorsTest(unittest.TestCase):
         trace = [sample("man-run", "run", 0, 0), sample("man-run", "run", 1, 4, x=12.0)]
         change = animation_anchors.analyze(trace, anchors, {"run": 14})["man-run"]["changes"][0]
         self.assertEqual(change["kind"], "frame")
-        self.assertEqual(change["cause"], "source registration")
+        self.assertEqual(change["causes"], ["source registration"])
         self.assertEqual(change["helmet_texels"], 9)
 
     def test_helmet_motion_over_a_stable_torso_is_an_authored_pose(self):
@@ -62,7 +62,7 @@ class AnimationAnchorsTest(unittest.TestCase):
         trace = [sample("man-idle-run", "idle", 0, 0), sample("man-idle-run", "run", 0, 5, x=3.0)]
         change = animation_anchors.analyze(trace, anchors, {"idle": 6, "run": 14})["man-idle-run"]["changes"][0]
         self.assertEqual(change["kind"], "transition")
-        self.assertEqual(change["cause"], "authored pose")
+        self.assertEqual(change["causes"], ["authored pose"])
 
     def test_a_late_frame_inside_a_clip_is_playback_timing(self):
         anchors = {("woman-midcreek", "run", i): animation_anchors.frame_anchors(figure()) for i in range(3)}
@@ -72,8 +72,8 @@ class AnimationAnchorsTest(unittest.TestCase):
             sample("woman-run", "run", 2, 11),
         ]
         changes = animation_anchors.analyze(trace, anchors, {"run": 14})["woman-run"]["changes"]
-        self.assertEqual(changes[0]["cause"], "none")
-        self.assertEqual(changes[1]["cause"], "playback timing")
+        self.assertEqual(changes[0]["causes"], [])
+        self.assertEqual(changes[1]["causes"], ["playback timing"])
         self.assertEqual(changes[1]["ticks"], 7)
 
     def test_camera_that_does_not_follow_physics_is_render_timing(self):
@@ -81,7 +81,7 @@ class AnimationAnchorsTest(unittest.TestCase):
         trace = [sample("man-run", "run", 0, 0, x=0.0), sample("man-run", "run", 1, 4, x=12.0)]
         trace[1]["camera"] = [30.0, 300.0]
         change = animation_anchors.analyze(trace, anchors, {"run": 14})["man-run"]["changes"][0]
-        self.assertEqual(change["cause"], "camera or render timing")
+        self.assertEqual(change["causes"], ["camera or render timing"])
 
     def test_mirrored_samples_use_mirrored_world_anchors(self):
         anchors = {
@@ -104,7 +104,7 @@ class AnimationAnchorsTest(unittest.TestCase):
         trace = [sample("woman-idle-diagnose", "secondary", 5, 0), sample("woman-idle-diagnose", "secondary", 6, 6)]
         change = animation_anchors.analyze(trace, anchors, {"secondary": 10})["woman-idle-diagnose"]["changes"][0]
         self.assertEqual(change["boot_texels"], 0)
-        self.assertEqual(change["cause"], "authored pose")
+        self.assertEqual(change["causes"], ["authored pose"])
 
     def test_planted_boot_drift_is_a_source_registration_change(self):
         anchors = {
@@ -113,7 +113,7 @@ class AnimationAnchorsTest(unittest.TestCase):
         }
         trace = [sample("man-idle-run", "idle", 2, 0), sample("man-idle-run", "idle", 3, 10)]
         change = animation_anchors.analyze(trace, anchors, {"idle": 6})["man-idle-run"]["changes"][0]
-        self.assertEqual(change["cause"], "source registration")
+        self.assertEqual(change["causes"], ["source registration"])
 
     def test_forward_lean_between_gaits_is_an_authored_pose(self):
         lean = Image.new("RGBA", (208, 208))
@@ -128,7 +128,48 @@ class AnimationAnchorsTest(unittest.TestCase):
         trace = [sample("woman-idle-run", "walk", 0, 0), sample("woman-idle-run", "run", 0, 5, x=2.0)]
         change = animation_anchors.analyze(trace, anchors, {"walk": 10, "run": 14})["woman-idle-run"]["changes"][0]
         self.assertEqual((change["helmet_texels"], change["torso_texels"]), (6, 4.0))
-        self.assertEqual(change["cause"], "authored pose")
+        self.assertEqual(change["causes"], ["authored pose"])
+
+    def test_a_pose_change_does_not_hide_a_camera_error(self):
+        anchors = {
+            ("man-midcreek", "idle", 0): animation_anchors.frame_anchors(figure()),
+            ("man-midcreek", "run", 0): animation_anchors.frame_anchors(figure(hat_shift=9)),
+        }
+        trace = [sample("man-idle-run", "idle", 0, 0), sample("man-idle-run", "run", 0, 5, x=3.0)]
+        trace[1]["camera"] = [11.0, 300.0]
+        result = animation_anchors.analyze(trace, anchors, {"idle": 6, "run": 14})["man-idle-run"]
+        self.assertEqual(result["changes"][0]["causes"], ["authored pose", "camera or render timing"])
+        self.assertEqual(result["unexplained"], 1)
+
+    def test_a_registration_shift_does_not_hide_late_playback(self):
+        anchors = {
+            ("man-midcreek", "run", 0): animation_anchors.frame_anchors(figure()),
+            ("man-midcreek", "run", 1): animation_anchors.frame_anchors(figure()),
+            ("man-midcreek", "run", 2): animation_anchors.frame_anchors(figure(shift=9)),
+        }
+        trace = [sample("man-run", "run", 0, 0), sample("man-run", "run", 1, 4), sample("man-run", "run", 2, 11)]
+        change = animation_anchors.analyze(trace, anchors, {"run": 14})["man-run"]["changes"][1]
+        self.assertEqual(change["causes"], ["source registration", "playback timing"])
+
+    def test_tool_reach_is_reported_and_mirrored(self):
+        anchors = {
+            ("woman-midcreek", "primary", 0): animation_anchors.frame_anchors(figure(reach=10)),
+            ("woman-midcreek", "primary", 1): animation_anchors.frame_anchors(figure(reach=30)),
+        }
+        trace = [sample("woman-repair", "primary", 0, 0, flip=True), sample("woman-repair", "primary", 1, 6, flip=True)]
+        change = animation_anchors.analyze(trace, anchors, {"primary": 10})["woman-repair"]["changes"][0]
+        self.assertEqual((change["reach_texels"], change["reach_world"]), (20, -10.0))
+        self.assertEqual(change["causes"], ["authored pose"])
+
+    def test_tool_reach_moving_with_drifting_boots_is_registration(self):
+        anchors = {
+            ("man-midcreek", "primary", 0): animation_anchors.frame_anchors(figure(reach=10)),
+            ("man-midcreek", "primary", 1): animation_anchors.frame_anchors(figure(shift=4, reach=10)),
+        }
+        trace = [sample("man-repair", "primary", 0, 0), sample("man-repair", "primary", 1, 6)]
+        change = animation_anchors.analyze(trace, anchors, {"primary": 10})["man-repair"]["changes"][0]
+        self.assertEqual(change["reach_texels"], 4)
+        self.assertIn("source registration", change["causes"])
 
     def test_summary_reports_the_largest_unexplained_jump(self):
         anchors = {

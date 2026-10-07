@@ -102,9 +102,11 @@ regression that failed before the fix.
   uses a Level 2 rack because Level 3 has no diagnosis rack.
 - [x] Add `tools/animation_anchors.py`. It measures helmet, torso, boot span,
   and reach anchors in every frame and joins them with the rendered trace. It
-  classifies each frame change as source registration, authored pose, playback
-  timing, or camera and render timing. Its rules failed in tests before the
-  implementation.
+  reports every independent cause of each frame change: source registration,
+  authored pose, playback timing, or camera and render timing. A pose change
+  cannot hide a timing or camera cause. Tool reach deltas are reported; a
+  repair or diagnosis tool swing over registered boots is an authored pose.
+  Its rules failed in tests before the implementation.
 - [x] Measure before changing artwork. With fixed 60 Hz steps, every flagged
   change was source registration: the man's run frames 3 and 7 move the whole
   figure 9 and 4 texels forward (helmet x=125 and 120, other frames 114 to 116);

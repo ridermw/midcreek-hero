@@ -222,6 +222,25 @@ class AssetPipelineTest(unittest.TestCase):
                     self.assertEqual(animation_anchors.frame_anchors(frame)["helmet_x"], animation_assets.RUN_HELMET_X)
             self.assertTrue((art / "previews/man-midcreek/run.png").is_file())
 
+    def test_register_rejects_an_incomplete_frame_set_before_writing(self):
+        with tempfile.TemporaryDirectory() as directory:
+            art = Path(directory)
+            frames = art / "frames/man-midcreek/run"
+            frames.mkdir(parents=True)
+            for index in (0, 1, 2, 4, 5, 6, 7):
+                frame = Image.new("RGBA", (208, 208))
+                frame.paste((15, 80, 180, 255), (120, 35, 137, 51))
+                frame.paste((60, 40, 20, 255), (110, 125, 140, 184))
+                frame.save(frames / f"{index:02d}.png")
+            before = {path.name: path.read_bytes() for path in frames.glob("*.png")}
+            with patch.object(animation_assets, "ART", art), self.assertRaisesRegex(ValueError, "03.png"):
+                animation_assets.register("man-midcreek", "run")
+            self.assertEqual({path.name: path.read_bytes() for path in frames.glob("*.png")}, before)
+            (frames / "03.png").write_bytes(before["02.png"])
+            (frames / "08.png").write_bytes(before["02.png"])
+            with patch.object(animation_assets, "ART", art), self.assertRaisesRegex(ValueError, "08.png"):
+                animation_assets.register("man-midcreek", "run")
+
     def test_repair_alignment_preserves_pixels_baseline_and_tool_reach(self):
         frame = Image.new("RGBA", (208, 208))
         frame.paste((15, 80, 180, 255), (118, 35, 135, 51))

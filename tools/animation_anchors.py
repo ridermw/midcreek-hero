@@ -19,6 +19,8 @@ WORLD_PER_TEXEL = 0.5
 JUMP_TEXELS = 3
 # Planted clips keep both boots in place; any larger boot span drift is registration.
 PLANTED = ("idle", "primary", "secondary")
+# Repair and diagnosis extend a tool; reach is the rightmost opaque column.
+TOOL_CLIPS = ("primary", "secondary")
 PLANTED_TEXELS = 1
 # A translated figure moves its torso about as far as its helmet; a lean moves the helmet more.
 TRANSLATION_RATIO = 0.75
@@ -67,23 +69,27 @@ def load_anchors(art=None, clips=None):
 
 
 def classify(before, after, kind, ticks, fps, camera_error, clip, previous_clip):
+    """Return every independent cause, so a pose or registration change cannot hide timing."""
     helmet = after["helmet_x"] - before["helmet_x"]
     torso = after["torso_x"] - before["torso_x"]
     boots = after["boot_x"] - before["boot_x"]
+    reach = after["reach_x"] - before["reach_x"]
+    causes = []
     if clip in PLANTED and previous_clip in PLANTED:
         # Planted boots separate a registration shift from an upper body lean.
         if abs(boots) > PLANTED_TEXELS:
-            return "source registration"
+            causes.append("source registration")
     elif (abs(helmet) > JUMP_TEXELS and abs(torso) > JUMP_TEXELS and helmet * torso > 0
           and abs(torso) >= TRANSLATION_RATIO * abs(helmet)):
-        return "source registration"
-    if abs(helmet) > JUMP_TEXELS:
-        return "authored pose"
+        causes.append("source registration")
+    # A helmet lean or a tool swing relative to the torso is authored motion.
+    if not causes and (abs(helmet) > JUMP_TEXELS or (clip in TOOL_CLIPS and abs(reach - torso) > JUMP_TEXELS)):
+        causes.append("authored pose")
     if kind != "transition" and ticks is not None and abs(ticks - 60.0 / fps) > TIMING_TICKS:
-        return "playback timing"
+        causes.append("playback timing")
     if camera_error > CAMERA_PIXELS:
-        return "camera or render timing"
-    return "none"
+        causes.append("camera or render timing")
+    return causes
 
 
 def analyze(samples, anchors, fps):
@@ -113,6 +119,7 @@ def analyze(samples, anchors, fps):
             camera_dx = current["camera"][0] - previous["camera"][0]
             sign = -1 if current.get("flip") else 1
             helmet = after["helmet_x"] - before["helmet_x"]
+            reach = after["reach_x"] - before["reach_x"]
             changes.append({
                 "kind": kind,
                 "from": [previous["clip"], previous["frame"]],
@@ -123,11 +130,13 @@ def analyze(samples, anchors, fps):
                 "helmet_texels": helmet,
                 "torso_texels": round(after["torso_x"] - before["torso_x"], 2),
                 "boot_texels": after["boot_x"] - before["boot_x"],
+                "reach_texels": reach,
                 "helmet_world": helmet * WORLD_PER_TEXEL * sign,
-                "cause": classify(before, after, kind, ticks, fps[current["clip"]], abs(camera_dx - dx), current["clip"], previous["clip"]),
+                "reach_world": reach * WORLD_PER_TEXEL * sign,
+                "causes": classify(before, after, kind, ticks, fps[current["clip"]], abs(camera_dx - dx), current["clip"], previous["clip"]),
             })
             last_change = current
-        unexplained = [c for c in changes if c["cause"] in UNEXPLAINED]
+        unexplained = [c for c in changes if any(cause in UNEXPLAINED for cause in c["causes"])]
         report[phase] = {
             "changes": changes,
             "unexplained": len(unexplained),
@@ -140,15 +149,17 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("trace")
     parser.add_argument("report")
+    parser.add_argument("--art", type=Path, help="Animation art root to measure; defaults to the published frames.")
     args = parser.parse_args()
     samples = json.loads(Path(args.trace).read_text())
     fps = dict(zip(animation_assets.CLIPS, animation_assets.FPS))
-    report = analyze(samples, load_anchors(clips=sorted({s["clip"] for s in samples})), fps)
+    report = analyze(samples, load_anchors(args.art, sorted({s["clip"] for s in samples})), fps)
     Path(args.report).write_text(json.dumps(report, indent=1) + "\n", newline="\n")
     for phase, result in report.items():
         causes = {}
         for change in result["changes"]:
-            causes[change["cause"]] = causes.get(change["cause"], 0) + 1
+            for cause in change["causes"] or ["none"]:
+                causes[cause] = causes.get(cause, 0) + 1
         print(f"{phase}: changes={len(result['changes'])} unexplained={result['unexplained']} "
               f"max_helmet_texels={result['max_helmet_texels']} causes={causes}")
 

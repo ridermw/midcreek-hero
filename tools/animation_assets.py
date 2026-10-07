@@ -265,8 +265,15 @@ ALIGNERS = {
 
 def register(variant, clip):
     """Translate published frames in place with the clip's registration rule."""
+    count, _, _ = configuration(variant, clip)
+    folder = ART / "frames" / variant / clip
+    expected = [f"{index:02d}.png" for index in range(count)]
+    present = sorted(path.name for path in folder.glob("*.png"))
+    for name in sorted(set(expected) ^ set(present)):
+        raise ValueError(f"{folder / name}: {'missing' if name in expected else 'unexpected'} frame; expected {count} frames")
     results = []
-    for path in sorted((ART / "frames" / variant / clip).glob("*.png")):
+    for name in expected:
+        path = folder / name
         with Image.open(path) as frame:
             try:
                 results.append(ALIGNERS[clip](frame.convert("RGBA")))

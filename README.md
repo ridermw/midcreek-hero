@@ -535,8 +535,9 @@ python3 -m tools.animation_anchors /tmp/midcreek-motion/native-trace.json /tmp/m
 The probe uses repeatable input and writes frame, facing, physics, camera, and
 timing samples to `native-trace.json`. It also writes two help screenshots.
 `--actions=run,idle-run` limits the cases and `--skip-help` skips the help
-screenshots. The anchor report classifies each frame change as source
+screenshots. The anchor report lists every cause of each frame change: source
 registration, authored pose, playback timing, or camera and render timing.
+Pass `--art <animation art directory>` to measure a trace against older frames.
 Add `--fixed-fps 60` before `--` to remove host render rate effects.
 Use a separate run with `--write-movie /tmp/midcreek-motion/actions.avi --fixed-fps 60`
 before `--` to record the action cases and the help demonstrations.
