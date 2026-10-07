@@ -21,7 +21,12 @@ func _initialize() -> void:
 		if arg.begins_with("--output="):
 			output = arg.trim_prefix("--output=")
 		elif arg.begins_with("--actions="):
-			only = arg.trim_prefix("--actions=").split(",", false)
+			var parsed := parse_actions(arg.trim_prefix("--actions="))
+			if not parsed["ok"]:
+				push_error(parsed["error"])
+				quit(1)
+				return
+			only = parsed["actions"]
 		elif arg == "--skip-help":
 			skip_help = true
 	if output.is_empty():
@@ -29,6 +34,18 @@ func _initialize() -> void:
 		quit(1)
 		return
 	run.call_deferred()
+
+
+static func parse_actions(value: String) -> Dictionary:
+	var selected := value.split(",", false)
+	for action: String in selected:
+		if not ACTIONS.has(action):
+			return {
+				"ok": false,
+				"error": "Unknown animation probe action '%s'. Expected one of: %s" % [action, ", ".join(ACTIONS)],
+				"actions": PackedStringArray(),
+			}
+	return {"ok": true, "error": "", "actions": selected}
 
 
 func record(delta: float) -> void:

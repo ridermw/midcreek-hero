@@ -120,14 +120,39 @@ def _frame_count(anchors, variant, clip):
                if anchor_variant == variant and anchor_clip == clip) + 1
 
 
-def _frame_steps(before, after, count, signed_progress):
+def _speed_sign(sample):
+    speed = sample.get("playback_speed", 1.0) or 0.0
+    if speed > 0:
+        return 1
+    if speed < 0:
+        return -1
+    return 0
+
+
+def _latest_direction_window(samples):
+    start = 0
+    last_sign = 0
+    for index, sample in enumerate(samples):
+        sign = _speed_sign(sample)
+        if sign and last_sign and sign != last_sign:
+            start = index
+        if sign:
+            last_sign = sign
+    return samples[start:]
+
+
+def _observed_frame_progress(before, after, count, signed_progress):
     if count <= 1:
-        return max(1, abs(after - before))
+        return max(0.0, abs(after["frame"] - before["frame"]))
+    before_position = before["frame"] + before.get("progress", 0.0)
+    after_position = after["frame"] + after.get("progress", 0.0)
     if signed_progress < 0:
-        steps = (before - after) % count
+        distance = before_position - after_position
     else:
-        steps = (after - before) % count
-    return max(1, steps)
+        distance = after_position - before_position
+    if distance < 0:
+        distance += count
+    return distance
 
 
 def _world_anchor_delta(before_x, after_x, previous_flip, current_flip):
@@ -149,11 +174,14 @@ def analyze(samples, anchors, fps):
         last_change = None
         last_change_index = None
         for index, (previous, current) in enumerate(zip(items, items[1:]), start=1):
-            if (previous["clip"], previous["frame"]) == (current["clip"], current["frame"]):
+            same_frame = (previous["clip"], previous["frame"]) == (current["clip"], current["frame"])
+            if same_frame and previous.get("flip") == current.get("flip"):
                 continue
             before = anchors[(variant, previous["clip"], previous["frame"])]
             after = anchors[(variant, current["clip"], current["frame"])]
-            if previous["clip"] != current["clip"]:
+            if same_frame:
+                kind = "facing"
+            elif previous["clip"] != current["clip"]:
                 kind = "transition"
             elif current["frame"] < previous["frame"]:
                 kind = "loop"
@@ -162,13 +190,14 @@ def analyze(samples, anchors, fps):
             ticks = None
             playback_frames = None
             playback_timing = False
-            if last_change is not None and last_change["clip"] == current["clip"] and kind != "transition":
+            if last_change is not None and last_change["clip"] == current["clip"] and kind not in ("transition", "facing"):
                 ticks = current["physics_frame"] - last_change["physics_frame"]
+                timing_window = _latest_direction_window(items[last_change_index:index + 1])
                 signed_progress, playback_frames = _animation_frame_progress(
-                    items[last_change_index:index + 1], current["clip"], fps[current["clip"]])
-                frame_steps = _frame_steps(last_change["frame"], current["frame"],
-                                           _frame_count(anchors, variant, current["clip"]), signed_progress)
-                playback_timing = abs(playback_frames - frame_steps) > fps[current["clip"]] * TIMING_TICKS / 60.0
+                    timing_window, current["clip"], fps[current["clip"]])
+                observed_frames = _observed_frame_progress(
+                    timing_window[0], current, _frame_count(anchors, variant, current["clip"]), signed_progress)
+                playback_timing = abs(playback_frames - observed_frames) > fps[current["clip"]] * TIMING_TICKS / 60.0
             dx = current["position"][0] - previous["position"][0]
             camera_dx = current["camera"][0] - previous["camera"][0]
             helmet = after["helmet_x"] - before["helmet_x"]
@@ -190,8 +219,9 @@ def analyze(samples, anchors, fps):
                                                    previous.get("flip"), current.get("flip")),
                 "causes": classify(before, after, kind, playback_timing, abs(camera_dx - dx), current["clip"], previous["clip"]),
             })
-            last_change = current
-            last_change_index = index
+            if kind != "facing":
+                last_change = current
+                last_change_index = index
         unexplained = [c for c in changes if any(cause in UNEXPLAINED for cause in c["causes"])]
         report[phase] = {
             "changes": changes,

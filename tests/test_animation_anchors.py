@@ -22,12 +22,12 @@ def figure(shift=0, hat_shift=0, reach=0):
     return frame
 
 
-def sample(phase, clip, frame, tick, x=0.0, flip=False, wall_us=None, playback_speed=1.0):
+def sample(phase, clip, frame, tick, x=0.0, flip=False, wall_us=None, playback_speed=1.0, progress=0.0):
     return {
         "phase": phase, "clip": clip, "frame": frame, "physics_frame": tick,
         "wall_us": tick * 16667 if wall_us is None else wall_us,
         "position": [x, 416.0], "camera": [x, 300.0], "flip": flip,
-        "playback_speed": playback_speed,
+        "playback_speed": playback_speed, "progress": progress,
     }
 
 
@@ -130,6 +130,20 @@ class AnimationAnchorsTest(unittest.TestCase):
         trace = [sample("man-turn", "idle", 0, 0), sample("man-turn", "run", 0, 4, flip=True)]
         change = animation_anchors.analyze(trace, anchors, {"idle": 6, "run": 14})["man-turn"]["changes"][0]
         self.assertEqual(change["helmet_world"], -6.0)
+
+    def test_same_frame_facing_change_is_reported_without_resetting_timing(self):
+        anchors = {("man-midcreek", "run", i): animation_anchors.frame_anchors(figure(hat_shift=6)) for i in (0, 1, 2)}
+        trace = [
+            sample("man-run", "run", 0, 0),
+            sample("man-run", "run", 1, 4),
+            sample("man-run", "run", 1, 5, flip=True),
+            sample("man-run", "run", 2, 8, flip=True),
+        ]
+        changes = animation_anchors.analyze(trace, anchors, {"run": 14})["man-run"]["changes"]
+        self.assertEqual(changes[1]["kind"], "facing")
+        self.assertEqual(changes[1]["helmet_world"], -6.0)
+        self.assertEqual(changes[2]["ticks"], 4)
+        self.assertEqual(changes[2]["causes"], [])
 
     def test_planted_upper_body_lean_over_fixed_boots_is_an_authored_pose(self):
         lean = figure()
@@ -258,6 +272,17 @@ class AnimationAnchorsTest(unittest.TestCase):
         ]
         changes = animation_anchors.analyze(trace, anchors, {"climb": 8})["man-climb"]["changes"]
         self.assertEqual(changes[1]["causes"], [])
+
+    def test_within_frame_climb_reversal_uses_post_reversal_progress(self):
+        anchors = {("man-midcreek", "climb", i): animation_anchors.frame_anchors(figure()) for i in (0, 1, 5)}
+        trace = [
+            sample("man-climb", "climb", 1, -8, playback_speed=2.109375, progress=0.0),
+            sample("man-climb", "climb", 0, 0, playback_speed=2.109375, progress=0.35),
+            sample("man-climb", "climb", 0, 2, playback_speed=-2.109375, progress=0.75),
+            sample("man-climb", "climb", 5, 5, playback_speed=-2.109375, progress=0.9),
+        ]
+        change = animation_anchors.analyze(trace, anchors, {"climb": 8})["man-climb"]["changes"][1]
+        self.assertEqual(change["causes"], [])
 
     def test_summary_reports_the_largest_unexplained_jump(self):
         anchors = {
