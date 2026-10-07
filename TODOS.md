@@ -21,7 +21,7 @@ Each open item below has one acceptance criterion and names its pull request.
 | 2. Additional environments and tasks | Delivered | #26 (`ec3da76`, merged as `b2353f3`) |
 | 3. Role of sliding | Decided: retained | October 5 request |
 | 4. Elevator geometry and restart states | Delivered in PR3 | PR3, `ridermw-elevators` |
-| 5. Background depth | Blocked on art generator (12A) | PR5, `ridermw-background-depth` |
+| 5. Background depth | Blocked on art generator (12A, draft PR5) | PR5, `ridermw-background-depth` |
 | 5a. Background scale | Blocked on art generator (draft PR4) | PR4, `ridermw-background-scale` |
 | 6. Route timing contract | Delivered | Independent route timing increment |
 | Cable pile movement, drone sliding | Delivered in PR2 | PR2, `ridermw-hazards` |
@@ -468,9 +468,11 @@ obscuring hazards or worsening motion quality.
 **Context:** Start with `game/level.gd`, `tools/environment_assets.py`,
 `tests/background_coverage_test.gd`, `tests/test_asset_pipeline.py`,
 `tests/export_test.gd`, and `export_presets.cfg`. The earlier sketch proposed a
-distant shell and four rack bands. That count and its speed factors are not
-approved. The user approved ordered per environment manifests, not a replacement
-for all asset tools.
+distant shell and four rack bands. The October 6 plan review approved four
+ordered layers instead: shell 0.1, far 0.2, racks 0.4, and equipment 0.6
+scroll (decisions 12A to 16A in the backlog plan; 14A sets texel sizes and 15A
+the 92 px floor-connected height limit). The user approved ordered per
+environment manifests, not a replacement for all asset tools.
 
 Define layer order, texture path, scroll factor, tint, and coverage behavior in a
 validated manifest. Keep background racks as artwork within layers, not
@@ -495,6 +497,40 @@ art until a `mockui` build supports `--model sunburst`, `--background`, and
 shell, far, racks, and equipment layers with existing art, and the desktop
 probe records p95 frame time at or below 16.7 ms on levels 1, 9, and 14.
 Composition approval stays with the owner.
+
+**Blocked (draft PR5, October 7):** No shell or racks art exists, and the
+generator that must make it is unavailable on this device. The installed
+`mockui` is mock-ui-gen 0.1.0 (gpt-image-2); it has no `--model`,
+`--background`, or `--strict-prompt` option, and the package is not on PyPI.
+Decision 12A rejects deriving the new layers from existing far art.
+
+- Prerequisites delivered: PR4 adds `tests/background_perf_probe.gd` and records
+  two of the three measurement points (`docs/evidence/background/baseline.json`
+  and `after-scale.json`). The third point, after depth layers, needs the art.
+- Planned contract, unchanged: four ordered layers per environment, shell 0.1,
+  far 0.2, racks 0.4, equipment 0.6 scroll; shell 2.0 and racks 1.0 world px
+  per texel (14A); racks must pass the 92 px floor-connected height test (15A);
+  manifest, missing-art, export, and camera-extreme coverage tests come first.
+- Measurement limit: this host renders real time at about 33 Hz, and its p95
+  process frame time is already about 59 to 68 ms on levels 1, 9, and 14
+  before any new layer. The 16.7 ms criterion needs a capable desktop
+  measurement; this host can only show relative change.
+- Unblock steps: install a `mockui` build that supports `--model sunburst`,
+  `--background`, and `--strict-prompt`; add independent reference images at
+  `art/cel-shift/environment/layers/shell.png` and
+  `art/cel-shift/environment/layers/racks.png` so `render()` has real source
+  images for the new layers; do not derive those references from the existing
+  far art. Update `tools/environment_assets.py` to add `shell` and `racks` to
+  `LAYERS`, `LAYER_RULES`, `SETS`, `EXPANSION_SETS`, the render layer
+  validation, `normalized_size()`, `normalize_set()`, every normalize branch,
+  and `write_manifest()` so manifests publish ordered shell, far, racks, and
+  equipment layers with the approved 0.1, 0.2, 0.4, and 0.6 scroll factors and
+  2.0/2.0/1.0/1.0 world-px-per-texel scales. Write the failing manifest,
+  missing-art, export, and camera-extreme coverage tests first. For each set,
+  after the new references and normalization support exist, run
+  `python tools/environment_assets.py render --set <set> --layer shell`, the
+  same with `--layer racks`, then `python tools/environment_assets.py normalize
+  --set <set>`; then run the probe for the third point on a capable desktop.
 
 ## 5a. Correct background object scale
 
