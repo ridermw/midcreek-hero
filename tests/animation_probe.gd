@@ -53,12 +53,16 @@ func record(delta: float) -> void:
 		return
 	var player = current.player
 	var sprite: AnimatedSprite2D = player.sprite
+	var viewport_size: Vector2 = current.get_viewport().get_visible_rect().size
+	var camera_world_size := Vector2(viewport_size.x / current.camera.zoom.x, viewport_size.y / current.camera.zoom.y)
 	samples.append({
 		"phase": phase, "wall_us": Time.get_ticks_usec() - started,
 		"delta": delta, "physics_frame": Engine.get_physics_frames(),
 		"position": [player.position.x, player.position.y],
 		"velocity": [player.velocity.x, player.velocity.y],
 		"camera": [current.camera.get_screen_center_position().x, current.camera.get_screen_center_position().y],
+		"camera_limits": [current.camera.limit_left, current.camera.limit_top, current.camera.limit_right, current.camera.limit_bottom],
+		"viewport_size": [camera_world_size.x, camera_world_size.y],
 		"clip": String(sprite.animation), "frame": sprite.frame,
 		"flip": sprite.flip_h,
 		"progress": sprite.frame_progress, "playing": sprite.is_playing(),

@@ -22,13 +22,19 @@ def figure(shift=0, hat_shift=0, reach=0):
     return frame
 
 
-def sample(phase, clip, frame, tick, x=0.0, flip=False, wall_us=None, playback_speed=1.0, progress=0.0):
-    return {
+def sample(phase, clip, frame, tick, x=0.0, y=416.0, camera_x=None, camera_y=300.0,
+           flip=False, wall_us=None, playback_speed=1.0, progress=0.0, camera_limits=None, viewport_size=None):
+    item = {
         "phase": phase, "clip": clip, "frame": frame, "physics_frame": tick,
         "wall_us": tick * 16667 if wall_us is None else wall_us,
-        "position": [x, 416.0], "camera": [x, 300.0], "flip": flip,
+        "position": [x, y], "camera": [x if camera_x is None else camera_x, camera_y], "flip": flip,
         "playback_speed": playback_speed, "progress": progress,
     }
+    if camera_limits is not None:
+        item["camera_limits"] = camera_limits
+    if viewport_size is not None:
+        item["viewport_size"] = viewport_size
+    return item
 
 
 class AnimationAnchorsTest(unittest.TestCase):
@@ -245,6 +251,71 @@ class AnimationAnchorsTest(unittest.TestCase):
         change = animation_anchors.analyze(trace, anchors, {"primary": 10})["man-repair"]["changes"][0]
         self.assertEqual(change["reach_texels"], 4)
         self.assertEqual(change["causes"], ["source registration"])
+
+    def test_frozen_active_run_from_phase_start_is_playback_timing(self):
+        anchors = {("man-midcreek", "run", 0): animation_anchors.frame_anchors(figure())}
+        trace = [
+            sample("man-run", "run", 0, 0, playback_speed=1.0, progress=0.0),
+            sample("man-run", "run", 0, 30, playback_speed=1.0, progress=0.0),
+        ]
+        changes = animation_anchors.analyze(trace, anchors, {"run": 14})["man-run"]["changes"]
+        self.assertEqual(len(changes), 1)
+        self.assertEqual(changes[0]["kind"], "sample")
+        self.assertEqual(changes[0]["causes"], ["playback timing"])
+
+    def test_first_run_frame_advance_uses_phase_start_for_timing(self):
+        anchors = {("man-midcreek", "run", i): animation_anchors.frame_anchors(figure()) for i in (0, 1)}
+        trace = [
+            sample("man-run", "run", 0, 0, playback_speed=1.0, progress=0.0),
+            sample("man-run", "run", 1, 30, playback_speed=1.0, progress=0.0),
+        ]
+        change = animation_anchors.analyze(trace, anchors, {"run": 14})["man-run"]["changes"][0]
+        self.assertEqual(change["kind"], "frame")
+        self.assertEqual(change["causes"], ["playback timing"])
+
+    def test_fractional_progress_from_phase_start_is_not_timing_drift(self):
+        anchors = {("man-midcreek", "run", i): animation_anchors.frame_anchors(figure()) for i in (0, 1)}
+        trace = [
+            sample("man-run", "run", 0, 0, playback_speed=1.0, progress=0.0),
+            sample("man-run", "run", 0, 4, playback_speed=1.0, progress=14.0 * 4.0 / 60.0),
+            sample("man-run", "run", 1, 5, playback_speed=1.0, progress=14.0 * 5.0 / 60.0 - 1.0),
+        ]
+        changes = animation_anchors.analyze(trace, anchors, {"run": 14})["man-run"]["changes"]
+        self.assertEqual(len(changes), 1)
+        self.assertEqual(changes[0]["causes"], [])
+
+    def test_vertical_camera_jitter_between_unchanged_frames_is_render_timing(self):
+        anchors = {("man-midcreek", "run", 0): animation_anchors.frame_anchors(figure())}
+        trace = [
+            sample("man-run", "run", 0, 0, x=320.0, y=320.0, camera_x=320.0, camera_y=320.0),
+            sample("man-run", "run", 0, 1, x=320.0, y=320.0, camera_x=320.0, camera_y=328.0),
+        ]
+        changes = animation_anchors.analyze(trace, anchors, {"run": 14})["man-run"]["changes"]
+        self.assertEqual(len(changes), 1)
+        self.assertEqual(changes[0]["kind"], "sample")
+        self.assertEqual(changes[0]["causes"], ["camera or render timing"])
+
+    def test_vertical_camera_jitter_during_frame_change_is_render_timing(self):
+        anchors = {("man-midcreek", "run", i): animation_anchors.frame_anchors(figure()) for i in (0, 1)}
+        trace = [
+            sample("man-run", "run", 0, 0, x=320.0, y=320.0, camera_x=320.0, camera_y=320.0),
+            sample("man-run", "run", 1, 4, x=320.0, y=320.0, camera_x=320.0, camera_y=328.0),
+        ]
+        change = animation_anchors.analyze(trace, anchors, {"run": 14})["man-run"]["changes"][0]
+        self.assertEqual(change["causes"], ["camera or render timing"])
+
+    def test_clamped_camera_movement_is_not_render_timing(self):
+        limits = [0.0, 0.0, 960.0, 720.0]
+        viewport = [480.0, 360.0]
+        anchors = {("man-midcreek", "run", 0): animation_anchors.frame_anchors(figure())}
+        trace = [
+            sample("man-run", "run", 0, 0, x=170.0, y=170.0, camera_x=240.0, camera_y=180.0,
+                   camera_limits=limits, viewport_size=viewport),
+            sample("man-run", "run", 0, 1, x=160.0, y=160.0, camera_x=240.0, camera_y=180.0,
+                   camera_limits=limits, viewport_size=viewport),
+        ]
+        result = animation_anchors.analyze(trace, anchors, {"run": 14})["man-run"]
+        self.assertEqual(result["changes"], [])
 
     def test_tool_motion_relative_to_torso_is_reported_with_boot_registration(self):
         anchors = {

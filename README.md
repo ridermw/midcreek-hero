@@ -548,21 +548,25 @@ reversal, and idle, run, and diagnosis transitions for both heroes, then
 capture both repair help demonstrations:
 
 ```sh
-mkdir -p /tmp/midcreek-motion
-godot --path . --script tests/animation_probe.gd -- --output=/tmp/midcreek-motion
-python3 -m tools.animation_anchors /tmp/midcreek-motion/native-trace.json /tmp/midcreek-motion/report.json
+mkdir -p docs/evidence/animation-anchors/local
+godot --path . --script tests/animation_probe.gd -- --output=docs/evidence/animation-anchors/local
+python3 -m tools.animation_anchors docs/evidence/animation-anchors/local/native-trace.json docs/evidence/animation-anchors/local/report.json
 ```
 
-The probe uses repeatable input and writes frame, facing, physics, camera, and
-timing samples to `native-trace.json`. It also writes two help screenshots.
-`--actions=run,idle-run` limits the cases and `--skip-help` skips the help
-screenshots. The anchor report lists every cause of each frame change: source
+The probe uses repeatable input and writes frame, facing, physics, camera center,
+camera limits, viewport size, and timing samples to `native-trace.json`. It also
+writes two help screenshots. `--actions=run,idle-run` limits the cases and
+`--skip-help` skips the help screenshots; unknown selectors fail during argument
+parsing. The anchor report lists every cause of each frame change: source
 registration, authored pose, playback timing, or camera and render timing.
-Playback timing uses the recorded animation playback speed so climb pauses,
-reversals, and velocity scaling are not flagged as nominal-fps drift.
-Pass `--art <animation art directory>` to measure a trace against older frames.
-Add `--fixed-fps 60` before `--` to remove host render rate effects.
-Use a separate run with `--write-movie /tmp/midcreek-motion/actions.avi --fixed-fps 60`
+Playback timing starts at each phase's first sample and uses recorded animation
+playback speed and frame progress, so climb pauses, reversals, velocity scaling,
+and normal fractional progress are not flagged as nominal-fps drift. Camera
+checks compare both axes against the movement expected after the level camera
+limits clamp the view. Pass `--art <animation art directory>` to measure a trace
+against older frames. Add `--fixed-fps 60` before `--` to remove host render
+rate effects. Use a separate run with
+`--write-movie docs/evidence/animation-anchors/local/actions.avi --fixed-fps 60`
 before `--` to record the action cases and the help demonstrations.
 Movie mode fixes the simulation rate; do not use its timing as a device
 performance measurement. The probe does not change saved progress.
