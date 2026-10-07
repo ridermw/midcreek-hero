@@ -44,6 +44,14 @@ func run() -> void:
 		var invalid: Dictionary = layer.duplicate(true)
 		invalid.merge(change, true)
 		check(not background.parse({"version": 1, "layers": [invalid]}), "Invalid layer is rejected: " + str(change))
+	for change: Dictionary in [
+		{"scale": 1.5}, {"name": "Far", "scale": 1.0},
+		{"name": "Shell", "scale": 1.0}, {"name": "Equipment", "scale": 2.0},
+		{"name": "Racks", "scale": 2.0},
+	]:
+		var invalid_scale: Dictionary = layer.duplicate(true)
+		invalid_scale.merge(change, true)
+		check(not background.parse({"version": 1, "layers": [invalid_scale]}), "Invalid native scale is rejected: " + str(change))
 	var heights := campaign_background_heights()
 	for name: String in heights.keys():
 		check(background.load_set(name), "Existing background manifest loads: " + name)

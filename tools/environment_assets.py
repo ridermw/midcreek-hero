@@ -168,6 +168,15 @@ def layer_texture_path(name, layer):
     return f"res://art/cel-shift/environment/{name}/{layer}.png"
 
 
+def generated_source_root(art=ART, name=None):
+    if name is None:
+        return art / "generated"
+    specific = art / name / "generated"
+    if name == COLD_AISLE and not specific.exists():
+        return art / "generated"
+    return specific
+
+
 def write_manifest(name, art=ART):
     if name is None:
         name = COLD_AISLE
@@ -191,10 +200,7 @@ def normalize(layer, art=ART, name=None):
     output_size_for = normalized_size(layer, name)
     if name is not None:
         source_size = SOURCE_SIZE
-    base = art if name is None else art / name
-    source = base / "generated" / f"{layer}.png"
-    if name == COLD_AISLE and not source.exists():
-        source = art / "generated" / f"{layer}.png"
+    source = generated_source_root(art, name) / f"{layer}.png"
     with Image.open(source) as image:
         if image.size != source_size:
             raise ValueError(f"{source}: wrong size {image.size}, expected {source_size}")

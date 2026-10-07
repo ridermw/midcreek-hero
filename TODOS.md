@@ -526,7 +526,7 @@ by 720 viewport. Baseline to after-scale mean/p95 process ms: level 01
 39.64/69.57 -> 35.94/58.83; level 09 37.05/63.88 -> 37.25/59.06; level 14
 35.99/60.12 -> 37.93/67.97. Texture memory MiB: 35.71 -> 35.27 on level 01
 and 34.17 -> 34.92 on levels 09 and 14. The CI mirror measured
-`EXPORT_FILES_PASS total_bytes=53609295`, which is +397176 bytes from the
+`EXPORT_FILES_PASS total_bytes=53610239`, which is +398120 bytes from the
 previous 53212119 byte value.
 
 **Blocked:** All 15 equipment sets still exceed the 92 world px floor-connected

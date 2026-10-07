@@ -568,6 +568,20 @@ class AssetPipelineTest(unittest.TestCase):
             with Image.open(art / "cold-aisle/far.png") as result:
                 self.assertEqual(result.size, environment_assets.normalized_size("far", "cold-aisle"))
 
+    def test_cold_aisle_source_root_prefers_regenerated_set_sources(self):
+        with tempfile.TemporaryDirectory() as directory:
+            art = Path(directory)
+            (art / "generated").mkdir()
+            self.assertEqual(
+                environment_assets.generated_source_root(art, "cold-aisle"),
+                art / "generated",
+            )
+            (art / "cold-aisle/generated").mkdir(parents=True)
+            self.assertEqual(
+                environment_assets.generated_source_root(art, "cold-aisle"),
+                art / "cold-aisle/generated",
+            )
+
     def test_named_set_normalizes_into_its_own_directory(self):
         with tempfile.TemporaryDirectory() as directory:
             art = Path(directory)
@@ -616,12 +630,8 @@ class AssetPipelineTest(unittest.TestCase):
             art = Path(directory)
             for name in sorted(sets):
                 with self.subTest(set=name):
-                    if name == environment_assets.COLD_AISLE:
-                        source_root = environment_assets.ART / "generated"
-                        target_root = art / "generated"
-                    else:
-                        source_root = environment_assets.ART / name / "generated"
-                        target_root = art / name / "generated"
+                    source_root = environment_assets.generated_source_root(environment_assets.ART, name)
+                    target_root = art / source_root.relative_to(environment_assets.ART)
                     target_root.mkdir(parents=True)
                     for layer in ("far", "equipment"):
                         (target_root / f"{layer}.png").write_bytes((source_root / f"{layer}.png").read_bytes())
