@@ -377,7 +377,7 @@
      2
     ],
     "physics_frame": 109,
-    "ticks": null,
+    "ticks": 1,
     "physics_dx": 0.0,
     "helmet_texels": -3,
     "torso_texels": -1.09,
@@ -807,7 +807,7 @@
      3
     ],
     "physics_frame": 277,
-    "ticks": null,
+    "ticks": 5,
     "physics_dx": 3.0,
     "helmet_texels": 0,
     "torso_texels": 0.71,
@@ -1111,7 +1111,7 @@
      2
     ],
     "physics_frame": 389,
-    "ticks": null,
+    "ticks": 1,
     "physics_dx": 0.0,
     "helmet_texels": -3,
     "torso_texels": -1.09,
@@ -1450,7 +1450,7 @@
      1
     ],
     "physics_frame": 514,
-    "ticks": null,
+    "ticks": 6,
     "physics_dx": 0.0,
     "helmet_texels": -3,
     "torso_texels": -0.76,
@@ -2131,7 +2131,7 @@
      2
     ],
     "physics_frame": 717,
-    "ticks": null,
+    "ticks": 1,
     "physics_dx": 0.0,
     "helmet_texels": -3,
     "torso_texels": -1.0,
@@ -2561,7 +2561,7 @@
      3
     ],
     "physics_frame": 885,
-    "ticks": null,
+    "ticks": 5,
     "physics_dx": 3.0,
     "helmet_texels": 0,
     "torso_texels": 2.5,
@@ -2865,7 +2865,7 @@
      2
     ],
     "physics_frame": 997,
-    "ticks": null,
+    "ticks": 1,
     "physics_dx": 0.0,
     "helmet_texels": -3,
     "torso_texels": -1.0,
@@ -3202,7 +3202,7 @@
      1
     ],
     "physics_frame": 1122,
-    "ticks": null,
+    "ticks": 6,
     "physics_dx": 0.0,
     "helmet_texels": -2,
     "torso_texels": -1.34,

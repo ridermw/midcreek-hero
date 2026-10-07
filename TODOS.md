@@ -104,15 +104,21 @@ regression that failed before the fix.
   and reach anchors in every frame and joins them with the rendered trace. It
   reports every independent cause of each frame change: source registration,
   authored pose, playback timing, or camera and render timing. A pose change
-  cannot hide a timing or camera cause. Tool reach deltas are reported; a
-  repair or diagnosis tool swing over registered boots is an authored pose.
-  Its rules failed in tests before the implementation.
-- [x] Measure before changing artwork. With fixed 60 Hz steps, every flagged
-  change was source registration: the man's run frames 3 and 7 move the whole
-  figure 9 and 4 texels forward (helmet x=125 and 120, other frames 114 to 116);
-  both heroes' idle boots drift up to 3.5 texels; the man's diagnosis boots
-  drift 3.5 texels in frames 0, 4, and 7. No playback timing or camera cause
-  appeared. Evidence: `docs/evidence/animation-anchors/before-report.json`.
+  cannot hide a timing or camera cause. Facing-only changes are reported with
+  transformed world anchors without resetting playback timing. Playback timing
+  starts at the phase's first sample, keeps signed direction changes distinct,
+  and accepts normal fractional progress. Camera checks compare both axes
+  against level camera limits. Tool reach deltas are reported; a repair or
+  diagnosis tool swing over registered boots is an authored pose. Its rules
+  failed in tests before the implementation.
+- [x] Measure before changing artwork. The fixed-step baseline report was
+  regenerated with `--art` against the original frames from `db1c1dc` while
+  keeping the matching trace. Every flagged change was source registration:
+  the man's run 2 to 3 and 6 to 7 transitions move the whole figure 9 texels
+  (helmet x=116 to 125), both heroes' idle boots drift up to 3.5 texels, and
+  the man's diagnosis boots drift 3.5 texels in frames 0, 4, and 7. No playback
+  timing or camera cause appeared. Evidence:
+  `docs/evidence/animation-anchors/before-report.json`.
 - [x] Classify authored poses separately. The run pose leans its helmet about
   7 texels ahead of the walk pose while the torso stays within 4 texels. The
   woman's diagnosis leans back over fixed boots. These stay unchanged.
