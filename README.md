@@ -189,10 +189,13 @@ EXPANSION_ONLY=06,07 tools/godot_test.sh tests/expansion_route_test.gd EXPANSION
 
 `tests/expansion_route_test.gd` is the gameplay gate for all fifteen levels.
 It replays each full route and each checkpoint suffix for both heroes. It
-requires completion within the SLA and route budget, zero hits, and no added
-respawns. Set `EXPANSION_ONLY` to comma separated level numbers to run a group.
-The full gate exceeds the runner's 60 second limit, so CI runs four groups.
-Remaining work and its status are in [TODOS.md](TODOS.md).
+requires completion within the SLA and route budget, no added respawns, and
+zero hits except for the strict `KNOWN_GAPS` entries in
+`tests/expansion_route_test.gd`. Those temporary exceptions are level 03
+checkpoint replays 0 and 1, which must still take hits until the later PR2
+hazard-phase fix removes them. Set `EXPANSION_ONLY` to comma separated level
+numbers to run a group. The full gate exceeds the runner's 60 second limit, so
+CI runs four groups. Remaining work and its status are in [TODOS.md](TODOS.md).
 
 Open the [web build](https://ridermw.github.io/midcreek-hero/) or run
 `godot --path .`. The game starts on the title screen. Choose a technician,
