@@ -163,6 +163,39 @@ def _world_anchor_delta(before_x, after_x, previous_flip, current_flip):
     return after_world - before_world
 
 
+def _clamped_camera_center(sample):
+    position = sample["position"]
+    limits = sample.get("camera_limits")
+    viewport = sample.get("viewport_size")
+    if not limits or not viewport:
+        return float(position[0]), float(position[1])
+    half_width = float(viewport[0]) / 2.0
+    half_height = float(viewport[1]) / 2.0
+    min_x = float(limits[0]) + half_width
+    max_x = float(limits[2]) - half_width
+    min_y = float(limits[1]) + half_height
+    max_y = float(limits[3]) - half_height
+    if max_x < min_x:
+        x = (float(limits[0]) + float(limits[2])) / 2.0
+    else:
+        x = min(max(float(position[0]), min_x), max_x)
+    if max_y < min_y:
+        y = (float(limits[1]) + float(limits[3])) / 2.0
+    else:
+        y = min(max(float(position[1]), min_y), max_y)
+    return x, y
+
+
+def _camera_error(previous, current):
+    expected_before = _clamped_camera_center(previous)
+    expected_after = _clamped_camera_center(current)
+    expected_dx = expected_after[0] - expected_before[0]
+    expected_dy = expected_after[1] - expected_before[1]
+    camera_dx = current["camera"][0] - previous["camera"][0]
+    camera_dy = current["camera"][1] - previous["camera"][1]
+    return max(abs(camera_dx - expected_dx), abs(camera_dy - expected_dy))
+
+
 def analyze(samples, anchors, fps):
     phases = {}
     for item in samples:
@@ -171,14 +204,14 @@ def analyze(samples, anchors, fps):
     for phase, items in phases.items():
         variant = phase.split("-")[0] + "-midcreek"
         changes = []
-        last_change = None
-        last_change_index = None
+        last_change = items[0]
+        last_change_index = 0
         for index, (previous, current) in enumerate(zip(items, items[1:]), start=1):
             same_frame = (previous["clip"], previous["frame"]) == (current["clip"], current["frame"])
             before = anchors[(variant, previous["clip"], previous["frame"])]
             after = anchors[(variant, current["clip"], current["frame"])]
             dx = current["position"][0] - previous["position"][0]
-            camera_dx = current["camera"][0] - previous["camera"][0]
+            camera_error = _camera_error(previous, current)
             if same_frame and previous.get("flip") == current.get("flip"):
                 causes = []
                 if last_change is not None and last_change["clip"] == current["clip"]:
@@ -189,7 +222,7 @@ def analyze(samples, anchors, fps):
                         timing_window[0], current, _frame_count(anchors, variant, current["clip"]), signed_progress)
                     if abs(playback_frames - observed_frames) > fps[current["clip"]] * TIMING_TICKS / 60.0:
                         causes.append("playback timing")
-                if abs(camera_dx - dx) > CAMERA_PIXELS:
+                if camera_error > CAMERA_PIXELS:
                     causes.append("camera or render timing")
                 if causes:
                     changes.append({
@@ -244,7 +277,7 @@ def analyze(samples, anchors, fps):
                                                     previous.get("flip"), current.get("flip")),
                 "reach_world": _world_anchor_delta(before["reach_x"], after["reach_x"],
                                                    previous.get("flip"), current.get("flip")),
-                "causes": classify(before, after, kind, playback_timing, abs(camera_dx - dx), current["clip"], previous["clip"]),
+                "causes": classify(before, after, kind, playback_timing, camera_error, current["clip"], previous["clip"]),
             })
             if kind != "facing":
                 last_change = current
