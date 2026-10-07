@@ -138,6 +138,8 @@ func build_entities(level: Dictionary, parent: Node2D) -> Dictionary:
 		var node: Node2D = HAZARD_SCRIPTS[hazard["kind"]].new()
 		if "cell_x" in node:
 			node.cell_x = hazard["cell"].x
+		if node is CableSnag:
+			node.bounds = CableSnag.span(level, hazard["cell"])
 		built["hazards"].append(_add(parent, node, hazard["cell"]))
 		if node is ElectrifiedLiquid:
 			built["liquids"].append(node)

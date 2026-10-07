@@ -1,8 +1,15 @@
 extends RefCounted
 
+const PlayerMotor = preload("res://game/player_motor.gd")
 const ACTIONS: Array[String] = [
 	"move_left", "move_right", "move_up", "move_down", "jump", "repair", "diagnose", "slide"
 ]
+# until_hazard prediction: piles within this range of the hero or the target, for at most 8 s, with 4 px
+# of clearance, and 0.3 s of running after landing.
+const SIMULATION_RANGE := 640.0
+const SIMULATION_FRAMES := 480
+const CLEAR_MARGIN := 4.0
+const LANDED_FRAMES := 18
 
 var steps: Array = []
 var index: int = 0
@@ -11,6 +18,8 @@ var error_message: String = ""
 var _step_time: float = 0.0
 var _step_frames: int = 0
 var _slide_held: bool = false
+var _slide_pending: bool = false
+var _committed: bool = false
 
 
 func _init(route_steps: Array) -> void:
@@ -44,6 +53,9 @@ func apply(level: Object, delta: float) -> void:
 		_tick(delta, float(step["wait"]))
 		return
 	var held: Array = step["hold"]
+	if step.has("until_hazard"):
+		_until_hazard(level, step, held, delta, first)
+		return
 	if step.has("until_y"):
 		var target := float(step["until_y"])
 		var direction := -1.0 if "move_up" in held else 1.0
@@ -87,10 +99,110 @@ func _tick(delta: float, seconds: float) -> void:
 		_advance()
 
 
+# Waits in place until running to `gap` px before the patrolling pile at the
+# authored x, then jumping, is predicted to clear every nearby pile. Then it
+# runs to the gap and hands off to the next step, which is the jump.
+func _until_hazard(level: Object, step: Dictionary, held: Array, delta: float, first: bool) -> void:
+	var target: Node2D = null
+	for hazard in level.entities["hazards"]:
+		if "patrol" in hazard and hazard.patrol != null and is_equal_approx(hazard.patrol.origin, float(step["until_hazard"])):
+			target = hazard
+	if target == null:
+		failed = true
+		error_message = "Route step %d has no patrolling hazard at x=%.0f." % [index + 1, float(step["until_hazard"])]
+		return
+	var gap := float(step["gap"])
+	var on_floor: bool = level.player.is_on_floor()
+	if target.position.x - level.player.position.x <= gap and _committed and on_floor:
+		_advance()
+		apply(level, delta)
+		return
+	if on_floor and not _committed:
+		_committed = jump_clear(level, target, gap)
+	var moves: Array = held
+	if not _committed and on_floor:
+		# Wait only on floor that no patrolling pile can reach.
+		moves = []
+		var x: float = level.player.position.x
+		if in_zone(level, target, x):
+			moves = ["move_left"]
+		else:
+			for hazard in level.entities["hazards"]:
+				if hazard != target and in_zone(level, hazard, x):
+					moves = ["move_right"]
+	_set_input(level, moves, first)
+	_step_time += delta
+	_step_frames += 1
+	if _step_time > float(step["max_seconds"]):
+		failed = true
+		error_message = "Route step %d found no clear jump over x=%.0f within %.1f s." % [index + 1, float(step["until_hazard"]), float(step["max_seconds"])]
+
+
+## True when the full patrol range of a pile can reach a hero at `x`.
+static func in_zone(level: Object, hazard: Node2D, x: float) -> bool:
+	if not ("patrol" in hazard) or hazard.patrol == null or hazard.has_method("beam_rect"):
+		return false
+	var reach: float = hazard.SIZE.x / 2.0 + level.player.BODY_SIZE.x / 2.0 + CLEAR_MARGIN
+	return x > hazard.patrol.min_x - reach and x < hazard.patrol.max_x + reach
+
+
+## Predicts a run to `gap` px before `target` and a full jump, against the
+## deterministic patrol of every nearby pile. Drones are passed by sliding.
+static func jump_clear(level: Object, target: Node2D, gap: float) -> bool:
+	var dt := 1.0 / 60.0
+	var player: Node2D = level.player
+	var half: float = player.BODY_SIZE.x / 2.0
+	var x: float = player.position.x
+	var speed: float = player.velocity.x
+	var piles: Array[Dictionary] = []
+	for hazard in level.entities["hazards"]:
+		var near: bool = absf(hazard.position.x - x) < SIMULATION_RANGE or absf(hazard.position.x - target.position.x) < SIMULATION_RANGE
+		if "patrol" in hazard and hazard.patrol != null and not hazard.has_method("beam_rect") and (near or hazard == target):
+			piles.append({"node": hazard, "x": hazard.position.x, "direction": hazard.patrol.direction})
+	var height := 0.0
+	var rise := 0.0
+	var jumping := false
+	var landed := 0
+	for frame: int in range(SIMULATION_FRAMES):
+		speed = minf(PlayerMotor.RUN_SPEED, speed + PlayerMotor.ACCELERATION * dt)
+		x += speed * dt
+		var target_x := 0.0
+		for pile: Dictionary in piles:
+			var patrol: RefCounted = pile["node"].patrol
+			pile["x"] += pile["direction"] * patrol.speed * dt
+			if pile["x"] >= patrol.max_x:
+				pile["x"] = patrol.max_x
+				pile["direction"] = -1.0
+			elif pile["x"] <= patrol.min_x:
+				pile["x"] = patrol.min_x
+				pile["direction"] = 1.0
+			if pile["node"] == target:
+				target_x = pile["x"]
+		if not jumping and target_x - x <= gap:
+			jumping = true
+			rise = PlayerMotor.JUMP_VELOCITY
+		if jumping and landed == 0:
+			rise -= PlayerMotor.GRAVITY * dt
+			height += rise * dt
+			if height <= 0.0:
+				height = 0.0
+				landed = 1
+		elif landed > 0:
+			landed += 1
+		for pile: Dictionary in piles:
+			var size: Vector2 = pile["node"].SIZE
+			if absf(x - pile["x"]) < size.x / 2.0 + half + CLEAR_MARGIN and height < size.y + CLEAR_MARGIN:
+				return false
+		if landed >= LANDED_FRAMES and x > target_x:
+			return true
+	return false
+
+
 func _advance() -> void:
 	index += 1
 	_step_time = 0.0
 	_step_frames = 0
+	_committed = false
 
 
 func _set_input(level: Object, held: Array, first_frame: bool) -> void:
@@ -111,8 +223,12 @@ func _set_input(level: Object, held: Array, first_frame: bool) -> void:
 			input["jump_pressed"] = true
 	var slide_held := "slide" in held
 	if slide_held and not _slide_held:
-		input["slide_pressed"] = true
+		_slide_pending = true
 	_slide_held = slide_held
+	# A slide needs floor contact, so a press made in the air waits for landing.
+	if _slide_pending and (not level.player.has_method("is_on_floor") or level.player.is_on_floor()):
+		input["slide_pressed"] = true
+		_slide_pending = false
 	level.player.input_override = input
 	var actions := {}
 	for action: String in ["repair", "diagnose", "jump"]:
@@ -135,6 +251,8 @@ func _validate(step: Variant) -> String:
 		allowed = ["hold", "until_x", "max_seconds"] if step.has("until_x") else ["hold", "seconds"]
 		if step.has("until_y") and not step.has("until_x"):
 			allowed = ["hold", "until_y", "max_seconds"]
+		if step.has("until_hazard"):
+			allowed = ["hold", "until_hazard", "gap", "max_seconds"]
 	for key: Variant in step:
 		if key not in allowed:
 			return "unsupported field '%s'." % key
@@ -147,6 +265,16 @@ func _validate(step: Variant) -> String:
 	for action: Variant in step["hold"]:
 		if not action is String or String(action) not in ACTIONS:
 			return "unknown action '%s'." % action
+	if step.has("until_hazard"):
+		for key: String in ["until_hazard", "gap"]:
+			var number: Variant = step[key] if step.has(key) else null
+			if not ((number is float or number is int) and is_finite(float(number))):
+				return key + " must be a finite number."
+		if not _is_duration(step.get("max_seconds")) or float(step["max_seconds"]) <= 0.0:
+			return "until_hazard needs a positive max_seconds."
+		if step["hold"] != ["move_right"]:
+			return "until_hazard holds only move_right."
+		return ""
 	if step.has("until_y"):
 		if step.has("seconds") or step.has("until_x"):
 			return "hold cannot combine until_y with seconds or until_x."

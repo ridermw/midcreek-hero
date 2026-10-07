@@ -39,7 +39,7 @@
   {"hold": ["move_right", "jump"], "seconds": 0.45},
   {"hold": ["move_right"], "until_x": 4342, "max_seconds": 8},
   {"hold": ["move_right", "jump"], "seconds": 0.45},
-  {"hold": ["move_right"], "until_x": 4562, "max_seconds": 8},
+  {"hold": ["move_right"], "until_hazard": 4624, "gap": 62, "max_seconds": 12},
   {"hold": ["move_right", "jump"], "seconds": 0.45},
   {"hold": ["move_right"], "until_x": 4772, "max_seconds": 8},
   {"hold": ["move_right", "jump"], "seconds": 0.45},
@@ -123,9 +123,9 @@
   {"hold": ["move_right", "jump"], "seconds": 0.45},
   {"hold": ["move_right"], "until_x": 14102, "max_seconds": 8},
   {"hold": ["move_right", "jump"], "seconds": 0.45},
-  {"hold": ["move_right"], "until_x": 14386, "max_seconds": 8},
+  {"hold": ["move_right"], "until_hazard": 14448, "gap": 62, "max_seconds": 12},
   {"hold": ["move_right", "jump"], "seconds": 0.45},
-  {"hold": ["move_right"], "until_x": 14642, "max_seconds": 8},
+  {"hold": ["move_right"], "until_hazard": 14704, "gap": 62, "max_seconds": 12},
   {"hold": ["move_right", "jump"], "seconds": 0.45},
   {"hold": ["move_right"], "until_x": 15088, "max_seconds": 8}
 ]

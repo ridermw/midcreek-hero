@@ -15,6 +15,8 @@ CLIPS = ("idle", "walk", "run", "jump", "slide", "primary", "secondary", "reacti
 LOOPING = ("idle", "walk", "run", "climb")
 FPS = (6, 10, 14, 10, 12, 10, 10, 10, 8, 8)
 NORMAL_COUNTS = (6, 8, 8, 6, 4, 6, 8, 4, 6, 6)
+# Median helmet column of the published run cycle; the run pose leans ahead of the pivot.
+RUN_HELMET_X = 116
 NORMAL_POSES = {
     "idle": "Small breathing loop, hands relaxed or resting near tool belt. Six phases: neutral, inhale begins, chest rises, inhale peak, exhale, near-neutral returning seamlessly to first. Keep planted feet absolutely stationary.",
     "walk": "Eight-frame RIGHT-FACING PROFILE walk loop: 1 left leg forward/right back contact, 2 weight sinks onto left heel, 3 right leg passes under hips while left supports, 4 rise over left toe/right reaches forward, 5 right forward/left back contact, 6 sink on right heel, 7 left passes under hips while right supports, 8 rise over right toe/left reaches forward. Arms swing opposite legs. Feet alternate, torso remains stable. Every phase differs. Hands empty, tools on belt.",
@@ -159,9 +161,9 @@ def normalize(variant, clip):
         if bounds is None or position[1] + bounds[1] < 1 or position[1] + bounds[3] >= 208:
             raise ValueError(f"{source}: frame {index} cannot fit without clipping")
         frame.alpha_composite(scaled, position)
-        if clip in ("climb", "primary"):
+        if clip in ALIGNERS:
             try:
-                frame = align_climb(frame) if clip == "climb" else align_repair(frame)
+                frame = ALIGNERS[clip](frame)
             except ValueError as error:
                 raise ValueError(f"{source}: frame {index}: {error}") from error
         frames.append(frame)
@@ -196,19 +198,33 @@ def normalize(variant, clip):
 def align_repair(frame):
     bounds = frame.getbbox()
     if bounds is None or not 181 <= bounds[3] <= 187:
-        raise ValueError("Repair frame has no planted boot contact at the floor baseline")
+        raise ValueError("Frame has no planted boot contact at the floor baseline")
     # Only the planted boots anchor repair; the torso and tool move during the action.
     feet = frame.crop((0, bounds[3] - 16, frame.width, bounds[3])).getbbox()
     offset = 104 - (feet[0] + feet[2] - 1) // 2
-    if bounds[0] + offset < 0 or bounds[2] + offset > frame.width:
-        raise ValueError("Repair frame cannot align without clipping")
+    return _translate(frame, offset, "Repair frame")
+
+
+# Idle and diagnosis keep both boots planted, like repair.
+align_stance = align_repair
+
+
+def align_run(frame):
+    # The running figure progresses at a constant speed, so its helmet holds one column.
+    return _translate(frame, RUN_HELMET_X - _hat_x(frame), "Run frame")
+
+
+def _translate(frame, offset, label):
+    left, _, right, _ = frame.getbbox()
+    if left + offset < 0 or right + offset > frame.width:
+        raise ValueError(f"{label} cannot align without clipping")
     aligned = Image.new("RGBA", frame.size)
     aligned.paste(frame, (offset, 0))
     return aligned
 
 
-def align_climb(frame):
-    # The fixed blue hard hat anchors the ladder pose; raised arms change its full bounds.
+def _hat_x(frame):
+    # The topmost blue hard hat region; raised arms and blue shoulders are separate regions.
     blue = set()
     for y in range(85):
         for x in range(frame.width):
@@ -230,16 +246,41 @@ def align_climb(frame):
         if len(region) >= 16:
             regions.append(region)
     if not regions:
-        raise ValueError("Climb frame has no visible blue hard hat alignment anchor")
+        raise ValueError("Frame has no visible blue hard hat alignment anchor")
     region = min(regions, key=lambda points: min(y for _, y in points))
-    hat = [x for x, _ in region]
-    offset = 104 - sorted(hat)[len(hat) // 2]
-    left, _, right, _ = frame.getbbox()
-    if left + offset < 0 or right + offset > frame.width:
-        raise ValueError("Climb frame cannot align without clipping")
-    aligned = Image.new("RGBA", frame.size)
-    aligned.paste(frame, (offset, 0))
-    return aligned
+    hat = sorted(x for x, _ in region)
+    return hat[len(hat) // 2]
+
+
+def align_climb(frame):
+    # The fixed blue hard hat anchors the ladder pose; raised arms change its full bounds.
+    return _translate(frame, 104 - _hat_x(frame), "Climb frame")
+
+
+ALIGNERS = {
+    "climb": align_climb, "primary": align_repair, "idle": align_stance,
+    "secondary": align_stance, "run": align_run,
+}
+
+
+def register(variant, clip):
+    """Translate published frames in place with the clip's registration rule."""
+    count, _, _ = configuration(variant, clip)
+    folder = ART / "frames" / variant / clip
+    expected = [f"{index:02d}.png" for index in range(count)]
+    present = sorted(path.name for path in folder.glob("*.png"))
+    for name in sorted(set(expected) ^ set(present)):
+        raise ValueError(f"{folder / name}: {'missing' if name in expected else 'unexpected'} frame; expected {count} frames")
+    results = []
+    for name in expected:
+        path = folder / name
+        with Image.open(path) as frame:
+            try:
+                results.append(ALIGNERS[clip](frame.convert("RGBA")))
+            except ValueError as error:
+                raise ValueError(f"{path}: {error}") from error
+    write_frames(variant, clip, results)
+    print(f"Registered {variant}/{clip}: {len(results)} frames")
 
 
 def write_frames(variant, clip, results):
@@ -286,18 +327,24 @@ def manifest():
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("operation", choices=("prompts", "render", "normalize", "manifest"))
+    parser.add_argument("operation", choices=("prompts", "render", "normalize", "register", "manifest"))
     parser.add_argument("--variant", choices=VARIANTS)
     parser.add_argument("--clip", choices=CLIPS)
     args = parser.parse_args()
     if args.operation in ("render", "normalize") and not (args.variant and args.clip):
         parser.error("--variant and --clip are required")
+    if args.operation == "register" and args.clip and args.clip not in ALIGNERS:
+        parser.error(f"register does not support clip '{args.clip}'; expected one of: {', '.join(ALIGNERS)}")
     if args.operation == "prompts":
         write_prompts()
     elif args.operation == "render":
         render(args.variant, args.clip)
     elif args.operation == "normalize":
         normalize(args.variant, args.clip)
+    elif args.operation == "register":
+        for variant in [args.variant] if args.variant else VARIANTS:
+            for clip in [args.clip] if args.clip else ALIGNERS:
+                register(variant, clip)
     else:
         manifest()
 

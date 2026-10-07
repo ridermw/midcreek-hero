@@ -10,6 +10,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 TILE = 32
+LIFT_RISE_TILES = 5
 
 
 class Layout:
@@ -53,7 +54,11 @@ class Layout:
 
     def snag(self, col):
         self.put(col, self.stand, "s")
-        self.run_to(self.cx(col) - 62)
+        self.jump_pile(col)
+
+    def jump_pile(self, col):
+        # The runner waits in place until a run up and jump over the patrolling pile is clear.
+        self.route.append({"hold": ["move_right"], "until_hazard": self.cx(col), "gap": 62, "max_seconds": 12})
         self.jump()
 
     def vent(self, col, row=None):
@@ -66,11 +71,9 @@ class Layout:
         self.run_to(self.cx(col) - 70)
         self.jump()
 
-    def mover(self, col, jump_col, jump_offset=0):
-        # Pixel offsets depend on patrol phase; remeasure after any earlier route edit.
+    def mover(self, col):
         self.put(col, self.stand, "m")
-        self.run_to(self.cx(jump_col) + jump_offset)
-        self.jump()
+        self.jump_pile(col)
 
     def drone(self, col):
         self.put(col, self.stand, "d")
@@ -140,13 +143,17 @@ class Layout:
 
     def lift_up(self, col, first, last):
         self.put(col, self.stand, "l")
+        top_row = self.stand - LIFT_RISE_TILES
         for x in range(first, last + 1):
-            for row in range(self.stand - 2, self.stand + 1):
+            for row in range(top_row + 1, self.stand + 1):
                 self.put(x, row, "#")
         self.run_to(self.cx(col) - 6)
         self.route.append({"wait": 0.2})
-        self.route.append({"hold": ["move_up"], "until_y": (self.stand + 1) * TILE - 96 + 2, "max_seconds": 8})
+        self.route.append({"hold": ["move_up"], "until_y": (self.stand + 1) * TILE - LIFT_RISE_TILES * TILE + 2, "max_seconds": 10})
         self.run_to(first * TILE + 24)
+
+    def lift_top_row(self):
+        return self.stand - LIFT_RISE_TILES
 
     def ladder(self, col, top_row, first, last):
         for row in range(top_row, self.stand + 1):
@@ -238,10 +245,9 @@ def arc_run(L, x, count, spacing=8):
     return x + 3 + count * spacing
 
 
-def mover_run(L, x, count, spacing=12, lead=3, jump_offset=0):
+def mover_run(L, x, count, spacing=12):
     for i in range(count):
-        col = x + 6 + i * spacing
-        L.mover(col, col - lead, jump_offset)
+        L.mover(x + 6 + i * spacing)
     return x + 6 + count * spacing
 
 
@@ -261,7 +267,7 @@ def ladder_tower(L, x, top_row, rack=None, length=6):
 
 def lift_deck(L, x, length=14, rack=None, hazard=None, mode="repair"):
     L.lift_up(x, x + 2, x + 2 + length)
-    deck_row = L.stand - 3
+    deck_row = L.lift_top_row()
     if hazard == "arc":
         L.arc(x + 2 + length // 2, deck_row)
     elif hazard == "vent":

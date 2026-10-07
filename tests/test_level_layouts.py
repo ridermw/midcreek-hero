@@ -16,15 +16,14 @@ LEVELS = {
 
 
 class LevelLayoutTest(unittest.TestCase):
-    def test_moving_cable_launch_offset_changes_route_not_geometry(self):
-        original = layout.Layout(20)
-        shifted = layout.Layout(20)
-        original.mover(10, 7)
-        shifted.mover(10, 7, jump_offset=8)
-        self.assertEqual(original.grid, shifted.grid)
-        self.assertEqual(original.route[0]["until_x"], 240)
-        self.assertEqual(shifted.route[0]["until_x"], 248)
-        self.assertEqual(original.route[1:], shifted.route[1:])
+    def test_cable_piles_wait_for_a_clear_jump_over_their_authored_x(self):
+        for kind in ("snag", "mover"):
+            with self.subTest(kind=kind):
+                level = layout.Layout(20)
+                getattr(level, kind)(10)
+                self.assertEqual(level.grid[level.stand][10], "s" if kind == "snag" else "m")
+                self.assertEqual(level.route[0], {"hold": ["move_right"], "until_hazard": 336, "gap": 62, "max_seconds": 12})
+                self.assertEqual(level.route[1], {"hold": ["move_right", "jump"], "seconds": 0.45})
 
     def test_authored_guidance_carries_one_explicit_action(self):
         actions = {"move_left", "move_right", "move_up", "move_down", "jump", "slide", "repair", "diagnose", "pause"}
@@ -43,6 +42,29 @@ class LevelLayoutTest(unittest.TestCase):
                         self.assertEqual(prompt["intent"], "")
                         self.assertTrue(prompt["status"])
                     self.assertNotRegex(prompt["text"] + prompt["status"], r"Pad:|E or X|E / X|Q / Y|C or Shift|hold E|Press Q")
+
+
+    def test_lift_runtime_and_generator_rise_stay_in_sync(self):
+        lift_source = (layout.ROOT / "game/entities/lift.gd").read_text()
+        marker = "const RISE_TILES := "
+        self.assertIn(marker, lift_source)
+        runtime_rise = int(lift_source.split(marker, 1)[1].splitlines()[0])
+        self.assertEqual(runtime_rise, 5)
+        self.assertEqual(layout.LIFT_RISE_TILES, runtime_rise)
+        self.assertEqual(layout.LIFT_RISE_TILES * layout.TILE, 160)
+
+    def test_lift_up_builds_a_five_tile_second_story_and_route_target(self):
+        level = layout.Layout(80)
+        level.lift_up(20, 22, 28)
+        self.assertEqual(level.grid[level.stand][20], "l")
+        top_row = level.stand - layout.LIFT_RISE_TILES
+        self.assertEqual(top_row, 7)
+        for x in range(22, 29):
+            with self.subTest(column=x):
+                self.assertEqual(level.grid[top_row][x], ".")
+                self.assertEqual(level.grid[top_row + 1][x], "#")
+                self.assertEqual(level.grid[level.stand][x], "#")
+        self.assertEqual(level.route[-2], {"hold": ["move_up"], "until_y": (level.stand + 1) * layout.TILE - 160 + 2, "max_seconds": 10})
 
     def test_current_authored_targets_are_preserved(self):
         for name, targets in zip(LEVELS, [(120, 195), (120, 195), (125, 200), (125, 200), (125, 170)]):

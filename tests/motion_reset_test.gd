@@ -30,6 +30,18 @@ func run() -> void:
 				check(not node.active, path + " does not undo progress while resetting motion.")
 		node.queue_free()
 		await process_frame
+	var level: Node = load("res://game/level.tscn").instantiate()
+	level.level_path = "res://levels/03-cable-jungle.level"
+	root.add_child(level)
+	check(level.error_message.is_empty() and level.entities["work"].is_empty(), "Level 3 loads without work stations.")
+	var movers: Array = level.entities["hazards"].filter(func(h) -> bool: return h.has_method("setup"))
+	var authored: Array = movers.map(func(h) -> float: return h.position.x)
+	for hazard in movers:
+		hazard.advance(1.7)
+	level._respawn()
+	check(not movers.is_empty() and movers.map(func(h) -> float: return h.position.x) == authored, "Respawn resets moving hazards in levels without work stations.")
+	level.queue_free()
+	await process_frame
 	print("MOTION_RESET_TEST_COMPLETE: %d checks, %d failures" % [checks, failures])
 	quit(1 if failures else 0)
 

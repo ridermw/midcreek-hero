@@ -41,6 +41,15 @@ func run() -> void:
 		spawn == Vector2(900, 320) and timer.remaining == 30.0 and timer.running,
 		"restore gives at least 30 s.",
 	)
+	var flag: Node2D = load("res://game/entities/checkpoint.gd").new()
+	flag.position = Vector2(500, 416)
+	check(flag.in_range(Vector2(500, 416)), "Feet at the flag base activate it.")
+	check(flag.in_range(Vector2(484, 399)), "A jump that starts beside the flag still passes through it.")
+	check(flag.in_range(Vector2(510, 353)), "Feet inside the visible flag column activate it.")
+	check(not flag.in_range(Vector2(500, 351)), "Feet above the flag top do not activate it.")
+	check(not flag.in_range(Vector2(517, 416)), "Feet beside the flag do not activate it.")
+	check(not flag.in_range(Vector2(500, 433)), "Feet below the flag base do not activate it.")
+	flag.free()
 	print("CHECKPOINT_TEST_COMPLETE: %d checks, %d failures" % [checks, failures])
 	quit(1 if failures else 0)
 

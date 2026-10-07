@@ -184,8 +184,17 @@ tools/godot_test.sh tests/rack_work_test.gd RACK_WORK_TEST
 tools/godot_test.sh tests/fire_work_test.gd FIRE_WORK_TEST
 tools/godot_test.sh tests/service_work_test.gd SERVICE_WORK_TEST
 tools/godot_test.sh tests/work_runtime_test.gd WORK_RUNTIME_TEST
-tools/godot_test.sh tests/expansion_route_test.gd EXPANSION_ROUTE_TEST
+EXPANSION_ONLY=06,07 tools/godot_test.sh tests/expansion_route_test.gd EXPANSION_ROUTE_TEST
 ```
+
+`tests/expansion_route_test.gd` is the gameplay gate for all fifteen levels.
+It replays each full route and each checkpoint suffix for both heroes. It
+requires completion within the SLA and route budget, no added respawns, and
+zero hits. After each checkpoint restore it also holds the hero still for 2 s
+and requires zero hits. `KNOWN_GAPS` in `tests/expansion_route_test.gd` lists
+strict temporary exceptions; it is empty. Set `EXPANSION_ONLY` to comma separated level
+numbers to run a group. The full gate exceeds the runner's 60 second limit, so
+CI runs it in groups. Remaining work and its status are in [TODOS.md](TODOS.md).
 
 Open the [web build](https://ridermw.github.io/midcreek-hero/) or run
 `godot --path .`. The game starts on the title screen. Choose a technician,
@@ -302,11 +311,11 @@ fields produced by the image checker.
 
 | # | Name | New mechanics | Hazards |
 |---|---|---|---|
-| 1 | Cold Aisle Onboarding | Run, jump, repair | Cable snags, open floor tiles |
+| 1 | Cold Aisle Onboarding | Run, jump, repair | Patrolling cable piles, open floor tiles |
 | 2 | Hot Aisle | Fetch a PSU or DIMM, diagnose then repair | Heat vents (1.5 s off, 0.4 s warning, 1.0 s on) |
-| 3 | Cable Jungle | Slide under trays, ladders, wall jump, reseat a cable | Moving cable snags |
-| 4 | Power Room | Ride lifts, reboot a switch in order | Spark arcs (1.4 s off, 0.5 s flicker, 0.6 s on) |
-| 5 | Outage Night | Darkness with a flashlight, every task type, a row of 4 racks | Patrol drones (slide under them), all earlier hazards |
+| 3 | Cable Jungle | Slide under trays, ladders, wall jump, reseat a cable | Moving cable piles |
+| 4 | Power Room | Ride 5 tile lifts, reboot a switch in order | Spark arcs (1.4 s off, 0.5 s flicker, 0.6 s on) |
+| 5 | Outage Night | Darkness with a flashlight, every task type, a row of 4 racks | Patrol drones with scanner beams (slide under them), all earlier hazards |
 
 Work order types: hold E to repair a red rack. For a fetch order, run over the
 spare part, then hold E at the rack that shows the part icon. For a diagnose
@@ -314,7 +323,8 @@ order, press Q at the rack with the amber marker, then hold E. To reseat a
 cable, press E at the port, then press each button the HUD shows within 1 s.
 To reboot a switch, press E at switch panels 1, 2, and 3 in that order; a wrong
 panel turns them all off. A spark sound marks each arc becoming active.
-Stand on a lift to ride it 3 tiles up. Slide under a low tray; the slide continues until there is room to stand. Press
+Stand on a lift to ride its 96 px platform 5 tiles up. It moves at 64 px/s
+and pauses 1.0 s at both landings. Slide under a low tray; the slide continues until there is room to stand. Press
 into a wall in the air to slow your fall, and jump to kick off it. A restart at a
 checkpoint undoes pickups, diagnoses, repairs, cable reseats, and switch throws
 made after that checkpoint.
@@ -334,19 +344,40 @@ A test can request engine flags with a first line such as
 Route steps accept only `tap`, only `wait`, or `hold` with `seconds` or a target
 (`until_x` or `until_y`) and `max_seconds`. A target needs exactly one matching
 direction: left or right for x, up or down for y. Extra fields are rejected rather
-than ignored.
+than ignored. `{"hold": ["move_right"], "until_hazard": x, "gap": 62,
+"max_seconds": 12}` targets the patrolling pile authored at `x`. It waits on
+floor that no pile can reach, backs away from the target pile, or moves out of
+a trailing pile's range, until a run to `gap` pixels before the pile and a
+full jump are predicted to clear every nearby pile. Then it runs to the gap
+and hands off to the next step, which is the jump. The prediction uses the
+deterministic patrol state and the motor's jump constants; drones are passed
+by sliding, not jumping.
 
 Holding slide produces one press, including across adjacent hold steps. Release
-slide with a wait or a step without slide before triggering it again. The
+slide with a wait or a step without slide before triggering it again. A route
+slide press made in the air waits for floor contact, as a player would. The
 motor buffers a slide press for 0.1 s, so a press just before a slide ends
 starts the next slide with no gap. Every route must finish with no damage.
 
 Cable hazards use double pixel scale so the wires are visible before contact.
 The damage rectangle matches the combined opaque frame bounds: 64 by 16 world
 pixels for stationary cables and 64 by 22 for moving cables.
-Patrol range, patrol speed, animation timing, and damage amount are unchanged.
-Recorded moving cable approaches use measured launch positions; changing a
-launch offset changes route input, not level geometry or the timing targets.
+Every cable pile moves. A stationary pile (`s`) patrols at 40 px/s and reverses
+at walls, floor edges, and 48 px from its authored cell; its body stays on
+supported floor. The level validator rejects a pile with less than 32 px to
+patrol. A moving pile (`m`) keeps its 96 px range at 60 px/s. Drones, moving
+piles, and stationary piles share `game/hazards/patrol.gd`.
+
+A drone draws a translucent scanner beam from 36 to 200 px above the floor.
+The drawn beam and the damage rectangle come from one function. A slide body
+(24 px) passes under it; a standing hero (64 px), a jump apex (feet about
+104 px), and a wall jump meet it. `tests/drone_clearance_test.gd` checks jump
+and wall jump hits and keyboard, gamepad, and touch slides for both heroes.
+
+A checkpoint restart restores task progress and effects, then resets every
+hazard and lift to its authored safe state in every level. A hazard that saved
+progress disabled stays disabled. The route gate holds the hero still for 2 s
+after each checkpoint restore and requires zero hits.
 
 New content can use `~` for electrified liquid. Each liquid cell requires a
 solid floor cell directly below it. Contact sets health to zero immediately,
@@ -379,8 +410,8 @@ human difficulty targets. Their current values remain unchanged:
 | 1 Cold Aisle Onboarding | 93.2 s | 120 s | 195 s |
 | 2 Hot Aisle | 95.7 s | 120 s | 195 s |
 | 3 Cable Jungle | 96.2 s | 125 s | 200 s |
-| 4 Power Room | 97.2 s | 125 s | 200 s |
-| 5 Outage Night | 99.9 s | 125 s | 170 s |
+| 4 Power Room | 109.2 s | 125 s | 200 s |
+| 5 Outage Night | 108.9 s | 125 s | 170 s |
 | 6 Cooling Gallery | 41.8 s | 210 s | 420 s |
 | 7 Operations Suite | 64.2 s | 210 s | 420 s |
 | 8 Fiber Exchange | 56.9 s | 210 s | 420 s |
@@ -393,12 +424,19 @@ human difficulty targets. Their current values remain unchanged:
 | 15 Expansion Site | 104.2 s | 360 s | 720 s |
 
 `python3 -m tools.levels.expansion` reproduces all shipped expansion levels and
-their routes. The independent budgets are 180 seconds for 06 through 08 and
+their routes. The independent budgets are 110 seconds for 01 through 05, 180
+seconds for 06 through 08,
 200 seconds for 09 and 11, 220 seconds for 10 and 12 through 14, and 300
 seconds for 15.
 The expansion route check runs
 both heroes through the full level and again from every saved checkpoint.
+It covers levels 01 through 15.
 These automated timings do not establish human difficulty.
+`tests/expansion_capture.gd` saves rendered route captures. Set
+`CAPTURE_FIXTURE` to a level path and `CAPTURE_MODE=death` to capture the first
+fatal frame for both heroes instead. For example, run
+`CAPTURE_DIR=docs/evidence/liquid CAPTURE_FIXTURE=res://tests/fixtures/liquid.level CAPTURE_MODE=death godot --fixed-fps 60 --path . --script tests/expansion_capture.gd`.
+The capture needs a rendered window and rejects headless runs.
 The [Cooling Gallery evidence](docs/evidence/campaign-expansion/06-receipt.json)
 records native and browser results, capture paths, and validation limits.
 The [07 through 09 evidence](docs/evidence/campaign-expansion/07-09-receipt.json)
@@ -499,23 +537,33 @@ part of the authored poses. This corrects sideways stance drift, not every
 possible pose discontinuity.
 The lower band must contain only the planted boots. The woman's individual
 boots still vary by up to 3 texture pixels within that centered stance.
-Idle and diagnosis transitions use their existing anchors and remain outside
-this registration correction. Preview sheets now match the published frames;
+Idle and diagnosis now use the same planted boot registration as repair, and
+the run cycle holds its helmet at texture column 116. Run
+`python3 -m tools.animation_assets register` to reapply these integer
+translations to published frames. Preview sheets now match the published frames;
 older previews used a different palette.
 
-To reproduce walking, running, repair, ascent, descent, and a climb stop and
-reversal for both heroes in Level 3, then
+To reproduce walking, running, repair, ascent, descent, a climb stop and
+reversal, and idle, run, and diagnosis transitions for both heroes, then
 capture both repair help demonstrations:
 
 ```sh
 mkdir -p /tmp/midcreek-motion
 godot --path . --script tests/animation_probe.gd -- --output=/tmp/midcreek-motion
+python3 -m tools.animation_anchors /tmp/midcreek-motion/native-trace.json /tmp/midcreek-motion/report.json
 ```
 
-The probe uses repeatable input and writes frame, physics, camera, and timing
-samples to `native-trace.json`. It also writes two help screenshots. Use a
-separate run with `--write-movie /tmp/midcreek-motion/actions.avi --fixed-fps 60`
-before `--` to record all twelve action cases and the help demonstrations.
+The probe uses repeatable input and writes frame, facing, physics, camera, and
+timing samples to `native-trace.json`. It also writes two help screenshots.
+`--actions=run,idle-run` limits the cases and `--skip-help` skips the help
+screenshots. The anchor report lists every cause of each frame change: source
+registration, authored pose, playback timing, or camera and render timing.
+Playback timing uses the recorded animation playback speed so climb pauses,
+reversals, and velocity scaling are not flagged as nominal-fps drift.
+Pass `--art <animation art directory>` to measure a trace against older frames.
+Add `--fixed-fps 60` before `--` to remove host render rate effects.
+Use a separate run with `--write-movie /tmp/midcreek-motion/actions.avi --fixed-fps 60`
+before `--` to record the action cases and the help demonstrations.
 Movie mode fixes the simulation rate; do not use its timing as a device
 performance measurement. The probe does not change saved progress.
 
