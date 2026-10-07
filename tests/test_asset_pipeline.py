@@ -222,6 +222,11 @@ class AssetPipelineTest(unittest.TestCase):
                     self.assertEqual(animation_anchors.frame_anchors(frame)["helmet_x"], animation_assets.RUN_HELMET_X)
             self.assertTrue((art / "previews/man-midcreek/run.png").is_file())
 
+    def test_register_command_rejects_clips_without_alignment_rules(self):
+        with patch("sys.argv", ["animation_assets.py", "register", "--clip", "walk"]):
+            with self.assertRaises(SystemExit):
+                animation_assets.main()
+
     def test_register_rejects_an_incomplete_frame_set_before_writing(self):
         with tempfile.TemporaryDirectory() as directory:
             art = Path(directory)

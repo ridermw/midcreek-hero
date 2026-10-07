@@ -175,10 +175,39 @@ def analyze(samples, anchors, fps):
         last_change_index = None
         for index, (previous, current) in enumerate(zip(items, items[1:]), start=1):
             same_frame = (previous["clip"], previous["frame"]) == (current["clip"], current["frame"])
-            if same_frame and previous.get("flip") == current.get("flip"):
-                continue
             before = anchors[(variant, previous["clip"], previous["frame"])]
             after = anchors[(variant, current["clip"], current["frame"])]
+            dx = current["position"][0] - previous["position"][0]
+            camera_dx = current["camera"][0] - previous["camera"][0]
+            if same_frame and previous.get("flip") == current.get("flip"):
+                causes = []
+                if last_change is not None and last_change["clip"] == current["clip"]:
+                    timing_window = _latest_direction_window(items[last_change_index:index + 1])
+                    signed_progress, playback_frames = _animation_frame_progress(
+                        timing_window, current["clip"], fps[current["clip"]])
+                    observed_frames = _observed_frame_progress(
+                        timing_window[0], current, _frame_count(anchors, variant, current["clip"]), signed_progress)
+                    if abs(playback_frames - observed_frames) > fps[current["clip"]] * TIMING_TICKS / 60.0:
+                        causes.append("playback timing")
+                if abs(camera_dx - dx) > CAMERA_PIXELS:
+                    causes.append("camera or render timing")
+                if causes:
+                    changes.append({
+                        "kind": "sample",
+                        "from": [previous["clip"], previous["frame"]],
+                        "to": [current["clip"], current["frame"]],
+                        "physics_frame": current["physics_frame"],
+                        "ticks": None,
+                        "physics_dx": round(dx, 3),
+                        "helmet_texels": 0,
+                        "torso_texels": 0,
+                        "boot_texels": 0,
+                        "reach_texels": 0,
+                        "helmet_world": 0.0,
+                        "reach_world": 0.0,
+                        "causes": causes,
+                    })
+                continue
             if same_frame:
                 kind = "facing"
             elif previous["clip"] != current["clip"]:
@@ -198,8 +227,6 @@ def analyze(samples, anchors, fps):
                 observed_frames = _observed_frame_progress(
                     timing_window[0], current, _frame_count(anchors, variant, current["clip"]), signed_progress)
                 playback_timing = abs(playback_frames - observed_frames) > fps[current["clip"]] * TIMING_TICKS / 60.0
-            dx = current["position"][0] - previous["position"][0]
-            camera_dx = current["camera"][0] - previous["camera"][0]
             helmet = after["helmet_x"] - before["helmet_x"]
             reach = after["reach_x"] - before["reach_x"]
             changes.append({

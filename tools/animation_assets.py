@@ -333,6 +333,8 @@ def main():
     args = parser.parse_args()
     if args.operation in ("render", "normalize") and not (args.variant and args.clip):
         parser.error("--variant and --clip are required")
+    if args.operation == "register" and args.clip and args.clip not in ALIGNERS:
+        parser.error(f"register does not support clip '{args.clip}'; expected one of: {', '.join(ALIGNERS)}")
     if args.operation == "prompts":
         write_prompts()
     elif args.operation == "render":

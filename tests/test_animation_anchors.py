@@ -113,6 +113,28 @@ class AnimationAnchorsTest(unittest.TestCase):
         change = animation_anchors.analyze(trace, anchors, {"run": 14})["man-run"]["changes"][0]
         self.assertEqual(change["causes"], ["camera or render timing"])
 
+    def test_camera_jitter_between_unchanged_frames_is_render_timing(self):
+        anchors = {("man-midcreek", "run", 0): animation_anchors.frame_anchors(figure())}
+        trace = [
+            sample("man-run", "run", 0, 0, x=0.0),
+            sample("man-run", "run", 0, 1, x=0.0),
+        ]
+        trace[1]["camera"] = [5.0, 300.0]
+        change = animation_anchors.analyze(trace, anchors, {"run": 14})["man-run"]["changes"][0]
+        self.assertEqual(change["kind"], "sample")
+        self.assertEqual(change["causes"], ["camera or render timing"])
+
+    def test_stalled_playback_between_unchanged_frames_is_timing(self):
+        anchors = {("man-midcreek", "run", i): animation_anchors.frame_anchors(figure()) for i in (0, 1)}
+        trace = [
+            sample("man-run", "run", 1, 0),
+            sample("man-run", "run", 0, 4),
+            sample("man-run", "run", 0, 14, playback_speed=1.0),
+        ]
+        changes = animation_anchors.analyze(trace, anchors, {"run": 14})["man-run"]["changes"]
+        self.assertEqual(changes[1]["kind"], "sample")
+        self.assertEqual(changes[1]["causes"], ["playback timing"])
+
     def test_mirrored_samples_use_mirrored_world_anchors(self):
         anchors = {
             ("man-midcreek", "run", 0): animation_anchors.frame_anchors(figure()),
