@@ -30,7 +30,7 @@ func run() -> void:
 	check(absf(low - 240.0) < 2.0 and absf(high - 560.0) < 2.0, "A drone patrols 5 tiles each way.")
 	check(absf(highest_bob - 4.0) < 0.2 and absf(lowest_bob + 4.0) < 0.2, "A drone bobs 4 px.")
 	var rect := drone.hit_rect()
-	check(rect.size == Vector2(24, 16) and rect.end.y <= drone.position.y - 32.0, "A drone hovers above sliding height.")
+	check(rect.size == Vector2(24, 164) and rect.end.y <= drone.position.y - 32.0, "A drone beam starts above sliding height and rises to 200 px.")
 	drone.free()
 
 	var level := LEVEL_SCENE.instantiate()
