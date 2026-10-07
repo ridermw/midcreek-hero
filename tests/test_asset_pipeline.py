@@ -87,12 +87,16 @@ def floor_connected_region_heights(image, floor_band_rows=4, min_row_width=4):
             continue
         bottom = max(floor_rows)
         top = bottom
+        found_body_above_floor = False
         for row in range(bottom, -1, -1):
             count = by_row.get(row, 0)
             if count == 0:
                 break
-            if count < min_row_width and row < floor_top:
-                break
+            if row < floor_top:
+                if count >= min_row_width:
+                    found_body_above_floor = True
+                elif found_body_above_floor:
+                    break
             top = row
         heights.append(bottom - top + 1)
     return heights
@@ -496,6 +500,13 @@ class AssetPipelineTest(unittest.TestCase):
         image.paste((200, 200, 120, 255), (8, 10, 44, 36))
         image.paste((200, 200, 120, 255), (25, 36, 26, 84))
         self.assertEqual(floor_connected_region_heights(image), [36])
+
+    def test_floor_connected_height_counts_objects_on_narrow_legs(self):
+        image = Image.new("RGBA", (80, 120))
+        image.paste((120, 120, 120, 255), (10, 0, 46, 18))
+        image.paste((120, 120, 120, 255), (16, 18, 17, 120))
+        image.paste((120, 120, 120, 255), (38, 18, 39, 120))
+        self.assertEqual(floor_connected_region_heights(image), [120])
 
     def test_equipment_floor_connected_regions_are_within_contract_or_strict_known_gap(self):
         used = {header["background"] for _, header, _ in level_headers()}
