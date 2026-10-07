@@ -35,7 +35,7 @@ class ExpansionArtTests(unittest.TestCase):
             self.assertLessEqual(len(colors), 96)
             manifest = json.loads((root / "cooling-gallery/manifest.json").read_text())
             self.assertEqual([layer["name"] for layer in manifest["layers"]], ["Far", "Equipment"])
-            self.assertEqual([layer["scale"] for layer in manifest["layers"]], [2, 2])
+            self.assertEqual([layer["scale"] for layer in manifest["layers"]], [2.0, 1.0])
 
     def test_work_catalog_extends_assets_without_mutating_legacy_catalog(self):
         with tempfile.TemporaryDirectory() as directory:
@@ -80,7 +80,7 @@ class ExpansionArtTests(unittest.TestCase):
             image.save(source / "far.png")
             environment_assets.normalize("far", root, "loading-yard")
             with Image.open(root / "loading-yard/far.png") as result:
-                self.assertEqual(result.size, (320, 180))
+                self.assertEqual(result.size, environment_assets.normalized_size("far", "loading-yard"))
                 self.assertLessEqual(len(set(result.convert("RGB").getdata())), 96)
                 self.assertEqual(result.convert("RGBA").getchannel("A").getextrema(), (255, 255))
 

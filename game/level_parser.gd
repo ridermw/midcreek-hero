@@ -48,6 +48,7 @@ func parse(text: String, source: String) -> Dictionary:
 	var level := {
 		"source": source,
 		"header": header,
+		"validate_background_size": header.get("validate_background_size", false),
 		"width": rows[0].length(),
 		"height": rows.size(),
 		"solids": {},
@@ -96,6 +97,8 @@ func _check_header(header: Dictionary) -> String:
 			return "Header key '%s' must be a number." % key
 	if float(header["par_seconds"]) <= 0.0 or float(header["par_seconds"]) >= float(header["sla_seconds"]):
 		return "par_seconds must be above 0 and below sla_seconds."
+	if header.has("validate_background_size") and not header["validate_background_size"] is bool:
+		return "Header key 'validate_background_size' must be true or false."
 	if not header.get("tasks") is Array or header["tasks"].is_empty():
 		return "Header key 'tasks' must be a non-empty array."
 	return ""

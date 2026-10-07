@@ -83,14 +83,28 @@ python3 tools/environment_assets.py normalize
 ```
 
 Use `--layer far`, `--layer equipment`, or `--layer floor` to normalize one
-layer. The command writes `environment/layers/` under `art/cel-shift/` (the
-cold aisle set). The other 4 level sets use `render --set <name> --layer far`
-or `--layer equipment`, then `normalize --set <name>`.
-It uses nearest-neighbor sampling. Far and equipment layers become 640x360.
-The floor strip becomes 640x96. The equipment layer uses binary alpha.
-Source dimensions and transparency must match the layer contract.
-In gameplay, the distant layer scales uniformly to cover the level height,
-including the highest camera position. Equipment keeps its original scale.
+layer. The command keeps `environment/layers/` for the older data hall art
+test and writes the runtime cold aisle set under `environment/cold-aisle/`.
+Other level sets use `render --set <name> --layer far` or `--layer equipment`,
+then `normalize --set <name>`.
+It uses nearest-neighbor sampling. Far layers use 2.0 world px per texel and
+are normalized to exactly half of the campaign level height, so runtime load
+rejects a far texture whose scaled height does not match the level. Equipment
+layers use 1.0 world px per texel and binary alpha. For levels 06 to 15,
+this changes rendered equipment from scale 2 to scale 1, so existing objects
+and their horizontal repeat render at half their previous size. The source
+compositions are unchanged until art can be regenerated. The floor strip remains
+640x96. Source dimensions and transparency must match the layer contract.
+`tests/background_perf_probe.gd` measures native rendered background cost at
+1280x720 with 120 warm up frames and a 600 frame camera sweep on levels 1, 9,
+and 14. Write results with `godot --fixed-fps 60 --path . --script
+tests/background_perf_probe.gd -- --output=docs/evidence/background/<name>.json`.
+The browser probe is blocked on this host because headless Edge uses software
+rendering too slow to measure. `HEIGHT_KNOWN_GAPS` in
+`tests/test_asset_pipeline.py` lists the current equipment height failures.
+Level 07 now measures 98 world px for floor-connected equipment against the
+92 world px limit, so it remains listed. Each entry is strict and must be
+removed when new art is generated.
 
 Animation source sheets use 512x512 cells. The normalizer uses one fixed
 512-to-171 scale and writes 208x208 frames. It reuses the published animation

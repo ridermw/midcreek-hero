@@ -221,12 +221,13 @@ func _build_background(background: String) -> bool:
 		error_message = definition.error_message
 		return false
 	var floor_y := float(level["height"] * LevelBuilder.TILE)
+	if level.get("validate_background_size", false) and not definition.validate_level_height(floor_y):
+		error_message = definition.error_message
+		return false
 	var z := -10 * (definition.layers.size() + 1)
 	for layer: Dictionary in definition.layers:
 		var texture: Texture2D = layer["texture"]
 		var background_scale: float = layer["scale"]
-		if layer["coverage"] == "level":
-			background_scale = maxf(background_scale, floor_y / texture.get_height())
 		var parallax := Parallax2D.new()
 		parallax.name = layer["name"]
 		parallax.scroll_scale = Vector2(layer["scroll"], 1.0)

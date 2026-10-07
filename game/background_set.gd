@@ -1,6 +1,7 @@
 extends RefCounted
 
 const ROOT := "res://art/cel-shift/environment/"
+const LAYER_SCALES := {"far": 2.0, "shell": 2.0, "equipment": 1.0, "racks": 1.0}
 
 var layers: Array[Dictionary] = []
 var error_message := ""
@@ -28,9 +29,14 @@ func parse(data: Variant) -> bool:
 	for entry: Variant in data["layers"]:
 		if not entry is Dictionary:
 			return _fail("Background layer must be an object.")
-		if not entry.get("name") is String or not _valid_name(entry["name"]) or names.has(entry["name"]):
+		if not entry.get("name") is String or not _valid_name(entry["name"]):
+			return _fail("Background layer names must be valid identifiers.")
+		var layer_name := String(entry["name"]).to_lower()
+		if names.has(layer_name):
 			return _fail("Background layer names must be unique identifiers.")
-		names[entry["name"]] = true
+		if not LAYER_SCALES.has(layer_name):
+			return _fail("Background layer names must be Far, Shell, Equipment, or Racks.")
+		names[layer_name] = true
 		var path: Variant = entry.get("texture")
 		if not path is String or not path.begins_with(ROOT) or ".." in path or not path.ends_with(".png"):
 			return _fail("Background textures must be PNG files in the environment directory.")
@@ -38,8 +44,14 @@ func parse(data: Variant) -> bool:
 			return _fail("Background scroll must be between zero and one.")
 		if not _number(entry.get("scale")) or float(entry["scale"]) <= 0.0:
 			return _fail("Background scale must be finite and positive.")
-		if entry.get("coverage") not in ["level", "native"]:
-			return _fail("Background coverage must be level or native.")
+		var scale := float(entry["scale"])
+		if not is_equal_approx(scale, round(scale)):
+			return _fail("Background scale must be an integer texel ratio.")
+		var expected_scale: float = LAYER_SCALES[layer_name]
+		if not is_equal_approx(scale, expected_scale):
+			return _fail("Background %s scale must be %.1f world px per texel." % [entry["name"], expected_scale])
+		if entry.get("coverage") != "native":
+			return _fail("Background coverage must be native; level coverage must be pre-normalized.")
 		var tint: Variant = entry.get("tint")
 		if not tint is Array or tint.size() != 3:
 			return _fail("Background tint needs three color components.")
@@ -57,6 +69,18 @@ func parse(data: Variant) -> bool:
 			"coverage": entry["coverage"], "tint": Color(tint[0], tint[1], tint[2]),
 		})
 	layers = pending
+	return true
+
+
+func validate_level_height(level_height: float) -> bool:
+	for layer: Dictionary in layers:
+		var name := String(layer["name"]).to_lower()
+		if name not in ["far", "shell"]:
+			continue
+		var texture: Texture2D = layer["texture"]
+		var actual := texture.get_height() * float(layer["scale"])
+		if not is_equal_approx(actual, level_height):
+			return _fail("Background texture height mismatch: %s is %.1f world px tall; expected %.1f." % [layer["path"], actual, level_height])
 	return true
 
 

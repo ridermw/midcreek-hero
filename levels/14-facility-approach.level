@@ -125,7 +125,8 @@
       "text": "pass through the low clearance",
       "status": ""
     }
-  ]
+  ],
+  "validate_background_size": true
 }
 ---
 ............................................................................

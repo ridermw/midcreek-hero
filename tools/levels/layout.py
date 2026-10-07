@@ -171,6 +171,8 @@ class Layout:
         self.grid = [row[:width] for row in self.grid]
 
     def render(self, header):
+        header = dict(header)
+        header.setdefault("validate_background_size", True)
         level = json.dumps(header, indent=2) + "\n---\n" + "\n".join("".join(r) for r in self.grid) + "\n"
         steps = ",\n".join("  " + json.dumps(step) for step in self.route)
         return level, "[\n" + steps + "\n]\n"

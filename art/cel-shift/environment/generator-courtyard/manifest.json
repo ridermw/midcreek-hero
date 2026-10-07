@@ -10,8 +10,8 @@
         0.47,
         0.56
       ],
-      "coverage": "level",
-      "scale": 2
+      "coverage": "native",
+      "scale": 2.0
     },
     {
       "name": "Equipment",
@@ -23,7 +23,7 @@
         0.68
       ],
       "coverage": "native",
-      "scale": 2
+      "scale": 1.0
     }
   ]
 }

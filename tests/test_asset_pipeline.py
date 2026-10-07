@@ -2,6 +2,7 @@
 
 import configparser
 import json
+from collections import deque
 from statistics import mean
 import tempfile
 import unittest
@@ -13,6 +14,93 @@ from PIL import Image
 from tools import animation_anchors, animation_assets, environment_assets
 
 ROOT = Path(__file__).resolve().parents[1]
+
+TILE = 32
+HEIGHT_LIMIT_WORLD = 92
+HEIGHT_KNOWN_GAPS = {
+    "cable-jungle": "art generator unavailable (12A)",
+    "cold-aisle": "art generator unavailable (12A)",
+    "cooling-gallery": "art generator unavailable (12A)",
+    "expansion-site": "art generator unavailable (12A)",
+    "facility-approach": "art generator unavailable (12A)",
+    "fiber-exchange": "art generator unavailable (12A)",
+    "fire-response-hall": "art generator unavailable (12A)",
+    "generator-courtyard": "art generator unavailable (12A)",
+    "hot-aisle": "art generator unavailable (12A)",
+    "loading-yard": "art generator unavailable (12A)",
+    "operations-suite": "art generator unavailable (12A)",
+    "outage-night": "art generator unavailable (12A)",
+    "power-room": "art generator unavailable (12A)",
+    "pump-station": "art generator unavailable (12A)",
+    "rooftop-air-handlers": "art generator unavailable (12A)",
+}
+
+
+def level_headers():
+    for path in sorted((ROOT / "levels").glob("[0-9][0-9]-*.level")):
+        if path.name.startswith("00-"):
+            continue
+        header, grid = path.read_text().replace("\r\n", "\n").split("\n---\n", 1)
+        rows = [row for row in grid.splitlines() if row]
+        yield path.name, json.loads(header), rows
+
+
+def manifest_path_to_file(texture_path):
+    assert texture_path.startswith("res://")
+    return ROOT / texture_path.removeprefix("res://")
+
+
+def floor_connected_region_heights(image, floor_band_rows=4, min_row_width=4):
+    rgba = image.convert("RGBA")
+    width, height = rgba.size
+    opaque = rgba.getchannel("A")
+    box = rgba.getbbox()
+    if box is None:
+        return []
+    floor_top = max(box[1], box[3] - floor_band_rows)
+    seeds = [
+        (x, y)
+        for y in range(floor_top, box[3])
+        for x in range(box[0], box[2])
+        if opaque.getpixel((x, y)) > 0
+    ]
+    seen = set()
+    heights = []
+    for seed in seeds:
+        if seed in seen:
+            continue
+        queue = deque([seed])
+        seen.add(seed)
+        by_row = {}
+        while queue:
+            x, y = queue.popleft()
+            by_row[y] = by_row.get(y, 0) + 1
+            for nx, ny in ((x - 1, y), (x + 1, y), (x, y - 1), (x, y + 1)):
+                if nx < 0 or ny < 0 or nx >= width or ny >= height or (nx, ny) in seen:
+                    continue
+                if opaque.getpixel((nx, ny)) == 0:
+                    continue
+                seen.add((nx, ny))
+                queue.append((nx, ny))
+        floor_rows = [row for row in by_row if row >= floor_top]
+        if not floor_rows:
+            continue
+        bottom = max(floor_rows)
+        top = bottom
+        found_body_above_floor = False
+        for row in range(bottom, -1, -1):
+            count = by_row.get(row, 0)
+            if count == 0:
+                break
+            if row < floor_top:
+                if count >= min_row_width:
+                    found_body_above_floor = True
+                elif found_body_above_floor:
+                    break
+            top = row
+        heights.append(bottom - top + 1)
+    return heights
+
 
 
 class AssetPipelineTest(unittest.TestCase):
@@ -405,6 +493,41 @@ class AssetPipelineTest(unittest.TestCase):
             path = animation_assets.ART / "prompts/man-midcreek" / f"{clip}.mock.md"
             self.assertEqual(path.read_text(), animation_assets.prompt_text("man-midcreek", clip))
 
+
+    def test_floor_connected_height_ignores_hung_fixture_touching_floor_object(self):
+        image = Image.new("RGBA", (80, 120))
+        image.paste((120, 120, 120, 255), (10, 84, 42, 120))
+        image.paste((200, 200, 120, 255), (8, 10, 44, 36))
+        image.paste((200, 200, 120, 255), (25, 36, 26, 84))
+        self.assertEqual(floor_connected_region_heights(image), [36])
+
+    def test_floor_connected_height_counts_objects_on_narrow_legs(self):
+        image = Image.new("RGBA", (80, 120))
+        image.paste((120, 120, 120, 255), (10, 0, 46, 18))
+        image.paste((120, 120, 120, 255), (16, 18, 17, 120))
+        image.paste((120, 120, 120, 255), (38, 18, 39, 120))
+        self.assertEqual(floor_connected_region_heights(image), [120])
+
+    def test_equipment_floor_connected_regions_are_within_contract_or_strict_known_gap(self):
+        used = {header["background"] for _, header, _ in level_headers()}
+        seen = set()
+        for name in sorted(used):
+            manifest = json.loads((environment_assets.ART / name / "manifest.json").read_text())
+            for layer in manifest["layers"]:
+                layer_name = layer["name"].lower()
+                if layer_name not in {"equipment", "racks"}:
+                    continue
+                seen.add(name)
+                with Image.open(manifest_path_to_file(layer["texture"])) as image:
+                    heights = floor_connected_region_heights(image)
+                max_height = max(heights, default=0) * float(layer["scale"])
+                with self.subTest(set=name, layer=layer_name, max_height=max_height):
+                    if name in HEIGHT_KNOWN_GAPS:
+                        self.assertGreater(max_height, HEIGHT_LIMIT_WORLD, HEIGHT_KNOWN_GAPS[name])
+                    else:
+                        self.assertLessEqual(max_height, HEIGHT_LIMIT_WORLD)
+        self.assertEqual(set(HEIGHT_KNOWN_GAPS), set(HEIGHT_KNOWN_GAPS).intersection(seen))
+
     def test_normalized_environment_contract(self):
         with tempfile.TemporaryDirectory() as directory:
             art = Path(directory)
@@ -435,7 +558,7 @@ class AssetPipelineTest(unittest.TestCase):
 
     def test_background_sets_cover_every_level(self):
         self.assertEqual(
-            set(environment_assets.SETS), {"hot-aisle", "cable-jungle", "power-room", "outage-night"}
+            set(environment_assets.SETS), {"cold-aisle", "hot-aisle", "cable-jungle", "power-room", "outage-night"}
         )
         for name, prompts in environment_assets.SETS.items():
             with self.subTest(name=name):
@@ -444,6 +567,32 @@ class AssetPipelineTest(unittest.TestCase):
                 self.assertIn("Edit image 1", text)
                 self.assertIn("Keep unchanged", text)
 
+
+    def test_cold_aisle_has_set_specific_render_and_normalize_contract(self):
+        self.assertIn("cold", environment_assets.prompt_text("cold-aisle", "far").lower())
+        with tempfile.TemporaryDirectory() as directory:
+            art = Path(directory)
+            generated = art / "cold-aisle/generated"
+            generated.mkdir(parents=True)
+            Image.new("RGBA", (1280, 720), (20, 40, 60, 255)).save(generated / "far.png")
+            environment_assets.normalize("far", art, "cold-aisle")
+            with Image.open(art / "cold-aisle/far.png") as result:
+                self.assertEqual(result.size, environment_assets.normalized_size("far", "cold-aisle"))
+
+    def test_cold_aisle_source_root_prefers_regenerated_set_sources(self):
+        with tempfile.TemporaryDirectory() as directory:
+            art = Path(directory)
+            (art / "generated").mkdir()
+            self.assertEqual(
+                environment_assets.generated_source_root(art, "cold-aisle"),
+                art / "generated",
+            )
+            (art / "cold-aisle/generated").mkdir(parents=True)
+            self.assertEqual(
+                environment_assets.generated_source_root(art, "cold-aisle"),
+                art / "cold-aisle/generated",
+            )
+
     def test_named_set_normalizes_into_its_own_directory(self):
         with tempfile.TemporaryDirectory() as directory:
             art = Path(directory)
@@ -451,7 +600,7 @@ class AssetPipelineTest(unittest.TestCase):
             Image.new("RGBA", (1280, 720), (90, 40, 30, 255)).save(art / "hot-aisle/generated/far.png")
             environment_assets.normalize("far", art, "hot-aisle")
             with Image.open(art / "hot-aisle/far.png") as result:
-                self.assertEqual(result.size, (640, 360))
+                self.assertEqual(result.size, environment_assets.normalized_size("far", "hot-aisle"))
             self.assertFalse((art / "layers/far.png").exists())
 
     def test_environment_rejects_invalid_sources(self):
@@ -484,6 +633,34 @@ class AssetPipelineTest(unittest.TestCase):
                         with Image.open(committed) as expected:
                             self.assertEqual(expected.size, output_size)
                             self.assertEqual(actual.tobytes(), expected.tobytes())
+
+    def test_checked_in_campaign_environment_sets_are_reproducible(self):
+        sets = {header["background"] for _, header, _ in level_headers()}
+        self.assertEqual(len(sets), 15)
+        with tempfile.TemporaryDirectory() as directory:
+            art = Path(directory)
+            for name in sorted(sets):
+                with self.subTest(set=name):
+                    source_root = environment_assets.generated_source_root(environment_assets.ART, name)
+                    target_root = art / source_root.relative_to(environment_assets.ART)
+                    target_root.mkdir(parents=True)
+                    for layer in ("far", "equipment"):
+                        (target_root / f"{layer}.png").write_bytes((source_root / f"{layer}.png").read_bytes())
+                    if name in environment_assets.EXPANSION_SETS:
+                        environment_assets.normalize_set(name, art)
+                    else:
+                        for layer in ("far", "equipment"):
+                            environment_assets.normalize(layer, art, name)
+                        environment_assets.write_manifest(name, art)
+                    for layer in ("far", "equipment"):
+                        with Image.open(art / name / f"{layer}.png") as actual:
+                            with Image.open(environment_assets.ART / name / f"{layer}.png") as expected:
+                                self.assertEqual(actual.size, expected.size)
+                                self.assertEqual(actual.tobytes(), expected.tobytes())
+                    self.assertEqual(
+                        json.loads((art / name / "manifest.json").read_text()),
+                        json.loads((environment_assets.ART / name / "manifest.json").read_text()),
+                    )
 
     def test_environment_metadata_has_no_account(self):
         for path in (environment_assets.ART / "generated").glob("*.metadata.json"):

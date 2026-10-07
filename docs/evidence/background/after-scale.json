@@ -1,0 +1,109 @@
+{
+	"method": {
+		"browser_note": "Exported desktop browser measurement is blocked on this host because headless Edge uses software rendering too slow to measure.",
+		"fixed_fps": 60,
+		"host_note": "This host renders real time at about 33 Hz, so measurements are host-specific desktop evidence.",
+		"levels": [
+			"01-cold-aisle",
+			"09-loading-yard",
+			"14-facility-approach"
+		],
+		"renderer": "native rendered Godot",
+		"sample_frames": 600,
+		"viewport": [
+			1280,
+			720
+		],
+		"warmup_frames": 120
+	},
+	"results": [
+		{
+			"camera": {
+				"effective_from": [
+					320.0,
+					268.0
+				],
+				"effective_to": [
+					13696.0,
+					180.0
+				],
+				"half_extent": [
+					320.0,
+					180.0
+				],
+				"zoom": [
+					2.0,
+					2.0
+				]
+			},
+			"draw_calls_mean": 19.8633333333333,
+			"draw_calls_p95": 22.0,
+			"level": "01-cold-aisle",
+			"process_ms_mean": 35.939045,
+			"process_ms_p95": 58.825,
+			"real_time_fps": 33.6853981434405,
+			"texture_bytes_mean": 36985411.0,
+			"texture_bytes_p95": 36985411.0,
+			"wall_seconds": 17.811872
+		},
+		{
+			"camera": {
+				"effective_from": [
+					320.0,
+					460.0
+				],
+				"effective_to": [
+					1600.0,
+					180.0
+				],
+				"half_extent": [
+					320.0,
+					180.0
+				],
+				"zoom": [
+					2.0,
+					2.0
+				]
+			},
+			"draw_calls_mean": 19.7,
+			"draw_calls_p95": 27.0,
+			"level": "09-loading-yard",
+			"process_ms_mean": 37.2487266666666,
+			"process_ms_p95": 59.056,
+			"real_time_fps": 33.0497390309982,
+			"texture_bytes_mean": 36611639.0,
+			"texture_bytes_p95": 36611639.0,
+			"wall_seconds": 18.154455
+		},
+		{
+			"camera": {
+				"effective_from": [
+					320.0,
+					460.0
+				],
+				"effective_to": [
+					2112.0,
+					180.0
+				],
+				"half_extent": [
+					320.0,
+					180.0
+				],
+				"zoom": [
+					2.0,
+					2.0
+				]
+			},
+			"draw_calls_mean": 19.1416666666667,
+			"draw_calls_p95": 24.0,
+			"level": "14-facility-approach",
+			"process_ms_mean": 37.9269516666667,
+			"process_ms_p95": 67.975,
+			"real_time_fps": 33.5675997471017,
+			"texture_bytes_mean": 36611639.0,
+			"texture_bytes_p95": 36611639.0,
+			"wall_seconds": 17.874379
+		}
+	],
+	"schema": "midcreek-background-perf-v1"
+}
