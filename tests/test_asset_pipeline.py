@@ -609,6 +609,38 @@ class AssetPipelineTest(unittest.TestCase):
                             self.assertEqual(expected.size, output_size)
                             self.assertEqual(actual.tobytes(), expected.tobytes())
 
+    def test_checked_in_campaign_environment_sets_are_reproducible(self):
+        sets = {header["background"] for _, header, _ in level_headers()}
+        self.assertEqual(len(sets), 15)
+        with tempfile.TemporaryDirectory() as directory:
+            art = Path(directory)
+            for name in sorted(sets):
+                with self.subTest(set=name):
+                    if name == environment_assets.COLD_AISLE:
+                        source_root = environment_assets.ART / "generated"
+                        target_root = art / "generated"
+                    else:
+                        source_root = environment_assets.ART / name / "generated"
+                        target_root = art / name / "generated"
+                    target_root.mkdir(parents=True)
+                    for layer in ("far", "equipment"):
+                        (target_root / f"{layer}.png").write_bytes((source_root / f"{layer}.png").read_bytes())
+                    if name in environment_assets.EXPANSION_SETS:
+                        environment_assets.normalize_set(name, art)
+                    else:
+                        for layer in ("far", "equipment"):
+                            environment_assets.normalize(layer, art, name)
+                        environment_assets.write_manifest(name, art)
+                    for layer in ("far", "equipment"):
+                        with Image.open(art / name / f"{layer}.png") as actual:
+                            with Image.open(environment_assets.ART / name / f"{layer}.png") as expected:
+                                self.assertEqual(actual.size, expected.size)
+                                self.assertEqual(actual.tobytes(), expected.tobytes())
+                    self.assertEqual(
+                        json.loads((art / name / "manifest.json").read_text()),
+                        json.loads((environment_assets.ART / name / "manifest.json").read_text()),
+                    )
+
     def test_environment_metadata_has_no_account(self):
         for path in (environment_assets.ART / "generated").glob("*.metadata.json"):
             with self.subTest(path=path.name):

@@ -19,66 +19,90 @@
 	"results": [
 		{
 			"camera": {
-				"from": [
-					640.0,
-					360.0
+				"effective_from": [
+					320.0,
+					268.0
 				],
-				"to": [
-					13376.0,
-					88.0
+				"effective_to": [
+					13696.0,
+					180.0
+				],
+				"half_extent": [
+					320.0,
+					180.0
+				],
+				"zoom": [
+					2.0,
+					2.0
 				]
 			},
-			"draw_calls_mean": 19.9166666666667,
-			"draw_calls_p95": 23.0,
+			"draw_calls_mean": 19.8633333333333,
+			"draw_calls_p95": 22.0,
 			"level": "01-cold-aisle",
-			"process_ms_mean": 42.7287566666667,
-			"process_ms_p95": 66.512,
-			"real_time_fps": 34.3454557527494,
+			"process_ms_mean": 39.6400516666669,
+			"process_ms_p95": 69.572,
+			"real_time_fps": 33.8039233847598,
 			"texture_bytes_mean": 37449511.0,
 			"texture_bytes_p95": 37449511.0,
-			"wall_seconds": 17.46956
+			"wall_seconds": 17.749419
 		},
 		{
 			"camera": {
-				"from": [
-					640.0,
-					360.0
+				"effective_from": [
+					320.0,
+					460.0
 				],
-				"to": [
-					1280.0,
-					280.0
+				"effective_to": [
+					1600.0,
+					180.0
+				],
+				"half_extent": [
+					320.0,
+					180.0
+				],
+				"zoom": [
+					2.0,
+					2.0
 				]
 			},
-			"draw_calls_mean": 19.6233333333333,
-			"draw_calls_p95": 22.0,
+			"draw_calls_mean": 20.0566666666667,
+			"draw_calls_p95": 27.0,
 			"level": "09-loading-yard",
-			"process_ms_mean": 43.8414833333334,
-			"process_ms_p95": 88.376,
-			"real_time_fps": 32.9340916371339,
+			"process_ms_mean": 37.0456116666667,
+			"process_ms_p95": 63.884,
+			"real_time_fps": 33.3918767136294,
 			"texture_bytes_mean": 35826439.0,
 			"texture_bytes_p95": 35826439.0,
-			"wall_seconds": 18.218204
+			"wall_seconds": 17.968442
 		},
 		{
 			"camera": {
-				"from": [
-					640.0,
-					360.0
+				"effective_from": [
+					320.0,
+					460.0
 				],
-				"to": [
-					1792.0,
-					280.0
+				"effective_to": [
+					2112.0,
+					180.0
+				],
+				"half_extent": [
+					320.0,
+					180.0
+				],
+				"zoom": [
+					2.0,
+					2.0
 				]
 			},
-			"draw_calls_mean": 17.4216666666667,
-			"draw_calls_p95": 23.0,
+			"draw_calls_mean": 19.4983333333333,
+			"draw_calls_p95": 24.0,
 			"level": "14-facility-approach",
-			"process_ms_mean": 44.6752799999995,
-			"process_ms_p95": 62.214,
-			"real_time_fps": 34.4710582718303,
+			"process_ms_mean": 35.9900616666666,
+			"process_ms_p95": 60.125,
+			"real_time_fps": 34.3466530989754,
 			"texture_bytes_mean": 35826439.0,
 			"texture_bytes_p95": 35826439.0,
-			"wall_seconds": 17.405906
+			"wall_seconds": 17.468951
 		}
 	],
 	"schema": "midcreek-background-perf-v1"

@@ -515,8 +515,19 @@ are normalized to exactly half the campaign level height; load fails with the
 texture path if the scaled height does not match. The old computed `coverage:
 level` scale is rejected. The native performance probe records baseline and
 after-scale JSON for levels 1, 9, and 14. Paired Level 07 captures are
-`07-{man,woman}-before-native.png` and `07-{man,woman}-after-native.png`. The
-existing composition is unchanged; only texel normalization changed.
+`07-{man,woman}-before-native.png` and `07-{man,woman}-after-native.png`. Source
+compositions are unchanged. For levels 06 to 15, equipment manifest scale changed
+from 2 to 1, so rendered equipment objects and their horizontal repeat are half
+their previous size. Level 07 floor-connected equipment now measures 98 world px
+against the 92 px limit, so it stays a known gap.
+
+**Measurements:** The fixed native probe uses camera zoom when clamping the 1280
+by 720 viewport. Baseline to after-scale mean/p95 process ms: level 01
+39.64/69.57 -> 35.94/58.83; level 09 37.05/63.88 -> 37.25/59.06; level 14
+35.99/60.12 -> 37.93/67.97. Texture memory MiB: 35.71 -> 35.27 on level 01
+and 34.17 -> 34.92 on levels 09 and 14. The CI mirror measured
+`EXPORT_FILES_PASS total_bytes=53609295`, which is +397176 bytes from the
+previous 53212119 byte value.
 
 **Blocked:** All 15 equipment sets still exceed the 92 world px floor-connected
 height limit. `HEIGHT_KNOWN_GAPS` lists each set as a strict temporary gap with

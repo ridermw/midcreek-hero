@@ -90,7 +90,10 @@ then `normalize --set <name>`.
 It uses nearest-neighbor sampling. Far layers use 2.0 world px per texel and
 are normalized to exactly half of the campaign level height, so runtime load
 rejects a far texture whose scaled height does not match the level. Equipment
-layers use 1.0 world px per texel and binary alpha. The floor strip remains
+layers use 1.0 world px per texel and binary alpha. For levels 06 to 15,
+this changes rendered equipment from scale 2 to scale 1, so existing objects
+and their horizontal repeat render at half their previous size. The source
+compositions are unchanged until art can be regenerated. The floor strip remains
 640x96. Source dimensions and transparency must match the layer contract.
 `tests/background_perf_probe.gd` measures native rendered background cost at
 1280x720 with 120 warm up frames and a 600 frame camera sweep on levels 1, 9,
@@ -99,7 +102,9 @@ tests/background_perf_probe.gd -- --output=docs/evidence/background/<name>.json`
 The browser probe is blocked on this host because headless Edge uses software
 rendering too slow to measure. `HEIGHT_KNOWN_GAPS` in
 `tests/test_asset_pipeline.py` lists the current equipment height failures.
-Each entry is strict and must be removed when new art is generated.
+Level 07 now measures 98 world px for floor-connected equipment against the
+92 world px limit, so it remains listed. Each entry is strict and must be
+removed when new art is generated.
 
 Animation source sheets use 512x512 cells. The normalizer uses one fixed
 512-to-171 scale and writes 208x208 frames. It reuses the published animation

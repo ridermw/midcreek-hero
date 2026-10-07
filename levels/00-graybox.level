@@ -5,10 +5,32 @@
   "music": "level1",
   "background": "cold-aisle",
   "tasks": [
-    {"id": "r1", "type": "repair", "at": ["A"], "required": true},
-    {"id": "r2", "type": "repair", "at": ["B"], "required": true},
-    {"id": "r3", "type": "repair", "at": ["G"], "required": true}
-  ]
+    {
+      "id": "r1",
+      "type": "repair",
+      "at": [
+        "A"
+      ],
+      "required": true
+    },
+    {
+      "id": "r2",
+      "type": "repair",
+      "at": [
+        "B"
+      ],
+      "required": true
+    },
+    {
+      "id": "r3",
+      "type": "repair",
+      "at": [
+        "G"
+      ],
+      "required": true
+    }
+  ],
+  "validate_background_size": false
 }
 ---
 ............................................................

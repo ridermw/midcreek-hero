@@ -60,6 +60,20 @@ func run() -> void:
 				check(is_equal_approx(item["scale"], 2.0), name + " " + layer_name + " uses 2.0 world px per texel.")
 				check(item["coverage"] == "native", name + " " + layer_name + " uses only native scale.")
 	check(not background.load_set("../layers"), "Set names cannot escape their directory.")
+
+	var bad_level := "user://background-wrong-height.level"
+	var bad_file := FileAccess.open(bad_level, FileAccess.WRITE)
+	bad_file.store_string(FileAccess.get_file_as_string("res://levels/06-cooling-gallery.level").replace('"cooling-gallery"', '"cold-aisle"'))
+	bad_file.close()
+	var level_scene := load("res://game/level.tscn")
+	var bad_instance = level_scene.instantiate()
+	bad_instance.level_path = bad_level
+	root.add_child(bad_instance)
+	check(bad_instance.error_message.contains("Background texture height mismatch"), "User level with wrong-height far texture fails clearly.")
+	check(bad_instance.error_message.contains("res://art/cel-shift/environment/cold-aisle/far.png"), "User level size error names the far texture.")
+	bad_instance.queue_free()
+	await process_frame
+	DirAccess.remove_absolute(bad_level)
 	finish()
 
 

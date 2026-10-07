@@ -221,7 +221,7 @@ func _build_background(background: String) -> bool:
 		error_message = definition.error_message
 		return false
 	var floor_y := float(level["height"] * LevelBuilder.TILE)
-	if _requires_background_size_contract() and not definition.validate_level_height(floor_y):
+	if level.get("validate_background_size", false) and not definition.validate_level_height(floor_y):
 		error_message = definition.error_message
 		return false
 	var z := -10 * (definition.layers.size() + 1)
@@ -246,10 +246,6 @@ func _build_background(background: String) -> bool:
 		$World.move_child(parallax, 0)
 		z += 10
 	return true
-
-
-func _requires_background_size_contract() -> bool:
-	return level["source"].begins_with("res://levels/") and not level["source"].get_file().begins_with("00-")
 
 
 func _physics_process(delta: float) -> void:

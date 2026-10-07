@@ -86,8 +86,10 @@ func measure_level(slug: String, level: Node) -> Dictionary:
 	return {
 		"level": slug,
 		"camera": {
-			"from": [bounds["start"].x, bounds["start"].y],
-			"to": [bounds["end"].x, bounds["end"].y],
+			"effective_from": [bounds["start"].x, bounds["start"].y],
+			"effective_to": [bounds["end"].x, bounds["end"].y],
+			"half_extent": [bounds["half_extent"].x, bounds["half_extent"].y],
+			"zoom": [level.camera.zoom.x, level.camera.zoom.y],
 		},
 		"process_ms_mean": average(process_ms),
 		"process_ms_p95": percentile(process_ms, 0.95),
@@ -100,13 +102,20 @@ func measure_level(slug: String, level: Node) -> Dictionary:
 	}
 
 
-func camera_sweep_bounds(level: Node) -> Dictionary:
-	var half := Vector2(VIEWPORT_SIZE) * 0.5
-	var min_x: float = minf(float(level.camera.limit_left) + half.x, float(level.camera.limit_right) - half.x)
-	var max_x: float = maxf(float(level.camera.limit_left) + half.x, float(level.camera.limit_right) - half.x)
-	var top_y: float = minf(float(level.camera.limit_top) + half.y, float(level.camera.limit_bottom) - half.y)
-	var bottom_y: float = maxf(float(level.camera.limit_top) + half.y, float(level.camera.limit_bottom) - half.y)
-	return {"start": Vector2(min_x, bottom_y), "end": Vector2(max_x, top_y)}
+static func camera_sweep_bounds(level: Node) -> Dictionary:
+	var half: Vector2 = Vector2(VIEWPORT_SIZE) * 0.5 / level.camera.zoom
+	var x := axis_bounds(float(level.camera.limit_left), float(level.camera.limit_right), half.x)
+	var y := axis_bounds(float(level.camera.limit_top), float(level.camera.limit_bottom), half.y)
+	return {"start": Vector2(x.x, y.y), "end": Vector2(x.y, y.x), "half_extent": half}
+
+
+static func axis_bounds(minimum: float, maximum: float, half_extent: float) -> Vector2:
+	var low := minimum + half_extent
+	var high := maximum - half_extent
+	if low > high:
+		var center := (minimum + maximum) * 0.5
+		return Vector2(center, center)
+	return Vector2(low, high)
 
 
 func move_camera(level: Node, bounds: Dictionary, t: float) -> void:
