@@ -24,7 +24,7 @@ Each open item below has one acceptance criterion and names its pull request.
 | 5. Background depth | Open | PR5, `ridermw-background-depth` |
 | 5a. Background scale | Open | PR4, `ridermw-background-scale` |
 | 6. Route timing contract | Delivered | Independent route timing increment |
-| Cable pile movement, drone sliding | Open | PR2, `ridermw-hazards` |
+| Cable pile movement, drone sliding | Delivered in PR2 | PR2, `ridermw-hazards` |
 | Difficulty and device evidence | Requires owner | See "Requires owner" |
 
 The size budget wording differs between an earlier draft and this file. The
@@ -535,7 +535,7 @@ download budget or a device performance result.
 
 ## Follow up: continuous cable pile movement
 
-- [ ] Make every cable pile obstacle move continuously during gameplay,
+- [x] Make every cable pile obstacle move continuously during gameplay,
   including the currently stationary piles. The user named Mario mushrooms
   as the movement reference on October 5.
 
@@ -547,9 +547,32 @@ and verify safe checkpoint recovery for both heroes.
 stays inside its floor span, and the route gate passes for every checkpoint
 and both heroes with the level 03 known gaps removed.
 
+**Delivered (PR2):**
+- Stationary piles patrol at 40 px/s and reverse at walls, floor edges, and
+  48 px from the authored cell (decision 3A). The validator rejects a pile
+  with less than 32 px to patrol (8A). Moving piles keep 96 px at 60 px/s.
+  Drones and both pile kinds share `game/hazards/patrol.gd` (5A); existing
+  hazard behavior tests pass unchanged.
+- Respawn resets hazard and lift motion in every level, not only levels with
+  work stations (1A). A failing Level 3 test showed the old gap. The gate
+  holds the hero still for 2 s after every checkpoint restore with zero hits.
+- Fixed takeoff points cannot clear a pile whose phase differs between a full
+  run and a checkpoint replay. The route step `until_hazard` waits on safe
+  floor until a run up and jump are predicted clear, using the deterministic
+  patrol and the motor's jump constants. Rejected alternatives: phase hazards
+  from the level timer (conflicts with authored safe restart states), and
+  fixed waits (route time grows with every pile).
+- A route slide press made in the air now waits for floor contact. A checkpoint
+  replay landed a jump at a tray entrance and lost its slide press.
+- Level 05 moves one pile from column 160 to 162, so a heat vent jump cannot
+  land within its reach. Levels 01 to 05 were regenerated with their scripts
+  (2A); only routes and that one pile changed.
+- Evidence: `tests/hazard_motion_test.gd`, `tests/hazard_route_test.gd`, the
+  route gate for all fifteen levels, and captures in `docs/evidence/hazards/`.
+
 ## Follow up: pass security drones only by sliding
 
-- [ ] Prevent the hero from jumping over security drones. Sliding underneath
+- [x] Prevent the hero from jumping over security drones. Sliding underneath
   must be the only way to pass them. The user requested this on October 5.
 
 Use visible drone geometry and matching collision bounds. Verify that ordinary
@@ -559,6 +582,14 @@ clearance for both heroes. Update affected routes and checkpoint recovery checks
 **Acceptance criterion (PR2):** Real physics shows that jump and wall jump into
 each drone cause a hit, while keyboard, gamepad, and touch slides pass under it
 for both heroes.
+
+**Delivered (PR2):** A drone draws a pulsing scanner beam from 36 to 200 px
+above the floor; the drawn beam and the hit rectangle share `beam_rect()`
+(decision 4A). Rejected alternatives: a ceiling cap above each drone (geometry
+edits in every level) and a higher hover (allows running under).
+`tests/drone_clearance_test.gd` failed for jump and wall jump before the beam.
+It now shows both are hit, and `InputEventKey`, `InputEventJoypadButton`, and
+`MobileInput` touch slides pass under the beam for both heroes (9A).
 
 ## Requires owner
 
@@ -612,9 +643,9 @@ SLA values change only when observations justify it.
   same trap for players.
 - [x] The gate takes about 199 s locally and about 98 s in CI. CI runs it in
   four `EXPANSION_ONLY` groups of about 25 s each, below the 60 s limit.
-- [ ] Known gap for PR2: level 03 replays from checkpoints 0 and 1 take hits,
-  because hazards restart at their authored phase. The gate lists both as
-  strict known gaps. It fails when a listed gap passes.
+- [x] Known gap for PR2: level 03 replays from checkpoints 0 and 1 took hits,
+  because hazards restart at their authored phase. PR2 removed both entries;
+  `KNOWN_GAPS` is empty.
 
 ## NOT in scope
 

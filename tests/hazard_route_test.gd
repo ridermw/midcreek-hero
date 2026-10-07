@@ -23,6 +23,7 @@ func run() -> void:
 	]:
 		check(not RouteRunner.new([bad]).error_message.is_empty(), "Malformed hazard step is rejected: %s" % bad)
 	var text := FileAccess.get_file_as_string("res://tests/fixtures/controller.level")
+	var states := {}
 	for kind: String in ["s", "m"]:
 		var path := "user://hazard-route-%s.level" % kind
 		var file := FileAccess.open(path, FileAccess.WRITE)
@@ -37,7 +38,9 @@ func run() -> void:
 				root.add_child(level)
 				var pile: Node2D = level.entities["hazards"][0]
 				var origin: float = pile.patrol.origin
-				pile.advance(phase)
+				for tick: int in range(roundi(phase * 60.0)):
+					pile.advance(1.0 / 60.0)
+				states["%s %d %d" % [kind, signi(int(pile.direction)), int(pile.position.x)]] = true
 				if kind == "m" and phase == 0.0:
 					# The pile moves away from a close standing start, so a jump now would land on it.
 					level.player.respawn(Vector2(origin - 70.0, level.player.position.y))
@@ -58,6 +61,36 @@ func run() -> void:
 				await process_frame
 		if kind == "m":
 			check(waited, "The route waits or backs away when a jump over the moving pile is not yet clear.")
+		var left := states.keys().filter(func(key: String) -> bool: return key.begins_with(kind + " -1"))
+		var right := states.keys().filter(func(key: String) -> bool: return key.begins_with(kind + " 1"))
+		check(left.size() >= 3 and right.size() >= 3, "%s phases cover both directions and several positions: %s" % [kind, states.keys().filter(func(key: String) -> bool: return key.begins_with(kind))])
+	var far := "user://hazard-route-far.level"
+	var far_file := FileAccess.open(far, FileAccess.WRITE)
+	far_file.store_string(text.replace("..s..h", ".....h").replace("C..F", "Cm.F"))
+	far_file.close()
+	for phase: float in [0.0, 0.6, 1.2, 1.8, 2.4, 3.0, 3.6, 4.2]:
+		var hero := "man" if int(phase * 10.0) % 12 == 0 else "woman"
+		var level := LEVEL.instantiate()
+		level.character = hero
+		level.level_path = far
+		root.add_child(level)
+		var pile: Node2D = level.entities["hazards"][0]
+		for tick: int in range(roundi(phase * 60.0)):
+			pile.advance(1.0 / 60.0)
+		check(pile.position.x - level.player.position.x > RouteRunner.SIMULATION_RANGE, "The far pile starts beyond the prediction range.")
+		var runner := RouteRunner.new([
+			{"hold": ["move_right"], "until_hazard": pile.patrol.origin, "gap": 62, "max_seconds": 12},
+			{"hold": ["move_right", "jump"], "seconds": 0.45},
+			{"hold": ["move_right"], "until_x": pile.patrol.origin + 100.0, "max_seconds": 4},
+		])
+		for frame: int in range(1200):
+			runner.apply(level, 1.0 / 60.0)
+			await physics_frame
+			if runner.done() or runner.failed or level.health.hits_taken > 0:
+				break
+		check(runner.done() and level.health.hits_taken == 0, "%s: a pile beyond the prediction range is still predicted before committing, phase %.1f s (hits=%d)." % [hero, phase, level.health.hits_taken])
+		level.queue_free()
+		await process_frame
 	var pair := "user://hazard-route-pair.level"
 	var pair_file := FileAccess.open(pair, FileAccess.WRITE)
 	pair_file.store_string(text.replace("C..B", "C.sB"))
@@ -70,7 +103,8 @@ func run() -> void:
 			root.add_child(level)
 			var piles: Array = level.entities["hazards"]
 			for pile in piles:
-				pile.advance(phase * (1.0 + piles.find(pile)))
+				for tick: int in range(roundi(phase * 60.0 * (1.0 + piles.find(pile)))):
+					pile.advance(1.0 / 60.0)
 			var runner := RouteRunner.new([
 				{"hold": ["move_right"], "until_hazard": piles[0].patrol.origin, "gap": 62, "max_seconds": 12},
 				{"hold": ["move_right", "jump"], "seconds": 0.45},

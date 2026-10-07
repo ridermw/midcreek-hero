@@ -4,7 +4,7 @@ const PlayerMotor = preload("res://game/player_motor.gd")
 const ACTIONS: Array[String] = [
 	"move_left", "move_right", "move_up", "move_down", "jump", "repair", "diagnose", "slide"
 ]
-# until_hazard prediction: piles within this range, for at most 8 s, with 4 px
+# until_hazard prediction: piles within this range of the hero or the target, for at most 8 s, with 4 px
 # of clearance, and 0.3 s of running after landing.
 const SIMULATION_RANGE := 640.0
 const SIMULATION_FRAMES := 480
@@ -156,7 +156,8 @@ static func jump_clear(level: Object, target: Node2D, gap: float) -> bool:
 	var speed: float = player.velocity.x
 	var piles: Array[Dictionary] = []
 	for hazard in level.entities["hazards"]:
-		if "patrol" in hazard and hazard.patrol != null and not hazard.has_method("beam_rect") and absf(hazard.position.x - x) < SIMULATION_RANGE:
+		var near: bool = absf(hazard.position.x - x) < SIMULATION_RANGE or absf(hazard.position.x - target.position.x) < SIMULATION_RANGE
+		if "patrol" in hazard and hazard.patrol != null and not hazard.has_method("beam_rect") and (near or hazard == target):
 			piles.append({"node": hazard, "x": hazard.position.x, "direction": hazard.patrol.direction})
 	var height := 0.0
 	var rise := 0.0

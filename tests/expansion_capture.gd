@@ -39,7 +39,11 @@ static func config(env: Dictionary) -> Dictionary:
 	var steps: Array = DEATH_STEPS.duplicate(true)
 	if mode != "death":
 		steps = JSON.parse_string(FileAccess.get_file_as_string("res://levels/routes/" + slug + ".route.json"))
-	return {"mode": mode, "slug": slug, "level_path": level_path, "steps": steps}
+	var at: Array[float] = []
+	for value: String in String(env.get("CAPTURE_AT", "")).split(",", false):
+		at.append(float(value))
+	at.sort()
+	return {"mode": mode, "slug": slug, "level_path": level_path, "steps": steps, "at": at}
 
 
 func run() -> void:
@@ -49,7 +53,7 @@ func run() -> void:
 		quit(1)
 		return
 	var env := {}
-	for key: String in ["CAPTURE_LEVEL", "CAPTURE_FIXTURE", "CAPTURE_MODE"]:
+	for key: String in ["CAPTURE_LEVEL", "CAPTURE_FIXTURE", "CAPTURE_MODE", "CAPTURE_AT"]:
 		if not OS.get_environment(key).is_empty():
 			env[key] = OS.get_environment(key)
 	var settings := config(env)
@@ -80,6 +84,7 @@ func run() -> void:
 			continue
 		var captured := -1
 		var partial_fire_captured := false
+		var positions: Array[float] = settings["at"].duplicate()
 		for frame: int in range(18000):
 			await physics_frame
 			if frame % 600 == 0:
@@ -90,6 +95,8 @@ func run() -> void:
 			if count != captured:
 				captured = count
 				capture_tag = "stage%d" % count
+			if capture_tag.is_empty() and not positions.is_empty() and level.player.position.x >= positions[0]:
+				capture_tag = "x%d" % int(positions.pop_front())
 			if capture_tag.is_empty() and not partial_fire_captured:
 				for station in level.entities["work"]:
 					if station.order.definition["type"] == "extinguish_fire" and station.order.unit.intensity <= 1.5 and station.order.unit.intensity > 0.0:
