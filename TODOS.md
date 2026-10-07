@@ -516,9 +516,18 @@ Decision 12A rejects deriving the new layers from existing far art.
   before any new layer. The 16.7 ms criterion needs a capable desktop
   measurement; this host can only show relative change.
 - Unblock steps: install a `mockui` build that supports `--model sunburst`,
-  `--background`, and `--strict-prompt`; add `shell` and `racks` to the
-  `--layer` choices, prompts, and layer rules in `tools/environment_assets.py`;
-  write the failing manifest tests; for each set run
+  `--background`, and `--strict-prompt`; add independent reference images at
+  `art/cel-shift/environment/layers/shell.png` and
+  `art/cel-shift/environment/layers/racks.png` so `render()` has real source
+  images for the new layers; do not derive those references from the existing
+  far art. Update `tools/environment_assets.py` to add `shell` and `racks` to
+  `LAYERS`, `LAYER_RULES`, `SETS`, `EXPANSION_SETS`, the render layer
+  validation, `normalized_size()`, `normalize_set()`, every normalize branch,
+  and `write_manifest()` so manifests publish ordered shell, far, racks, and
+  equipment layers with the approved 0.1, 0.2, 0.4, and 0.6 scroll factors and
+  2.0/2.0/1.0/1.0 world-px-per-texel scales. Write the failing manifest,
+  missing-art, export, and camera-extreme coverage tests first. For each set,
+  after the new references and normalization support exist, run
   `python tools/environment_assets.py render --set <set> --layer shell`, the
   same with `--layer racks`, then `python tools/environment_assets.py normalize
   --set <set>`; then run the probe for the third point on a capable desktop.
