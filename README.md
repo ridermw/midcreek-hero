@@ -314,7 +314,7 @@ fields produced by the image checker.
 | 1 | Cold Aisle Onboarding | Run, jump, repair | Patrolling cable piles, open floor tiles |
 | 2 | Hot Aisle | Fetch a PSU or DIMM, diagnose then repair | Heat vents (1.5 s off, 0.4 s warning, 1.0 s on) |
 | 3 | Cable Jungle | Slide under trays, ladders, wall jump, reseat a cable | Moving cable piles |
-| 4 | Power Room | Ride lifts, reboot a switch in order | Spark arcs (1.4 s off, 0.5 s flicker, 0.6 s on) |
+| 4 | Power Room | Ride 5 tile lifts, reboot a switch in order | Spark arcs (1.4 s off, 0.5 s flicker, 0.6 s on) |
 | 5 | Outage Night | Darkness with a flashlight, every task type, a row of 4 racks | Patrol drones with scanner beams (slide under them), all earlier hazards |
 
 Work order types: hold E to repair a red rack. For a fetch order, run over the
@@ -323,7 +323,8 @@ order, press Q at the rack with the amber marker, then hold E. To reseat a
 cable, press E at the port, then press each button the HUD shows within 1 s.
 To reboot a switch, press E at switch panels 1, 2, and 3 in that order; a wrong
 panel turns them all off. A spark sound marks each arc becoming active.
-Stand on a lift to ride it 3 tiles up. Slide under a low tray; the slide continues until there is room to stand. Press
+Stand on a lift to ride its 96 px platform 5 tiles up. It moves at 64 px/s
+and pauses 1.0 s at both landings. Slide under a low tray; the slide continues until there is room to stand. Press
 into a wall in the air to slow your fall, and jump to kick off it. A restart at a
 checkpoint undoes pickups, diagnoses, repairs, cable reseats, and switch throws
 made after that checkpoint.
@@ -409,8 +410,8 @@ human difficulty targets. Their current values remain unchanged:
 | 1 Cold Aisle Onboarding | 93.2 s | 120 s | 195 s |
 | 2 Hot Aisle | 95.7 s | 120 s | 195 s |
 | 3 Cable Jungle | 96.2 s | 125 s | 200 s |
-| 4 Power Room | 97.2 s | 125 s | 200 s |
-| 5 Outage Night | 99.9 s | 125 s | 170 s |
+| 4 Power Room | 109.2 s | 125 s | 200 s |
+| 5 Outage Night | 108.9 s | 125 s | 170 s |
 | 6 Cooling Gallery | 41.8 s | 210 s | 420 s |
 | 7 Operations Suite | 64.2 s | 210 s | 420 s |
 | 8 Fiber Exchange | 56.9 s | 210 s | 420 s |

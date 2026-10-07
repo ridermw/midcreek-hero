@@ -20,7 +20,7 @@ Each open item below has one acceptance criterion and names its pull request.
 | 1. Hero animation smoothness | Delivered in PR1 | PR1, `ridermw-hero-animation` |
 | 2. Additional environments and tasks | Delivered | #26 (`ec3da76`, merged as `b2353f3`) |
 | 3. Role of sliding | Decided: retained | October 5 request |
-| 4. Elevator geometry and restart states | Open | PR3, `ridermw-elevators` |
+| 4. Elevator geometry and restart states | Delivered in PR3 | PR3, `ridermw-elevators` |
 | 5. Background depth | Open | PR5, `ridermw-background-depth` |
 | 5a. Background scale | Open | PR4, `ridermw-background-scale` |
 | 6. Route timing contract | Delivered | Independent route timing increment |
@@ -415,6 +415,37 @@ gate passes for every checkpoint and both heroes after a death during a ride.
 **Depends on / blocked by:** Measured jump behavior, chosen landing pause
 duration, per level geometry, and the separate progress restore and motion reset
 methods. Task controlled elevators also depend on item 2.
+
+**Delivered (PR3):**
+- Runtime lifts now rise 5 tiles / 160 px, use a 96 by 16 px one way platform,
+  move at 64 px/s, and pause for 1.0 s at the lower and upper landings.
+  The full period is 7.0 s. `game/entities/lift.gd` is the runtime source of
+  truth for `RISE_TILES`; `game/level_validator.gd` reads that constant, and
+  `tools/levels/layout.py` has a parity test against it.
+- Level 04 and 05 lift decks are generated at row 7 (`stand - 5`) from
+  `tools/levels/level4.py`, `tools/levels/level5.py`, and
+  `tools/levels/layout.py`. The shipped `.level` and `.route.json` files were
+  regenerated, not hand edited.
+- `tests/elevator_test.gd` uses real physics for all six lift sites and both
+  heroes. Normal jumps, wall contact, and repeated wall contact cannot reach the
+  upper story without the lift. The same test covers boarding, riding, leaving
+  the top landing, falling mid ride, and death during a ride restoring the
+  checkpoint while the lift returns to the lower pause.
+- `tests/level_validator_test.gd` checks the 5 tile shaft, 96 px deck sweep,
+  standable upper landing, no checkpoints in shafts, and validator reachability
+  with each lift removed. `tests/power_room_test.gd` covers the new offset
+  timing and ride height.
+- Evidence: rendered Level 04 captures for both heroes at each lift ride are in
+  `docs/evidence/elevators/`. Route gates for levels 04 and 05 pass with zero
+  hits and zero added respawns. Current route times are 109.2 s for level 04 and
+  108.9 s for level 05, both under the unchanged 110 s budget.
+- CI route gate groups now run `01,02,03` and `04,05` separately so the 60 s
+  Godot test runner does not kill the longer elevator replay group.
+- Rejected alternatives: keeping the 96 px / 3 tile lift with ceiling caps was
+  rejected because it did not prove a real second story. Call controls were
+  rejected by the accepted plan. A generated movement solver and a second
+  physics engine were rejected; the validator stays approximate and real
+  physics tests cover bypass attempts.
 
 ## 5. Approve background depth and its asset contract
 
