@@ -25,15 +25,12 @@ func run() -> void:
 		check(bottom >= level.camera.limit_bottom, file + " distant artwork covers the lowest camera view.")
 		check(is_equal_approx(far.repeat_size.x, sprite.texture.get_width() * sprite.scale.x), file + " scaled artwork repeats without horizontal gaps.")
 		var equipment := level.get_node("World/Equipment").get_child(0) as Sprite2D
-		if int(file.substr(0, 2)) <= 5:
-			check(equipment.scale == Vector2.ONE, file + " original foreground racks retain their authored scale.")
-		else:
-			check(equipment.texture.get_size() == Vector2(320, 180) and equipment.scale == Vector2(2, 2), file + " compact foreground keeps a 640 by 360 world footprint.")
+		check(equipment.scale == Vector2.ONE, file + " foreground equipment uses 1 world px per texel.")
 		level.queue_free()
 		await process_frame
 	var fixture := "user://expansion-background.level"
 	var file := FileAccess.open(fixture, FileAccess.WRITE)
-	file.store_string(FileAccess.get_file_as_string("res://levels/01-cold-aisle.level").replace('"cold-aisle"', '"cooling-gallery"'))
+	file.store_string(FileAccess.get_file_as_string("res://levels/06-cooling-gallery.level").replace('"cooling-gallery"', '"operations-suite"'))
 	file.close()
 	var expansion := LEVEL_SCENE.instantiate()
 	expansion.level_path = fixture
@@ -41,7 +38,7 @@ func run() -> void:
 	check(expansion.error_message.is_empty(), "A new environment loads through its ordered manifest.")
 	if expansion.error_message.is_empty():
 		var equipment := expansion.get_node("World/Equipment").get_child(0) as Sprite2D
-		check(equipment.texture.get_size() == Vector2(320, 180) and equipment.scale == Vector2(2, 2), "Compact art retains the intended world size.")
+		check(equipment.texture.get_size() == Vector2(320, 180) and equipment.scale == Vector2.ONE, "Compact art uses one world pixel per texel.")
 	expansion.queue_free()
 	await process_frame
 	DirAccess.remove_absolute(fixture)

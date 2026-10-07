@@ -15,10 +15,14 @@ else:
 ROOT = Path(__file__).resolve().parents[1]
 ART = ROOT / "art/cel-shift/environment"
 LAYERS = {
-    "far": ((1280, 720), (640, 360)),
+    "far": ((1280, 720), (640, 224)),
     "equipment": ((1280, 720), (640, 360)),
     "floor": ((1536, 512), (640, 96)),
 }
+FAR_WORLD_PX_PER_TEXEL = 2.0
+EQUIPMENT_WORLD_PX_PER_TEXEL = 1.0
+TILE = 32
+COLD_AISLE = "cold-aisle"
 STYLE = (
     "Strict side-on orthographic elevation, NOT isometric, for a pixel art data center "
     "side scroller. Horizontal seams must match perfectly at the left and right edges for "
@@ -131,12 +135,57 @@ def render(name, layer, art=ART):
     sidecar.write_text(json.dumps(data, indent=2) + "\n")
 
 
+def campaign_background_heights():
+    heights = {}
+    for path in sorted((ROOT / "levels").glob("[0-9][0-9]-*.level")):
+        if path.name.startswith("00-"):
+            continue
+        header_text, grid_text = path.read_text().replace("\r\n", "\n").split("\n---\n", 1)
+        name = json.loads(header_text)["background"]
+        height = len([row for row in grid_text.splitlines() if row]) * TILE
+        previous = heights.setdefault(name, height)
+        if previous != height:
+            raise ValueError(f"{name}: shared background levels have different heights: {previous} and {height}")
+    return heights
+
+
+def normalized_size(layer, name=None):
+    if layer == "far":
+        key = COLD_AISLE if name is None else name
+        height = campaign_background_heights()[key]
+        return (640, int(height / FAR_WORLD_PX_PER_TEXEL))
+    if layer == "equipment" and name in EXPANSION_SETS:
+        return (320, 180)
+    return LAYERS[layer][1]
+
+
+def layer_texture_path(name, layer):
+    if name is None:
+        return f"res://art/cel-shift/environment/layers/{layer}.png"
+    return f"res://art/cel-shift/environment/{name}/{layer}.png"
+
+
+def write_manifest(name, art=ART):
+    target = art / COLD_AISLE / "manifest.json" if name is None else art / name / "manifest.json"
+    layers = []
+    for layer, scroll, tint, scale in [
+        ("far", 0.2, [0.42, 0.47, 0.56], FAR_WORLD_PX_PER_TEXEL),
+        ("equipment", 0.6, [0.55, 0.6, 0.68], EQUIPMENT_WORLD_PX_PER_TEXEL),
+    ]:
+        layers.append({
+            "name": layer.capitalize(),
+            "texture": layer_texture_path(name, layer),
+            "scroll": scroll, "tint": tint, "coverage": "native", "scale": scale,
+        })
+    target.parent.mkdir(parents=True, exist_ok=True)
+    target.write_text(json.dumps({"version": 1, "layers": layers}, indent=2) + "\n", newline="\n")
+
+
 def normalize(layer, art=ART, name=None):
-    source_size, output_size = LAYERS[layer]
+    source_size = LAYERS[layer][0]
+    output_size_for = normalized_size(layer, name)
     if name is not None:
         source_size = SOURCE_SIZE
-    if name in EXPANSION_SETS:
-        output_size = (320, 180)
     base = art / name if name else art
     source = base / "generated" / f"{layer}.png"
     with Image.open(source) as image:
@@ -149,7 +198,7 @@ def normalize(layer, art=ART, name=None):
             raise ValueError(f"{source}: equipment requires transparent and visible pixels")
     elif alpha_range != (255, 255):
         raise ValueError(f"{source}: {layer} must be opaque")
-    result = result.resize(output_size, Image.Resampling.NEAREST)
+    result = result.resize(output_size_for, Image.Resampling.NEAREST)
     if layer == "equipment":
         alpha = result.getchannel("A").point(lambda value: 255 if value >= 128 else 0)
         if alpha.getextrema() != (0, 255):
@@ -164,7 +213,7 @@ def normalize(layer, art=ART, name=None):
     output = (art / name / f"{layer}.png") if name else (art / "layers" / f"{layer}.png")
     output.parent.mkdir(parents=True, exist_ok=True)
     result.save(output)
-    print(f"Normalized {layer}: {output_size[0]}x{output_size[1]}")
+    print(f"Normalized {layer}: {output_size_for[0]}x{output_size_for[1]}")
 
 
 def normalize_set(name, art=ART):
@@ -187,19 +236,7 @@ def normalize_set(name, art=ART):
         output.putalpha(alpha)
         output.paste((0, 0, 0, 0), mask=alpha.point(lambda value: 255 if value == 0 else 0))
         output.save(path)
-    layers = []
-    for layer, scroll, tint, coverage in [
-        ("far", 0.2, [0.42, 0.47, 0.56], "level"),
-        ("equipment", 0.6, [0.55, 0.6, 0.68], "native"),
-    ]:
-        layers.append({
-            "name": layer.capitalize(),
-            "texture": f"res://art/cel-shift/environment/{name}/{layer}.png",
-            "scroll": scroll, "tint": tint, "coverage": coverage, "scale": 2,
-        })
-    (art / name / "manifest.json").write_text(
-        json.dumps({"version": 1, "layers": layers}, indent=2) + "\n"
-    )
+    write_manifest(name, art)
 
 
 def main():
@@ -213,12 +250,19 @@ def main():
             parser.error("render needs --set and --layer far or equipment")
         render(args.name, args.layer)
         return
-    if args.name in EXPANSION_SETS and args.layer is None:
-        normalize_set(args.name)
+    if args.name and args.layer is None:
+        if args.name in EXPANSION_SETS:
+            normalize_set(args.name)
+        else:
+            for layer in ("far", "equipment"):
+                normalize(layer, ART, args.name)
+            write_manifest(args.name)
         return
     layers = (args.layer,) if args.layer else (("far", "equipment") if args.name else LAYERS)
     for layer in layers:
         normalize(layer, ART, args.name)
+    if args.layer in (None, "far", "equipment"):
+        write_manifest(args.name)
 
 
 if __name__ == "__main__":

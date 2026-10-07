@@ -21,8 +21,8 @@ Each open item below has one acceptance criterion and names its pull request.
 | 2. Additional environments and tasks | Delivered | #26 (`ec3da76`, merged as `b2353f3`) |
 | 3. Role of sliding | Decided: retained | October 5 request |
 | 4. Elevator geometry and restart states | Delivered in PR3 | PR3, `ridermw-elevators` |
-| 5. Background depth | Open | PR5, `ridermw-background-depth` |
-| 5a. Background scale | Open | PR4, `ridermw-background-scale` |
+| 5. Background depth | Blocked on art generator (12A) | PR5, `ridermw-background-depth` |
+| 5a. Background scale | Blocked on art generator (draft PR4) | PR4, `ridermw-background-scale` |
 | 6. Route timing contract | Delivered | Independent route timing increment |
 | Cable pile movement, drone sliding | Delivered in PR2 | PR2, `ridermw-hazards` |
 | Difficulty and device evidence | Requires owner | See "Requires owner" |
@@ -486,8 +486,10 @@ using size as an acceptance gate.
 
 **Depends on / blocked by:** A rendered performance baseline and animation
 diagnosis from item 1; user approval of composition; final camera bounds from
-item 4; actual device evidence from item 6. Do not infer real phone performance
-from emulation.
+item 4; actual device evidence from item 6. The required MockUI generator is
+blocked by decision 12A on this device; item 5 depth cannot add shell or racks
+art until a `mockui` build supports `--model sunburst`, `--background`, and
+`--strict-prompt`. Do not infer real phone performance from emulation.
 
 **Acceptance criterion (PR5):** Every environment manifest declares ordered
 shell, far, racks, and equipment layers with existing art, and the desktop
@@ -497,14 +499,36 @@ Composition approval stays with the owner.
 ## 5a. Correct background object scale
 
 - [ ] **What:** Make background objects match the hero scale. Level 07 shows
-  a desk at about 1.2 times hero height.
+  a desk at about 1.2 times hero height. Draft PR4 delivers the contract,
+  measurement, and allowed re-normalization work. New compositions are blocked.
 
 **Why:** Equipment layers fill the full view height without a hero scale rule,
 and layer texels are up to 8.5 times the hero texel size.
 
 **Context:** `tools/environment_assets.py`, `game/background_set.gd`,
-`tests/background_manifest_test.gd`, and the reference capture
-`docs/evidence/campaign-expansion/07-man-native.png`.
+`tests/background_manifest_test.gd`, and the reference captures in
+`docs/evidence/background/`.
+
+**Delivered in draft PR4:** Far and shell layers must use 2.0 world px per
+texel. Equipment and racks layers must use 1.0 world px per texel. Far textures
+are normalized to exactly half the campaign level height; load fails with the
+texture path if the scaled height does not match. The old computed `coverage:
+level` scale is rejected. The native performance probe records baseline and
+after-scale JSON for levels 1, 9, and 14. Paired Level 07 captures are
+`07-{man,woman}-before-native.png` and `07-{man,woman}-after-native.png`. The
+existing composition is unchanged; only texel normalization changed.
+
+**Blocked:** All 15 equipment sets still exceed the 92 world px floor-connected
+height limit. `HEIGHT_KNOWN_GAPS` lists each set as a strict temporary gap with
+reason `art generator unavailable (12A)`. If any listed set passes, the test
+fails so the entry must be removed.
+
+**Unblock action:** Install a MockUI build that supports `--model sunburst`,
+`--background`, and `--strict-prompt`. Then run `python tools/environment_assets.py
+render --set <set> --layer far` and `python tools/environment_assets.py render
+--set <set> --layer equipment` for each set, followed by `python
+tools/environment_assets.py normalize --set <set>`. Remove passing sets from
+`HEIGHT_KNOWN_GAPS`, recapture Level 07, and get owner approval of composition.
 
 **Acceptance criterion (PR4):** In equipment layers, opaque regions connected
 to the floor band are at most 92 world px tall, every layer has an integer texel
@@ -635,6 +659,19 @@ It now shows both are hit, and `InputEventKey`, `InputEventJoypadButton`, and
 
 These items need people or physical devices. Agents supply captures and
 procedures but cannot close them.
+
+### Background composition approval
+
+**What:** Approve the regenerated background composition and object scale.
+**Why:** Draft PR4 changes texel normalization but cannot make new desks, chairs,
+racks, or depth layers while the generator is unavailable. Owner review must
+confirm the final composition after regeneration.
+**Context:** Compare `docs/evidence/background/07-man-before-native.png`,
+`07-man-after-native.png`, `07-woman-before-native.png`, and
+`07-woman-after-native.png`. Use the 92 world px floor-connected height test as
+the automated contract, not as visual approval.
+**Depends on:** A MockUI build with `--model sunburst`, `--background`, and
+`--strict-prompt`, followed by environment render and normalize for every set.
 
 ### Physical phone performance
 
