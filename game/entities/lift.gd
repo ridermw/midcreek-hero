@@ -56,6 +56,8 @@ func reset_motion() -> void:
 
 func _draw() -> void:
 	if art != null and art.has("tiles", "lift"):
-		draw_texture_rect(art.texture("tiles", "lift"), Rect2(-SIZE.x / 2.0, 0, SIZE.x, SIZE.y), false)
+		var texture = art.texture("tiles", "lift")
+		draw_texture(texture, Vector2(-SIZE.x / 2.0, 0))
+		draw_texture_rect_region(texture, Rect2(16, 0, 32, SIZE.y), Rect2(0, 0, 32, SIZE.y))
 	else:
 		draw_rect(Rect2(-SIZE.x / 2.0, 0, SIZE.x, SIZE.y), Color(0.85, 0.7, 0.15))

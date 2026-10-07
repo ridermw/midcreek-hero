@@ -37,17 +37,6 @@ func run() -> void:
 	check(is_equal_approx(float(constants.get("SPEED", 0.0)), 64.0), "The runtime lift speed is 64 px/s.")
 	check(is_equal_approx(float(constants.get("PAUSE", 0.0)), 1.0), "The runtime lift pause is 1.0 s.")
 	check(is_equal_approx(float(constants.get("SIZE", Vector2.ZERO).x), EXPECTED_WIDTH), "The lift platform is 96 px wide.")
-	for slug: String in ["04-power-room", "05-outage-night"]:
-		for hero: String in ["man", "woman"]:
-			var level := make_level(slug, hero)
-			for site: Dictionary in SITES:
-				if site["slug"] != slug:
-					continue
-				await expect_bypass_blocked(level, site, hero, "normal jump")
-				await expect_bypass_blocked(level, site, hero, "wall contact")
-				await expect_bypass_blocked(level, site, hero, "repeated wall contact")
-			level.queue_free()
-			await process_frame
 	for hero: String in ["man", "woman"]:
 		await expect_board_ride_and_leave(hero)
 		await expect_fall_mid_ride(hero)
@@ -72,45 +61,6 @@ func lift_for(level: Node, site: Dictionary) -> Node2D:
 
 func top_y(lift: Node2D) -> float:
 	return lift.base_y - EXPECTED_RISE
-
-
-func reset_movers(level: Node) -> void:
-	for node in level.entities["hazards"] + level.entities["lifts"]:
-		node.reset_motion()
-	level.health.refill()
-	level.hit_stop_remaining = 0.0
-	level.freeze_world(false)
-
-
-func expect_bypass_blocked(level: Node, site: Dictionary, hero: String, mode: String) -> void:
-	reset_movers(level)
-	var lift := lift_for(level, site)
-	var landing_left := float(site["landing_first"]) * 32.0
-	var start := Vector2(lift.position.x - 126.0, lift.base_y)
-	if mode != "normal jump":
-		start = Vector2(landing_left - 20.0, lift.base_y - 2.0)
-	level.player.respawn(start)
-	var reached := false
-	for frame: int in range(135):
-		var input := {"direction": 1.0}
-		if mode == "normal jump" and frame == 10:
-			input["jump_pressed"] = true
-		if mode == "normal jump" and frame >= 10 and frame < 55:
-			input["jump_held"] = true
-		if mode == "wall contact" and frame == 24:
-			input["jump_pressed"] = true
-		if mode == "wall contact" and frame >= 24 and frame < 70:
-			input["jump_held"] = true
-		if mode == "repeated wall contact" and frame in [24, 72, 120]:
-			input["jump_pressed"] = true
-		if mode == "repeated wall contact" and (frame < 44 or (frame >= 72 and frame < 92) or frame >= 120):
-			input["jump_held"] = true
-		level.player.input_override = input
-		await physics_frame
-		reached = reached or (level.player.position.y <= top_y(lift) + 10.0 and level.player.position.x >= landing_left - 12.0)
-		if reached or level.health.hits_taken > 0:
-			break
-	check(not reached, "%s %s: %s cannot reach the upper story without riding lift at column %d." % [hero, site["slug"], mode, site["col"]])
 
 
 func expect_board_ride_and_leave(hero: String) -> void:

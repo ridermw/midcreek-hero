@@ -426,10 +426,16 @@ methods. Task controlled elevators also depend on item 2.
   `tools/levels/level4.py`, `tools/levels/level5.py`, and
   `tools/levels/layout.py`. The shipped `.level` and `.route.json` files were
   regenerated, not hand edited.
-- `tests/elevator_test.gd` uses real physics for all six lift sites and both
-  heroes. Normal jumps, wall contact, and repeated wall contact cannot reach the
-  upper story without the lift. The same test covers boarding, riding, leaving
-  the top landing, falling mid ride, and death during a ride restoring the
+- `tests/elevator_bypass_test.gd` removes lift collision during bypass trials.
+  For all six lift sites and both heroes, normal jumps leave the floor and are
+  observed through landing or 1.5 s without standing on the deck. Wall jump
+  trials assert wall contact before each jump press and assert that the press
+  produces an upward kick away from the deck face. Repeated wall-contact trials
+  repeat that asserted kick several times. Nearby-platform trials discover every
+  authored standable non-lift cell within 6 columns of the deck's left edge,
+  start a run-and-jump trial from each one, and assert the hero never stands on
+  the deck top. `tests/elevator_test.gd` covers boarding, riding, leaving the
+  top landing, falling mid ride, and death during a ride restoring the
   checkpoint while the lift returns to the lower pause.
 - `tests/level_validator_test.gd` checks the 5 tile shaft, 96 px deck sweep,
   standable upper landing, no checkpoints in shafts, and validator reachability
