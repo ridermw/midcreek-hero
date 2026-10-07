@@ -84,6 +84,28 @@ class AnimationAnchorsTest(unittest.TestCase):
         self.assertEqual(changes[1]["causes"], ["playback timing"])
         self.assertEqual(changes[1]["ticks"], 7)
 
+    def test_forward_loop_wrap_counts_as_one_frame_advance(self):
+        anchors = {("man-midcreek", "run", i): animation_anchors.frame_anchors(figure()) for i in (0, 6, 7)}
+        trace = [
+            sample("man-run", "run", 6, 0),
+            sample("man-run", "run", 7, 4),
+            sample("man-run", "run", 0, 8),
+        ]
+        changes = animation_anchors.analyze(trace, anchors, {"run": 14})["man-run"]["changes"]
+        self.assertEqual(changes[1]["kind"], "loop")
+        self.assertEqual(changes[1]["causes"], [])
+
+    def test_reverse_loop_wrap_counts_as_one_frame_advance(self):
+        anchors = {("man-midcreek", "climb", i): animation_anchors.frame_anchors(figure()) for i in (0, 1, 5)}
+        trace = [
+            sample("man-climb", "climb", 1, 0, playback_speed=-1.0),
+            sample("man-climb", "climb", 0, 8, playback_speed=-1.0),
+            sample("man-climb", "climb", 5, 16, playback_speed=-1.0),
+        ]
+        changes = animation_anchors.analyze(trace, anchors, {"climb": 8})["man-climb"]["changes"]
+        self.assertEqual(changes[1]["kind"], "frame")
+        self.assertEqual(changes[1]["causes"], [])
+
     def test_camera_that_does_not_follow_physics_is_render_timing(self):
         anchors = {("man-midcreek", "run", i): animation_anchors.frame_anchors(figure()) for i in range(2)}
         trace = [sample("man-run", "run", 0, 0, x=0.0), sample("man-run", "run", 1, 4, x=12.0)]
@@ -99,6 +121,15 @@ class AnimationAnchorsTest(unittest.TestCase):
         trace = [sample("man-run", "run", 0, 0, flip=True), sample("man-run", "run", 1, 4, x=-12.0, flip=True)]
         change = animation_anchors.analyze(trace, anchors, {"run": 14})["man-run"]["changes"][0]
         self.assertEqual(change["helmet_world"], -4.5)
+
+    def test_facing_changes_apply_each_sample_flip_to_world_anchors(self):
+        anchors = {
+            ("man-midcreek", "idle", 0): animation_anchors.frame_anchors(figure(hat_shift=6)),
+            ("man-midcreek", "run", 0): animation_anchors.frame_anchors(figure(hat_shift=6)),
+        }
+        trace = [sample("man-turn", "idle", 0, 0), sample("man-turn", "run", 0, 4, flip=True)]
+        change = animation_anchors.analyze(trace, anchors, {"idle": 6, "run": 14})["man-turn"]["changes"][0]
+        self.assertEqual(change["helmet_world"], -6.0)
 
     def test_planted_upper_body_lean_over_fixed_boots_is_an_authored_pose(self):
         lean = figure()

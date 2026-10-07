@@ -103,14 +103,39 @@ def classify(before, after, kind, playback_timing, camera_error, clip, previous_
 
 
 def _animation_frame_progress(samples, clip, fps):
-    progress = 0.0
+    signed = 0.0
+    total = 0.0
     for before, after in zip(samples, samples[1:]):
         if before["clip"] != clip or after["clip"] != clip:
             continue
         ticks = max(0, after["physics_frame"] - before["physics_frame"])
-        speed = abs(before.get("playback_speed", 1.0) or 0.0)
-        progress += speed * fps * ticks / 60.0
-    return progress
+        speed = before.get("playback_speed", 1.0) or 0.0
+        signed += speed * fps * ticks / 60.0
+        total += abs(speed) * fps * ticks / 60.0
+    return signed, total
+
+
+def _frame_count(anchors, variant, clip):
+    return max(frame for (anchor_variant, anchor_clip, frame) in anchors
+               if anchor_variant == variant and anchor_clip == clip) + 1
+
+
+def _frame_steps(before, after, count, signed_progress):
+    if count <= 1:
+        return max(1, abs(after - before))
+    if signed_progress < 0:
+        steps = (before - after) % count
+    else:
+        steps = (after - before) % count
+    return max(1, steps)
+
+
+def _world_anchor_delta(before_x, after_x, previous_flip, current_flip):
+    before_sign = -1 if previous_flip else 1
+    after_sign = -1 if current_flip else 1
+    before_world = (before_x - PIVOT_X) * WORLD_PER_TEXEL * before_sign
+    after_world = (after_x - PIVOT_X) * WORLD_PER_TEXEL * after_sign
+    return after_world - before_world
 
 
 def analyze(samples, anchors, fps):
@@ -139,12 +164,13 @@ def analyze(samples, anchors, fps):
             playback_timing = False
             if last_change is not None and last_change["clip"] == current["clip"] and kind != "transition":
                 ticks = current["physics_frame"] - last_change["physics_frame"]
-                frame_steps = max(1, abs(current["frame"] - last_change["frame"]))
-                playback_frames = _animation_frame_progress(items[last_change_index:index + 1], current["clip"], fps[current["clip"]])
+                signed_progress, playback_frames = _animation_frame_progress(
+                    items[last_change_index:index + 1], current["clip"], fps[current["clip"]])
+                frame_steps = _frame_steps(last_change["frame"], current["frame"],
+                                           _frame_count(anchors, variant, current["clip"]), signed_progress)
                 playback_timing = abs(playback_frames - frame_steps) > fps[current["clip"]] * TIMING_TICKS / 60.0
             dx = current["position"][0] - previous["position"][0]
             camera_dx = current["camera"][0] - previous["camera"][0]
-            sign = -1 if current.get("flip") else 1
             helmet = after["helmet_x"] - before["helmet_x"]
             reach = after["reach_x"] - before["reach_x"]
             changes.append({
@@ -158,8 +184,10 @@ def analyze(samples, anchors, fps):
                 "torso_texels": round(after["torso_x"] - before["torso_x"], 2),
                 "boot_texels": after["boot_x"] - before["boot_x"],
                 "reach_texels": reach,
-                "helmet_world": helmet * WORLD_PER_TEXEL * sign,
-                "reach_world": reach * WORLD_PER_TEXEL * sign,
+                "helmet_world": _world_anchor_delta(before["helmet_x"], after["helmet_x"],
+                                                    previous.get("flip"), current.get("flip")),
+                "reach_world": _world_anchor_delta(before["reach_x"], after["reach_x"],
+                                                   previous.get("flip"), current.get("flip")),
                 "causes": classify(before, after, kind, playback_timing, abs(camera_dx - dx), current["clip"], previous["clip"]),
             })
             last_change = current

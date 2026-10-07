@@ -190,9 +190,7 @@
     "reach_texels": -14,
     "helmet_world": 0.0,
     "reach_world": -7.0,
-    "causes": [
-     "playback timing"
-    ]
+    "causes": []
    },
    {
     "kind": "frame",
@@ -360,12 +358,10 @@
     "reach_texels": -14,
     "helmet_world": 0.0,
     "reach_world": -7.0,
-    "causes": [
-     "playback timing"
-    ]
+    "causes": []
    }
   ],
-  "unexplained": 2,
+  "unexplained": 0,
   "max_helmet_texels": 0
  },
  "man-idle-run": {
@@ -645,9 +641,7 @@
     "reach_texels": -14,
     "helmet_world": 0.0,
     "reach_world": -7.0,
-    "causes": [
-     "playback timing"
-    ]
+    "causes": []
    },
    {
     "kind": "frame",
@@ -797,7 +791,7 @@
     "causes": []
    }
   ],
-  "unexplained": 1,
+  "unexplained": 0,
   "max_helmet_texels": 0
  },
  "man-run-idle": {
@@ -926,9 +920,7 @@
     "reach_texels": -14,
     "helmet_world": 0.0,
     "reach_world": -7.0,
-    "causes": [
-     "playback timing"
-    ]
+    "causes": []
    },
    {
     "kind": "transition",
@@ -1100,13 +1092,11 @@
     "reach_texels": 0,
     "helmet_world": 0.5,
     "reach_world": 0.0,
-    "causes": [
-     "playback timing"
-    ]
+    "causes": []
    }
   ],
-  "unexplained": 2,
-  "max_helmet_texels": 1
+  "unexplained": 0,
+  "max_helmet_texels": 0
  },
  "man-idle-diagnose": {
   "changes": [
@@ -1376,9 +1366,7 @@
     "reach_texels": 0,
     "helmet_world": -0.5,
     "reach_world": 0.0,
-    "causes": [
-     "playback timing"
-    ]
+    "causes": []
    },
    {
     "kind": "transition",
@@ -1446,8 +1434,8 @@
     "causes": []
    }
   ],
-  "unexplained": 1,
-  "max_helmet_texels": 1
+  "unexplained": 0,
+  "max_helmet_texels": 0
  },
  "man-diagnose-idle": {
   "changes": [
@@ -1629,9 +1617,7 @@
     "reach_texels": 0,
     "helmet_world": -0.5,
     "reach_world": 0.0,
-    "causes": [
-     "playback timing"
-    ]
+    "causes": []
    },
    {
     "kind": "transition",
@@ -1764,8 +1750,8 @@
     "causes": []
    }
   ],
-  "unexplained": 1,
-  "max_helmet_texels": 1
+  "unexplained": 0,
+  "max_helmet_texels": 0
  },
  "woman-run": {
   "changes": [
@@ -1958,9 +1944,7 @@
     "reach_texels": -7,
     "helmet_world": 0.0,
     "reach_world": -3.5,
-    "causes": [
-     "playback timing"
-    ]
+    "causes": []
    },
    {
     "kind": "frame",
@@ -2128,12 +2112,10 @@
     "reach_texels": -7,
     "helmet_world": 0.0,
     "reach_world": -3.5,
-    "causes": [
-     "playback timing"
-    ]
+    "causes": []
    }
   ],
-  "unexplained": 2,
+  "unexplained": 0,
   "max_helmet_texels": 0
  },
  "woman-idle-run": {
@@ -2413,9 +2395,7 @@
     "reach_texels": -7,
     "helmet_world": 0.0,
     "reach_world": -3.5,
-    "causes": [
-     "playback timing"
-    ]
+    "causes": []
    },
    {
     "kind": "frame",
@@ -2565,7 +2545,7 @@
     "causes": []
    }
   ],
-  "unexplained": 1,
+  "unexplained": 0,
   "max_helmet_texels": 0
  },
  "woman-run-idle": {
@@ -2694,9 +2674,7 @@
     "reach_texels": -7,
     "helmet_world": 0.0,
     "reach_world": -3.5,
-    "causes": [
-     "playback timing"
-    ]
+    "causes": []
    },
    {
     "kind": "transition",
@@ -2868,12 +2846,10 @@
     "reach_texels": 0,
     "helmet_world": 0.0,
     "reach_world": 0.0,
-    "causes": [
-     "playback timing"
-    ]
+    "causes": []
    }
   ],
-  "unexplained": 2,
+  "unexplained": 0,
   "max_helmet_texels": 0
  },
  "woman-idle-diagnose": {
@@ -3144,9 +3120,7 @@
     "reach_texels": 0,
     "helmet_world": -1.0,
     "reach_world": 0.0,
-    "causes": [
-     "playback timing"
-    ]
+    "causes": []
    },
    {
     "kind": "transition",
@@ -3212,8 +3186,8 @@
     "causes": []
    }
   ],
-  "unexplained": 1,
-  "max_helmet_texels": 2
+  "unexplained": 0,
+  "max_helmet_texels": 0
  },
  "woman-diagnose-idle": {
   "changes": [
@@ -3395,9 +3369,7 @@
     "reach_texels": 0,
     "helmet_world": -1.0,
     "reach_world": 0.0,
-    "causes": [
-     "playback timing"
-    ]
+    "causes": []
    },
    {
     "kind": "transition",
@@ -3528,7 +3500,7 @@
     "causes": []
    }
   ],
-  "unexplained": 1,
-  "max_helmet_texels": 2
+  "unexplained": 0,
+  "max_helmet_texels": 0
  }
 }
