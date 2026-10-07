@@ -45,16 +45,7 @@ func run() -> void:
 		await process_frame
 	var payload := {
 		"schema": "midcreek-background-perf-v1",
-		"method": {
-			"renderer": "native rendered Godot",
-			"viewport": [VIEWPORT_SIZE.x, VIEWPORT_SIZE.y],
-			"fixed_fps": 60,
-			"warmup_frames": WARMUP_FRAMES,
-			"sample_frames": SAMPLE_FRAMES,
-			"levels": LEVELS,
-			"host_note": "This host renders real time at about 33 Hz, so measurements are host-specific desktop evidence.",
-			"browser_note": "Exported desktop browser measurement is blocked on this host because headless Edge uses software rendering too slow to measure.",
-		},
+		"method": method_metadata(),
 		"results": results,
 	}
 	var file := FileAccess.open(output, FileAccess.WRITE)
@@ -65,6 +56,17 @@ func run() -> void:
 	file.store_string(JSON.stringify(payload, "\t") + "\n")
 	print("BACKGROUND_PERF_PROBE_COMPLETE: %d levels, 0 failures" % results.size())
 	quit(0)
+
+
+static func method_metadata() -> Dictionary:
+	return {
+		"renderer": "native rendered Godot",
+		"viewport": [VIEWPORT_SIZE.x, VIEWPORT_SIZE.y],
+		"fixed_fps": 60,
+		"warmup_frames": WARMUP_FRAMES,
+		"sample_frames": SAMPLE_FRAMES,
+		"levels": LEVELS,
+	}
 
 
 func measure_level(slug: String, level: Node) -> Dictionary:

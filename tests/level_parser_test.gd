@@ -177,6 +177,13 @@ func run() -> void:
 	expect_error(level_text(gpu_header, VALID_GRID), "Fetch task 'f1' part must be psu or dimm.")
 	expect_error(level_text(header_with("darkness", "false"), VALID_GRID), "Header key 'darkness' must be true or false.")
 	check(not parser.parse(level_text(header_with("darkness", false), VALID_GRID), "d.level").is_empty(), "darkness false parses.")
+	var default_validation := parser.parse(level_text(VALID_HEADER, VALID_GRID), "default-validation.level")
+	check(not default_validation.is_empty() and default_validation["validate_background_size"] == false, "validate_background_size defaults to false.")
+	for enabled: bool in [false, true]:
+		var validation_level := parser.parse(level_text(header_with("validate_background_size", enabled), VALID_GRID), "validation.level")
+		check(not validation_level.is_empty() and validation_level["validate_background_size"] == enabled, "validate_background_size boolean parses: " + str(enabled))
+	for invalid_validation: Variant in ["true", 1, null, [], {}]:
+		expect_error(level_text(header_with("validate_background_size", invalid_validation), VALID_GRID), "Header key 'validate_background_size' must be true or false.")
 	print("LEVEL_PARSER_TEST_COMPLETE: %d checks, %d failures" % [checks, failures])
 	quit(1 if failures else 0)
 
