@@ -516,23 +516,30 @@ part of the authored poses. This corrects sideways stance drift, not every
 possible pose discontinuity.
 The lower band must contain only the planted boots. The woman's individual
 boots still vary by up to 3 texture pixels within that centered stance.
-Idle and diagnosis transitions use their existing anchors and remain outside
-this registration correction. Preview sheets now match the published frames;
+Idle and diagnosis now use the same planted boot registration as repair, and
+the run cycle holds its helmet at texture column 116. Run
+`python3 -m tools.animation_assets register` to reapply these integer
+translations to published frames. Preview sheets now match the published frames;
 older previews used a different palette.
 
-To reproduce walking, running, repair, ascent, descent, and a climb stop and
-reversal for both heroes in Level 3, then
+To reproduce walking, running, repair, ascent, descent, a climb stop and
+reversal, and idle, run, and diagnosis transitions for both heroes, then
 capture both repair help demonstrations:
 
 ```sh
 mkdir -p /tmp/midcreek-motion
 godot --path . --script tests/animation_probe.gd -- --output=/tmp/midcreek-motion
+python3 -m tools.animation_anchors /tmp/midcreek-motion/native-trace.json /tmp/midcreek-motion/report.json
 ```
 
-The probe uses repeatable input and writes frame, physics, camera, and timing
-samples to `native-trace.json`. It also writes two help screenshots. Use a
-separate run with `--write-movie /tmp/midcreek-motion/actions.avi --fixed-fps 60`
-before `--` to record all twelve action cases and the help demonstrations.
+The probe uses repeatable input and writes frame, facing, physics, camera, and
+timing samples to `native-trace.json`. It also writes two help screenshots.
+`--actions=run,idle-run` limits the cases and `--skip-help` skips the help
+screenshots. The anchor report classifies each frame change as source
+registration, authored pose, playback timing, or camera and render timing.
+Add `--fixed-fps 60` before `--` to remove host render rate effects.
+Use a separate run with `--write-movie /tmp/midcreek-motion/actions.avi --fixed-fps 60`
+before `--` to record the action cases and the help demonstrations.
 Movie mode fixes the simulation rate; do not use its timing as a device
 performance measurement. The probe does not change saved progress.
 

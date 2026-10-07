@@ -1,0 +1,3102 @@
+{
+ "man-run": {
+  "changes": [
+   {
+    "kind": "transition",
+    "from": [
+     "walk",
+     0
+    ],
+    "to": [
+     "run",
+     0
+    ],
+    "physics_frame": 19,
+    "ticks": null,
+    "physics_dx": 2.333,
+    "helmet_texels": 7,
+    "torso_texels": 1.75,
+    "boot_texels": -2.5,
+    "helmet_world": 3.5,
+    "cause": "authored pose"
+   },
+   {
+    "kind": "frame",
+    "from": [
+     "run",
+     0
+    ],
+    "to": [
+     "run",
+     1
+    ],
+    "physics_frame": 24,
+    "ticks": 5,
+    "physics_dx": 3.0,
+    "helmet_texels": 0,
+    "torso_texels": 0.55,
+    "boot_texels": -9.0,
+    "helmet_world": 0.0,
+    "cause": "none"
+   },
+   {
+    "kind": "frame",
+    "from": [
+     "run",
+     1
+    ],
+    "to": [
+     "run",
+     2
+    ],
+    "physics_frame": 28,
+    "ticks": 4,
+    "physics_dx": 3.0,
+    "helmet_texels": 0,
+    "torso_texels": -2.03,
+    "boot_texels": -6.5,
+    "helmet_world": 0.0,
+    "cause": "none"
+   },
+   {
+    "kind": "frame",
+    "from": [
+     "run",
+     2
+    ],
+    "to": [
+     "run",
+     3
+    ],
+    "physics_frame": 32,
+    "ticks": 4,
+    "physics_dx": 3.0,
+    "helmet_texels": 0,
+    "torso_texels": 0.71,
+    "boot_texels": 59.5,
+    "helmet_world": 0.0,
+    "cause": "none"
+   },
+   {
+    "kind": "frame",
+    "from": [
+     "run",
+     3
+    ],
+    "to": [
+     "run",
+     4
+    ],
+    "physics_frame": 37,
+    "ticks": 5,
+    "physics_dx": 3.0,
+    "helmet_texels": 0,
+    "torso_texels": 1.57,
+    "boot_texels": -45.0,
+    "helmet_world": 0.0,
+    "cause": "none"
+   },
+   {
+    "kind": "frame",
+    "from": [
+     "run",
+     4
+    ],
+    "to": [
+     "run",
+     5
+    ],
+    "physics_frame": 41,
+    "ticks": 4,
+    "physics_dx": 3.0,
+    "helmet_texels": 0,
+    "torso_texels": -0.43,
+    "boot_texels": -12.5,
+    "helmet_world": 0.0,
+    "cause": "none"
+   },
+   {
+    "kind": "frame",
+    "from": [
+     "run",
+     5
+    ],
+    "to": [
+     "run",
+     6
+    ],
+    "physics_frame": 45,
+    "ticks": 4,
+    "physics_dx": 3.0,
+    "helmet_texels": 0,
+    "torso_texels": -1.72,
+    "boot_texels": -1.0,
+    "helmet_world": 0.0,
+    "cause": "none"
+   },
+   {
+    "kind": "frame",
+    "from": [
+     "run",
+     6
+    ],
+    "to": [
+     "run",
+     7
+    ],
+    "physics_frame": 49,
+    "ticks": 4,
+    "physics_dx": 3.0,
+    "helmet_texels": 0,
+    "torso_texels": 2.76,
+    "boot_texels": 14.5,
+    "helmet_world": 0.0,
+    "cause": "none"
+   },
+   {
+    "kind": "loop",
+    "from": [
+     "run",
+     7
+    ],
+    "to": [
+     "run",
+     0
+    ],
+    "physics_frame": 54,
+    "ticks": 5,
+    "physics_dx": 3.0,
+    "helmet_texels": 0,
+    "torso_texels": -1.41,
+    "boot_texels": 0.0,
+    "helmet_world": 0.0,
+    "cause": "none"
+   },
+   {
+    "kind": "frame",
+    "from": [
+     "run",
+     0
+    ],
+    "to": [
+     "run",
+     1
+    ],
+    "physics_frame": 58,
+    "ticks": 4,
+    "physics_dx": 3.0,
+    "helmet_texels": 0,
+    "torso_texels": 0.55,
+    "boot_texels": -9.0,
+    "helmet_world": 0.0,
+    "cause": "none"
+   },
+   {
+    "kind": "frame",
+    "from": [
+     "run",
+     1
+    ],
+    "to": [
+     "run",
+     2
+    ],
+    "physics_frame": 62,
+    "ticks": 4,
+    "physics_dx": 3.0,
+    "helmet_texels": 0,
+    "torso_texels": -2.03,
+    "boot_texels": -6.5,
+    "helmet_world": 0.0,
+    "cause": "none"
+   },
+   {
+    "kind": "frame",
+    "from": [
+     "run",
+     2
+    ],
+    "to": [
+     "run",
+     3
+    ],
+    "physics_frame": 67,
+    "ticks": 5,
+    "physics_dx": 3.0,
+    "helmet_texels": 0,
+    "torso_texels": 0.71,
+    "boot_texels": 59.5,
+    "helmet_world": 0.0,
+    "cause": "none"
+   },
+   {
+    "kind": "frame",
+    "from": [
+     "run",
+     3
+    ],
+    "to": [
+     "run",
+     4
+    ],
+    "physics_frame": 71,
+    "ticks": 4,
+    "physics_dx": 3.0,
+    "helmet_texels": 0,
+    "torso_texels": 1.57,
+    "boot_texels": -45.0,
+    "helmet_world": 0.0,
+    "cause": "none"
+   },
+   {
+    "kind": "frame",
+    "from": [
+     "run",
+     4
+    ],
+    "to": [
+     "run",
+     5
+    ],
+    "physics_frame": 75,
+    "ticks": 4,
+    "physics_dx": 3.0,
+    "helmet_texels": 0,
+    "torso_texels": -0.43,
+    "boot_texels": -12.5,
+    "helmet_world": 0.0,
+    "cause": "none"
+   },
+   {
+    "kind": "frame",
+    "from": [
+     "run",
+     5
+    ],
+    "to": [
+     "run",
+     6
+    ],
+    "physics_frame": 79,
+    "ticks": 4,
+    "physics_dx": 3.0,
+    "helmet_texels": 0,
+    "torso_texels": -1.72,
+    "boot_texels": -1.0,
+    "helmet_world": 0.0,
+    "cause": "none"
+   },
+   {
+    "kind": "frame",
+    "from": [
+     "run",
+     6
+    ],
+    "to": [
+     "run",
+     7
+    ],
+    "physics_frame": 84,
+    "ticks": 5,
+    "physics_dx": 3.0,
+    "helmet_texels": 0,
+    "torso_texels": 2.76,
+    "boot_texels": 14.5,
+    "helmet_world": 0.0,
+    "cause": "none"
+   },
+   {
+    "kind": "loop",
+    "from": [
+     "run",
+     7
+    ],
+    "to": [
+     "run",
+     0
+    ],
+    "physics_frame": 88,
+    "ticks": 4,
+    "physics_dx": 3.0,
+    "helmet_texels": 0,
+    "torso_texels": -1.41,
+    "boot_texels": 0.0,
+    "helmet_world": 0.0,
+    "cause": "none"
+   }
+  ],
+  "unexplained": 0,
+  "max_helmet_texels": 0
+ },
+ "man-idle-run": {
+  "changes": [
+   {
+    "kind": "frame",
+    "from": [
+     "idle",
+     1
+    ],
+    "to": [
+     "idle",
+     2
+    ],
+    "physics_frame": 109,
+    "ticks": null,
+    "physics_dx": 0.0,
+    "helmet_texels": -3,
+    "torso_texels": -1.09,
+    "boot_texels": -0.5,
+    "helmet_world": -1.5,
+    "cause": "none"
+   },
+   {
+    "kind": "frame",
+    "from": [
+     "idle",
+     2
+    ],
+    "to": [
+     "idle",
+     3
+    ],
+    "physics_frame": 119,
+    "ticks": 10,
+    "physics_dx": 0.0,
+    "helmet_texels": 0,
+    "torso_texels": 0.55,
+    "boot_texels": 0.0,
+    "helmet_world": 0.0,
+    "cause": "none"
+   },
+   {
+    "kind": "frame",
+    "from": [
+     "idle",
+     3
+    ],
+    "to": [
+     "idle",
+     4
+    ],
+    "physics_frame": 129,
+    "ticks": 10,
+    "physics_dx": 0.0,
+    "helmet_texels": 6,
+    "torso_texels": 0.45,
+    "boot_texels": 0.5,
+    "helmet_world": 3.0,
+    "cause": "authored pose"
+   },
+   {
+    "kind": "transition",
+    "from": [
+     "idle",
+     4
+    ],
+    "to": [
+     "walk",
+     0
+    ],
+    "physics_frame": 133,
+    "ticks": null,
+    "physics_dx": 0.389,
+    "helmet_texels": 1,
+    "torso_texels": 0.26,
+    "boot_texels": -2.0,
+    "helmet_world": 0.5,
+    "cause": "none"
+   },
+   {
+    "kind": "transition",
+    "from": [
+     "walk",
+     0
+    ],
+    "to": [
+     "run",
+     0
+    ],
+    "physics_frame": 138,
+    "ticks": null,
+    "physics_dx": 2.333,
+    "helmet_texels": 7,
+    "torso_texels": 1.75,
+    "boot_texels": -2.5,
+    "helmet_world": 3.5,
+    "cause": "authored pose"
+   },
+   {
+    "kind": "frame",
+    "from": [
+     "run",
+     0
+    ],
+    "to": [
+     "run",
+     1
+    ],
+    "physics_frame": 143,
+    "ticks": 5,
+    "physics_dx": 3.0,
+    "helmet_texels": 0,
+    "torso_texels": 0.55,
+    "boot_texels": -9.0,
+    "helmet_world": 0.0,
+    "cause": "none"
+   },
+   {
+    "kind": "frame",
+    "from": [
+     "run",
+     1
+    ],
+    "to": [
+     "run",
+     2
+    ],
+    "physics_frame": 147,
+    "ticks": 4,
+    "physics_dx": 3.0,
+    "helmet_texels": 0,
+    "torso_texels": -2.03,
+    "boot_texels": -6.5,
+    "helmet_world": 0.0,
+    "cause": "none"
+   },
+   {
+    "kind": "frame",
+    "from": [
+     "run",
+     2
+    ],
+    "to": [
+     "run",
+     3
+    ],
+    "physics_frame": 151,
+    "ticks": 4,
+    "physics_dx": 3.0,
+    "helmet_texels": 0,
+    "torso_texels": 0.71,
+    "boot_texels": 59.5,
+    "helmet_world": 0.0,
+    "cause": "none"
+   },
+   {
+    "kind": "frame",
+    "from": [
+     "run",
+     3
+    ],
+    "to": [
+     "run",
+     4
+    ],
+    "physics_frame": 156,
+    "ticks": 5,
+    "physics_dx": 3.0,
+    "helmet_texels": 0,
+    "torso_texels": 1.57,
+    "boot_texels": -45.0,
+    "helmet_world": 0.0,
+    "cause": "none"
+   },
+   {
+    "kind": "frame",
+    "from": [
+     "run",
+     4
+    ],
+    "to": [
+     "run",
+     5
+    ],
+    "physics_frame": 160,
+    "ticks": 4,
+    "physics_dx": 3.0,
+    "helmet_texels": 0,
+    "torso_texels": -0.43,
+    "boot_texels": -12.5,
+    "helmet_world": 0.0,
+    "cause": "none"
+   },
+   {
+    "kind": "frame",
+    "from": [
+     "run",
+     5
+    ],
+    "to": [
+     "run",
+     6
+    ],
+    "physics_frame": 164,
+    "ticks": 4,
+    "physics_dx": 3.0,
+    "helmet_texels": 0,
+    "torso_texels": -1.72,
+    "boot_texels": -1.0,
+    "helmet_world": 0.0,
+    "cause": "none"
+   },
+   {
+    "kind": "frame",
+    "from": [
+     "run",
+     6
+    ],
+    "to": [
+     "run",
+     7
+    ],
+    "physics_frame": 168,
+    "ticks": 4,
+    "physics_dx": 3.0,
+    "helmet_texels": 0,
+    "torso_texels": 2.76,
+    "boot_texels": 14.5,
+    "helmet_world": 0.0,
+    "cause": "none"
+   },
+   {
+    "kind": "loop",
+    "from": [
+     "run",
+     7
+    ],
+    "to": [
+     "run",
+     0
+    ],
+    "physics_frame": 173,
+    "ticks": 5,
+    "physics_dx": 3.0,
+    "helmet_texels": 0,
+    "torso_texels": -1.41,
+    "boot_texels": 0.0,
+    "helmet_world": 0.0,
+    "cause": "none"
+   },
+   {
+    "kind": "frame",
+    "from": [
+     "run",
+     0
+    ],
+    "to": [
+     "run",
+     1
+    ],
+    "physics_frame": 177,
+    "ticks": 4,
+    "physics_dx": 3.0,
+    "helmet_texels": 0,
+    "torso_texels": 0.55,
+    "boot_texels": -9.0,
+    "helmet_world": 0.0,
+    "cause": "none"
+   },
+   {
+    "kind": "frame",
+    "from": [
+     "run",
+     1
+    ],
+    "to": [
+     "run",
+     2
+    ],
+    "physics_frame": 181,
+    "ticks": 4,
+    "physics_dx": 3.0,
+    "helmet_texels": 0,
+    "torso_texels": -2.03,
+    "boot_texels": -6.5,
+    "helmet_world": 0.0,
+    "cause": "none"
+   },
+   {
+    "kind": "frame",
+    "from": [
+     "run",
+     2
+    ],
+    "to": [
+     "run",
+     3
+    ],
+    "physics_frame": 186,
+    "ticks": 5,
+    "physics_dx": 3.0,
+    "helmet_texels": 0,
+    "torso_texels": 0.71,
+    "boot_texels": 59.5,
+    "helmet_world": 0.0,
+    "cause": "none"
+   },
+   {
+    "kind": "frame",
+    "from": [
+     "run",
+     3
+    ],
+    "to": [
+     "run",
+     4
+    ],
+    "physics_frame": 190,
+    "ticks": 4,
+    "physics_dx": 3.0,
+    "helmet_texels": 0,
+    "torso_texels": 1.57,
+    "boot_texels": -45.0,
+    "helmet_world": 0.0,
+    "cause": "none"
+   },
+   {
+    "kind": "frame",
+    "from": [
+     "run",
+     4
+    ],
+    "to": [
+     "run",
+     5
+    ],
+    "physics_frame": 194,
+    "ticks": 4,
+    "physics_dx": 3.0,
+    "helmet_texels": 0,
+    "torso_texels": -0.43,
+    "boot_texels": -12.5,
+    "helmet_world": 0.0,
+    "cause": "none"
+   },
+   {
+    "kind": "frame",
+    "from": [
+     "run",
+     5
+    ],
+    "to": [
+     "run",
+     6
+    ],
+    "physics_frame": 198,
+    "ticks": 4,
+    "physics_dx": 3.0,
+    "helmet_texels": 0,
+    "torso_texels": -1.72,
+    "boot_texels": -1.0,
+    "helmet_world": 0.0,
+    "cause": "none"
+   },
+   {
+    "kind": "frame",
+    "from": [
+     "run",
+     6
+    ],
+    "to": [
+     "run",
+     7
+    ],
+    "physics_frame": 203,
+    "ticks": 5,
+    "physics_dx": 3.0,
+    "helmet_texels": 0,
+    "torso_texels": 2.76,
+    "boot_texels": 14.5,
+    "helmet_world": 0.0,
+    "cause": "none"
+   }
+  ],
+  "unexplained": 0,
+  "max_helmet_texels": 0
+ },
+ "man-run-idle": {
+  "changes": [
+   {
+    "kind": "frame",
+    "from": [
+     "run",
+     2
+    ],
+    "to": [
+     "run",
+     3
+    ],
+    "physics_frame": 277,
+    "ticks": null,
+    "physics_dx": 3.0,
+    "helmet_texels": 0,
+    "torso_texels": 0.71,
+    "boot_texels": 59.5,
+    "helmet_world": 0.0,
+    "cause": "none"
+   },
+   {
+    "kind": "frame",
+    "from": [
+     "run",
+     3
+    ],
+    "to": [
+     "run",
+     4
+    ],
+    "physics_frame": 281,
+    "ticks": 4,
+    "physics_dx": 3.0,
+    "helmet_texels": 0,
+    "torso_texels": 1.57,
+    "boot_texels": -45.0,
+    "helmet_world": 0.0,
+    "cause": "none"
+   },
+   {
+    "kind": "frame",
+    "from": [
+     "run",
+     4
+    ],
+    "to": [
+     "run",
+     5
+    ],
+    "physics_frame": 285,
+    "ticks": 4,
+    "physics_dx": 3.0,
+    "helmet_texels": 0,
+    "torso_texels": -0.43,
+    "boot_texels": -12.5,
+    "helmet_world": 0.0,
+    "cause": "none"
+   },
+   {
+    "kind": "frame",
+    "from": [
+     "run",
+     5
+    ],
+    "to": [
+     "run",
+     6
+    ],
+    "physics_frame": 289,
+    "ticks": 4,
+    "physics_dx": 3.0,
+    "helmet_texels": 0,
+    "torso_texels": -1.72,
+    "boot_texels": -1.0,
+    "helmet_world": 0.0,
+    "cause": "none"
+   },
+   {
+    "kind": "frame",
+    "from": [
+     "run",
+     6
+    ],
+    "to": [
+     "run",
+     7
+    ],
+    "physics_frame": 294,
+    "ticks": 5,
+    "physics_dx": 3.0,
+    "helmet_texels": 0,
+    "torso_texels": 2.76,
+    "boot_texels": 14.5,
+    "helmet_world": 0.0,
+    "cause": "none"
+   },
+   {
+    "kind": "loop",
+    "from": [
+     "run",
+     7
+    ],
+    "to": [
+     "run",
+     0
+    ],
+    "physics_frame": 298,
+    "ticks": 4,
+    "physics_dx": 2.222,
+    "helmet_texels": 0,
+    "torso_texels": -1.41,
+    "boot_texels": 0.0,
+    "helmet_world": 0.0,
+    "cause": "none"
+   },
+   {
+    "kind": "transition",
+    "from": [
+     "run",
+     0
+    ],
+    "to": [
+     "walk",
+     0
+    ],
+    "physics_frame": 299,
+    "ticks": null,
+    "physics_dx": 1.833,
+    "helmet_texels": -7,
+    "torso_texels": -1.75,
+    "boot_texels": 2.5,
+    "helmet_world": -3.5,
+    "cause": "authored pose"
+   },
+   {
+    "kind": "transition",
+    "from": [
+     "walk",
+     0
+    ],
+    "to": [
+     "idle",
+     0
+    ],
+    "physics_frame": 304,
+    "ticks": null,
+    "physics_dx": 0.0,
+    "helmet_texels": -3,
+    "torso_texels": -1.15,
+    "boot_texels": 1.5,
+    "helmet_world": -1.5,
+    "cause": "none"
+   },
+   {
+    "kind": "frame",
+    "from": [
+     "idle",
+     0
+    ],
+    "to": [
+     "idle",
+     1
+    ],
+    "physics_frame": 314,
+    "ticks": 10,
+    "physics_dx": 0.0,
+    "helmet_texels": -1,
+    "torso_texels": 0.98,
+    "boot_texels": 0.5,
+    "helmet_world": -0.5,
+    "cause": "none"
+   },
+   {
+    "kind": "frame",
+    "from": [
+     "idle",
+     1
+    ],
+    "to": [
+     "idle",
+     2
+    ],
+    "physics_frame": 324,
+    "ticks": 10,
+    "physics_dx": 0.0,
+    "helmet_texels": -3,
+    "torso_texels": -1.09,
+    "boot_texels": -0.5,
+    "helmet_world": -1.5,
+    "cause": "none"
+   },
+   {
+    "kind": "frame",
+    "from": [
+     "idle",
+     2
+    ],
+    "to": [
+     "idle",
+     3
+    ],
+    "physics_frame": 334,
+    "ticks": 10,
+    "physics_dx": 0.0,
+    "helmet_texels": 0,
+    "torso_texels": 0.55,
+    "boot_texels": 0.0,
+    "helmet_world": 0.0,
+    "cause": "none"
+   },
+   {
+    "kind": "frame",
+    "from": [
+     "idle",
+     3
+    ],
+    "to": [
+     "idle",
+     4
+    ],
+    "physics_frame": 344,
+    "ticks": 10,
+    "physics_dx": 0.0,
+    "helmet_texels": 6,
+    "torso_texels": 0.45,
+    "boot_texels": 0.5,
+    "helmet_world": 3.0,
+    "cause": "authored pose"
+   },
+   {
+    "kind": "frame",
+    "from": [
+     "idle",
+     4
+    ],
+    "to": [
+     "idle",
+     5
+    ],
+    "physics_frame": 354,
+    "ticks": 10,
+    "physics_dx": 0.0,
+    "helmet_texels": -3,
+    "torso_texels": -0.78,
+    "boot_texels": -0.5,
+    "helmet_world": -1.5,
+    "cause": "none"
+   },
+   {
+    "kind": "loop",
+    "from": [
+     "idle",
+     5
+    ],
+    "to": [
+     "idle",
+     0
+    ],
+    "physics_frame": 364,
+    "ticks": 10,
+    "physics_dx": 0.0,
+    "helmet_texels": 1,
+    "torso_texels": -0.11,
+    "boot_texels": 0.0,
+    "helmet_world": 0.5,
+    "cause": "none"
+   }
+  ],
+  "unexplained": 0,
+  "max_helmet_texels": 0
+ },
+ "man-idle-diagnose": {
+  "changes": [
+   {
+    "kind": "frame",
+    "from": [
+     "idle",
+     1
+    ],
+    "to": [
+     "idle",
+     2
+    ],
+    "physics_frame": 389,
+    "ticks": null,
+    "physics_dx": 0.0,
+    "helmet_texels": -3,
+    "torso_texels": -1.09,
+    "boot_texels": -0.5,
+    "helmet_world": -1.5,
+    "cause": "none"
+   },
+   {
+    "kind": "frame",
+    "from": [
+     "idle",
+     2
+    ],
+    "to": [
+     "idle",
+     3
+    ],
+    "physics_frame": 399,
+    "ticks": 10,
+    "physics_dx": 0.0,
+    "helmet_texels": 0,
+    "torso_texels": 0.55,
+    "boot_texels": 0.0,
+    "helmet_world": 0.0,
+    "cause": "none"
+   },
+   {
+    "kind": "frame",
+    "from": [
+     "idle",
+     3
+    ],
+    "to": [
+     "idle",
+     4
+    ],
+    "physics_frame": 409,
+    "ticks": 10,
+    "physics_dx": 0.0,
+    "helmet_texels": 6,
+    "torso_texels": 0.45,
+    "boot_texels": 0.5,
+    "helmet_world": 3.0,
+    "cause": "authored pose"
+   },
+   {
+    "kind": "transition",
+    "from": [
+     "idle",
+     4
+    ],
+    "to": [
+     "secondary",
+     0
+    ],
+    "physics_frame": 413,
+    "ticks": null,
+    "physics_dx": 0.0,
+    "helmet_texels": 4,
+    "torso_texels": 4.2,
+    "boot_texels": -0.5,
+    "helmet_world": 2.0,
+    "cause": "authored pose"
+   },
+   {
+    "kind": "frame",
+    "from": [
+     "secondary",
+     0
+    ],
+    "to": [
+     "secondary",
+     1
+    ],
+    "physics_frame": 419,
+    "ticks": 6,
+    "physics_dx": 0.0,
+    "helmet_texels": -3,
+    "torso_texels": -0.76,
+    "boot_texels": 0.5,
+    "helmet_world": -1.5,
+    "cause": "none"
+   },
+   {
+    "kind": "frame",
+    "from": [
+     "secondary",
+     1
+    ],
+    "to": [
+     "secondary",
+     2
+    ],
+    "physics_frame": 425,
+    "ticks": 6,
+    "physics_dx": 0.0,
+    "helmet_texels": 0,
+    "torso_texels": 0.45,
+    "boot_texels": 0.0,
+    "helmet_world": 0.0,
+    "cause": "none"
+   },
+   {
+    "kind": "frame",
+    "from": [
+     "secondary",
+     2
+    ],
+    "to": [
+     "secondary",
+     3
+    ],
+    "physics_frame": 431,
+    "ticks": 6,
+    "physics_dx": 0.0,
+    "helmet_texels": 1,
+    "torso_texels": 1.97,
+    "boot_texels": 0.0,
+    "helmet_world": 0.5,
+    "cause": "none"
+   },
+   {
+    "kind": "frame",
+    "from": [
+     "secondary",
+     3
+    ],
+    "to": [
+     "secondary",
+     4
+    ],
+    "physics_frame": 437,
+    "ticks": 6,
+    "physics_dx": 0.0,
+    "helmet_texels": 5,
+    "torso_texels": -1.16,
+    "boot_texels": -0.5,
+    "helmet_world": 2.5,
+    "cause": "authored pose"
+   },
+   {
+    "kind": "frame",
+    "from": [
+     "secondary",
+     4
+    ],
+    "to": [
+     "secondary",
+     5
+    ],
+    "physics_frame": 443,
+    "ticks": 6,
+    "physics_dx": 0.0,
+    "helmet_texels": -5,
+    "torso_texels": 2.51,
+    "boot_texels": 0.5,
+    "helmet_world": -2.5,
+    "cause": "authored pose"
+   },
+   {
+    "kind": "frame",
+    "from": [
+     "secondary",
+     5
+    ],
+    "to": [
+     "secondary",
+     6
+    ],
+    "physics_frame": 449,
+    "ticks": 6,
+    "physics_dx": 0.0,
+    "helmet_texels": -1,
+    "torso_texels": -3.93,
+    "boot_texels": 0.0,
+    "helmet_world": -0.5,
+    "cause": "none"
+   },
+   {
+    "kind": "frame",
+    "from": [
+     "secondary",
+     6
+    ],
+    "to": [
+     "secondary",
+     7
+    ],
+    "physics_frame": 455,
+    "ticks": 6,
+    "physics_dx": 0.0,
+    "helmet_texels": 4,
+    "torso_texels": -0.38,
+    "boot_texels": -0.5,
+    "helmet_world": 2.0,
+    "cause": "authored pose"
+   },
+   {
+    "kind": "loop",
+    "from": [
+     "secondary",
+     7
+    ],
+    "to": [
+     "secondary",
+     0
+    ],
+    "physics_frame": 461,
+    "ticks": 6,
+    "physics_dx": 0.0,
+    "helmet_texels": -1,
+    "torso_texels": 1.3,
+    "boot_texels": 0.0,
+    "helmet_world": -0.5,
+    "cause": "none"
+   },
+   {
+    "kind": "transition",
+    "from": [
+     "secondary",
+     0
+    ],
+    "to": [
+     "idle",
+     0
+    ],
+    "physics_frame": 462,
+    "ticks": null,
+    "physics_dx": 0.0,
+    "helmet_texels": -6,
+    "torso_texels": -5.09,
+    "boot_texels": 0.0,
+    "helmet_world": -3.0,
+    "cause": "authored pose"
+   },
+   {
+    "kind": "frame",
+    "from": [
+     "idle",
+     0
+    ],
+    "to": [
+     "idle",
+     1
+    ],
+    "physics_frame": 472,
+    "ticks": 10,
+    "physics_dx": 0.0,
+    "helmet_texels": -1,
+    "torso_texels": 0.98,
+    "boot_texels": 0.5,
+    "helmet_world": -0.5,
+    "cause": "none"
+   },
+   {
+    "kind": "frame",
+    "from": [
+     "idle",
+     1
+    ],
+    "to": [
+     "idle",
+     2
+    ],
+    "physics_frame": 482,
+    "ticks": 10,
+    "physics_dx": 0.0,
+    "helmet_texels": -3,
+    "torso_texels": -1.09,
+    "boot_texels": -0.5,
+    "helmet_world": -1.5,
+    "cause": "none"
+   }
+  ],
+  "unexplained": 0,
+  "max_helmet_texels": 0
+ },
+ "man-diagnose-idle": {
+  "changes": [
+   {
+    "kind": "frame",
+    "from": [
+     "secondary",
+     0
+    ],
+    "to": [
+     "secondary",
+     1
+    ],
+    "physics_frame": 514,
+    "ticks": null,
+    "physics_dx": 0.0,
+    "helmet_texels": -3,
+    "torso_texels": -0.76,
+    "boot_texels": 0.5,
+    "helmet_world": -1.5,
+    "cause": "none"
+   },
+   {
+    "kind": "frame",
+    "from": [
+     "secondary",
+     1
+    ],
+    "to": [
+     "secondary",
+     2
+    ],
+    "physics_frame": 520,
+    "ticks": 6,
+    "physics_dx": 0.0,
+    "helmet_texels": 0,
+    "torso_texels": 0.45,
+    "boot_texels": 0.0,
+    "helmet_world": 0.0,
+    "cause": "none"
+   },
+   {
+    "kind": "frame",
+    "from": [
+     "secondary",
+     2
+    ],
+    "to": [
+     "secondary",
+     3
+    ],
+    "physics_frame": 526,
+    "ticks": 6,
+    "physics_dx": 0.0,
+    "helmet_texels": 1,
+    "torso_texels": 1.97,
+    "boot_texels": 0.0,
+    "helmet_world": 0.5,
+    "cause": "none"
+   },
+   {
+    "kind": "frame",
+    "from": [
+     "secondary",
+     3
+    ],
+    "to": [
+     "secondary",
+     4
+    ],
+    "physics_frame": 532,
+    "ticks": 6,
+    "physics_dx": 0.0,
+    "helmet_texels": 5,
+    "torso_texels": -1.16,
+    "boot_texels": -0.5,
+    "helmet_world": 2.5,
+    "cause": "authored pose"
+   },
+   {
+    "kind": "frame",
+    "from": [
+     "secondary",
+     4
+    ],
+    "to": [
+     "secondary",
+     5
+    ],
+    "physics_frame": 538,
+    "ticks": 6,
+    "physics_dx": 0.0,
+    "helmet_texels": -5,
+    "torso_texels": 2.51,
+    "boot_texels": 0.5,
+    "helmet_world": -2.5,
+    "cause": "authored pose"
+   },
+   {
+    "kind": "frame",
+    "from": [
+     "secondary",
+     5
+    ],
+    "to": [
+     "secondary",
+     6
+    ],
+    "physics_frame": 544,
+    "ticks": 6,
+    "physics_dx": 0.0,
+    "helmet_texels": -1,
+    "torso_texels": -3.93,
+    "boot_texels": 0.0,
+    "helmet_world": -0.5,
+    "cause": "none"
+   },
+   {
+    "kind": "frame",
+    "from": [
+     "secondary",
+     6
+    ],
+    "to": [
+     "secondary",
+     7
+    ],
+    "physics_frame": 550,
+    "ticks": 6,
+    "physics_dx": 0.0,
+    "helmet_texels": 4,
+    "torso_texels": -0.38,
+    "boot_texels": -0.5,
+    "helmet_world": 2.0,
+    "cause": "authored pose"
+   },
+   {
+    "kind": "loop",
+    "from": [
+     "secondary",
+     7
+    ],
+    "to": [
+     "secondary",
+     0
+    ],
+    "physics_frame": 556,
+    "ticks": 6,
+    "physics_dx": 0.0,
+    "helmet_texels": -1,
+    "torso_texels": 1.3,
+    "boot_texels": 0.0,
+    "helmet_world": -0.5,
+    "cause": "none"
+   },
+   {
+    "kind": "transition",
+    "from": [
+     "secondary",
+     0
+    ],
+    "to": [
+     "idle",
+     0
+    ],
+    "physics_frame": 557,
+    "ticks": null,
+    "physics_dx": 0.0,
+    "helmet_texels": -6,
+    "torso_texels": -5.09,
+    "boot_texels": 0.0,
+    "helmet_world": -3.0,
+    "cause": "authored pose"
+   },
+   {
+    "kind": "frame",
+    "from": [
+     "idle",
+     0
+    ],
+    "to": [
+     "idle",
+     1
+    ],
+    "physics_frame": 567,
+    "ticks": 10,
+    "physics_dx": 0.0,
+    "helmet_texels": -1,
+    "torso_texels": 0.98,
+    "boot_texels": 0.5,
+    "helmet_world": -0.5,
+    "cause": "none"
+   },
+   {
+    "kind": "frame",
+    "from": [
+     "idle",
+     1
+    ],
+    "to": [
+     "idle",
+     2
+    ],
+    "physics_frame": 577,
+    "ticks": 10,
+    "physics_dx": 0.0,
+    "helmet_texels": -3,
+    "torso_texels": -1.09,
+    "boot_texels": -0.5,
+    "helmet_world": -1.5,
+    "cause": "none"
+   },
+   {
+    "kind": "frame",
+    "from": [
+     "idle",
+     2
+    ],
+    "to": [
+     "idle",
+     3
+    ],
+    "physics_frame": 587,
+    "ticks": 10,
+    "physics_dx": 0.0,
+    "helmet_texels": 0,
+    "torso_texels": 0.55,
+    "boot_texels": 0.0,
+    "helmet_world": 0.0,
+    "cause": "none"
+   },
+   {
+    "kind": "frame",
+    "from": [
+     "idle",
+     3
+    ],
+    "to": [
+     "idle",
+     4
+    ],
+    "physics_frame": 597,
+    "ticks": 10,
+    "physics_dx": 0.0,
+    "helmet_texels": 6,
+    "torso_texels": 0.45,
+    "boot_texels": 0.5,
+    "helmet_world": 3.0,
+    "cause": "authored pose"
+   },
+   {
+    "kind": "frame",
+    "from": [
+     "idle",
+     4
+    ],
+    "to": [
+     "idle",
+     5
+    ],
+    "physics_frame": 607,
+    "ticks": 10,
+    "physics_dx": 0.0,
+    "helmet_texels": -3,
+    "torso_texels": -0.78,
+    "boot_texels": -0.5,
+    "helmet_world": -1.5,
+    "cause": "none"
+   }
+  ],
+  "unexplained": 0,
+  "max_helmet_texels": 0
+ },
+ "woman-run": {
+  "changes": [
+   {
+    "kind": "transition",
+    "from": [
+     "walk",
+     0
+    ],
+    "to": [
+     "run",
+     0
+    ],
+    "physics_frame": 627,
+    "ticks": null,
+    "physics_dx": 2.333,
+    "helmet_texels": 6,
+    "torso_texels": 3.64,
+    "boot_texels": 0.0,
+    "helmet_world": 3.0,
+    "cause": "authored pose"
+   },
+   {
+    "kind": "frame",
+    "from": [
+     "run",
+     0
+    ],
+    "to": [
+     "run",
+     1
+    ],
+    "physics_frame": 632,
+    "ticks": 5,
+    "physics_dx": 3.0,
+    "helmet_texels": 0,
+    "torso_texels": -2.02,
+    "boot_texels": -18.5,
+    "helmet_world": 0.0,
+    "cause": "none"
+   },
+   {
+    "kind": "frame",
+    "from": [
+     "run",
+     1
+    ],
+    "to": [
+     "run",
+     2
+    ],
+    "physics_frame": 636,
+    "ticks": 4,
+    "physics_dx": 3.0,
+    "helmet_texels": 0,
+    "torso_texels": -5.7,
+    "boot_texels": 3.5,
+    "helmet_world": 0.0,
+    "cause": "none"
+   },
+   {
+    "kind": "frame",
+    "from": [
+     "run",
+     2
+    ],
+    "to": [
+     "run",
+     3
+    ],
+    "physics_frame": 640,
+    "ticks": 4,
+    "physics_dx": 3.0,
+    "helmet_texels": 0,
+    "torso_texels": 2.5,
+    "boot_texels": 12.5,
+    "helmet_world": 0.0,
+    "cause": "none"
+   },
+   {
+    "kind": "frame",
+    "from": [
+     "run",
+     3
+    ],
+    "to": [
+     "run",
+     4
+    ],
+    "physics_frame": 645,
+    "ticks": 5,
+    "physics_dx": 3.0,
+    "helmet_texels": 0,
+    "torso_texels": 3.14,
+    "boot_texels": 1.0,
+    "helmet_world": 0.0,
+    "cause": "none"
+   },
+   {
+    "kind": "frame",
+    "from": [
+     "run",
+     4
+    ],
+    "to": [
+     "run",
+     5
+    ],
+    "physics_frame": 649,
+    "ticks": 4,
+    "physics_dx": 3.0,
+    "helmet_texels": 0,
+    "torso_texels": 0.43,
+    "boot_texels": -16.5,
+    "helmet_world": 0.0,
+    "cause": "none"
+   },
+   {
+    "kind": "frame",
+    "from": [
+     "run",
+     5
+    ],
+    "to": [
+     "run",
+     6
+    ],
+    "physics_frame": 653,
+    "ticks": 4,
+    "physics_dx": 3.0,
+    "helmet_texels": 0,
+    "torso_texels": -0.11,
+    "boot_texels": 2.5,
+    "helmet_world": 0.0,
+    "cause": "none"
+   },
+   {
+    "kind": "frame",
+    "from": [
+     "run",
+     6
+    ],
+    "to": [
+     "run",
+     7
+    ],
+    "physics_frame": 657,
+    "ticks": 4,
+    "physics_dx": 3.0,
+    "helmet_texels": 0,
+    "torso_texels": -3.86,
+    "boot_texels": 14.0,
+    "helmet_world": 0.0,
+    "cause": "none"
+   },
+   {
+    "kind": "loop",
+    "from": [
+     "run",
+     7
+    ],
+    "to": [
+     "run",
+     0
+    ],
+    "physics_frame": 662,
+    "ticks": 5,
+    "physics_dx": 3.0,
+    "helmet_texels": 0,
+    "torso_texels": 5.62,
+    "boot_texels": 1.5,
+    "helmet_world": 0.0,
+    "cause": "none"
+   },
+   {
+    "kind": "frame",
+    "from": [
+     "run",
+     0
+    ],
+    "to": [
+     "run",
+     1
+    ],
+    "physics_frame": 666,
+    "ticks": 4,
+    "physics_dx": 3.0,
+    "helmet_texels": 0,
+    "torso_texels": -2.02,
+    "boot_texels": -18.5,
+    "helmet_world": 0.0,
+    "cause": "none"
+   },
+   {
+    "kind": "frame",
+    "from": [
+     "run",
+     1
+    ],
+    "to": [
+     "run",
+     2
+    ],
+    "physics_frame": 670,
+    "ticks": 4,
+    "physics_dx": 3.0,
+    "helmet_texels": 0,
+    "torso_texels": -5.7,
+    "boot_texels": 3.5,
+    "helmet_world": 0.0,
+    "cause": "none"
+   },
+   {
+    "kind": "frame",
+    "from": [
+     "run",
+     2
+    ],
+    "to": [
+     "run",
+     3
+    ],
+    "physics_frame": 675,
+    "ticks": 5,
+    "physics_dx": 3.0,
+    "helmet_texels": 0,
+    "torso_texels": 2.5,
+    "boot_texels": 12.5,
+    "helmet_world": 0.0,
+    "cause": "none"
+   },
+   {
+    "kind": "frame",
+    "from": [
+     "run",
+     3
+    ],
+    "to": [
+     "run",
+     4
+    ],
+    "physics_frame": 679,
+    "ticks": 4,
+    "physics_dx": 3.0,
+    "helmet_texels": 0,
+    "torso_texels": 3.14,
+    "boot_texels": 1.0,
+    "helmet_world": 0.0,
+    "cause": "none"
+   },
+   {
+    "kind": "frame",
+    "from": [
+     "run",
+     4
+    ],
+    "to": [
+     "run",
+     5
+    ],
+    "physics_frame": 683,
+    "ticks": 4,
+    "physics_dx": 3.0,
+    "helmet_texels": 0,
+    "torso_texels": 0.43,
+    "boot_texels": -16.5,
+    "helmet_world": 0.0,
+    "cause": "none"
+   },
+   {
+    "kind": "frame",
+    "from": [
+     "run",
+     5
+    ],
+    "to": [
+     "run",
+     6
+    ],
+    "physics_frame": 687,
+    "ticks": 4,
+    "physics_dx": 3.0,
+    "helmet_texels": 0,
+    "torso_texels": -0.11,
+    "boot_texels": 2.5,
+    "helmet_world": 0.0,
+    "cause": "none"
+   },
+   {
+    "kind": "frame",
+    "from": [
+     "run",
+     6
+    ],
+    "to": [
+     "run",
+     7
+    ],
+    "physics_frame": 692,
+    "ticks": 5,
+    "physics_dx": 3.0,
+    "helmet_texels": 0,
+    "torso_texels": -3.86,
+    "boot_texels": 14.0,
+    "helmet_world": 0.0,
+    "cause": "none"
+   },
+   {
+    "kind": "loop",
+    "from": [
+     "run",
+     7
+    ],
+    "to": [
+     "run",
+     0
+    ],
+    "physics_frame": 696,
+    "ticks": 4,
+    "physics_dx": 3.0,
+    "helmet_texels": 0,
+    "torso_texels": 5.62,
+    "boot_texels": 1.5,
+    "helmet_world": 0.0,
+    "cause": "none"
+   }
+  ],
+  "unexplained": 0,
+  "max_helmet_texels": 0
+ },
+ "woman-idle-run": {
+  "changes": [
+   {
+    "kind": "frame",
+    "from": [
+     "idle",
+     1
+    ],
+    "to": [
+     "idle",
+     2
+    ],
+    "physics_frame": 717,
+    "ticks": null,
+    "physics_dx": 0.0,
+    "helmet_texels": -3,
+    "torso_texels": -1.0,
+    "boot_texels": 0.0,
+    "helmet_world": -1.5,
+    "cause": "none"
+   },
+   {
+    "kind": "frame",
+    "from": [
+     "idle",
+     2
+    ],
+    "to": [
+     "idle",
+     3
+    ],
+    "physics_frame": 727,
+    "ticks": 10,
+    "physics_dx": 0.0,
+    "helmet_texels": 3,
+    "torso_texels": -0.85,
+    "boot_texels": 0.5,
+    "helmet_world": 1.5,
+    "cause": "none"
+   },
+   {
+    "kind": "frame",
+    "from": [
+     "idle",
+     3
+    ],
+    "to": [
+     "idle",
+     4
+    ],
+    "physics_frame": 737,
+    "ticks": 10,
+    "physics_dx": 0.0,
+    "helmet_texels": -1,
+    "torso_texels": -0.29,
+    "boot_texels": 0.0,
+    "helmet_world": -0.5,
+    "cause": "none"
+   },
+   {
+    "kind": "transition",
+    "from": [
+     "idle",
+     4
+    ],
+    "to": [
+     "walk",
+     0
+    ],
+    "physics_frame": 741,
+    "ticks": null,
+    "physics_dx": 0.389,
+    "helmet_texels": 3,
+    "torso_texels": 0.58,
+    "boot_texels": -2.0,
+    "helmet_world": 1.5,
+    "cause": "none"
+   },
+   {
+    "kind": "transition",
+    "from": [
+     "walk",
+     0
+    ],
+    "to": [
+     "run",
+     0
+    ],
+    "physics_frame": 746,
+    "ticks": null,
+    "physics_dx": 2.333,
+    "helmet_texels": 6,
+    "torso_texels": 3.64,
+    "boot_texels": 0.0,
+    "helmet_world": 3.0,
+    "cause": "authored pose"
+   },
+   {
+    "kind": "frame",
+    "from": [
+     "run",
+     0
+    ],
+    "to": [
+     "run",
+     1
+    ],
+    "physics_frame": 751,
+    "ticks": 5,
+    "physics_dx": 3.0,
+    "helmet_texels": 0,
+    "torso_texels": -2.02,
+    "boot_texels": -18.5,
+    "helmet_world": 0.0,
+    "cause": "none"
+   },
+   {
+    "kind": "frame",
+    "from": [
+     "run",
+     1
+    ],
+    "to": [
+     "run",
+     2
+    ],
+    "physics_frame": 755,
+    "ticks": 4,
+    "physics_dx": 3.0,
+    "helmet_texels": 0,
+    "torso_texels": -5.7,
+    "boot_texels": 3.5,
+    "helmet_world": 0.0,
+    "cause": "none"
+   },
+   {
+    "kind": "frame",
+    "from": [
+     "run",
+     2
+    ],
+    "to": [
+     "run",
+     3
+    ],
+    "physics_frame": 759,
+    "ticks": 4,
+    "physics_dx": 3.0,
+    "helmet_texels": 0,
+    "torso_texels": 2.5,
+    "boot_texels": 12.5,
+    "helmet_world": 0.0,
+    "cause": "none"
+   },
+   {
+    "kind": "frame",
+    "from": [
+     "run",
+     3
+    ],
+    "to": [
+     "run",
+     4
+    ],
+    "physics_frame": 764,
+    "ticks": 5,
+    "physics_dx": 3.0,
+    "helmet_texels": 0,
+    "torso_texels": 3.14,
+    "boot_texels": 1.0,
+    "helmet_world": 0.0,
+    "cause": "none"
+   },
+   {
+    "kind": "frame",
+    "from": [
+     "run",
+     4
+    ],
+    "to": [
+     "run",
+     5
+    ],
+    "physics_frame": 768,
+    "ticks": 4,
+    "physics_dx": 3.0,
+    "helmet_texels": 0,
+    "torso_texels": 0.43,
+    "boot_texels": -16.5,
+    "helmet_world": 0.0,
+    "cause": "none"
+   },
+   {
+    "kind": "frame",
+    "from": [
+     "run",
+     5
+    ],
+    "to": [
+     "run",
+     6
+    ],
+    "physics_frame": 772,
+    "ticks": 4,
+    "physics_dx": 3.0,
+    "helmet_texels": 0,
+    "torso_texels": -0.11,
+    "boot_texels": 2.5,
+    "helmet_world": 0.0,
+    "cause": "none"
+   },
+   {
+    "kind": "frame",
+    "from": [
+     "run",
+     6
+    ],
+    "to": [
+     "run",
+     7
+    ],
+    "physics_frame": 776,
+    "ticks": 4,
+    "physics_dx": 3.0,
+    "helmet_texels": 0,
+    "torso_texels": -3.86,
+    "boot_texels": 14.0,
+    "helmet_world": 0.0,
+    "cause": "none"
+   },
+   {
+    "kind": "loop",
+    "from": [
+     "run",
+     7
+    ],
+    "to": [
+     "run",
+     0
+    ],
+    "physics_frame": 781,
+    "ticks": 5,
+    "physics_dx": 3.0,
+    "helmet_texels": 0,
+    "torso_texels": 5.62,
+    "boot_texels": 1.5,
+    "helmet_world": 0.0,
+    "cause": "none"
+   },
+   {
+    "kind": "frame",
+    "from": [
+     "run",
+     0
+    ],
+    "to": [
+     "run",
+     1
+    ],
+    "physics_frame": 785,
+    "ticks": 4,
+    "physics_dx": 3.0,
+    "helmet_texels": 0,
+    "torso_texels": -2.02,
+    "boot_texels": -18.5,
+    "helmet_world": 0.0,
+    "cause": "none"
+   },
+   {
+    "kind": "frame",
+    "from": [
+     "run",
+     1
+    ],
+    "to": [
+     "run",
+     2
+    ],
+    "physics_frame": 789,
+    "ticks": 4,
+    "physics_dx": 3.0,
+    "helmet_texels": 0,
+    "torso_texels": -5.7,
+    "boot_texels": 3.5,
+    "helmet_world": 0.0,
+    "cause": "none"
+   },
+   {
+    "kind": "frame",
+    "from": [
+     "run",
+     2
+    ],
+    "to": [
+     "run",
+     3
+    ],
+    "physics_frame": 794,
+    "ticks": 5,
+    "physics_dx": 3.0,
+    "helmet_texels": 0,
+    "torso_texels": 2.5,
+    "boot_texels": 12.5,
+    "helmet_world": 0.0,
+    "cause": "none"
+   },
+   {
+    "kind": "frame",
+    "from": [
+     "run",
+     3
+    ],
+    "to": [
+     "run",
+     4
+    ],
+    "physics_frame": 798,
+    "ticks": 4,
+    "physics_dx": 3.0,
+    "helmet_texels": 0,
+    "torso_texels": 3.14,
+    "boot_texels": 1.0,
+    "helmet_world": 0.0,
+    "cause": "none"
+   },
+   {
+    "kind": "frame",
+    "from": [
+     "run",
+     4
+    ],
+    "to": [
+     "run",
+     5
+    ],
+    "physics_frame": 802,
+    "ticks": 4,
+    "physics_dx": 3.0,
+    "helmet_texels": 0,
+    "torso_texels": 0.43,
+    "boot_texels": -16.5,
+    "helmet_world": 0.0,
+    "cause": "none"
+   },
+   {
+    "kind": "frame",
+    "from": [
+     "run",
+     5
+    ],
+    "to": [
+     "run",
+     6
+    ],
+    "physics_frame": 806,
+    "ticks": 4,
+    "physics_dx": 3.0,
+    "helmet_texels": 0,
+    "torso_texels": -0.11,
+    "boot_texels": 2.5,
+    "helmet_world": 0.0,
+    "cause": "none"
+   },
+   {
+    "kind": "frame",
+    "from": [
+     "run",
+     6
+    ],
+    "to": [
+     "run",
+     7
+    ],
+    "physics_frame": 811,
+    "ticks": 5,
+    "physics_dx": 3.0,
+    "helmet_texels": 0,
+    "torso_texels": -3.86,
+    "boot_texels": 14.0,
+    "helmet_world": 0.0,
+    "cause": "none"
+   }
+  ],
+  "unexplained": 0,
+  "max_helmet_texels": 0
+ },
+ "woman-run-idle": {
+  "changes": [
+   {
+    "kind": "frame",
+    "from": [
+     "run",
+     2
+    ],
+    "to": [
+     "run",
+     3
+    ],
+    "physics_frame": 885,
+    "ticks": null,
+    "physics_dx": 3.0,
+    "helmet_texels": 0,
+    "torso_texels": 2.5,
+    "boot_texels": 12.5,
+    "helmet_world": 0.0,
+    "cause": "none"
+   },
+   {
+    "kind": "frame",
+    "from": [
+     "run",
+     3
+    ],
+    "to": [
+     "run",
+     4
+    ],
+    "physics_frame": 889,
+    "ticks": 4,
+    "physics_dx": 3.0,
+    "helmet_texels": 0,
+    "torso_texels": 3.14,
+    "boot_texels": 1.0,
+    "helmet_world": 0.0,
+    "cause": "none"
+   },
+   {
+    "kind": "frame",
+    "from": [
+     "run",
+     4
+    ],
+    "to": [
+     "run",
+     5
+    ],
+    "physics_frame": 893,
+    "ticks": 4,
+    "physics_dx": 3.0,
+    "helmet_texels": 0,
+    "torso_texels": 0.43,
+    "boot_texels": -16.5,
+    "helmet_world": 0.0,
+    "cause": "none"
+   },
+   {
+    "kind": "frame",
+    "from": [
+     "run",
+     5
+    ],
+    "to": [
+     "run",
+     6
+    ],
+    "physics_frame": 897,
+    "ticks": 4,
+    "physics_dx": 3.0,
+    "helmet_texels": 0,
+    "torso_texels": -0.11,
+    "boot_texels": 2.5,
+    "helmet_world": 0.0,
+    "cause": "none"
+   },
+   {
+    "kind": "frame",
+    "from": [
+     "run",
+     6
+    ],
+    "to": [
+     "run",
+     7
+    ],
+    "physics_frame": 902,
+    "ticks": 5,
+    "physics_dx": 3.0,
+    "helmet_texels": 0,
+    "torso_texels": -3.86,
+    "boot_texels": 14.0,
+    "helmet_world": 0.0,
+    "cause": "none"
+   },
+   {
+    "kind": "loop",
+    "from": [
+     "run",
+     7
+    ],
+    "to": [
+     "run",
+     0
+    ],
+    "physics_frame": 906,
+    "ticks": 4,
+    "physics_dx": 2.222,
+    "helmet_texels": 0,
+    "torso_texels": 5.62,
+    "boot_texels": 1.5,
+    "helmet_world": 0.0,
+    "cause": "none"
+   },
+   {
+    "kind": "transition",
+    "from": [
+     "run",
+     0
+    ],
+    "to": [
+     "walk",
+     0
+    ],
+    "physics_frame": 907,
+    "ticks": null,
+    "physics_dx": 1.833,
+    "helmet_texels": -6,
+    "torso_texels": -3.64,
+    "boot_texels": 0.0,
+    "helmet_world": -3.0,
+    "cause": "authored pose"
+   },
+   {
+    "kind": "transition",
+    "from": [
+     "walk",
+     0
+    ],
+    "to": [
+     "idle",
+     0
+    ],
+    "physics_frame": 912,
+    "ticks": null,
+    "physics_dx": 0.0,
+    "helmet_texels": -1,
+    "torso_texels": -0.37,
+    "boot_texels": 2.0,
+    "helmet_world": -0.5,
+    "cause": "none"
+   },
+   {
+    "kind": "frame",
+    "from": [
+     "idle",
+     0
+    ],
+    "to": [
+     "idle",
+     1
+    ],
+    "physics_frame": 922,
+    "ticks": 10,
+    "physics_dx": 0.0,
+    "helmet_texels": -1,
+    "torso_texels": 1.93,
+    "boot_texels": -0.5,
+    "helmet_world": -0.5,
+    "cause": "none"
+   },
+   {
+    "kind": "frame",
+    "from": [
+     "idle",
+     1
+    ],
+    "to": [
+     "idle",
+     2
+    ],
+    "physics_frame": 932,
+    "ticks": 10,
+    "physics_dx": 0.0,
+    "helmet_texels": -3,
+    "torso_texels": -1.0,
+    "boot_texels": 0.0,
+    "helmet_world": -1.5,
+    "cause": "none"
+   },
+   {
+    "kind": "frame",
+    "from": [
+     "idle",
+     2
+    ],
+    "to": [
+     "idle",
+     3
+    ],
+    "physics_frame": 942,
+    "ticks": 10,
+    "physics_dx": 0.0,
+    "helmet_texels": 3,
+    "torso_texels": -0.85,
+    "boot_texels": 0.5,
+    "helmet_world": 1.5,
+    "cause": "none"
+   },
+   {
+    "kind": "frame",
+    "from": [
+     "idle",
+     3
+    ],
+    "to": [
+     "idle",
+     4
+    ],
+    "physics_frame": 952,
+    "ticks": 10,
+    "physics_dx": 0.0,
+    "helmet_texels": -1,
+    "torso_texels": -0.29,
+    "boot_texels": 0.0,
+    "helmet_world": -0.5,
+    "cause": "none"
+   },
+   {
+    "kind": "frame",
+    "from": [
+     "idle",
+     4
+    ],
+    "to": [
+     "idle",
+     5
+    ],
+    "physics_frame": 962,
+    "ticks": 10,
+    "physics_dx": 0.0,
+    "helmet_texels": 2,
+    "torso_texels": -0.23,
+    "boot_texels": -0.5,
+    "helmet_world": 1.0,
+    "cause": "none"
+   },
+   {
+    "kind": "loop",
+    "from": [
+     "idle",
+     5
+    ],
+    "to": [
+     "idle",
+     0
+    ],
+    "physics_frame": 972,
+    "ticks": 10,
+    "physics_dx": 0.0,
+    "helmet_texels": 0,
+    "torso_texels": 0.44,
+    "boot_texels": 0.5,
+    "helmet_world": 0.0,
+    "cause": "none"
+   }
+  ],
+  "unexplained": 0,
+  "max_helmet_texels": 0
+ },
+ "woman-idle-diagnose": {
+  "changes": [
+   {
+    "kind": "frame",
+    "from": [
+     "idle",
+     1
+    ],
+    "to": [
+     "idle",
+     2
+    ],
+    "physics_frame": 997,
+    "ticks": null,
+    "physics_dx": 0.0,
+    "helmet_texels": -3,
+    "torso_texels": -1.0,
+    "boot_texels": 0.0,
+    "helmet_world": -1.5,
+    "cause": "none"
+   },
+   {
+    "kind": "frame",
+    "from": [
+     "idle",
+     2
+    ],
+    "to": [
+     "idle",
+     3
+    ],
+    "physics_frame": 1007,
+    "ticks": 10,
+    "physics_dx": 0.0,
+    "helmet_texels": 3,
+    "torso_texels": -0.85,
+    "boot_texels": 0.5,
+    "helmet_world": 1.5,
+    "cause": "none"
+   },
+   {
+    "kind": "frame",
+    "from": [
+     "idle",
+     3
+    ],
+    "to": [
+     "idle",
+     4
+    ],
+    "physics_frame": 1017,
+    "ticks": 10,
+    "physics_dx": 0.0,
+    "helmet_texels": -1,
+    "torso_texels": -0.29,
+    "boot_texels": 0.0,
+    "helmet_world": -0.5,
+    "cause": "none"
+   },
+   {
+    "kind": "transition",
+    "from": [
+     "idle",
+     4
+    ],
+    "to": [
+     "secondary",
+     0
+    ],
+    "physics_frame": 1021,
+    "ticks": null,
+    "physics_dx": 0.0,
+    "helmet_texels": 4,
+    "torso_texels": 0.25,
+    "boot_texels": 0.0,
+    "helmet_world": 2.0,
+    "cause": "authored pose"
+   },
+   {
+    "kind": "frame",
+    "from": [
+     "secondary",
+     0
+    ],
+    "to": [
+     "secondary",
+     1
+    ],
+    "physics_frame": 1027,
+    "ticks": 6,
+    "physics_dx": 0.0,
+    "helmet_texels": -2,
+    "torso_texels": -1.34,
+    "boot_texels": 0.0,
+    "helmet_world": -1.0,
+    "cause": "none"
+   },
+   {
+    "kind": "frame",
+    "from": [
+     "secondary",
+     1
+    ],
+    "to": [
+     "secondary",
+     2
+    ],
+    "physics_frame": 1033,
+    "ticks": 6,
+    "physics_dx": 0.0,
+    "helmet_texels": 2,
+    "torso_texels": 6.73,
+    "boot_texels": 0.0,
+    "helmet_world": 1.0,
+    "cause": "none"
+   },
+   {
+    "kind": "frame",
+    "from": [
+     "secondary",
+     2
+    ],
+    "to": [
+     "secondary",
+     3
+    ],
+    "physics_frame": 1039,
+    "ticks": 6,
+    "physics_dx": 0.0,
+    "helmet_texels": 0,
+    "torso_texels": 3.0,
+    "boot_texels": 0.0,
+    "helmet_world": 0.0,
+    "cause": "none"
+   },
+   {
+    "kind": "frame",
+    "from": [
+     "secondary",
+     3
+    ],
+    "to": [
+     "secondary",
+     4
+    ],
+    "physics_frame": 1045,
+    "ticks": 6,
+    "physics_dx": 0.0,
+    "helmet_texels": 4,
+    "torso_texels": -9.53,
+    "boot_texels": 0.0,
+    "helmet_world": 2.0,
+    "cause": "authored pose"
+   },
+   {
+    "kind": "frame",
+    "from": [
+     "secondary",
+     4
+    ],
+    "to": [
+     "secondary",
+     5
+    ],
+    "physics_frame": 1051,
+    "ticks": 6,
+    "physics_dx": 0.0,
+    "helmet_texels": -3,
+    "torso_texels": 7.15,
+    "boot_texels": 0.0,
+    "helmet_world": -1.5,
+    "cause": "none"
+   },
+   {
+    "kind": "frame",
+    "from": [
+     "secondary",
+     5
+    ],
+    "to": [
+     "secondary",
+     6
+    ],
+    "physics_frame": 1057,
+    "ticks": 6,
+    "physics_dx": 0.0,
+    "helmet_texels": -6,
+    "torso_texels": -8.79,
+    "boot_texels": 0.0,
+    "helmet_world": -3.0,
+    "cause": "authored pose"
+   },
+   {
+    "kind": "frame",
+    "from": [
+     "secondary",
+     6
+    ],
+    "to": [
+     "secondary",
+     7
+    ],
+    "physics_frame": 1063,
+    "ticks": 6,
+    "physics_dx": 0.0,
+    "helmet_texels": 7,
+    "torso_texels": 2.94,
+    "boot_texels": 0.0,
+    "helmet_world": 3.5,
+    "cause": "authored pose"
+   },
+   {
+    "kind": "loop",
+    "from": [
+     "secondary",
+     7
+    ],
+    "to": [
+     "secondary",
+     0
+    ],
+    "physics_frame": 1069,
+    "ticks": 6,
+    "physics_dx": 0.0,
+    "helmet_texels": -2,
+    "torso_texels": -0.16,
+    "boot_texels": 0.0,
+    "helmet_world": -1.0,
+    "cause": "none"
+   },
+   {
+    "kind": "transition",
+    "from": [
+     "secondary",
+     0
+    ],
+    "to": [
+     "idle",
+     0
+    ],
+    "physics_frame": 1070,
+    "ticks": null,
+    "physics_dx": 0.0,
+    "helmet_texels": -2,
+    "torso_texels": -0.04,
+    "boot_texels": 0.0,
+    "helmet_world": -1.0,
+    "cause": "none"
+   },
+   {
+    "kind": "frame",
+    "from": [
+     "idle",
+     0
+    ],
+    "to": [
+     "idle",
+     1
+    ],
+    "physics_frame": 1080,
+    "ticks": 10,
+    "physics_dx": 0.0,
+    "helmet_texels": -1,
+    "torso_texels": 1.93,
+    "boot_texels": -0.5,
+    "helmet_world": -0.5,
+    "cause": "none"
+   },
+   {
+    "kind": "frame",
+    "from": [
+     "idle",
+     1
+    ],
+    "to": [
+     "idle",
+     2
+    ],
+    "physics_frame": 1090,
+    "ticks": 10,
+    "physics_dx": 0.0,
+    "helmet_texels": -3,
+    "torso_texels": -1.0,
+    "boot_texels": 0.0,
+    "helmet_world": -1.5,
+    "cause": "none"
+   }
+  ],
+  "unexplained": 0,
+  "max_helmet_texels": 0
+ },
+ "woman-diagnose-idle": {
+  "changes": [
+   {
+    "kind": "frame",
+    "from": [
+     "secondary",
+     0
+    ],
+    "to": [
+     "secondary",
+     1
+    ],
+    "physics_frame": 1122,
+    "ticks": null,
+    "physics_dx": 0.0,
+    "helmet_texels": -2,
+    "torso_texels": -1.34,
+    "boot_texels": 0.0,
+    "helmet_world": -1.0,
+    "cause": "none"
+   },
+   {
+    "kind": "frame",
+    "from": [
+     "secondary",
+     1
+    ],
+    "to": [
+     "secondary",
+     2
+    ],
+    "physics_frame": 1128,
+    "ticks": 6,
+    "physics_dx": 0.0,
+    "helmet_texels": 2,
+    "torso_texels": 6.73,
+    "boot_texels": 0.0,
+    "helmet_world": 1.0,
+    "cause": "none"
+   },
+   {
+    "kind": "frame",
+    "from": [
+     "secondary",
+     2
+    ],
+    "to": [
+     "secondary",
+     3
+    ],
+    "physics_frame": 1134,
+    "ticks": 6,
+    "physics_dx": 0.0,
+    "helmet_texels": 0,
+    "torso_texels": 3.0,
+    "boot_texels": 0.0,
+    "helmet_world": 0.0,
+    "cause": "none"
+   },
+   {
+    "kind": "frame",
+    "from": [
+     "secondary",
+     3
+    ],
+    "to": [
+     "secondary",
+     4
+    ],
+    "physics_frame": 1140,
+    "ticks": 6,
+    "physics_dx": 0.0,
+    "helmet_texels": 4,
+    "torso_texels": -9.53,
+    "boot_texels": 0.0,
+    "helmet_world": 2.0,
+    "cause": "authored pose"
+   },
+   {
+    "kind": "frame",
+    "from": [
+     "secondary",
+     4
+    ],
+    "to": [
+     "secondary",
+     5
+    ],
+    "physics_frame": 1146,
+    "ticks": 6,
+    "physics_dx": 0.0,
+    "helmet_texels": -3,
+    "torso_texels": 7.15,
+    "boot_texels": 0.0,
+    "helmet_world": -1.5,
+    "cause": "none"
+   },
+   {
+    "kind": "frame",
+    "from": [
+     "secondary",
+     5
+    ],
+    "to": [
+     "secondary",
+     6
+    ],
+    "physics_frame": 1152,
+    "ticks": 6,
+    "physics_dx": 0.0,
+    "helmet_texels": -6,
+    "torso_texels": -8.79,
+    "boot_texels": 0.0,
+    "helmet_world": -3.0,
+    "cause": "authored pose"
+   },
+   {
+    "kind": "frame",
+    "from": [
+     "secondary",
+     6
+    ],
+    "to": [
+     "secondary",
+     7
+    ],
+    "physics_frame": 1158,
+    "ticks": 6,
+    "physics_dx": 0.0,
+    "helmet_texels": 7,
+    "torso_texels": 2.94,
+    "boot_texels": 0.0,
+    "helmet_world": 3.5,
+    "cause": "authored pose"
+   },
+   {
+    "kind": "loop",
+    "from": [
+     "secondary",
+     7
+    ],
+    "to": [
+     "secondary",
+     0
+    ],
+    "physics_frame": 1164,
+    "ticks": 6,
+    "physics_dx": 0.0,
+    "helmet_texels": -2,
+    "torso_texels": -0.16,
+    "boot_texels": 0.0,
+    "helmet_world": -1.0,
+    "cause": "none"
+   },
+   {
+    "kind": "transition",
+    "from": [
+     "secondary",
+     0
+    ],
+    "to": [
+     "idle",
+     0
+    ],
+    "physics_frame": 1165,
+    "ticks": null,
+    "physics_dx": 0.0,
+    "helmet_texels": -2,
+    "torso_texels": -0.04,
+    "boot_texels": 0.0,
+    "helmet_world": -1.0,
+    "cause": "none"
+   },
+   {
+    "kind": "frame",
+    "from": [
+     "idle",
+     0
+    ],
+    "to": [
+     "idle",
+     1
+    ],
+    "physics_frame": 1175,
+    "ticks": 10,
+    "physics_dx": 0.0,
+    "helmet_texels": -1,
+    "torso_texels": 1.93,
+    "boot_texels": -0.5,
+    "helmet_world": -0.5,
+    "cause": "none"
+   },
+   {
+    "kind": "frame",
+    "from": [
+     "idle",
+     1
+    ],
+    "to": [
+     "idle",
+     2
+    ],
+    "physics_frame": 1185,
+    "ticks": 10,
+    "physics_dx": 0.0,
+    "helmet_texels": -3,
+    "torso_texels": -1.0,
+    "boot_texels": 0.0,
+    "helmet_world": -1.5,
+    "cause": "none"
+   },
+   {
+    "kind": "frame",
+    "from": [
+     "idle",
+     2
+    ],
+    "to": [
+     "idle",
+     3
+    ],
+    "physics_frame": 1195,
+    "ticks": 10,
+    "physics_dx": 0.0,
+    "helmet_texels": 3,
+    "torso_texels": -0.85,
+    "boot_texels": 0.5,
+    "helmet_world": 1.5,
+    "cause": "none"
+   },
+   {
+    "kind": "frame",
+    "from": [
+     "idle",
+     3
+    ],
+    "to": [
+     "idle",
+     4
+    ],
+    "physics_frame": 1205,
+    "ticks": 10,
+    "physics_dx": 0.0,
+    "helmet_texels": -1,
+    "torso_texels": -0.29,
+    "boot_texels": 0.0,
+    "helmet_world": -0.5,
+    "cause": "none"
+   },
+   {
+    "kind": "frame",
+    "from": [
+     "idle",
+     4
+    ],
+    "to": [
+     "idle",
+     5
+    ],
+    "physics_frame": 1215,
+    "ticks": 10,
+    "physics_dx": 0.0,
+    "helmet_texels": 2,
+    "torso_texels": -0.23,
+    "boot_texels": -0.5,
+    "helmet_world": 1.0,
+    "cause": "none"
+   }
+  ],
+  "unexplained": 0,
+  "max_helmet_texels": 0
+ }
+}

@@ -17,7 +17,7 @@ Each open item below has one acceptance criterion and names its pull request.
 
 | Item | Status | Pull request |
 |---|---|---|
-| 1. Hero animation smoothness | Open | PR1, `ridermw-hero-animation` |
+| 1. Hero animation smoothness | Delivered in PR1 | PR1, `ridermw-hero-animation` |
 | 2. Additional environments and tasks | Delivered | #26 (`ec3da76`, merged as `b2353f3`) |
 | 3. Role of sliding | Decided: retained | October 5 request |
 | 4. Elevator geometry and restart states | Open | PR3, `ridermw-elevators` |
@@ -65,7 +65,7 @@ measured download size without a size ceiling". This file has the later decision
 
 ## 1. Diagnose hero animation smoothness
 
-- [ ] **What:** Diagnose and correct jerky running, repairing, and climbing for
+- [x] **What:** Diagnose and correct jerky running, repairing, and climbing for
   both heroes.
 
 **Why:** The user reports visible jerkiness in these actions. Static frame size
@@ -94,6 +94,44 @@ automated results.
 no unexplained helmet, torso, tool, or boot anchor jump in run, idle to run, run
 to idle, idle to diagnose, and diagnose to idle, and each corrected cause has a
 regression that failed before the fix.
+
+### Verified increment: frame anchor registration (PR1)
+
+- [x] Extend `tests/animation_probe.gd` with idle to run, run to idle, idle to
+  diagnose, and diagnose to idle phases, and record sprite facing. Diagnosis
+  uses a Level 2 rack because Level 3 has no diagnosis rack.
+- [x] Add `tools/animation_anchors.py`. It measures helmet, torso, boot span,
+  and reach anchors in every frame and joins them with the rendered trace. It
+  classifies each frame change as source registration, authored pose, playback
+  timing, or camera and render timing. Its rules failed in tests before the
+  implementation.
+- [x] Measure before changing artwork. With fixed 60 Hz steps, every flagged
+  change was source registration: the man's run frames 3 and 7 move the whole
+  figure 9 and 4 texels forward (helmet x=125 and 120, other frames 114 to 116);
+  both heroes' idle boots drift up to 3.5 texels; the man's diagnosis boots
+  drift 3.5 texels in frames 0, 4, and 7. No playback timing or camera cause
+  appeared. Evidence: `docs/evidence/animation-anchors/before-report.json`.
+- [x] Classify authored poses separately. The run pose leans its helmet about
+  7 texels ahead of the walk pose while the torso stays within 4 texels. The
+  woman's diagnosis leans back over fixed boots. These stay unchanged.
+- [x] Observe failing artwork regressions in `tests/test_asset_pipeline.py`:
+  run helmet registration within 1 texel of x=116, and planted idle and
+  diagnosis boots within 0.5 texel of the pivot.
+- [x] Correct the frames with integer translation only. `python -m
+  tools.animation_assets register` applies the run helmet rule and the planted
+  stance rule to published frames; `normalize` applies the same rules. All 37
+  changed frames keep their exact color counts and vertical bounds.
+- [x] Measure after the change: zero unexplained changes for both heroes in
+  all five phases (`after-report.json`). Native help captures for both heroes
+  render the corrected clips.
+- [ ] Browser run capture is blocked on this host. Headless Edge uses software
+  rendering; each screenshot takes longer than one 71 ms run frame, so no
+  capture matched its sampled frame. A real time native run on this host also
+  renders at about 33 Hz, which quantizes frame changes to 2 physics ticks
+  (`realtime-before-report.json`). That is a host limit, not a game cause.
+
+[Run frames before and after](docs/evidence/animation-anchors/run-before-after.png)
+show the helmet column at x=116 for both heroes.
 
 **Depends on / blocked by:** No campaign selection is required. Reproduction
 and device observations must precede the choice of fix. Compare performance
@@ -640,8 +678,8 @@ They are not claims of defects in currently shipped features.
 
 This is a registration correction, not proof of perfect repair artwork.
 The woman's individual boot edges still vary by up to 3 texture pixels within
-the centered stance. Idle and diagnosis transitions use different existing
-anchors and remain unverified. Torso and tool poses still need visual judgment.
+the centered stance. PR1 registers idle and diagnosis boots on the same pivot.
+Torso and tool poses still need visual judgment.
 The lower 16 pixel band must contain only planted boots; future source art
 must respect that assumption.
 

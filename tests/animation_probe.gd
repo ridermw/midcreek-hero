@@ -2,11 +2,14 @@ extends SceneTree
 
 const LEVEL := preload("res://game/level.tscn")
 const MAIN := preload("res://game/main.tscn")
+const ACTIONS := ["walk", "run", "repair", "climb", "descend", "climb-turn", "idle-run", "run-idle", "idle-diagnose", "diagnose-idle"]
 var samples: Array[Dictionary] = []
 var output := ""
 var phase := ""
 var started := 0
 var current: Node
+var only: PackedStringArray = []
+var skip_help := false
 
 
 func _initialize() -> void:
@@ -17,6 +20,10 @@ func _initialize() -> void:
 	for arg in OS.get_cmdline_user_args():
 		if arg.begins_with("--output="):
 			output = arg.trim_prefix("--output=")
+		elif arg.begins_with("--actions="):
+			only = arg.trim_prefix("--actions=").split(",", false)
+		elif arg == "--skip-help":
+			skip_help = true
 	if output.is_empty():
 		push_error("Animation probe requires --output=<existing directory>.")
 		quit(1)
@@ -36,6 +43,7 @@ func record(delta: float) -> void:
 		"velocity": [player.velocity.x, player.velocity.y],
 		"camera": [current.camera.get_screen_center_position().x, current.camera.get_screen_center_position().y],
 		"clip": String(sprite.animation), "frame": sprite.frame,
+		"flip": sprite.flip_h,
 		"progress": sprite.frame_progress, "playing": sprite.is_playing(),
 		"playback_speed": sprite.get_playing_speed(),
 		"locked": player.locked, "action": String(player.action),
@@ -54,7 +62,13 @@ func _process(delta: float) -> bool:
 
 func run() -> void:
 	for hero: String in ["man", "woman"]:
-		for action: String in ["walk", "run", "repair", "climb", "descend", "climb-turn"]:
+		for action: String in ACTIONS:
+			if not only.is_empty() and not only.has(action):
+				continue
+			if action in ["idle-run", "run-idle", "idle-diagnose", "diagnose-idle"]:
+				if not await transition(hero, action):
+					return
+				continue
 			current = LEVEL.instantiate()
 			current.character = hero
 			current.level_path = "res://levels/03-cable-jungle.level"
@@ -111,6 +125,10 @@ func run() -> void:
 		return
 	file.store_string(JSON.stringify(samples))
 	file.close()
+	if skip_help:
+		print("ANIMATION_PROBE_COMPLETE: %d rendered samples" % samples.size())
+		quit()
+		return
 	for hero: String in ["man", "woman"]:
 		var main := MAIN.instantiate()
 		main.save_path = "user://animation-probe-unused.json"
@@ -136,3 +154,54 @@ func run() -> void:
 		await process_frame
 	print("ANIMATION_PROBE_COMPLETE: %d rendered samples" % samples.size())
 	quit()
+
+
+# Records one clip change: idle and run in Level 3, idle and diagnose at a Level 2 rack.
+func transition(hero: String, action: String) -> bool:
+	var diagnose := action.contains("diagnose")
+	current = LEVEL.instantiate()
+	current.character = hero
+	current.level_path = "res://levels/02-hot-aisle.level" if diagnose else "res://levels/03-cable-jungle.level"
+	root.add_child(current)
+	if not current.error_message.is_empty():
+		push_error(current.error_message)
+		quit(1)
+		return false
+	current.use_action_override = true
+	current.player.use_override = true
+	var at := Vector2(960, 416)
+	if diagnose:
+		var racks: Array = current.entities["racks"].filter(func(r) -> bool: return r.kind == "diagnose_repair")
+		if racks.is_empty():
+			push_error("Level 2 has no diagnose rack for the probe.")
+			quit(1)
+			return false
+		at = racks[0].position
+	current.player.respawn(at)
+	await create_timer(0.3).timeout
+	if action == "run-idle":
+		current.player.input_override = {"direction": 1.0}
+		await create_timer(0.8).timeout
+	phase = hero + "-" + action
+	started = Time.get_ticks_usec()
+	DisplayServer.window_set_title("Animation probe: " + phase)
+	if action == "diagnose-idle":
+		current.action_override = {"diagnose": true}
+		await create_timer(0.05).timeout
+		current.action_override = {}
+		await create_timer(1.6).timeout
+	else:
+		await create_timer(0.4).timeout
+		if action == "idle-run":
+			current.player.input_override = {"direction": 1.0}
+		elif action == "run-idle":
+			current.player.input_override = {}
+		else:
+			current.action_override = {"diagnose": true}
+			await create_timer(0.05).timeout
+			current.action_override = {}
+		await create_timer(1.2).timeout
+	phase = ""
+	current.queue_free()
+	await process_frame
+	return true

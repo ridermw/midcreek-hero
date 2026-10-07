@@ -10,7 +10,7 @@ from unittest.mock import patch
 
 from PIL import Image
 
-from tools import animation_assets, environment_assets
+from tools import animation_anchors, animation_assets, environment_assets
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -164,6 +164,63 @@ class AssetPipelineTest(unittest.TestCase):
             with self.subTest(variant=variant):
                 self.assertLessEqual(max(centers) - min(centers), 0.5, "The repair stance midpoint stays registered across phases and the loop boundary.")
                 self.assertTrue(all(abs(center - 104) <= 0.5 for center in centers))
+
+    def test_idle_and_diagnose_planted_stances_stay_on_the_pivot(self):
+        for variant in animation_assets.VARIANTS:
+            for clip in ("idle", "secondary"):
+                centers = []
+                for path in sorted((animation_assets.ART / "frames" / variant / clip).glob("*.png")):
+                    with Image.open(path) as frame:
+                        centers.append(animation_anchors.frame_anchors(frame)["boot_x"])
+                with self.subTest(variant=variant, clip=clip, centers=centers):
+                    self.assertTrue(all(abs(center - 104) <= 0.5 for center in centers), "Planted boots stay on the pivot in every phase.")
+
+    def test_run_helmet_stays_registered_across_the_cycle(self):
+        for variant in animation_assets.VARIANTS:
+            helmets = []
+            for path in sorted((animation_assets.ART / "frames" / variant / "run").glob("*.png")):
+                with Image.open(path) as frame:
+                    helmets.append(animation_anchors.frame_anchors(frame)["helmet_x"])
+            with self.subTest(variant=variant, helmets=helmets):
+                self.assertEqual(len(helmets), 8)
+                self.assertTrue(all(abs(x - animation_assets.RUN_HELMET_X) <= 1 for x in helmets), "The running figure does not jump forward or back between frames.")
+
+    def test_run_alignment_registers_the_helmet_and_preserves_pixels(self):
+        frame = Image.new("RGBA", (208, 208))
+        frame.paste((15, 80, 180, 255), (117, 35, 134, 51))
+        frame.paste((180, 200, 20, 255), (110, 52, 140, 125))
+        frame.paste((60, 40, 20, 255), (100, 125, 160, 184))
+        aligned = animation_assets.align_run(frame)
+        self.assertEqual(animation_anchors.frame_anchors(aligned)["helmet_x"], animation_assets.RUN_HELMET_X)
+        self.assertEqual(aligned.getbbox()[1::2], frame.getbbox()[1::2])
+        self.assertEqual(sorted(frame.getcolors(208 * 208)), sorted(aligned.getcolors(208 * 208)))
+        self.assertEqual(aligned.tobytes(), animation_assets.align_run(aligned).tobytes())
+
+    def test_run_alignment_rejects_missing_helmet_and_clipping(self):
+        with self.assertRaisesRegex(ValueError, "hard hat"):
+            animation_assets.align_run(Image.new("RGBA", (208, 208)))
+        frame = Image.new("RGBA", (208, 208))
+        frame.paste((15, 80, 180, 255), (12, 35, 29, 51))
+        frame.putpixel((207, 120), (120, 120, 120, 255))
+        with self.assertRaisesRegex(ValueError, "clipping"):
+            animation_assets.align_run(frame)
+
+    def test_register_translates_published_frames_in_place(self):
+        with tempfile.TemporaryDirectory() as directory:
+            art = Path(directory)
+            frames = art / "frames/man-midcreek/run"
+            frames.mkdir(parents=True)
+            for index, left in enumerate((100, 109, 100, 104, 100, 100, 100, 96)):
+                frame = Image.new("RGBA", (208, 208))
+                frame.paste((15, 80, 180, 255), (left + 8, 35, left + 25, 51))
+                frame.paste((60, 40, 20, 255), (left, 125, left + 30, 184))
+                frame.save(frames / f"{index:02d}.png")
+            with patch.object(animation_assets, "ART", art):
+                animation_assets.register("man-midcreek", "run")
+            for path in sorted(frames.glob("*.png")):
+                with self.subTest(frame=path.name), Image.open(path) as frame:
+                    self.assertEqual(animation_anchors.frame_anchors(frame)["helmet_x"], animation_assets.RUN_HELMET_X)
+            self.assertTrue((art / "previews/man-midcreek/run.png").is_file())
 
     def test_repair_alignment_preserves_pixels_baseline_and_tool_reach(self):
         frame = Image.new("RGBA", (208, 208))
