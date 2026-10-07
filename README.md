@@ -537,6 +537,8 @@ timing samples to `native-trace.json`. It also writes two help screenshots.
 `--actions=run,idle-run` limits the cases and `--skip-help` skips the help
 screenshots. The anchor report lists every cause of each frame change: source
 registration, authored pose, playback timing, or camera and render timing.
+Playback timing uses the recorded animation playback speed so climb pauses,
+reversals, and velocity scaling are not flagged as nominal-fps drift.
 Pass `--art <animation art directory>` to measure a trace against older frames.
 Add `--fixed-fps 60` before `--` to remove host render rate effects.
 Use a separate run with `--write-movie /tmp/midcreek-motion/actions.avi --fixed-fps 60`

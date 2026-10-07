@@ -22,11 +22,12 @@ def figure(shift=0, hat_shift=0, reach=0):
     return frame
 
 
-def sample(phase, clip, frame, tick, x=0.0, flip=False, wall_us=None):
+def sample(phase, clip, frame, tick, x=0.0, flip=False, wall_us=None, playback_speed=1.0):
     return {
         "phase": phase, "clip": clip, "frame": frame, "physics_frame": tick,
         "wall_us": tick * 16667 if wall_us is None else wall_us,
         "position": [x, 416.0], "camera": [x, 300.0], "flip": flip,
+        "playback_speed": playback_speed,
     }
 
 
@@ -38,6 +39,13 @@ class AnimationAnchorsTest(unittest.TestCase):
         self.assertAlmostEqual(anchors["torso_x"], 104.0)
         self.assertEqual(anchors["boot_x"], 104.5)
         self.assertEqual(anchors["reach_x"], 146)
+
+    def test_frame_anchors_measure_the_hard_hat_region_not_blue_shoulders(self):
+        frame = Image.new("RGBA", (208, 208))
+        frame.paste(HAT, (112, 35, 129, 51))
+        frame.paste(HAT, (50, 70, 101, 84))
+        anchors = animation_anchors.frame_anchors(frame)
+        self.assertEqual(anchors["helmet_x"], 120)
 
     def test_frame_anchors_reject_a_frame_without_a_helmet(self):
         with self.assertRaisesRegex(ValueError, "helmet"):
@@ -169,7 +177,56 @@ class AnimationAnchorsTest(unittest.TestCase):
         trace = [sample("man-repair", "primary", 0, 0), sample("man-repair", "primary", 1, 6)]
         change = animation_anchors.analyze(trace, anchors, {"primary": 10})["man-repair"]["changes"][0]
         self.assertEqual(change["reach_texels"], 4)
-        self.assertIn("source registration", change["causes"])
+        self.assertEqual(change["causes"], ["source registration"])
+
+    def test_tool_motion_relative_to_torso_is_reported_with_boot_registration(self):
+        anchors = {
+            ("man-midcreek", "primary", 0): animation_anchors.frame_anchors(figure(reach=10)),
+            ("man-midcreek", "primary", 1): animation_anchors.frame_anchors(figure(shift=4, reach=30)),
+        }
+        trace = [sample("man-repair", "primary", 0, 0), sample("man-repair", "primary", 1, 6)]
+        change = animation_anchors.analyze(trace, anchors, {"primary": 10})["man-repair"]["changes"][0]
+        self.assertEqual(change["causes"], ["source registration", "authored pose"])
+
+    def test_helmet_motion_relative_to_boots_is_reported_with_boot_registration(self):
+        anchors = {
+            ("woman-midcreek", "secondary", 0): animation_anchors.frame_anchors(figure()),
+            ("woman-midcreek", "secondary", 1): animation_anchors.frame_anchors(figure(shift=4, hat_shift=6)),
+        }
+        trace = [sample("woman-diagnose", "secondary", 0, 0), sample("woman-diagnose", "secondary", 1, 6)]
+        change = animation_anchors.analyze(trace, anchors, {"secondary": 10})["woman-diagnose"]["changes"][0]
+        self.assertEqual(change["causes"], ["source registration", "authored pose"])
+
+    def test_speed_scaled_climb_ascent_is_not_flagged_as_late_playback(self):
+        anchors = {("man-midcreek", "climb", i): animation_anchors.frame_anchors(figure()) for i in range(3)}
+        trace = [
+            sample("man-climb", "climb", 0, 0, playback_speed=2.109375),
+            sample("man-climb", "climb", 1, 4, playback_speed=2.109375),
+            sample("man-climb", "climb", 2, 8, playback_speed=2.109375),
+        ]
+        changes = animation_anchors.analyze(trace, anchors, {"climb": 8})["man-climb"]["changes"]
+        self.assertEqual(changes[1]["causes"], [])
+
+    def test_speed_scaled_climb_descent_is_not_flagged_as_late_playback(self):
+        anchors = {("man-midcreek", "climb", i): animation_anchors.frame_anchors(figure()) for i in range(3)}
+        trace = [
+            sample("man-climb", "climb", 2, 0, playback_speed=-2.109375),
+            sample("man-climb", "climb", 1, 4, playback_speed=-2.109375),
+            sample("man-climb", "climb", 0, 8, playback_speed=-2.109375),
+        ]
+        changes = animation_anchors.analyze(trace, anchors, {"climb": 8})["man-climb"]["changes"]
+        self.assertEqual(changes[1]["causes"], [])
+
+    def test_paused_climb_time_is_not_counted_as_playback_drift(self):
+        anchors = {("man-midcreek", "climb", i): animation_anchors.frame_anchors(figure()) for i in range(3)}
+        trace = [
+            sample("man-climb", "climb", 0, 0, playback_speed=1.0),
+            sample("man-climb", "climb", 1, 8, playback_speed=0.0),
+            sample("man-climb", "climb", 1, 14, playback_speed=1.0),
+            sample("man-climb", "climb", 2, 22, playback_speed=1.0),
+        ]
+        changes = animation_anchors.analyze(trace, anchors, {"climb": 8})["man-climb"]["changes"]
+        self.assertEqual(changes[1]["causes"], [])
 
     def test_summary_reports_the_largest_unexplained_jump(self):
         anchors = {

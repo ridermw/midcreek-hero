@@ -47,9 +47,8 @@ def frame_anchors(image):
         raise ValueError("Frame has no visible blue helmet anchor")
     bounds = frame.getbbox()
     feet = frame.crop((0, bounds[3] - 16, width, bounds[3])).getbbox()
-    xs = sorted(x for x, _ in hat)
     return {
-        "helmet_x": xs[len(xs) // 2],
+        "helmet_x": animation_assets._hat_x(frame),
         "helmet_top": min(y for _, y in hat),
         "torso_x": round(sum(vest) / len(vest), 2) if vest else float(PIVOT_X),
         "boot_x": (feet[0] + feet[2] - 1) / 2,
@@ -68,13 +67,14 @@ def load_anchors(art=None, clips=None):
     return anchors
 
 
-def classify(before, after, kind, ticks, fps, camera_error, clip, previous_clip):
+def classify(before, after, kind, playback_timing, camera_error, clip, previous_clip):
     """Return every independent cause, so a pose or registration change cannot hide timing."""
     helmet = after["helmet_x"] - before["helmet_x"]
     torso = after["torso_x"] - before["torso_x"]
     boots = after["boot_x"] - before["boot_x"]
     reach = after["reach_x"] - before["reach_x"]
     causes = []
+    planted_pair = clip in PLANTED and previous_clip in PLANTED
     if clip in PLANTED and previous_clip in PLANTED:
         # Planted boots separate a registration shift from an upper body lean.
         if abs(boots) > PLANTED_TEXELS:
@@ -82,14 +82,35 @@ def classify(before, after, kind, ticks, fps, camera_error, clip, previous_clip)
     elif (abs(helmet) > JUMP_TEXELS and abs(torso) > JUMP_TEXELS and helmet * torso > 0
           and abs(torso) >= TRANSLATION_RATIO * abs(helmet)):
         causes.append("source registration")
-    # A helmet lean or a tool swing relative to the torso is authored motion.
-    if not causes and (abs(helmet) > JUMP_TEXELS or (clip in TOOL_CLIPS and abs(reach - torso) > JUMP_TEXELS)):
+    # A helmet lean or a tool swing relative to its carrier is authored motion,
+    # even when a separate boot or full-body registration shift is also present.
+    authored_pose = False
+    if planted_pair:
+        authored_pose = abs(helmet - boots) > JUMP_TEXELS
+    elif causes:
+        authored_pose = abs(helmet - torso) > JUMP_TEXELS
+    else:
+        authored_pose = abs(helmet) > JUMP_TEXELS
+    if clip in TOOL_CLIPS and abs(reach - torso) > JUMP_TEXELS:
+        authored_pose = True
+    if authored_pose:
         causes.append("authored pose")
-    if kind != "transition" and ticks is not None and abs(ticks - 60.0 / fps) > TIMING_TICKS:
+    if kind != "transition" and playback_timing:
         causes.append("playback timing")
     if camera_error > CAMERA_PIXELS:
         causes.append("camera or render timing")
     return causes
+
+
+def _animation_frame_progress(samples, clip, fps):
+    progress = 0.0
+    for before, after in zip(samples, samples[1:]):
+        if before["clip"] != clip or after["clip"] != clip:
+            continue
+        ticks = max(0, after["physics_frame"] - before["physics_frame"])
+        speed = abs(before.get("playback_speed", 1.0) or 0.0)
+        progress += speed * fps * ticks / 60.0
+    return progress
 
 
 def analyze(samples, anchors, fps):
@@ -101,7 +122,8 @@ def analyze(samples, anchors, fps):
         variant = phase.split("-")[0] + "-midcreek"
         changes = []
         last_change = None
-        for previous, current in zip(items, items[1:]):
+        last_change_index = None
+        for index, (previous, current) in enumerate(zip(items, items[1:]), start=1):
             if (previous["clip"], previous["frame"]) == (current["clip"], current["frame"]):
                 continue
             before = anchors[(variant, previous["clip"], previous["frame"])]
@@ -113,8 +135,13 @@ def analyze(samples, anchors, fps):
             else:
                 kind = "frame"
             ticks = None
+            playback_frames = None
+            playback_timing = False
             if last_change is not None and last_change["clip"] == current["clip"] and kind != "transition":
                 ticks = current["physics_frame"] - last_change["physics_frame"]
+                frame_steps = max(1, abs(current["frame"] - last_change["frame"]))
+                playback_frames = _animation_frame_progress(items[last_change_index:index + 1], current["clip"], fps[current["clip"]])
+                playback_timing = abs(playback_frames - frame_steps) > fps[current["clip"]] * TIMING_TICKS / 60.0
             dx = current["position"][0] - previous["position"][0]
             camera_dx = current["camera"][0] - previous["camera"][0]
             sign = -1 if current.get("flip") else 1
@@ -133,9 +160,10 @@ def analyze(samples, anchors, fps):
                 "reach_texels": reach,
                 "helmet_world": helmet * WORLD_PER_TEXEL * sign,
                 "reach_world": reach * WORLD_PER_TEXEL * sign,
-                "causes": classify(before, after, kind, ticks, fps[current["clip"]], abs(camera_dx - dx), current["clip"], previous["clip"]),
+                "causes": classify(before, after, kind, playback_timing, abs(camera_dx - dx), current["clip"], previous["clip"]),
             })
             last_change = current
+            last_change_index = index
         unexplained = [c for c in changes if any(cause in UNEXPLAINED for cause in c["causes"])]
         report[phase] = {
             "changes": changes,

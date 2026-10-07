@@ -37,12 +37,12 @@
     "physics_frame": 24,
     "ticks": 5,
     "physics_dx": 3.0,
-    "helmet_texels": -1,
-    "torso_texels": -0.45,
-    "boot_texels": -10.0,
-    "reach_texels": -13,
-    "helmet_world": -0.5,
-    "reach_world": -6.5,
+    "helmet_texels": 0,
+    "torso_texels": 0.55,
+    "boot_texels": -9.0,
+    "reach_texels": -12,
+    "helmet_world": 0.0,
+    "reach_world": -6.0,
     "causes": []
    },
    {
@@ -58,12 +58,12 @@
     "physics_frame": 28,
     "ticks": 4,
     "physics_dx": 3.0,
-    "helmet_texels": 1,
-    "torso_texels": -1.03,
-    "boot_texels": -5.5,
-    "reach_texels": 7,
-    "helmet_world": 0.5,
-    "reach_world": 3.5,
+    "helmet_texels": 0,
+    "torso_texels": -2.03,
+    "boot_texels": -6.5,
+    "reach_texels": 6,
+    "helmet_world": 0.0,
+    "reach_world": 3.0,
     "causes": []
    },
    {
@@ -79,15 +79,13 @@
     "physics_frame": 32,
     "ticks": 4,
     "physics_dx": 3.0,
-    "helmet_texels": 9,
-    "torso_texels": 9.71,
-    "boot_texels": 68.5,
-    "reach_texels": 24,
-    "helmet_world": 4.5,
-    "reach_world": 12.0,
-    "causes": [
-     "source registration"
-    ]
+    "helmet_texels": 0,
+    "torso_texels": 0.71,
+    "boot_texels": 59.5,
+    "reach_texels": 15,
+    "helmet_world": 0.0,
+    "reach_world": 7.5,
+    "causes": []
    },
    {
     "kind": "frame",
@@ -102,15 +100,13 @@
     "physics_frame": 37,
     "ticks": 5,
     "physics_dx": 3.0,
-    "helmet_texels": -9,
-    "torso_texels": -7.43,
-    "boot_texels": -54.0,
-    "reach_texels": -15,
-    "helmet_world": -4.5,
-    "reach_world": -7.5,
-    "causes": [
-     "source registration"
-    ]
+    "helmet_texels": 0,
+    "torso_texels": 1.57,
+    "boot_texels": -45.0,
+    "reach_texels": -6,
+    "helmet_world": 0.0,
+    "reach_world": -3.0,
+    "causes": []
    },
    {
     "kind": "frame",
@@ -125,12 +121,12 @@
     "physics_frame": 41,
     "ticks": 4,
     "physics_dx": 3.0,
-    "helmet_texels": -2,
-    "torso_texels": -2.43,
-    "boot_texels": -14.5,
-    "reach_texels": -16,
-    "helmet_world": -1.0,
-    "reach_world": -8.0,
+    "helmet_texels": 0,
+    "torso_texels": -0.43,
+    "boot_texels": -12.5,
+    "reach_texels": -14,
+    "helmet_world": 0.0,
+    "reach_world": -7.0,
     "causes": []
    },
    {
@@ -146,12 +142,12 @@
     "physics_frame": 45,
     "ticks": 4,
     "physics_dx": 3.0,
-    "helmet_texels": 1,
-    "torso_texels": -0.72,
-    "boot_texels": 0.0,
-    "reach_texels": 6,
-    "helmet_world": 0.5,
-    "reach_world": 3.0,
+    "helmet_texels": 0,
+    "torso_texels": -1.72,
+    "boot_texels": -1.0,
+    "reach_texels": 5,
+    "helmet_world": 0.0,
+    "reach_world": 2.5,
     "causes": []
    },
    {
@@ -167,15 +163,13 @@
     "physics_frame": 49,
     "ticks": 4,
     "physics_dx": 3.0,
-    "helmet_texels": 5,
-    "torso_texels": 7.76,
-    "boot_texels": 19.5,
-    "reach_texels": 25,
-    "helmet_world": 2.5,
-    "reach_world": 12.5,
-    "causes": [
-     "source registration"
-    ]
+    "helmet_texels": 0,
+    "torso_texels": 2.76,
+    "boot_texels": 14.5,
+    "reach_texels": 20,
+    "helmet_world": 0.0,
+    "reach_world": 10.0,
+    "causes": []
    },
    {
     "kind": "loop",
@@ -190,14 +184,14 @@
     "physics_frame": 54,
     "ticks": 5,
     "physics_dx": 3.0,
-    "helmet_texels": -4,
-    "torso_texels": -5.41,
-    "boot_texels": -4.0,
-    "reach_texels": -18,
-    "helmet_world": -2.0,
-    "reach_world": -9.0,
+    "helmet_texels": 0,
+    "torso_texels": -1.41,
+    "boot_texels": 0.0,
+    "reach_texels": -14,
+    "helmet_world": 0.0,
+    "reach_world": -7.0,
     "causes": [
-     "source registration"
+     "playback timing"
     ]
    },
    {
@@ -213,12 +207,12 @@
     "physics_frame": 58,
     "ticks": 4,
     "physics_dx": 3.0,
-    "helmet_texels": -1,
-    "torso_texels": -0.45,
-    "boot_texels": -10.0,
-    "reach_texels": -13,
-    "helmet_world": -0.5,
-    "reach_world": -6.5,
+    "helmet_texels": 0,
+    "torso_texels": 0.55,
+    "boot_texels": -9.0,
+    "reach_texels": -12,
+    "helmet_world": 0.0,
+    "reach_world": -6.0,
     "causes": []
    },
    {
@@ -234,12 +228,12 @@
     "physics_frame": 62,
     "ticks": 4,
     "physics_dx": 3.0,
-    "helmet_texels": 1,
-    "torso_texels": -1.03,
-    "boot_texels": -5.5,
-    "reach_texels": 7,
-    "helmet_world": 0.5,
-    "reach_world": 3.5,
+    "helmet_texels": 0,
+    "torso_texels": -2.03,
+    "boot_texels": -6.5,
+    "reach_texels": 6,
+    "helmet_world": 0.0,
+    "reach_world": 3.0,
     "causes": []
    },
    {
@@ -255,15 +249,13 @@
     "physics_frame": 67,
     "ticks": 5,
     "physics_dx": 3.0,
-    "helmet_texels": 9,
-    "torso_texels": 9.71,
-    "boot_texels": 68.5,
-    "reach_texels": 24,
-    "helmet_world": 4.5,
-    "reach_world": 12.0,
-    "causes": [
-     "source registration"
-    ]
+    "helmet_texels": 0,
+    "torso_texels": 0.71,
+    "boot_texels": 59.5,
+    "reach_texels": 15,
+    "helmet_world": 0.0,
+    "reach_world": 7.5,
+    "causes": []
    },
    {
     "kind": "frame",
@@ -278,15 +270,13 @@
     "physics_frame": 71,
     "ticks": 4,
     "physics_dx": 3.0,
-    "helmet_texels": -9,
-    "torso_texels": -7.43,
-    "boot_texels": -54.0,
-    "reach_texels": -15,
-    "helmet_world": -4.5,
-    "reach_world": -7.5,
-    "causes": [
-     "source registration"
-    ]
+    "helmet_texels": 0,
+    "torso_texels": 1.57,
+    "boot_texels": -45.0,
+    "reach_texels": -6,
+    "helmet_world": 0.0,
+    "reach_world": -3.0,
+    "causes": []
    },
    {
     "kind": "frame",
@@ -301,12 +291,12 @@
     "physics_frame": 75,
     "ticks": 4,
     "physics_dx": 3.0,
-    "helmet_texels": -2,
-    "torso_texels": -2.43,
-    "boot_texels": -14.5,
-    "reach_texels": -16,
-    "helmet_world": -1.0,
-    "reach_world": -8.0,
+    "helmet_texels": 0,
+    "torso_texels": -0.43,
+    "boot_texels": -12.5,
+    "reach_texels": -14,
+    "helmet_world": 0.0,
+    "reach_world": -7.0,
     "causes": []
    },
    {
@@ -322,12 +312,12 @@
     "physics_frame": 79,
     "ticks": 4,
     "physics_dx": 3.0,
-    "helmet_texels": 1,
-    "torso_texels": -0.72,
-    "boot_texels": 0.0,
-    "reach_texels": 6,
-    "helmet_world": 0.5,
-    "reach_world": 3.0,
+    "helmet_texels": 0,
+    "torso_texels": -1.72,
+    "boot_texels": -1.0,
+    "reach_texels": 5,
+    "helmet_world": 0.0,
+    "reach_world": 2.5,
     "causes": []
    },
    {
@@ -343,15 +333,13 @@
     "physics_frame": 84,
     "ticks": 5,
     "physics_dx": 3.0,
-    "helmet_texels": 5,
-    "torso_texels": 7.76,
-    "boot_texels": 19.5,
-    "reach_texels": 25,
-    "helmet_world": 2.5,
-    "reach_world": 12.5,
-    "causes": [
-     "source registration"
-    ]
+    "helmet_texels": 0,
+    "torso_texels": 2.76,
+    "boot_texels": 14.5,
+    "reach_texels": 20,
+    "helmet_world": 0.0,
+    "reach_world": 10.0,
+    "causes": []
    },
    {
     "kind": "loop",
@@ -366,19 +354,19 @@
     "physics_frame": 88,
     "ticks": 4,
     "physics_dx": 3.0,
-    "helmet_texels": -4,
-    "torso_texels": -5.41,
-    "boot_texels": -4.0,
-    "reach_texels": -18,
-    "helmet_world": -2.0,
-    "reach_world": -9.0,
+    "helmet_texels": 0,
+    "torso_texels": -1.41,
+    "boot_texels": 0.0,
+    "reach_texels": -14,
+    "helmet_world": 0.0,
+    "reach_world": -7.0,
     "causes": [
-     "source registration"
+     "playback timing"
     ]
    }
   ],
-  "unexplained": 8,
-  "max_helmet_texels": 9
+  "unexplained": 2,
+  "max_helmet_texels": 0
  },
  "man-idle-run": {
   "changes": [
@@ -395,12 +383,12 @@
     "physics_frame": 109,
     "ticks": null,
     "physics_dx": 0.0,
-    "helmet_texels": -2,
-    "torso_texels": -0.09,
-    "boot_texels": 0.5,
-    "reach_texels": 1,
-    "helmet_world": -1.0,
-    "reach_world": 0.5,
+    "helmet_texels": -3,
+    "torso_texels": -1.09,
+    "boot_texels": -0.5,
+    "reach_texels": 0,
+    "helmet_world": -1.5,
+    "reach_world": 0.0,
     "causes": []
    },
    {
@@ -416,15 +404,13 @@
     "physics_frame": 119,
     "ticks": 10,
     "physics_dx": 0.0,
-    "helmet_texels": 3,
-    "torso_texels": 3.55,
-    "boot_texels": 3.0,
-    "reach_texels": 3,
-    "helmet_world": 1.5,
-    "reach_world": 1.5,
-    "causes": [
-     "source registration"
-    ]
+    "helmet_texels": 0,
+    "torso_texels": 0.55,
+    "boot_texels": 0.0,
+    "reach_texels": 0,
+    "helmet_world": 0.0,
+    "reach_world": 0.0,
+    "causes": []
    },
    {
     "kind": "frame",
@@ -439,14 +425,14 @@
     "physics_frame": 129,
     "ticks": 10,
     "physics_dx": 0.0,
-    "helmet_texels": 3,
-    "torso_texels": -2.55,
-    "boot_texels": -2.5,
-    "reach_texels": -2,
-    "helmet_world": 1.5,
-    "reach_world": -1.0,
+    "helmet_texels": 6,
+    "torso_texels": 0.45,
+    "boot_texels": 0.5,
+    "reach_texels": 1,
+    "helmet_world": 3.0,
+    "reach_world": 0.5,
     "causes": [
-     "source registration"
+     "authored pose"
     ]
    },
    {
@@ -462,12 +448,12 @@
     "physics_frame": 133,
     "ticks": null,
     "physics_dx": 0.389,
-    "helmet_texels": -1,
-    "torso_texels": -1.74,
-    "boot_texels": -4.0,
-    "reach_texels": 2,
-    "helmet_world": -0.5,
-    "reach_world": 1.0,
+    "helmet_texels": 1,
+    "torso_texels": 0.26,
+    "boot_texels": -2.0,
+    "reach_texels": 4,
+    "helmet_world": 0.5,
+    "reach_world": 2.0,
     "causes": []
    },
    {
@@ -506,12 +492,12 @@
     "physics_frame": 143,
     "ticks": 5,
     "physics_dx": 3.0,
-    "helmet_texels": -1,
-    "torso_texels": -0.45,
-    "boot_texels": -10.0,
-    "reach_texels": -13,
-    "helmet_world": -0.5,
-    "reach_world": -6.5,
+    "helmet_texels": 0,
+    "torso_texels": 0.55,
+    "boot_texels": -9.0,
+    "reach_texels": -12,
+    "helmet_world": 0.0,
+    "reach_world": -6.0,
     "causes": []
    },
    {
@@ -527,12 +513,12 @@
     "physics_frame": 147,
     "ticks": 4,
     "physics_dx": 3.0,
-    "helmet_texels": 1,
-    "torso_texels": -1.03,
-    "boot_texels": -5.5,
-    "reach_texels": 7,
-    "helmet_world": 0.5,
-    "reach_world": 3.5,
+    "helmet_texels": 0,
+    "torso_texels": -2.03,
+    "boot_texels": -6.5,
+    "reach_texels": 6,
+    "helmet_world": 0.0,
+    "reach_world": 3.0,
     "causes": []
    },
    {
@@ -548,15 +534,13 @@
     "physics_frame": 151,
     "ticks": 4,
     "physics_dx": 3.0,
-    "helmet_texels": 9,
-    "torso_texels": 9.71,
-    "boot_texels": 68.5,
-    "reach_texels": 24,
-    "helmet_world": 4.5,
-    "reach_world": 12.0,
-    "causes": [
-     "source registration"
-    ]
+    "helmet_texels": 0,
+    "torso_texels": 0.71,
+    "boot_texels": 59.5,
+    "reach_texels": 15,
+    "helmet_world": 0.0,
+    "reach_world": 7.5,
+    "causes": []
    },
    {
     "kind": "frame",
@@ -571,15 +555,13 @@
     "physics_frame": 156,
     "ticks": 5,
     "physics_dx": 3.0,
-    "helmet_texels": -9,
-    "torso_texels": -7.43,
-    "boot_texels": -54.0,
-    "reach_texels": -15,
-    "helmet_world": -4.5,
-    "reach_world": -7.5,
-    "causes": [
-     "source registration"
-    ]
+    "helmet_texels": 0,
+    "torso_texels": 1.57,
+    "boot_texels": -45.0,
+    "reach_texels": -6,
+    "helmet_world": 0.0,
+    "reach_world": -3.0,
+    "causes": []
    },
    {
     "kind": "frame",
@@ -594,12 +576,12 @@
     "physics_frame": 160,
     "ticks": 4,
     "physics_dx": 3.0,
-    "helmet_texels": -2,
-    "torso_texels": -2.43,
-    "boot_texels": -14.5,
-    "reach_texels": -16,
-    "helmet_world": -1.0,
-    "reach_world": -8.0,
+    "helmet_texels": 0,
+    "torso_texels": -0.43,
+    "boot_texels": -12.5,
+    "reach_texels": -14,
+    "helmet_world": 0.0,
+    "reach_world": -7.0,
     "causes": []
    },
    {
@@ -615,12 +597,12 @@
     "physics_frame": 164,
     "ticks": 4,
     "physics_dx": 3.0,
-    "helmet_texels": 1,
-    "torso_texels": -0.72,
-    "boot_texels": 0.0,
-    "reach_texels": 6,
-    "helmet_world": 0.5,
-    "reach_world": 3.0,
+    "helmet_texels": 0,
+    "torso_texels": -1.72,
+    "boot_texels": -1.0,
+    "reach_texels": 5,
+    "helmet_world": 0.0,
+    "reach_world": 2.5,
     "causes": []
    },
    {
@@ -636,15 +618,13 @@
     "physics_frame": 168,
     "ticks": 4,
     "physics_dx": 3.0,
-    "helmet_texels": 5,
-    "torso_texels": 7.76,
-    "boot_texels": 19.5,
-    "reach_texels": 25,
-    "helmet_world": 2.5,
-    "reach_world": 12.5,
-    "causes": [
-     "source registration"
-    ]
+    "helmet_texels": 0,
+    "torso_texels": 2.76,
+    "boot_texels": 14.5,
+    "reach_texels": 20,
+    "helmet_world": 0.0,
+    "reach_world": 10.0,
+    "causes": []
    },
    {
     "kind": "loop",
@@ -659,14 +639,14 @@
     "physics_frame": 173,
     "ticks": 5,
     "physics_dx": 3.0,
-    "helmet_texels": -4,
-    "torso_texels": -5.41,
-    "boot_texels": -4.0,
-    "reach_texels": -18,
-    "helmet_world": -2.0,
-    "reach_world": -9.0,
+    "helmet_texels": 0,
+    "torso_texels": -1.41,
+    "boot_texels": 0.0,
+    "reach_texels": -14,
+    "helmet_world": 0.0,
+    "reach_world": -7.0,
     "causes": [
-     "source registration"
+     "playback timing"
     ]
    },
    {
@@ -682,12 +662,12 @@
     "physics_frame": 177,
     "ticks": 4,
     "physics_dx": 3.0,
-    "helmet_texels": -1,
-    "torso_texels": -0.45,
-    "boot_texels": -10.0,
-    "reach_texels": -13,
-    "helmet_world": -0.5,
-    "reach_world": -6.5,
+    "helmet_texels": 0,
+    "torso_texels": 0.55,
+    "boot_texels": -9.0,
+    "reach_texels": -12,
+    "helmet_world": 0.0,
+    "reach_world": -6.0,
     "causes": []
    },
    {
@@ -703,12 +683,12 @@
     "physics_frame": 181,
     "ticks": 4,
     "physics_dx": 3.0,
-    "helmet_texels": 1,
-    "torso_texels": -1.03,
-    "boot_texels": -5.5,
-    "reach_texels": 7,
-    "helmet_world": 0.5,
-    "reach_world": 3.5,
+    "helmet_texels": 0,
+    "torso_texels": -2.03,
+    "boot_texels": -6.5,
+    "reach_texels": 6,
+    "helmet_world": 0.0,
+    "reach_world": 3.0,
     "causes": []
    },
    {
@@ -724,15 +704,13 @@
     "physics_frame": 186,
     "ticks": 5,
     "physics_dx": 3.0,
-    "helmet_texels": 9,
-    "torso_texels": 9.71,
-    "boot_texels": 68.5,
-    "reach_texels": 24,
-    "helmet_world": 4.5,
-    "reach_world": 12.0,
-    "causes": [
-     "source registration"
-    ]
+    "helmet_texels": 0,
+    "torso_texels": 0.71,
+    "boot_texels": 59.5,
+    "reach_texels": 15,
+    "helmet_world": 0.0,
+    "reach_world": 7.5,
+    "causes": []
    },
    {
     "kind": "frame",
@@ -747,15 +725,13 @@
     "physics_frame": 190,
     "ticks": 4,
     "physics_dx": 3.0,
-    "helmet_texels": -9,
-    "torso_texels": -7.43,
-    "boot_texels": -54.0,
-    "reach_texels": -15,
-    "helmet_world": -4.5,
-    "reach_world": -7.5,
-    "causes": [
-     "source registration"
-    ]
+    "helmet_texels": 0,
+    "torso_texels": 1.57,
+    "boot_texels": -45.0,
+    "reach_texels": -6,
+    "helmet_world": 0.0,
+    "reach_world": -3.0,
+    "causes": []
    },
    {
     "kind": "frame",
@@ -770,12 +746,12 @@
     "physics_frame": 194,
     "ticks": 4,
     "physics_dx": 3.0,
-    "helmet_texels": -2,
-    "torso_texels": -2.43,
-    "boot_texels": -14.5,
-    "reach_texels": -16,
-    "helmet_world": -1.0,
-    "reach_world": -8.0,
+    "helmet_texels": 0,
+    "torso_texels": -0.43,
+    "boot_texels": -12.5,
+    "reach_texels": -14,
+    "helmet_world": 0.0,
+    "reach_world": -7.0,
     "causes": []
    },
    {
@@ -791,12 +767,12 @@
     "physics_frame": 198,
     "ticks": 4,
     "physics_dx": 3.0,
-    "helmet_texels": 1,
-    "torso_texels": -0.72,
-    "boot_texels": 0.0,
-    "reach_texels": 6,
-    "helmet_world": 0.5,
-    "reach_world": 3.0,
+    "helmet_texels": 0,
+    "torso_texels": -1.72,
+    "boot_texels": -1.0,
+    "reach_texels": 5,
+    "helmet_world": 0.0,
+    "reach_world": 2.5,
     "causes": []
    },
    {
@@ -812,19 +788,17 @@
     "physics_frame": 203,
     "ticks": 5,
     "physics_dx": 3.0,
-    "helmet_texels": 5,
-    "torso_texels": 7.76,
-    "boot_texels": 19.5,
-    "reach_texels": 25,
-    "helmet_world": 2.5,
-    "reach_world": 12.5,
-    "causes": [
-     "source registration"
-    ]
+    "helmet_texels": 0,
+    "torso_texels": 2.76,
+    "boot_texels": 14.5,
+    "reach_texels": 20,
+    "helmet_world": 0.0,
+    "reach_world": 10.0,
+    "causes": []
    }
   ],
-  "unexplained": 9,
-  "max_helmet_texels": 9
+  "unexplained": 1,
+  "max_helmet_texels": 0
  },
  "man-run-idle": {
   "changes": [
@@ -841,15 +815,13 @@
     "physics_frame": 277,
     "ticks": null,
     "physics_dx": 3.0,
-    "helmet_texels": 9,
-    "torso_texels": 9.71,
-    "boot_texels": 68.5,
-    "reach_texels": 24,
-    "helmet_world": 4.5,
-    "reach_world": 12.0,
-    "causes": [
-     "source registration"
-    ]
+    "helmet_texels": 0,
+    "torso_texels": 0.71,
+    "boot_texels": 59.5,
+    "reach_texels": 15,
+    "helmet_world": 0.0,
+    "reach_world": 7.5,
+    "causes": []
    },
    {
     "kind": "frame",
@@ -864,15 +836,13 @@
     "physics_frame": 281,
     "ticks": 4,
     "physics_dx": 3.0,
-    "helmet_texels": -9,
-    "torso_texels": -7.43,
-    "boot_texels": -54.0,
-    "reach_texels": -15,
-    "helmet_world": -4.5,
-    "reach_world": -7.5,
-    "causes": [
-     "source registration"
-    ]
+    "helmet_texels": 0,
+    "torso_texels": 1.57,
+    "boot_texels": -45.0,
+    "reach_texels": -6,
+    "helmet_world": 0.0,
+    "reach_world": -3.0,
+    "causes": []
    },
    {
     "kind": "frame",
@@ -887,12 +857,12 @@
     "physics_frame": 285,
     "ticks": 4,
     "physics_dx": 3.0,
-    "helmet_texels": -2,
-    "torso_texels": -2.43,
-    "boot_texels": -14.5,
-    "reach_texels": -16,
-    "helmet_world": -1.0,
-    "reach_world": -8.0,
+    "helmet_texels": 0,
+    "torso_texels": -0.43,
+    "boot_texels": -12.5,
+    "reach_texels": -14,
+    "helmet_world": 0.0,
+    "reach_world": -7.0,
     "causes": []
    },
    {
@@ -908,12 +878,12 @@
     "physics_frame": 289,
     "ticks": 4,
     "physics_dx": 3.0,
-    "helmet_texels": 1,
-    "torso_texels": -0.72,
-    "boot_texels": 0.0,
-    "reach_texels": 6,
-    "helmet_world": 0.5,
-    "reach_world": 3.0,
+    "helmet_texels": 0,
+    "torso_texels": -1.72,
+    "boot_texels": -1.0,
+    "reach_texels": 5,
+    "helmet_world": 0.0,
+    "reach_world": 2.5,
     "causes": []
    },
    {
@@ -929,15 +899,13 @@
     "physics_frame": 294,
     "ticks": 5,
     "physics_dx": 3.0,
-    "helmet_texels": 5,
-    "torso_texels": 7.76,
-    "boot_texels": 19.5,
-    "reach_texels": 25,
-    "helmet_world": 2.5,
-    "reach_world": 12.5,
-    "causes": [
-     "source registration"
-    ]
+    "helmet_texels": 0,
+    "torso_texels": 2.76,
+    "boot_texels": 14.5,
+    "reach_texels": 20,
+    "helmet_world": 0.0,
+    "reach_world": 10.0,
+    "causes": []
    },
    {
     "kind": "loop",
@@ -952,14 +920,14 @@
     "physics_frame": 298,
     "ticks": 4,
     "physics_dx": 2.222,
-    "helmet_texels": -4,
-    "torso_texels": -5.41,
-    "boot_texels": -4.0,
-    "reach_texels": -18,
-    "helmet_world": -2.0,
-    "reach_world": -9.0,
+    "helmet_texels": 0,
+    "torso_texels": -1.41,
+    "boot_texels": 0.0,
+    "reach_texels": -14,
+    "helmet_world": 0.0,
+    "reach_world": -7.0,
     "causes": [
-     "source registration"
+     "playback timing"
     ]
    },
    {
@@ -998,12 +966,12 @@
     "physics_frame": 304,
     "ticks": null,
     "physics_dx": 0.0,
-    "helmet_texels": -1,
-    "torso_texels": 0.85,
-    "boot_texels": 3.5,
-    "reach_texels": -4,
-    "helmet_world": -0.5,
-    "reach_world": -2.0,
+    "helmet_texels": -3,
+    "torso_texels": -1.15,
+    "boot_texels": 1.5,
+    "reach_texels": -6,
+    "helmet_world": -1.5,
+    "reach_world": -3.0,
     "causes": []
    },
    {
@@ -1019,12 +987,12 @@
     "physics_frame": 314,
     "ticks": 10,
     "physics_dx": 0.0,
-    "helmet_texels": -2,
-    "torso_texels": -0.02,
-    "boot_texels": -0.5,
-    "reach_texels": 0,
-    "helmet_world": -1.0,
-    "reach_world": 0.0,
+    "helmet_texels": -1,
+    "torso_texels": 0.98,
+    "boot_texels": 0.5,
+    "reach_texels": 1,
+    "helmet_world": -0.5,
+    "reach_world": 0.5,
     "causes": []
    },
    {
@@ -1040,12 +1008,12 @@
     "physics_frame": 324,
     "ticks": 10,
     "physics_dx": 0.0,
-    "helmet_texels": -2,
-    "torso_texels": -0.09,
-    "boot_texels": 0.5,
-    "reach_texels": 1,
-    "helmet_world": -1.0,
-    "reach_world": 0.5,
+    "helmet_texels": -3,
+    "torso_texels": -1.09,
+    "boot_texels": -0.5,
+    "reach_texels": 0,
+    "helmet_world": -1.5,
+    "reach_world": 0.0,
     "causes": []
    },
    {
@@ -1061,15 +1029,13 @@
     "physics_frame": 334,
     "ticks": 10,
     "physics_dx": 0.0,
-    "helmet_texels": 3,
-    "torso_texels": 3.55,
-    "boot_texels": 3.0,
-    "reach_texels": 3,
-    "helmet_world": 1.5,
-    "reach_world": 1.5,
-    "causes": [
-     "source registration"
-    ]
+    "helmet_texels": 0,
+    "torso_texels": 0.55,
+    "boot_texels": 0.0,
+    "reach_texels": 0,
+    "helmet_world": 0.0,
+    "reach_world": 0.0,
+    "causes": []
    },
    {
     "kind": "frame",
@@ -1084,14 +1050,14 @@
     "physics_frame": 344,
     "ticks": 10,
     "physics_dx": 0.0,
-    "helmet_texels": 3,
-    "torso_texels": -2.55,
-    "boot_texels": -2.5,
-    "reach_texels": -2,
-    "helmet_world": 1.5,
-    "reach_world": -1.0,
+    "helmet_texels": 6,
+    "torso_texels": 0.45,
+    "boot_texels": 0.5,
+    "reach_texels": 1,
+    "helmet_world": 3.0,
+    "reach_world": 0.5,
     "causes": [
-     "source registration"
+     "authored pose"
     ]
    },
    {
@@ -1134,11 +1100,13 @@
     "reach_texels": 0,
     "helmet_world": 0.5,
     "reach_world": 0.0,
-    "causes": []
+    "causes": [
+     "playback timing"
+    ]
    }
   ],
-  "unexplained": 6,
-  "max_helmet_texels": 9
+  "unexplained": 2,
+  "max_helmet_texels": 1
  },
  "man-idle-diagnose": {
   "changes": [
@@ -1155,12 +1123,12 @@
     "physics_frame": 389,
     "ticks": null,
     "physics_dx": 0.0,
-    "helmet_texels": -2,
-    "torso_texels": -0.09,
-    "boot_texels": 0.5,
-    "reach_texels": 1,
-    "helmet_world": -1.0,
-    "reach_world": 0.5,
+    "helmet_texels": -3,
+    "torso_texels": -1.09,
+    "boot_texels": -0.5,
+    "reach_texels": 0,
+    "helmet_world": -1.5,
+    "reach_world": 0.0,
     "causes": []
    },
    {
@@ -1176,15 +1144,13 @@
     "physics_frame": 399,
     "ticks": 10,
     "physics_dx": 0.0,
-    "helmet_texels": 3,
-    "torso_texels": 3.55,
-    "boot_texels": 3.0,
-    "reach_texels": 3,
-    "helmet_world": 1.5,
-    "reach_world": 1.5,
-    "causes": [
-     "source registration"
-    ]
+    "helmet_texels": 0,
+    "torso_texels": 0.55,
+    "boot_texels": 0.0,
+    "reach_texels": 0,
+    "helmet_world": 0.0,
+    "reach_world": 0.0,
+    "causes": []
    },
    {
     "kind": "frame",
@@ -1199,14 +1165,14 @@
     "physics_frame": 409,
     "ticks": 10,
     "physics_dx": 0.0,
-    "helmet_texels": 3,
-    "torso_texels": -2.55,
-    "boot_texels": -2.5,
-    "reach_texels": -2,
-    "helmet_world": 1.5,
-    "reach_world": -1.0,
+    "helmet_texels": 6,
+    "torso_texels": 0.45,
+    "boot_texels": 0.5,
+    "reach_texels": 1,
+    "helmet_world": 3.0,
+    "reach_world": 0.5,
     "causes": [
-     "source registration"
+     "authored pose"
     ]
    },
    {
@@ -1245,14 +1211,14 @@
     "physics_frame": 419,
     "ticks": 6,
     "physics_dx": 0.0,
-    "helmet_texels": -7,
-    "torso_texels": -4.76,
-    "boot_texels": -3.5,
-    "reach_texels": -4,
-    "helmet_world": -3.5,
-    "reach_world": -2.0,
+    "helmet_texels": -3,
+    "torso_texels": -0.76,
+    "boot_texels": 0.5,
+    "reach_texels": 0,
+    "helmet_world": -1.5,
+    "reach_world": 0.0,
     "causes": [
-     "source registration"
+     "authored pose"
     ]
    },
    {
@@ -1312,14 +1278,14 @@
     "physics_frame": 437,
     "ticks": 6,
     "physics_dx": 0.0,
-    "helmet_texels": 9,
-    "torso_texels": 2.84,
-    "boot_texels": 3.5,
-    "reach_texels": -35,
-    "helmet_world": 4.5,
-    "reach_world": -17.5,
+    "helmet_texels": 5,
+    "torso_texels": -1.16,
+    "boot_texels": -0.5,
+    "reach_texels": -39,
+    "helmet_world": 2.5,
+    "reach_world": -19.5,
     "causes": [
-     "source registration"
+     "authored pose"
     ]
    },
    {
@@ -1335,14 +1301,14 @@
     "physics_frame": 443,
     "ticks": 6,
     "physics_dx": 0.0,
-    "helmet_texels": -9,
-    "torso_texels": -1.49,
-    "boot_texels": -3.5,
-    "reach_texels": 23,
-    "helmet_world": -4.5,
-    "reach_world": 11.5,
+    "helmet_texels": -5,
+    "torso_texels": 2.51,
+    "boot_texels": 0.5,
+    "reach_texels": 27,
+    "helmet_world": -2.5,
+    "reach_world": 13.5,
     "causes": [
-     "source registration"
+     "authored pose"
     ]
    },
    {
@@ -1381,14 +1347,14 @@
     "physics_frame": 455,
     "ticks": 6,
     "physics_dx": 0.0,
-    "helmet_texels": 7,
-    "torso_texels": 2.62,
-    "boot_texels": 2.5,
-    "reach_texels": 3,
-    "helmet_world": 3.5,
-    "reach_world": 1.5,
+    "helmet_texels": 4,
+    "torso_texels": -0.38,
+    "boot_texels": -0.5,
+    "reach_texels": 0,
+    "helmet_world": 2.0,
+    "reach_world": 0.0,
     "causes": [
-     "source registration"
+     "authored pose"
     ]
    },
    {
@@ -1404,13 +1370,15 @@
     "physics_frame": 461,
     "ticks": 6,
     "physics_dx": 0.0,
-    "helmet_texels": 0,
-    "torso_texels": 2.3,
-    "boot_texels": 1.0,
-    "reach_texels": 1,
-    "helmet_world": 0.0,
-    "reach_world": 0.5,
-    "causes": []
+    "helmet_texels": -1,
+    "torso_texels": 1.3,
+    "boot_texels": 0.0,
+    "reach_texels": 0,
+    "helmet_world": -0.5,
+    "reach_world": 0.0,
+    "causes": [
+     "playback timing"
+    ]
    },
    {
     "kind": "transition",
@@ -1448,12 +1416,12 @@
     "physics_frame": 472,
     "ticks": 10,
     "physics_dx": 0.0,
-    "helmet_texels": -2,
-    "torso_texels": -0.02,
-    "boot_texels": -0.5,
-    "reach_texels": 0,
-    "helmet_world": -1.0,
-    "reach_world": 0.0,
+    "helmet_texels": -1,
+    "torso_texels": 0.98,
+    "boot_texels": 0.5,
+    "reach_texels": 1,
+    "helmet_world": -0.5,
+    "reach_world": 0.5,
     "causes": []
    },
    {
@@ -1469,17 +1437,17 @@
     "physics_frame": 482,
     "ticks": 10,
     "physics_dx": 0.0,
-    "helmet_texels": -2,
-    "torso_texels": -0.09,
-    "boot_texels": 0.5,
-    "reach_texels": 1,
-    "helmet_world": -1.0,
-    "reach_world": 0.5,
+    "helmet_texels": -3,
+    "torso_texels": -1.09,
+    "boot_texels": -0.5,
+    "reach_texels": 0,
+    "helmet_world": -1.5,
+    "reach_world": 0.0,
     "causes": []
    }
   ],
-  "unexplained": 6,
-  "max_helmet_texels": 9
+  "unexplained": 1,
+  "max_helmet_texels": 1
  },
  "man-diagnose-idle": {
   "changes": [
@@ -1496,14 +1464,14 @@
     "physics_frame": 514,
     "ticks": null,
     "physics_dx": 0.0,
-    "helmet_texels": -7,
-    "torso_texels": -4.76,
-    "boot_texels": -3.5,
-    "reach_texels": -4,
-    "helmet_world": -3.5,
-    "reach_world": -2.0,
+    "helmet_texels": -3,
+    "torso_texels": -0.76,
+    "boot_texels": 0.5,
+    "reach_texels": 0,
+    "helmet_world": -1.5,
+    "reach_world": 0.0,
     "causes": [
-     "source registration"
+     "authored pose"
     ]
    },
    {
@@ -1563,14 +1531,14 @@
     "physics_frame": 532,
     "ticks": 6,
     "physics_dx": 0.0,
-    "helmet_texels": 9,
-    "torso_texels": 2.84,
-    "boot_texels": 3.5,
-    "reach_texels": -35,
-    "helmet_world": 4.5,
-    "reach_world": -17.5,
+    "helmet_texels": 5,
+    "torso_texels": -1.16,
+    "boot_texels": -0.5,
+    "reach_texels": -39,
+    "helmet_world": 2.5,
+    "reach_world": -19.5,
     "causes": [
-     "source registration"
+     "authored pose"
     ]
    },
    {
@@ -1586,14 +1554,14 @@
     "physics_frame": 538,
     "ticks": 6,
     "physics_dx": 0.0,
-    "helmet_texels": -9,
-    "torso_texels": -1.49,
-    "boot_texels": -3.5,
-    "reach_texels": 23,
-    "helmet_world": -4.5,
-    "reach_world": 11.5,
+    "helmet_texels": -5,
+    "torso_texels": 2.51,
+    "boot_texels": 0.5,
+    "reach_texels": 27,
+    "helmet_world": -2.5,
+    "reach_world": 13.5,
     "causes": [
-     "source registration"
+     "authored pose"
     ]
    },
    {
@@ -1632,14 +1600,14 @@
     "physics_frame": 550,
     "ticks": 6,
     "physics_dx": 0.0,
-    "helmet_texels": 7,
-    "torso_texels": 2.62,
-    "boot_texels": 2.5,
-    "reach_texels": 3,
-    "helmet_world": 3.5,
-    "reach_world": 1.5,
+    "helmet_texels": 4,
+    "torso_texels": -0.38,
+    "boot_texels": -0.5,
+    "reach_texels": 0,
+    "helmet_world": 2.0,
+    "reach_world": 0.0,
     "causes": [
-     "source registration"
+     "authored pose"
     ]
    },
    {
@@ -1655,13 +1623,15 @@
     "physics_frame": 556,
     "ticks": 6,
     "physics_dx": 0.0,
-    "helmet_texels": 0,
-    "torso_texels": 2.3,
-    "boot_texels": 1.0,
-    "reach_texels": 1,
-    "helmet_world": 0.0,
-    "reach_world": 0.5,
-    "causes": []
+    "helmet_texels": -1,
+    "torso_texels": 1.3,
+    "boot_texels": 0.0,
+    "reach_texels": 0,
+    "helmet_world": -0.5,
+    "reach_world": 0.0,
+    "causes": [
+     "playback timing"
+    ]
    },
    {
     "kind": "transition",
@@ -1699,12 +1669,12 @@
     "physics_frame": 567,
     "ticks": 10,
     "physics_dx": 0.0,
-    "helmet_texels": -2,
-    "torso_texels": -0.02,
-    "boot_texels": -0.5,
-    "reach_texels": 0,
-    "helmet_world": -1.0,
-    "reach_world": 0.0,
+    "helmet_texels": -1,
+    "torso_texels": 0.98,
+    "boot_texels": 0.5,
+    "reach_texels": 1,
+    "helmet_world": -0.5,
+    "reach_world": 0.5,
     "causes": []
    },
    {
@@ -1720,12 +1690,12 @@
     "physics_frame": 577,
     "ticks": 10,
     "physics_dx": 0.0,
-    "helmet_texels": -2,
-    "torso_texels": -0.09,
-    "boot_texels": 0.5,
-    "reach_texels": 1,
-    "helmet_world": -1.0,
-    "reach_world": 0.5,
+    "helmet_texels": -3,
+    "torso_texels": -1.09,
+    "boot_texels": -0.5,
+    "reach_texels": 0,
+    "helmet_world": -1.5,
+    "reach_world": 0.0,
     "causes": []
    },
    {
@@ -1741,15 +1711,13 @@
     "physics_frame": 587,
     "ticks": 10,
     "physics_dx": 0.0,
-    "helmet_texels": 3,
-    "torso_texels": 3.55,
-    "boot_texels": 3.0,
-    "reach_texels": 3,
-    "helmet_world": 1.5,
-    "reach_world": 1.5,
-    "causes": [
-     "source registration"
-    ]
+    "helmet_texels": 0,
+    "torso_texels": 0.55,
+    "boot_texels": 0.0,
+    "reach_texels": 0,
+    "helmet_world": 0.0,
+    "reach_world": 0.0,
+    "causes": []
    },
    {
     "kind": "frame",
@@ -1764,14 +1732,14 @@
     "physics_frame": 597,
     "ticks": 10,
     "physics_dx": 0.0,
-    "helmet_texels": 3,
-    "torso_texels": -2.55,
-    "boot_texels": -2.5,
-    "reach_texels": -2,
-    "helmet_world": 1.5,
-    "reach_world": -1.0,
+    "helmet_texels": 6,
+    "torso_texels": 0.45,
+    "boot_texels": 0.5,
+    "reach_texels": 1,
+    "helmet_world": 3.0,
+    "reach_world": 0.5,
     "causes": [
-     "source registration"
+     "authored pose"
     ]
    },
    {
@@ -1796,8 +1764,8 @@
     "causes": []
    }
   ],
-  "unexplained": 6,
-  "max_helmet_texels": 9
+  "unexplained": 1,
+  "max_helmet_texels": 1
  },
  "woman-run": {
   "changes": [
@@ -1837,12 +1805,12 @@
     "physics_frame": 632,
     "ticks": 5,
     "physics_dx": 3.0,
-    "helmet_texels": 1,
-    "torso_texels": -1.02,
-    "boot_texels": -17.5,
-    "reach_texels": -10,
-    "helmet_world": 0.5,
-    "reach_world": -5.0,
+    "helmet_texels": 0,
+    "torso_texels": -2.02,
+    "boot_texels": -18.5,
+    "reach_texels": -11,
+    "helmet_world": 0.0,
+    "reach_world": -5.5,
     "causes": []
    },
    {
@@ -1879,12 +1847,12 @@
     "physics_frame": 640,
     "ticks": 4,
     "physics_dx": 3.0,
-    "helmet_texels": -1,
-    "torso_texels": 1.5,
-    "boot_texels": 11.5,
-    "reach_texels": 15,
-    "helmet_world": -0.5,
-    "reach_world": 7.5,
+    "helmet_texels": 0,
+    "torso_texels": 2.5,
+    "boot_texels": 12.5,
+    "reach_texels": 16,
+    "helmet_world": 0.0,
+    "reach_world": 8.0,
     "causes": []
    },
    {
@@ -1900,12 +1868,12 @@
     "physics_frame": 645,
     "ticks": 5,
     "physics_dx": 3.0,
-    "helmet_texels": 2,
-    "torso_texels": 5.14,
-    "boot_texels": 3.0,
-    "reach_texels": -7,
-    "helmet_world": 1.0,
-    "reach_world": -3.5,
+    "helmet_texels": 0,
+    "torso_texels": 3.14,
+    "boot_texels": 1.0,
+    "reach_texels": -9,
+    "helmet_world": 0.0,
+    "reach_world": -4.5,
     "causes": []
    },
    {
@@ -1921,12 +1889,12 @@
     "physics_frame": 649,
     "ticks": 4,
     "physics_dx": 3.0,
-    "helmet_texels": -1,
-    "torso_texels": -0.57,
-    "boot_texels": -17.5,
-    "reach_texels": -13,
-    "helmet_world": -0.5,
-    "reach_world": -6.5,
+    "helmet_texels": 0,
+    "torso_texels": 0.43,
+    "boot_texels": -16.5,
+    "reach_texels": -12,
+    "helmet_world": 0.0,
+    "reach_world": -6.0,
     "causes": []
    },
    {
@@ -1942,12 +1910,12 @@
     "physics_frame": 653,
     "ticks": 4,
     "physics_dx": 3.0,
-    "helmet_texels": -1,
-    "torso_texels": -1.11,
-    "boot_texels": 1.5,
-    "reach_texels": 5,
-    "helmet_world": -0.5,
-    "reach_world": 2.5,
+    "helmet_texels": 0,
+    "torso_texels": -0.11,
+    "boot_texels": 2.5,
+    "reach_texels": 6,
+    "helmet_world": 0.0,
+    "reach_world": 3.0,
     "causes": []
    },
    {
@@ -1990,7 +1958,9 @@
     "reach_texels": -7,
     "helmet_world": 0.0,
     "reach_world": -3.5,
-    "causes": []
+    "causes": [
+     "playback timing"
+    ]
    },
    {
     "kind": "frame",
@@ -2005,12 +1975,12 @@
     "physics_frame": 666,
     "ticks": 4,
     "physics_dx": 3.0,
-    "helmet_texels": 1,
-    "torso_texels": -1.02,
-    "boot_texels": -17.5,
-    "reach_texels": -10,
-    "helmet_world": 0.5,
-    "reach_world": -5.0,
+    "helmet_texels": 0,
+    "torso_texels": -2.02,
+    "boot_texels": -18.5,
+    "reach_texels": -11,
+    "helmet_world": 0.0,
+    "reach_world": -5.5,
     "causes": []
    },
    {
@@ -2047,12 +2017,12 @@
     "physics_frame": 675,
     "ticks": 5,
     "physics_dx": 3.0,
-    "helmet_texels": -1,
-    "torso_texels": 1.5,
-    "boot_texels": 11.5,
-    "reach_texels": 15,
-    "helmet_world": -0.5,
-    "reach_world": 7.5,
+    "helmet_texels": 0,
+    "torso_texels": 2.5,
+    "boot_texels": 12.5,
+    "reach_texels": 16,
+    "helmet_world": 0.0,
+    "reach_world": 8.0,
     "causes": []
    },
    {
@@ -2068,12 +2038,12 @@
     "physics_frame": 679,
     "ticks": 4,
     "physics_dx": 3.0,
-    "helmet_texels": 2,
-    "torso_texels": 5.14,
-    "boot_texels": 3.0,
-    "reach_texels": -7,
-    "helmet_world": 1.0,
-    "reach_world": -3.5,
+    "helmet_texels": 0,
+    "torso_texels": 3.14,
+    "boot_texels": 1.0,
+    "reach_texels": -9,
+    "helmet_world": 0.0,
+    "reach_world": -4.5,
     "causes": []
    },
    {
@@ -2089,12 +2059,12 @@
     "physics_frame": 683,
     "ticks": 4,
     "physics_dx": 3.0,
-    "helmet_texels": -1,
-    "torso_texels": -0.57,
-    "boot_texels": -17.5,
-    "reach_texels": -13,
-    "helmet_world": -0.5,
-    "reach_world": -6.5,
+    "helmet_texels": 0,
+    "torso_texels": 0.43,
+    "boot_texels": -16.5,
+    "reach_texels": -12,
+    "helmet_world": 0.0,
+    "reach_world": -6.0,
     "causes": []
    },
    {
@@ -2110,12 +2080,12 @@
     "physics_frame": 687,
     "ticks": 4,
     "physics_dx": 3.0,
-    "helmet_texels": -1,
-    "torso_texels": -1.11,
-    "boot_texels": 1.5,
-    "reach_texels": 5,
-    "helmet_world": -0.5,
-    "reach_world": 2.5,
+    "helmet_texels": 0,
+    "torso_texels": -0.11,
+    "boot_texels": 2.5,
+    "reach_texels": 6,
+    "helmet_world": 0.0,
+    "reach_world": 3.0,
     "causes": []
    },
    {
@@ -2158,10 +2128,12 @@
     "reach_texels": -7,
     "helmet_world": 0.0,
     "reach_world": -3.5,
-    "causes": []
+    "causes": [
+     "playback timing"
+    ]
    }
   ],
-  "unexplained": 0,
+  "unexplained": 2,
   "max_helmet_texels": 0
  },
  "woman-idle-run": {
@@ -2179,15 +2151,13 @@
     "physics_frame": 717,
     "ticks": null,
     "physics_dx": 0.0,
-    "helmet_texels": -1,
-    "torso_texels": 1.0,
-    "boot_texels": 2.0,
-    "reach_texels": 2,
-    "helmet_world": -0.5,
-    "reach_world": 1.0,
-    "causes": [
-     "source registration"
-    ]
+    "helmet_texels": -3,
+    "torso_texels": -1.0,
+    "boot_texels": 0.0,
+    "reach_texels": 0,
+    "helmet_world": -1.5,
+    "reach_world": 0.0,
+    "causes": []
    },
    {
     "kind": "frame",
@@ -2202,14 +2172,14 @@
     "physics_frame": 727,
     "ticks": 10,
     "physics_dx": 0.0,
-    "helmet_texels": 0,
-    "torso_texels": -3.85,
-    "boot_texels": -2.5,
-    "reach_texels": -3,
-    "helmet_world": 0.0,
-    "reach_world": -1.5,
+    "helmet_texels": 4,
+    "torso_texels": -0.85,
+    "boot_texels": 0.5,
+    "reach_texels": 0,
+    "helmet_world": 2.0,
+    "reach_world": 0.0,
     "causes": [
-     "source registration"
+     "authored pose"
     ]
    },
    {
@@ -2225,12 +2195,12 @@
     "physics_frame": 737,
     "ticks": 10,
     "physics_dx": 0.0,
-    "helmet_texels": 0,
-    "torso_texels": 0.71,
-    "boot_texels": 1.0,
-    "reach_texels": 2,
-    "helmet_world": 0.0,
-    "reach_world": 1.0,
+    "helmet_texels": -2,
+    "torso_texels": -0.29,
+    "boot_texels": 0.0,
+    "reach_texels": 1,
+    "helmet_world": -1.0,
+    "reach_world": 0.5,
     "causes": []
    },
    {
@@ -2246,12 +2216,12 @@
     "physics_frame": 741,
     "ticks": null,
     "physics_dx": 0.389,
-    "helmet_texels": 0,
-    "torso_texels": -2.42,
-    "boot_texels": -5.0,
-    "reach_texels": 2,
-    "helmet_world": 0.0,
-    "reach_world": 1.0,
+    "helmet_texels": 3,
+    "torso_texels": 0.58,
+    "boot_texels": -2.0,
+    "reach_texels": 5,
+    "helmet_world": 1.5,
+    "reach_world": 2.5,
     "causes": []
    },
    {
@@ -2290,12 +2260,12 @@
     "physics_frame": 751,
     "ticks": 5,
     "physics_dx": 3.0,
-    "helmet_texels": 1,
-    "torso_texels": -1.02,
-    "boot_texels": -17.5,
-    "reach_texels": -10,
-    "helmet_world": 0.5,
-    "reach_world": -5.0,
+    "helmet_texels": 0,
+    "torso_texels": -2.02,
+    "boot_texels": -18.5,
+    "reach_texels": -11,
+    "helmet_world": 0.0,
+    "reach_world": -5.5,
     "causes": []
    },
    {
@@ -2332,12 +2302,12 @@
     "physics_frame": 759,
     "ticks": 4,
     "physics_dx": 3.0,
-    "helmet_texels": -1,
-    "torso_texels": 1.5,
-    "boot_texels": 11.5,
-    "reach_texels": 15,
-    "helmet_world": -0.5,
-    "reach_world": 7.5,
+    "helmet_texels": 0,
+    "torso_texels": 2.5,
+    "boot_texels": 12.5,
+    "reach_texels": 16,
+    "helmet_world": 0.0,
+    "reach_world": 8.0,
     "causes": []
    },
    {
@@ -2353,12 +2323,12 @@
     "physics_frame": 764,
     "ticks": 5,
     "physics_dx": 3.0,
-    "helmet_texels": 2,
-    "torso_texels": 5.14,
-    "boot_texels": 3.0,
-    "reach_texels": -7,
-    "helmet_world": 1.0,
-    "reach_world": -3.5,
+    "helmet_texels": 0,
+    "torso_texels": 3.14,
+    "boot_texels": 1.0,
+    "reach_texels": -9,
+    "helmet_world": 0.0,
+    "reach_world": -4.5,
     "causes": []
    },
    {
@@ -2374,12 +2344,12 @@
     "physics_frame": 768,
     "ticks": 4,
     "physics_dx": 3.0,
-    "helmet_texels": -1,
-    "torso_texels": -0.57,
-    "boot_texels": -17.5,
-    "reach_texels": -13,
-    "helmet_world": -0.5,
-    "reach_world": -6.5,
+    "helmet_texels": 0,
+    "torso_texels": 0.43,
+    "boot_texels": -16.5,
+    "reach_texels": -12,
+    "helmet_world": 0.0,
+    "reach_world": -6.0,
     "causes": []
    },
    {
@@ -2395,12 +2365,12 @@
     "physics_frame": 772,
     "ticks": 4,
     "physics_dx": 3.0,
-    "helmet_texels": -1,
-    "torso_texels": -1.11,
-    "boot_texels": 1.5,
-    "reach_texels": 5,
-    "helmet_world": -0.5,
-    "reach_world": 2.5,
+    "helmet_texels": 0,
+    "torso_texels": -0.11,
+    "boot_texels": 2.5,
+    "reach_texels": 6,
+    "helmet_world": 0.0,
+    "reach_world": 3.0,
     "causes": []
    },
    {
@@ -2443,7 +2413,9 @@
     "reach_texels": -7,
     "helmet_world": 0.0,
     "reach_world": -3.5,
-    "causes": []
+    "causes": [
+     "playback timing"
+    ]
    },
    {
     "kind": "frame",
@@ -2458,12 +2430,12 @@
     "physics_frame": 785,
     "ticks": 4,
     "physics_dx": 3.0,
-    "helmet_texels": 1,
-    "torso_texels": -1.02,
-    "boot_texels": -17.5,
-    "reach_texels": -10,
-    "helmet_world": 0.5,
-    "reach_world": -5.0,
+    "helmet_texels": 0,
+    "torso_texels": -2.02,
+    "boot_texels": -18.5,
+    "reach_texels": -11,
+    "helmet_world": 0.0,
+    "reach_world": -5.5,
     "causes": []
    },
    {
@@ -2500,12 +2472,12 @@
     "physics_frame": 794,
     "ticks": 5,
     "physics_dx": 3.0,
-    "helmet_texels": -1,
-    "torso_texels": 1.5,
-    "boot_texels": 11.5,
-    "reach_texels": 15,
-    "helmet_world": -0.5,
-    "reach_world": 7.5,
+    "helmet_texels": 0,
+    "torso_texels": 2.5,
+    "boot_texels": 12.5,
+    "reach_texels": 16,
+    "helmet_world": 0.0,
+    "reach_world": 8.0,
     "causes": []
    },
    {
@@ -2521,12 +2493,12 @@
     "physics_frame": 798,
     "ticks": 4,
     "physics_dx": 3.0,
-    "helmet_texels": 2,
-    "torso_texels": 5.14,
-    "boot_texels": 3.0,
-    "reach_texels": -7,
-    "helmet_world": 1.0,
-    "reach_world": -3.5,
+    "helmet_texels": 0,
+    "torso_texels": 3.14,
+    "boot_texels": 1.0,
+    "reach_texels": -9,
+    "helmet_world": 0.0,
+    "reach_world": -4.5,
     "causes": []
    },
    {
@@ -2542,12 +2514,12 @@
     "physics_frame": 802,
     "ticks": 4,
     "physics_dx": 3.0,
-    "helmet_texels": -1,
-    "torso_texels": -0.57,
-    "boot_texels": -17.5,
-    "reach_texels": -13,
-    "helmet_world": -0.5,
-    "reach_world": -6.5,
+    "helmet_texels": 0,
+    "torso_texels": 0.43,
+    "boot_texels": -16.5,
+    "reach_texels": -12,
+    "helmet_world": 0.0,
+    "reach_world": -6.0,
     "causes": []
    },
    {
@@ -2563,12 +2535,12 @@
     "physics_frame": 806,
     "ticks": 4,
     "physics_dx": 3.0,
-    "helmet_texels": -1,
-    "torso_texels": -1.11,
-    "boot_texels": 1.5,
-    "reach_texels": 5,
-    "helmet_world": -0.5,
-    "reach_world": 2.5,
+    "helmet_texels": 0,
+    "torso_texels": -0.11,
+    "boot_texels": 2.5,
+    "reach_texels": 6,
+    "helmet_world": 0.0,
+    "reach_world": 3.0,
     "causes": []
    },
    {
@@ -2593,8 +2565,8 @@
     "causes": []
    }
   ],
-  "unexplained": 2,
-  "max_helmet_texels": 1
+  "unexplained": 1,
+  "max_helmet_texels": 0
  },
  "woman-run-idle": {
   "changes": [
@@ -2611,12 +2583,12 @@
     "physics_frame": 885,
     "ticks": null,
     "physics_dx": 3.0,
-    "helmet_texels": -1,
-    "torso_texels": 1.5,
-    "boot_texels": 11.5,
-    "reach_texels": 15,
-    "helmet_world": -0.5,
-    "reach_world": 7.5,
+    "helmet_texels": 0,
+    "torso_texels": 2.5,
+    "boot_texels": 12.5,
+    "reach_texels": 16,
+    "helmet_world": 0.0,
+    "reach_world": 8.0,
     "causes": []
    },
    {
@@ -2632,12 +2604,12 @@
     "physics_frame": 889,
     "ticks": 4,
     "physics_dx": 3.0,
-    "helmet_texels": 2,
-    "torso_texels": 5.14,
-    "boot_texels": 3.0,
-    "reach_texels": -7,
-    "helmet_world": 1.0,
-    "reach_world": -3.5,
+    "helmet_texels": 0,
+    "torso_texels": 3.14,
+    "boot_texels": 1.0,
+    "reach_texels": -9,
+    "helmet_world": 0.0,
+    "reach_world": -4.5,
     "causes": []
    },
    {
@@ -2653,12 +2625,12 @@
     "physics_frame": 893,
     "ticks": 4,
     "physics_dx": 3.0,
-    "helmet_texels": -1,
-    "torso_texels": -0.57,
-    "boot_texels": -17.5,
-    "reach_texels": -13,
-    "helmet_world": -0.5,
-    "reach_world": -6.5,
+    "helmet_texels": 0,
+    "torso_texels": 0.43,
+    "boot_texels": -16.5,
+    "reach_texels": -12,
+    "helmet_world": 0.0,
+    "reach_world": -6.0,
     "causes": []
    },
    {
@@ -2674,12 +2646,12 @@
     "physics_frame": 897,
     "ticks": 4,
     "physics_dx": 3.0,
-    "helmet_texels": -1,
-    "torso_texels": -1.11,
-    "boot_texels": 1.5,
-    "reach_texels": 5,
-    "helmet_world": -0.5,
-    "reach_world": 2.5,
+    "helmet_texels": 0,
+    "torso_texels": -0.11,
+    "boot_texels": 2.5,
+    "reach_texels": 6,
+    "helmet_world": 0.0,
+    "reach_world": 3.0,
     "causes": []
    },
    {
@@ -2722,7 +2694,9 @@
     "reach_texels": -7,
     "helmet_world": 0.0,
     "reach_world": -3.5,
-    "causes": []
+    "causes": [
+     "playback timing"
+    ]
    },
    {
     "kind": "transition",
@@ -2760,12 +2734,12 @@
     "physics_frame": 912,
     "ticks": null,
     "physics_dx": 0.0,
-    "helmet_texels": 1,
-    "torso_texels": 1.63,
-    "boot_texels": 4.0,
-    "reach_texels": -4,
-    "helmet_world": 0.5,
-    "reach_world": -2.0,
+    "helmet_texels": -1,
+    "torso_texels": -0.37,
+    "boot_texels": 2.0,
+    "reach_texels": -6,
+    "helmet_world": -0.5,
+    "reach_world": -3.0,
     "causes": []
    },
    {
@@ -2781,12 +2755,12 @@
     "physics_frame": 922,
     "ticks": 10,
     "physics_dx": 0.0,
-    "helmet_texels": 0,
-    "torso_texels": 2.93,
-    "boot_texels": 0.5,
-    "reach_texels": 1,
-    "helmet_world": 0.0,
-    "reach_world": 0.5,
+    "helmet_texels": -1,
+    "torso_texels": 1.93,
+    "boot_texels": -0.5,
+    "reach_texels": 0,
+    "helmet_world": -0.5,
+    "reach_world": 0.0,
     "causes": []
    },
    {
@@ -2802,15 +2776,13 @@
     "physics_frame": 932,
     "ticks": 10,
     "physics_dx": 0.0,
-    "helmet_texels": -1,
-    "torso_texels": 1.0,
-    "boot_texels": 2.0,
-    "reach_texels": 2,
-    "helmet_world": -0.5,
-    "reach_world": 1.0,
-    "causes": [
-     "source registration"
-    ]
+    "helmet_texels": -3,
+    "torso_texels": -1.0,
+    "boot_texels": 0.0,
+    "reach_texels": 0,
+    "helmet_world": -1.5,
+    "reach_world": 0.0,
+    "causes": []
    },
    {
     "kind": "frame",
@@ -2825,14 +2797,14 @@
     "physics_frame": 942,
     "ticks": 10,
     "physics_dx": 0.0,
-    "helmet_texels": 0,
-    "torso_texels": -3.85,
-    "boot_texels": -2.5,
-    "reach_texels": -3,
-    "helmet_world": 0.0,
-    "reach_world": -1.5,
+    "helmet_texels": 4,
+    "torso_texels": -0.85,
+    "boot_texels": 0.5,
+    "reach_texels": 0,
+    "helmet_world": 2.0,
+    "reach_world": 0.0,
     "causes": [
-     "source registration"
+     "authored pose"
     ]
    },
    {
@@ -2848,12 +2820,12 @@
     "physics_frame": 952,
     "ticks": 10,
     "physics_dx": 0.0,
-    "helmet_texels": 0,
-    "torso_texels": 0.71,
-    "boot_texels": 1.0,
-    "reach_texels": 2,
-    "helmet_world": 0.0,
-    "reach_world": 1.0,
+    "helmet_texels": -2,
+    "torso_texels": -0.29,
+    "boot_texels": 0.0,
+    "reach_texels": 1,
+    "helmet_world": -1.0,
+    "reach_world": 0.5,
     "causes": []
    },
    {
@@ -2869,12 +2841,12 @@
     "physics_frame": 962,
     "ticks": 10,
     "physics_dx": 0.0,
-    "helmet_texels": 3,
-    "torso_texels": 0.77,
-    "boot_texels": 0.5,
-    "reach_texels": 0,
-    "helmet_world": 1.5,
-    "reach_world": 0.0,
+    "helmet_texels": 2,
+    "torso_texels": -0.23,
+    "boot_texels": -0.5,
+    "reach_texels": -1,
+    "helmet_world": 1.0,
+    "reach_world": -0.5,
     "causes": []
    },
    {
@@ -2890,19 +2862,19 @@
     "physics_frame": 972,
     "ticks": 10,
     "physics_dx": 0.0,
-    "helmet_texels": -2,
-    "torso_texels": -1.56,
-    "boot_texels": -1.5,
-    "reach_texels": -2,
-    "helmet_world": -1.0,
-    "reach_world": -1.0,
+    "helmet_texels": 0,
+    "torso_texels": 0.44,
+    "boot_texels": 0.5,
+    "reach_texels": 0,
+    "helmet_world": 0.0,
+    "reach_world": 0.0,
     "causes": [
-     "source registration"
+     "playback timing"
     ]
    }
   ],
-  "unexplained": 3,
-  "max_helmet_texels": 2
+  "unexplained": 2,
+  "max_helmet_texels": 0
  },
  "woman-idle-diagnose": {
   "changes": [
@@ -2919,15 +2891,13 @@
     "physics_frame": 997,
     "ticks": null,
     "physics_dx": 0.0,
-    "helmet_texels": -1,
-    "torso_texels": 1.0,
-    "boot_texels": 2.0,
-    "reach_texels": 2,
-    "helmet_world": -0.5,
-    "reach_world": 1.0,
-    "causes": [
-     "source registration"
-    ]
+    "helmet_texels": -3,
+    "torso_texels": -1.0,
+    "boot_texels": 0.0,
+    "reach_texels": 0,
+    "helmet_world": -1.5,
+    "reach_world": 0.0,
+    "causes": []
    },
    {
     "kind": "frame",
@@ -2942,14 +2912,14 @@
     "physics_frame": 1007,
     "ticks": 10,
     "physics_dx": 0.0,
-    "helmet_texels": 0,
-    "torso_texels": -3.85,
-    "boot_texels": -2.5,
-    "reach_texels": -3,
-    "helmet_world": 0.0,
-    "reach_world": -1.5,
+    "helmet_texels": 4,
+    "torso_texels": -0.85,
+    "boot_texels": 0.5,
+    "reach_texels": 0,
+    "helmet_world": 2.0,
+    "reach_world": 0.0,
     "causes": [
-     "source registration"
+     "authored pose"
     ]
    },
    {
@@ -2965,12 +2935,12 @@
     "physics_frame": 1017,
     "ticks": 10,
     "physics_dx": 0.0,
-    "helmet_texels": 0,
-    "torso_texels": 0.71,
-    "boot_texels": 1.0,
-    "reach_texels": 2,
-    "helmet_world": 0.0,
-    "reach_world": 1.0,
+    "helmet_texels": -2,
+    "torso_texels": -0.29,
+    "boot_texels": 0.0,
+    "reach_texels": 1,
+    "helmet_world": -1.0,
+    "reach_world": 0.5,
     "causes": []
    },
    {
@@ -2986,14 +2956,14 @@
     "physics_frame": 1021,
     "ticks": null,
     "physics_dx": 0.0,
-    "helmet_texels": 0,
-    "torso_texels": -3.75,
-    "boot_texels": -4.0,
-    "reach_texels": -3,
-    "helmet_world": 0.0,
-    "reach_world": -1.5,
+    "helmet_texels": 4,
+    "torso_texels": 0.25,
+    "boot_texels": 0.0,
+    "reach_texels": 1,
+    "helmet_world": 2.0,
+    "reach_world": 0.5,
     "causes": [
-     "source registration"
+     "authored pose"
     ]
    },
    {
@@ -3174,7 +3144,9 @@
     "reach_texels": 0,
     "helmet_world": -1.0,
     "reach_world": 0.0,
-    "causes": []
+    "causes": [
+     "playback timing"
+    ]
    },
    {
     "kind": "transition",
@@ -3189,15 +3161,13 @@
     "physics_frame": 1070,
     "ticks": null,
     "physics_dx": 0.0,
-    "helmet_texels": 1,
-    "torso_texels": 2.96,
-    "boot_texels": 3.0,
-    "reach_texels": 1,
-    "helmet_world": 0.5,
-    "reach_world": 0.5,
-    "causes": [
-     "source registration"
-    ]
+    "helmet_texels": -2,
+    "torso_texels": -0.04,
+    "boot_texels": 0.0,
+    "reach_texels": -2,
+    "helmet_world": -1.0,
+    "reach_world": -1.0,
+    "causes": []
    },
    {
     "kind": "frame",
@@ -3212,12 +3182,12 @@
     "physics_frame": 1080,
     "ticks": 10,
     "physics_dx": 0.0,
-    "helmet_texels": 0,
-    "torso_texels": 2.93,
-    "boot_texels": 0.5,
-    "reach_texels": 1,
-    "helmet_world": 0.0,
-    "reach_world": 0.5,
+    "helmet_texels": -1,
+    "torso_texels": 1.93,
+    "boot_texels": -0.5,
+    "reach_texels": 0,
+    "helmet_world": -0.5,
+    "reach_world": 0.0,
     "causes": []
    },
    {
@@ -3233,19 +3203,17 @@
     "physics_frame": 1090,
     "ticks": 10,
     "physics_dx": 0.0,
-    "helmet_texels": -1,
-    "torso_texels": 1.0,
-    "boot_texels": 2.0,
-    "reach_texels": 2,
-    "helmet_world": -0.5,
-    "reach_world": 1.0,
-    "causes": [
-     "source registration"
-    ]
+    "helmet_texels": -3,
+    "torso_texels": -1.0,
+    "boot_texels": 0.0,
+    "reach_texels": 0,
+    "helmet_world": -1.5,
+    "reach_world": 0.0,
+    "causes": []
    }
   ],
-  "unexplained": 5,
-  "max_helmet_texels": 1
+  "unexplained": 1,
+  "max_helmet_texels": 2
  },
  "woman-diagnose-idle": {
   "changes": [
@@ -3427,7 +3395,9 @@
     "reach_texels": 0,
     "helmet_world": -1.0,
     "reach_world": 0.0,
-    "causes": []
+    "causes": [
+     "playback timing"
+    ]
    },
    {
     "kind": "transition",
@@ -3442,15 +3412,13 @@
     "physics_frame": 1165,
     "ticks": null,
     "physics_dx": 0.0,
-    "helmet_texels": 1,
-    "torso_texels": 2.96,
-    "boot_texels": 3.0,
-    "reach_texels": 1,
-    "helmet_world": 0.5,
-    "reach_world": 0.5,
-    "causes": [
-     "source registration"
-    ]
+    "helmet_texels": -2,
+    "torso_texels": -0.04,
+    "boot_texels": 0.0,
+    "reach_texels": -2,
+    "helmet_world": -1.0,
+    "reach_world": -1.0,
+    "causes": []
    },
    {
     "kind": "frame",
@@ -3465,12 +3433,12 @@
     "physics_frame": 1175,
     "ticks": 10,
     "physics_dx": 0.0,
-    "helmet_texels": 0,
-    "torso_texels": 2.93,
-    "boot_texels": 0.5,
-    "reach_texels": 1,
-    "helmet_world": 0.0,
-    "reach_world": 0.5,
+    "helmet_texels": -1,
+    "torso_texels": 1.93,
+    "boot_texels": -0.5,
+    "reach_texels": 0,
+    "helmet_world": -0.5,
+    "reach_world": 0.0,
     "causes": []
    },
    {
@@ -3486,15 +3454,13 @@
     "physics_frame": 1185,
     "ticks": 10,
     "physics_dx": 0.0,
-    "helmet_texels": -1,
-    "torso_texels": 1.0,
-    "boot_texels": 2.0,
-    "reach_texels": 2,
-    "helmet_world": -0.5,
-    "reach_world": 1.0,
-    "causes": [
-     "source registration"
-    ]
+    "helmet_texels": -3,
+    "torso_texels": -1.0,
+    "boot_texels": 0.0,
+    "reach_texels": 0,
+    "helmet_world": -1.5,
+    "reach_world": 0.0,
+    "causes": []
    },
    {
     "kind": "frame",
@@ -3509,14 +3475,14 @@
     "physics_frame": 1195,
     "ticks": 10,
     "physics_dx": 0.0,
-    "helmet_texels": 0,
-    "torso_texels": -3.85,
-    "boot_texels": -2.5,
-    "reach_texels": -3,
-    "helmet_world": 0.0,
-    "reach_world": -1.5,
+    "helmet_texels": 4,
+    "torso_texels": -0.85,
+    "boot_texels": 0.5,
+    "reach_texels": 0,
+    "helmet_world": 2.0,
+    "reach_world": 0.0,
     "causes": [
-     "source registration"
+     "authored pose"
     ]
    },
    {
@@ -3532,12 +3498,12 @@
     "physics_frame": 1205,
     "ticks": 10,
     "physics_dx": 0.0,
-    "helmet_texels": 0,
-    "torso_texels": 0.71,
-    "boot_texels": 1.0,
-    "reach_texels": 2,
-    "helmet_world": 0.0,
-    "reach_world": 1.0,
+    "helmet_texels": -2,
+    "torso_texels": -0.29,
+    "boot_texels": 0.0,
+    "reach_texels": 1,
+    "helmet_world": -1.0,
+    "reach_world": 0.5,
     "causes": []
    },
    {
@@ -3553,16 +3519,16 @@
     "physics_frame": 1215,
     "ticks": 10,
     "physics_dx": 0.0,
-    "helmet_texels": 3,
-    "torso_texels": 0.77,
-    "boot_texels": 0.5,
-    "reach_texels": 0,
-    "helmet_world": 1.5,
-    "reach_world": 0.0,
+    "helmet_texels": 2,
+    "torso_texels": -0.23,
+    "boot_texels": -0.5,
+    "reach_texels": -1,
+    "helmet_world": 1.0,
+    "reach_world": -0.5,
     "causes": []
    }
   ],
-  "unexplained": 3,
-  "max_helmet_texels": 1
+  "unexplained": 1,
+  "max_helmet_texels": 2
  }
 }
