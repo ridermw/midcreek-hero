@@ -1,0 +1,85 @@
+{
+	"method": {
+		"browser_note": "Exported desktop browser measurement is blocked on this host because headless Edge uses software rendering too slow to measure.",
+		"fixed_fps": 60,
+		"host_note": "This host renders real time at about 33 Hz, so measurements are host-specific desktop evidence.",
+		"levels": [
+			"01-cold-aisle",
+			"09-loading-yard",
+			"14-facility-approach"
+		],
+		"renderer": "native rendered Godot",
+		"sample_frames": 600,
+		"viewport": [
+			1280,
+			720
+		],
+		"warmup_frames": 120
+	},
+	"results": [
+		{
+			"camera": {
+				"from": [
+					640.0,
+					360.0
+				],
+				"to": [
+					13376.0,
+					88.0
+				]
+			},
+			"draw_calls_mean": 19.9166666666667,
+			"draw_calls_p95": 23.0,
+			"level": "01-cold-aisle",
+			"process_ms_mean": 42.7287566666667,
+			"process_ms_p95": 66.512,
+			"real_time_fps": 34.3454557527494,
+			"texture_bytes_mean": 37449511.0,
+			"texture_bytes_p95": 37449511.0,
+			"wall_seconds": 17.46956
+		},
+		{
+			"camera": {
+				"from": [
+					640.0,
+					360.0
+				],
+				"to": [
+					1280.0,
+					280.0
+				]
+			},
+			"draw_calls_mean": 19.6233333333333,
+			"draw_calls_p95": 22.0,
+			"level": "09-loading-yard",
+			"process_ms_mean": 43.8414833333334,
+			"process_ms_p95": 88.376,
+			"real_time_fps": 32.9340916371339,
+			"texture_bytes_mean": 35826439.0,
+			"texture_bytes_p95": 35826439.0,
+			"wall_seconds": 18.218204
+		},
+		{
+			"camera": {
+				"from": [
+					640.0,
+					360.0
+				],
+				"to": [
+					1792.0,
+					280.0
+				]
+			},
+			"draw_calls_mean": 17.4216666666667,
+			"draw_calls_p95": 23.0,
+			"level": "14-facility-approach",
+			"process_ms_mean": 44.6752799999995,
+			"process_ms_p95": 62.214,
+			"real_time_fps": 34.4710582718303,
+			"texture_bytes_mean": 35826439.0,
+			"texture_bytes_p95": 35826439.0,
+			"wall_seconds": 17.405906
+		}
+	],
+	"schema": "midcreek-background-perf-v1"
+}
