@@ -10,6 +10,27 @@ startup branding, climbing alignment, and full height background coverage are
 already delivered. The earlier plan checkboxes do not reflect that status.
 Climbing alignment does not establish smooth animation.
 
+## Backlog status (October 6 reconciliation)
+
+The backlog completion plan delivers the open work as stacked pull requests.
+Each open item below has one acceptance criterion and names its pull request.
+
+| Item | Status | Pull request |
+|---|---|---|
+| 1. Hero animation smoothness | Open | PR1, `ridermw-hero-animation` |
+| 2. Additional environments and tasks | Delivered | #26 (`ec3da76`, merged as `b2353f3`) |
+| 3. Role of sliding | Decided: retained | October 5 request |
+| 4. Elevator geometry and restart states | Open | PR3, `ridermw-elevators` |
+| 5. Background depth | Open | PR5, `ridermw-background-depth` |
+| 5a. Background scale | Open | PR4, `ridermw-background-scale` |
+| 6. Route timing contract | Delivered | Independent route timing increment |
+| Cable pile movement, drone sliding | Open | PR2, `ridermw-hazards` |
+| Difficulty and device evidence | Requires owner | See "Requires owner" |
+
+The size budget wording differs between an earlier draft and this file. The
+draft said "establish a measured download size budget". This file says "report
+measured download size without a size ceiling". This file has the later decision.
+
 ## Accepted implementation constraints
 
 - Fatal liquid sets health to zero immediately, including during invulnerability.
@@ -68,6 +89,11 @@ regressions that exercise that cause before production changes. Verify the
 corrected motion in the exported game and in help where it reuses the clips.
 Cover both heroes and all three actions. Record visual evidence separately from
 automated results.
+
+**Acceptance criterion (PR1):** A rendered anchor probe for both heroes shows
+no unexplained helmet, torso, tool, or boot anchor jump in run, idle to run, run
+to idle, idle to diagnose, and diagnose to idle, and each corrected cause has a
+regression that failed before the fix.
 
 **Depends on / blocked by:** No campaign selection is required. Reproduction
 and device observations must precede the choice of fix. Compare performance
@@ -207,8 +233,12 @@ Different frame hashes or different arm poses are not proof that legs alternate.
 
 ## 2. Implement approved additional environments and tasks
 
-- [ ] **What:** Add ten levels with the approved environments and all six new
+- [x] **What:** Add ten levels with the approved environments and all six new
   task types. Preserve the existing five levels and sliding.
+
+**Delivered:** #26 (`ec3da76`, merged to main as `b2353f3`). Evidence:
+`docs/evidence/campaign-expansion/`. Levels 06 to 15 pass the full route and
+every checkpoint replay for both heroes.
 
 **Why:** The user approved all ten environments and six task types on October 5.
 The new work belongs in levels 06 through 15, not revisions of existing levels.
@@ -279,8 +309,12 @@ its result without offering a nonexistent next level.
 
 ## 3. Decide the role of sliding
 
-- [ ] **What:** Decide whether to retain sliding, then define its purpose in the
+- [x] **What:** Decide whether to retain sliding, then define its purpose in the
   revised levels.
+
+**Decision:** Retained. The October 5 request keeps sliding and the existing
+level behavior. Sliding clears low trays. PR2 makes it the only way past
+security drones.
 
 **Why:** The user does not see a clear reason for the move. Additional forced
 sliding sections would not resolve that concern by themselves.
@@ -334,6 +368,10 @@ landing placement against active lethal liquid. Test falls, interrupted rides,
 death during movement, and restored power dependencies. No restart may place the
 hero directly in an unavoidable hazard.
 
+**Acceptance criterion (PR3):** At all six lift sites, real physics shows that
+jump and wall jump cannot reach the upper story without the lift, and the route
+gate passes for every checkpoint and both heroes after a death during a ride.
+
 **Depends on / blocked by:** Measured jump behavior, chosen landing pause
 duration, per level geometry, and the separate progress restore and motion reset
 methods. Task controlled elevators also depend on item 2.
@@ -371,10 +409,33 @@ diagnosis from item 1; user approval of composition; final camera bounds from
 item 4; actual device evidence from item 6. Do not infer real phone performance
 from emulation.
 
+**Acceptance criterion (PR5):** Every environment manifest declares ordered
+shell, far, racks, and equipment layers with existing art, and the desktop
+probe records p95 frame time at or below 16.7 ms on levels 1, 9, and 14.
+Composition approval stays with the owner.
+
+## 5a. Correct background object scale
+
+- [ ] **What:** Make background objects match the hero scale. Level 07 shows
+  a desk at about 1.2 times hero height.
+
+**Why:** Equipment layers fill the full view height without a hero scale rule,
+and layer texels are up to 8.5 times the hero texel size.
+
+**Context:** `tools/environment_assets.py`, `game/background_set.gd`,
+`tests/background_manifest_test.gd`, and the reference capture
+`docs/evidence/campaign-expansion/07-man-native.png`.
+
+**Acceptance criterion (PR4):** In equipment layers, opaque regions connected
+to the floor band are at most 92 world px tall, every layer has an integer texel
+ratio to the hero, and the paired level 07 capture shows the chair top at or
+below the hero shoulder.
+
 ## 6. Collect difficulty and device evidence
 
-- [ ] **What:** Collect player observations before changing difficulty targets,
-  and record performance on actual supported devices.
+- [x] **What:** Separate the automated route timing contract from human
+  difficulty. Delivered by the independent route timing increment below.
+  Player observations and device measurements moved to "Requires owner".
 
 **Why:** Automated route duration is not a measure of human difficulty. Average
 frame rate alone does not establish smooth animation or acceptable phone play.
@@ -441,7 +502,10 @@ download budget or a device performance result.
 Define movement speed, direction changes, and terrain edge behavior before
 implementation. Preserve visible collision bounds. Update affected route timing
 and verify safe checkpoint recovery for both heroes.
-This is a recorded follow up, not part of the current expansion change.
+
+**Acceptance criterion (PR2):** Every cable pile changes x within 2 s and
+stays inside its floor span, and the route gate passes for every checkpoint
+and both heroes with the level 03 known gaps removed.
 
 ## Follow up: pass security drones only by sliding
 
@@ -451,7 +515,66 @@ This is a recorded follow up, not part of the current expansion change.
 Use visible drone geometry and matching collision bounds. Verify that ordinary
 jumps and wall jumps cannot bypass a drone, while sliding provides safe
 clearance for both heroes. Update affected routes and checkpoint recovery checks.
-This is a recorded follow up, not part of the current expansion change.
+
+**Acceptance criterion (PR2):** Real physics shows that jump and wall jump into
+each drone cause a hit, while keyboard, gamepad, and touch slides pass under it
+for both heroes.
+
+## Requires owner
+
+These items need people or physical devices. Agents supply captures and
+procedures but cannot close them.
+
+### Physical phone performance
+
+**What:** Record frame timing and loading on an actual supported phone.
+**Why:** Emulated phone evidence does not establish real performance.
+**Context:** Use repeatable segments in levels 1, 9, and 14 with the exported
+web build. Record the device, browser, build, and capture conditions. Compare
+dense background scenes before and after PR5.
+**Depends on:** A physical phone and the PR5 build.
+
+### Physical controller checks
+
+**What:** Play one level with a physical gamepad and confirm move, jump, slide,
+repair, and prompts.
+**Why:** Headless tests inject gamepad events. They do not prove a real device
+mapping in a browser.
+**Context:** `game/input_setup.gd`, `game/control_prompt.gd`, and the exported
+web build. Record the controller model and browser.
+**Depends on:** A physical controller.
+
+### Player difficulty observations
+
+**What:** Collect completion time, failures, confusing interactions, elevator
+waits, and upper route use from players.
+**Why:** Automated route duration does not measure human difficulty. Par and
+SLA values change only when observations justify it.
+**Context:** `tools/levels/layout.py`, `game/score.gd`, and
+`tests/route_budgets.json`. Record the build and level for each observation.
+**Depends on:** Player participation, after PR2 and PR3 change hazards and lifts.
+
+## Verified reconciliation (PR0)
+
+- [x] Back up unpushed work as `backup/hero-animation-improvements` and
+  `backup/preserved-{e40bdbd,9b93224,3188760,e7c6a37,fbc789e}`.
+- [x] Audit each backup against main. Main contains or supersedes every file,
+  except tooling artifacts and `tests/liquid_capture.gd`. The capture harness
+  stays on its backup branch. `tests/expansion_capture.gd` now has a fixture
+  path and a death capture mode instead (`docs/evidence/liquid/`).
+- [x] Extend `tests/expansion_route_test.gd` to levels 01 to 15. It replays
+  the full route and every checkpoint suffix for both heroes. It failed for
+  uncovered levels and for a truncated level 01 route before the change.
+- [x] The extended gate found that the level 01, 02, and 04 routes jump
+  through the third checkpoint flag without activating it. Feet were 17 px
+  above the flag base. The checkpoint trigger now matches the visible 64 px
+  flag. Rejected alternative: move checkpoints or routes, which leaves the
+  same trap for players.
+- [x] The gate takes about 199 s locally and about 98 s in CI. CI runs it in
+  four `EXPANSION_ONLY` groups of about 25 s each, below the 60 s limit.
+- [ ] Known gap for PR2: level 03 replays from checkpoints 0 and 1 take hits,
+  because hazards restart at their authored phase. The gate lists both as
+  strict known gaps. It fails when a listed gap passes.
 
 ## NOT in scope
 

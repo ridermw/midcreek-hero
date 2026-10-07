@@ -2,6 +2,9 @@ extends SceneTree
 
 const LEVEL = preload("res://game/level.tscn")
 const Runner = preload("res://game/route_runner.gd")
+const DEFAULT_SLUG := "06-cooling-gallery"
+const DEATH_STEPS := [{"hold": ["move_right"], "until_x": 360, "max_seconds": 4}]
+const DEATH_FRAMES := 360
 
 class RouteInput:
 	extends Node
@@ -21,20 +24,41 @@ func _initialize() -> void:
 	run.call_deferred()
 
 
+# CAPTURE_LEVEL selects a campaign route. CAPTURE_FIXTURE selects any level path;
+# CAPTURE_MODE=death captures the first fatal frame and requires one recovery.
+static func config(env: Dictionary) -> Dictionary:
+	var mode: String = env.get("CAPTURE_MODE", "route")
+	var fixture: String = env.get("CAPTURE_FIXTURE", "")
+	var slug: String = env.get("CAPTURE_LEVEL", "")
+	var level_path := fixture
+	if fixture.is_empty():
+		slug = DEFAULT_SLUG if slug.is_empty() else slug
+		level_path = "res://levels/" + slug + ".level"
+	else:
+		slug = fixture.get_file().get_basename()
+	var steps: Array = DEATH_STEPS.duplicate(true)
+	if mode != "death":
+		steps = JSON.parse_string(FileAccess.get_file_as_string("res://levels/routes/" + slug + ".route.json"))
+	return {"mode": mode, "slug": slug, "level_path": level_path, "steps": steps}
+
+
 func run() -> void:
 	var directory := OS.get_environment("CAPTURE_DIR")
 	if directory.is_empty() or OS.has_feature("headless"):
 		printerr("Expansion capture requires a rendered viewport and CAPTURE_DIR.")
 		quit(1)
 		return
-	var slug := OS.get_environment("CAPTURE_LEVEL")
-	if slug.is_empty():
-		slug = "06-cooling-gallery"
-	var steps: Array = JSON.parse_string(FileAccess.get_file_as_string("res://levels/routes/" + slug + ".route.json"))
+	var env := {}
+	for key: String in ["CAPTURE_LEVEL", "CAPTURE_FIXTURE", "CAPTURE_MODE"]:
+		if not OS.get_environment(key).is_empty():
+			env[key] = OS.get_environment(key)
+	var settings := config(env)
+	var slug: String = settings["slug"]
+	var steps: Array = settings["steps"]
 	for hero: String in ["man", "woman"]:
 		var level := LEVEL.instantiate()
 		level.character = hero
-		level.level_path = "res://levels/" + slug + ".level"
+		level.level_path = settings["level_path"]
 		root.add_child(level)
 		if not level.error_message.is_empty():
 			printerr(level.error_message)
@@ -46,6 +70,14 @@ func run() -> void:
 		driver.runner = runner
 		driver.process_physics_priority = -200
 		root.add_child(driver)
+		if settings["mode"] == "death":
+			if not await capture_death(level, directory.path_join("%s-%s-native.png" % [slug, hero])):
+				quit(1)
+				return
+			driver.queue_free()
+			level.queue_free()
+			await process_frame
+			continue
 		var captured := -1
 		var partial_fire_captured := false
 		for frame: int in range(18000):
@@ -88,3 +120,22 @@ func run() -> void:
 		level.queue_free()
 		await process_frame
 	quit(0)
+
+
+func capture_death(level: Node, path: String) -> bool:
+	var captured := false
+	for frame: int in range(DEATH_FRAMES):
+		await physics_frame
+		if level.player.dead and not captured:
+			await RenderingServer.frame_post_draw
+			if root.get_texture().get_image().save_png(path) != OK:
+				printerr("Cannot write capture: " + path)
+				return false
+			captured = true
+		if level.respawns == 1:
+			break
+	if not captured or level.respawns != 1:
+		printerr("Rendered death did not recover exactly once: " + path)
+		return false
+	print("EXPANSION_CAPTURE death %s respawns=1" % path)
+	return true

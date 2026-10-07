@@ -15,8 +15,10 @@ func _process(delta: float) -> void:
 			queue_redraw()
 
 
+# The trigger matches the visible 64 px flag, so a jump through the flag activates it.
 func in_range(feet: Vector2) -> bool:
-	return absf(feet.x - position.x) <= 16.0 and absf(feet.y - position.y) <= 16.0
+	var rise := position.y - feet.y
+	return absf(feet.x - position.x) <= 16.0 and rise >= -16.0 and rise <= 64.0
 
 
 func set_reached() -> void:

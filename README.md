@@ -184,8 +184,15 @@ tools/godot_test.sh tests/rack_work_test.gd RACK_WORK_TEST
 tools/godot_test.sh tests/fire_work_test.gd FIRE_WORK_TEST
 tools/godot_test.sh tests/service_work_test.gd SERVICE_WORK_TEST
 tools/godot_test.sh tests/work_runtime_test.gd WORK_RUNTIME_TEST
-tools/godot_test.sh tests/expansion_route_test.gd EXPANSION_ROUTE_TEST
+EXPANSION_ONLY=06,07 tools/godot_test.sh tests/expansion_route_test.gd EXPANSION_ROUTE_TEST
 ```
+
+`tests/expansion_route_test.gd` is the gameplay gate for all fifteen levels.
+It replays each full route and each checkpoint suffix for both heroes. It
+requires completion within the SLA and route budget, zero hits, and no added
+respawns. Set `EXPANSION_ONLY` to comma separated level numbers to run a group.
+The full gate exceeds the runner's 60 second limit, so CI runs four groups.
+Remaining work and its status are in [TODOS.md](TODOS.md).
 
 Open the [web build](https://ridermw.github.io/midcreek-hero/) or run
 `godot --path .`. The game starts on the title screen. Choose a technician,
@@ -393,12 +400,19 @@ human difficulty targets. Their current values remain unchanged:
 | 15 Expansion Site | 104.2 s | 360 s | 720 s |
 
 `python3 -m tools.levels.expansion` reproduces all shipped expansion levels and
-their routes. The independent budgets are 180 seconds for 06 through 08 and
+their routes. The independent budgets are 110 seconds for 01 through 05, 180
+seconds for 06 through 08,
 200 seconds for 09 and 11, 220 seconds for 10 and 12 through 14, and 300
 seconds for 15.
 The expansion route check runs
 both heroes through the full level and again from every saved checkpoint.
+It covers levels 01 through 15.
 These automated timings do not establish human difficulty.
+`tests/expansion_capture.gd` saves rendered route captures. Set
+`CAPTURE_FIXTURE` to a level path and `CAPTURE_MODE=death` to capture the first
+fatal frame for both heroes instead. For example, run
+`CAPTURE_DIR=docs/evidence/liquid CAPTURE_FIXTURE=res://tests/fixtures/liquid.level CAPTURE_MODE=death godot --fixed-fps 60 --path . --script tests/expansion_capture.gd`.
+The capture needs a rendered window and rejects headless runs.
 The [Cooling Gallery evidence](docs/evidence/campaign-expansion/06-receipt.json)
 records native and browser results, capture paths, and validation limits.
 The [07 through 09 evidence](docs/evidence/campaign-expansion/07-09-receipt.json)
