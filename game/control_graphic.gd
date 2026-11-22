@@ -28,7 +28,7 @@ func show_model(model: Dictionary) -> void:
 	style.bg_color = Color(0.08, 0.17, 0.22)
 	style.border_color = Color(0.77, 0.94, 0.43)
 	style.set_border_width_all(2)
-	style.set_corner_radius_all(22 if graphic["shape"] == "button" else 6)
+	style.set_corner_radius_all(22 if graphic["shape"] in ["button", "stick"] else 6)
 	style.content_margin_left = 12
 	style.content_margin_right = 12
 	add_theme_stylebox_override("normal", style)

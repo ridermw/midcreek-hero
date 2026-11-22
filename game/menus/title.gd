@@ -21,5 +21,6 @@ func build(owner_main: Node) -> void:
 	var help := UiKit.button("How to Play", main.art)
 	help.pressed.connect(main.open_help)
 	box.add_child(help)
-	box.add_child(UiKit.label("Press any key or button", 18, UiKit.MUTED_COLOR))
+	var hint := "Tap Start to begin" if main.control_display() == "touch" else "Press any key or button"
+	box.add_child(UiKit.label(hint, 18, UiKit.MUTED_COLOR))
 	UiKit.link_focus([start, settings, help])

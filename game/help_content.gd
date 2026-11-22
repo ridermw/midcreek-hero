@@ -5,6 +5,8 @@ const CablePort = preload("res://game/entities/cable_port.gd")
 
 
 static func controls(display: String) -> Array:
+	if display == "touch":
+		return touch_controls()
 	var result: Array = []
 	for entry: Array in [
 		["move_left", "hold", "run left"], ["move_right", "hold", "run right"],
@@ -14,6 +16,22 @@ static func controls(display: String) -> Array:
 		["diagnose", "press", "diagnose a marked rack"], ["pause", "press", "open the pause menu"],
 	]:
 		result.append(Prompt.render(Prompt.make(entry[0], entry[1], entry[2]), display))
+	return result
+
+
+# Phones replace the direction buttons with a floating joystick and show work buttons only when needed.
+static func touch_controls() -> Array:
+	var result: Array = []
+	for entry: Array in [
+		["move_right", "Touch the left half of the screen and drag to run or climb. Lift your thumb to stop."],
+		["jump", "Jump stays at the lower right. Press it to jump; hold it for a higher jump."],
+		["slide", "Slide appears near low trays and drones. Press it to slide underneath."],
+		["repair", "Repair appears beside Jump at work sites. Hold it for racks and parts; press it for cables and switches."],
+		["diagnose", "Diagnose appears in the same place at a marked rack. Press it, then wait for Repair."],
+		["", "Tap the timer and health at the top left to see the work order tasks."],
+		["pause", "Pause is at the top right."],
+	]:
+		result.append({"action": entry[0], "graphic": Prompt.graphic(entry[0], "touch"), "description": entry[1]})
 	return result
 
 

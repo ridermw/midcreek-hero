@@ -34,10 +34,7 @@ $GODOT_HEAD_INCLUDE
 const GODOT_CONFIG = $GODOT_CONFIG;
 const GODOT_THREADS_ENABLED = $GODOT_THREADS_ENABLED;
 if (window.MidcreekTouch?.enabled) {
-  GODOT_CONFIG.canvasResizePolicy = 0;
   GODOT_CONFIG.focusCanvas = false;
-  document.getElementById("canvas").width = 960;
-  document.getElementById("canvas").height = 720;
 }
 const engine = new Engine(GODOT_CONFIG);
 const overlay = document.getElementById("status");

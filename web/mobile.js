@@ -27,10 +27,22 @@
     }
   }
 
+  function stickVector(dx, dy) {
+    const distance = Math.hypot(dx, dy);
+    const scale = Math.min(1, 28 / (distance || 1));
+    const threshold = Math.max(9, distance * 0.4);
+    return {x: dx * scale, y: dy * scale,
+      horizontal: Math.abs(dx) < threshold ? "" : dx < 0 ? "move_left" : "move_right",
+      vertical: Math.abs(dy) < threshold ? "" : dy < 0 ? "move_up" : "move_down"};
+  }
+
   function renderPrompt(text, graphic, buttons, model = {}, carry = "", reducedMotion = false, compact = false, announcement = null, standaloneTouch = false) {
+    const steering = compact && model.display === "touch" && model.action?.startsWith("move_");
+    const hold = !steering && model.action && model.intent === "hold";
+    const hint = model.approach ? "Approach the work site" : hold ? "Hold" : "";
     const description = [model.description, carry].filter(Boolean).join(" | ");
     const visibleText = compact
-      ? [model.action && model.intent === "hold" ? "Hold" : "", model.status, carry].filter(Boolean).join(" | ")
+      ? [hint, model.status, carry].filter(Boolean).join(" | ")
       : description;
     if (text.textContent !== visibleText) text.textContent = visibleText;
     if (announcement) {
@@ -50,21 +62,7 @@
     }
   }
 
-  function demoFrame(demo, seconds, reducedMotion = false) {
-    const duration = demo.steps.reduce((sum, step) => sum + step.seconds, 0);
-    let remaining = reducedMotion ? 0 : ((seconds % duration) + duration) % duration;
-    for (let i = 0; i < demo.steps.length; i++) {
-      const step = demo.steps[i];
-      if (remaining < step.seconds) {
-        const clip = demo.clips[step.clip];
-        return {step: i, frame: clip.frames[Math.floor(remaining * clip.fps) % clip.frames.length],
-          x: step.from + (step.to - step.from) * remaining / step.seconds};
-      }
-      remaining -= step.seconds;
-    }
-  }
-
-  if (typeof module !== "undefined") module.exports = {isPhone, TouchState, renderPrompt, demoFrame};
+  if (typeof module !== "undefined") module.exports = {isPhone, TouchState, stickVector, renderPrompt};
   if (!root.document) return;
   const enabled = isPhone({
     touch: navigator.maxTouchPoints,
@@ -82,15 +80,19 @@
   let promptText;
   let promptAnnouncement;
   let status;
+  let taskList;
   let rotate;
-  let notice;
+  let notice, noticeText;
+  let pause;
+  const twins = new Map();
   let revision = -1;
   let lastPortrait;
   let lastOrientation;
   let clearing = false;
-  let helpAnimation;
   const contexts = [];
-  const activeContacts = new Set();
+  let stick;
+  let stickRing;
+  const activeContacts = new Map();
   const state = new TouchState((action, down) => {
     if (!clearing) send({type: "action", action, down});
     shell?.querySelector(`[data-action="${action}"]`)?.setAttribute("aria-pressed", String(down));
@@ -119,6 +121,8 @@
   }
   function releaseAll() {
     activeContacts.clear();
+    stick = null;
+    if (stickRing) stickRing.hidden = true;
     clearing = true;
     state.clear();
     clearing = false;
@@ -131,7 +135,7 @@
   function reportError(error) {
     console.error(error);
     if (notice) {
-      notice.textContent = String(error);
+      noticeText.textContent = String(error);
       notice.hidden = false;
     }
   }
@@ -147,19 +151,81 @@
     const orientation = screen.orientation?.angle ?? root.orientation ?? 0;
     if (portrait !== lastPortrait || orientation !== lastOrientation) {
       releaseAll();
-      if (portrait !== lastPortrait) revision = -1;
       lastPortrait = portrait;
       lastOrientation = orientation;
     }
     shell.classList.toggle("portrait", portrait);
+    if (model) visibility();
     if (portrait && model?.screen === "level" && !model.paused) suspend();
-    const canvas = document.getElementById("canvas");
-    const available = shell.getBoundingClientRect();
-    const width = Math.max(1, Math.min(available.width - 264, (available.height - 88) * 4 / 3));
-    canvas.style.left = `${available.left + available.width / 2}px`;
-    canvas.style.top = `${available.top + available.height / 2 - 8}px`;
-    canvas.style.width = `${width}px`;
-    canvas.style.height = `${width * 3 / 4}px`;
+  }
+  // Menus are drawn by the game. The HTML twins are invisible and only serve screen readers.
+  function visibility() {
+    const portrait = innerHeight > innerWidth;
+    const playing = model.screen === "level" && !model.paused;
+    document.body.classList.toggle("mobile-playing", playing);
+    controls.hidden = !playing;
+    pause.hidden = !playing;
+    menu.hidden = playing || portrait;
+    rotate.hidden = !portrait;
+    const message = "Rotate your phone to landscape to play." + (model.screen === "level" ? " The game is paused." : "");
+    if (rotate.textContent !== message) rotate.textContent = message;
+    return {portrait, playing};
+  }
+  function placeTwins() {
+    for (const item of model.controls) {
+      const twin = twins.get(item.id);
+      if (!twin || !item.rect) continue;
+      const key = item.rect.join(",");
+      if (twin.dataset.rect !== key) {
+        twin.dataset.rect = key;
+        const [x, y, width, height] = item.rect.map(n => `${n * 100}%`);
+        Object.assign(twin.style, {left: x, top: y, width, height});
+      }
+      const slider = twin.querySelector("input");
+      if (slider && Number(slider.value) !== item.value) slider.value = item.value;
+    }
+  }
+  function buildJoystick(parent) {
+    const zone = element("div", "", parent);
+    zone.className = "stick-zone";
+    zone.setAttribute("aria-hidden", "true");
+    stickRing = element("div", "", zone);
+    stickRing.className = "stick-ring";
+    stickRing.hidden = true;
+    const knob = element("div", "", stickRing);
+    knob.className = "stick-knob";
+    zone.addEventListener("pointerdown", event => {
+      if (stick || event.button !== 0) return;
+      event.preventDefault();
+      resumeAudio();
+      zone.setPointerCapture(event.pointerId);
+      stick = {id: event.pointerId, x: event.clientX, y: event.clientY};
+      const rect = zone.getBoundingClientRect();
+      stickRing.style.left = `${stick.x - rect.left}px`;
+      stickRing.style.top = `${stick.y - rect.top}px`;
+      knob.style.transform = "";
+      stickRing.hidden = false;
+    });
+    zone.addEventListener("pointermove", event => {
+      if (stick?.id !== event.pointerId) return;
+      const v = stickVector(event.clientX - stick.x, event.clientY - stick.y);
+      knob.style.transform = `translate(${v.x}px, ${v.y}px)`;
+      if (v.horizontal) state.press("stick-x", v.horizontal); else state.release("stick-x");
+      if (v.vertical) state.press("stick-y", v.vertical); else state.release("stick-y");
+    });
+    for (const name of ["pointerup", "pointercancel", "lostpointercapture"]) {
+      zone.addEventListener(name, event => {
+        if (stick?.id !== event.pointerId) return;
+        stick = null;
+        stickRing.hidden = true;
+        state.release("stick-x");
+        state.release("stick-y");
+      });
+    }
+    // Movement remains operable without performing a drag.
+    const alternatives = element("div", "", parent);
+    alternatives.className = "stick-alternatives";
+    for (const label of ["Left", "Right", "Up", "Down"]) actionButton("move_" + label.toLowerCase(), label, alternatives);
   }
   function actionButton(action, text, parent) {
     const button = element("button", text, parent);
@@ -172,7 +238,7 @@
       event.preventDefault();
       resumeAudio();
       button.setPointerCapture(event.pointerId);
-      activeContacts.add(event.pointerId);
+      activeContacts.set(event.pointerId, action);
       state.press(event.pointerId, action);
     });
     for (const eventName of ["pointerup", "pointercancel", "lostpointercapture"]) {
@@ -184,14 +250,15 @@
     button.addEventListener("pointermove", event => {
       if (!activeContacts.has(event.pointerId)) return;
       const target = document.elementFromPoint(event.clientX, event.clientY);
-      if (target?.dataset.action) state.press(event.pointerId, target.dataset.action);
+      if (target === button) state.press(event.pointerId, action);
       else state.release(event.pointerId);
     });
     // Screen readers activate buttons with click rather than pointer events.
     button.addEventListener("click", event => {
-      if (event.detail !== 0) return;
+      if (event.detail !== 0 || button.hidden) return;
       resumeAudio();
-      if (action.startsWith("move_") || action === "repair") {
+      const heldWork = (action === "repair" || action === "diagnose") && model?.prompt?.intent === "hold";
+      if (action.startsWith("move_") || heldWork) {
         const id = `assist-${action}`;
         if (state.pointers.has(id)) state.release(id);
         else state.press(id, action);
@@ -201,6 +268,23 @@
       }
     });
     return button;
+  }
+  function updateActions(prompt, slideNearby) {
+    for (const button of controls.querySelectorAll(".action-pad button")) {
+      const action = button.dataset.action;
+      const visible = action === "jump" || (action === prompt?.action && !prompt.approach) || (action === "slide" && slideNearby);
+      if (button.hidden === !visible) continue;
+      if (!visible) {
+        // A context change releases the old action without transferring its finger to the new one.
+        for (const [id, original] of activeContacts) {
+          if (original !== action) continue;
+          activeContacts.delete(id);
+          state.release(id);
+        }
+        state.release(`assist-${action}`);
+      }
+      button.hidden = !visible;
+    }
   }
   function build() {
     document.body.classList.add("mobile");
@@ -212,25 +296,43 @@
     controls = element("section", "", shell);
     controls.id = "mobile-controls";
     controls.setAttribute("aria-label", "Game controls");
-    const pad = element("div", "", controls);
-    pad.className = "direction-pad";
-    for (const [action, label] of [["move_up", "Up"], ["move_left", "Left"], ["move_right", "Right"], ["move_down", "Down"]]) {
-      actionButton(action, label, pad);
-    }
+    buildJoystick(controls);
     const actions = element("div", "", controls);
     actions.className = "action-pad";
     for (const [action, label] of [["jump", "Jump"], ["slide", "Slide"], ["repair", "Repair"], ["diagnose", "Diagnose"]]) {
       actionButton(action, label, actions);
     }
-    const pause = element("button", "Pause", controls);
+    const toolbar = element("div", "", shell);
+    toolbar.className = "play-tools";
+    if (document.fullscreenEnabled) {
+      const fullscreen = element("button", "Full screen", toolbar);
+      fullscreen.id = "mobile-fullscreen";
+      fullscreen.addEventListener("click", async () => {
+        try {
+          if (document.fullscreenElement) await document.exitFullscreen();
+          else await document.documentElement.requestFullscreen();
+        } catch (error) {
+          reportError(error);
+        }
+      });
+      document.addEventListener("fullscreenchange", () => {
+        fullscreen.textContent = document.fullscreenElement ? "Exit full screen" : "Full screen";
+      });
+    }
+    pause = element("button", "Pause", toolbar);
     pause.id = "mobile-pause";
     pause.addEventListener("click", () => {
       resumeAudio();
       releaseAll();
       send({type: "pause"});
     });
-    status = element("div", "", controls);
+    const tasks = element("details", "", controls);
+    tasks.id = "mobile-tasks";
+    const summary = element("summary", "", tasks);
+    status = element("span", "", summary);
     status.id = "mobile-status";
+    element("span", " · Work order tasks", summary).className = "visually-hidden";
+    taskList = element("div", "", tasks);
     prompt = element("div", "", controls);
     prompt.id = "mobile-prompt";
     promptGraphic = element("span", "", prompt);
@@ -243,13 +345,18 @@
     promptAnnouncement.className = "visually-hidden";
     promptAnnouncement.setAttribute("role", "status");
     promptAnnouncement.setAttribute("aria-atomic", "true");
-    rotate = element("p", "Rotate your phone to landscape to play. The game is paused.", shell);
+    rotate = element("p", "Rotate your phone to landscape to play.", shell);
     rotate.id = "mobile-rotate";
-    notice = element("p", "", shell);
+    notice = element("div", "", shell);
     notice.id = "mobile-error";
-    notice.setAttribute("role", "alert");
     notice.hidden = true;
+    noticeText = element("p", "", notice);
+    noticeText.setAttribute("role", "alert");
+    // The banner covers in-game menu buttons, so players need a way to clear it.
+    element("button", "Dismiss", notice).addEventListener("click", () => { notice.hidden = true; });
     shell.addEventListener("contextmenu", event => event.preventDefault());
+    // Menu taps reach the game canvas directly, so audio resumes on any gesture.
+    for (const name of ["pointerdown", "pointerup", "touchend"]) document.addEventListener(name, resumeAudio, true);
     addEventListener("blur", suspend);
     document.addEventListener("visibilitychange", () => { if (document.hidden) suspend(); });
     addEventListener("pagehide", suspend);
@@ -259,111 +366,56 @@
     root.visualViewport?.addEventListener("resize", layout);
     layout();
   }
-  function buildHelp(help) {
-    element("h2", `${help.title} · ${help.page} / ${help.count}`, menu);
-    for (const control of help.controls) {
-      const row = element("p", "", menu);
-      const glyph = element("span", control.graphic.label, row);
-      glyph.className = "control-graphic";
-      glyph.dataset.shape = control.graphic.shape;
-      glyph.setAttribute("aria-hidden", "true");
-      element("span", control.description, row);
-    }
-    if (help.demo?.steps?.length) {
-      const canvas = element("canvas", "", menu);
-      canvas.width = 520;
-      canvas.height = 190;
-      canvas.className = "help-demo";
-      canvas.setAttribute("role", "img");
-      canvas.setAttribute("aria-label", `${help.title} demonstration.`);
-      const caption = element("p", "", menu);
-      const glyph = element("span", "", caption);
-      glyph.className = "control-graphic";
-      glyph.setAttribute("aria-hidden", "true");
-      const text = element("span", "", caption);
-      const images = {};
-      for (const [id, source] of Object.entries(help.demo.images)) {
-        images[id] = new Image();
-        images[id].src = source;
-      }
-      const started = performance.now();
-      const context = canvas.getContext("2d");
-      function draw(id, x, y, width, height) {
-        const image = images[id];
-        if (image?.complete && image.naturalWidth) context.drawImage(image, x, y, width, height);
-      }
-      function animate() {
-        const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
-        const frame = demoFrame(help.demo, (performance.now() - started) / 1000, reduced);
-        const step = help.demo.steps[frame.step];
-        context.fillStyle = "#061014";
-        context.fillRect(0, 0, 520, 190);
-        context.imageSmoothingEnabled = false;
-        context.fillStyle = "#526773";
-        context.fillRect(16, 163, 488, 2);
-        for (const prop of step.props) {
-          draw(prop.image, prop.x - prop.width / 2, 162 - prop.height, prop.width, prop.height);
-          if (prop.label) {
-            context.fillStyle = "#eaf5fa";
-            context.font = "16px system-ui";
-            context.fillText(prop.label, prop.x - 12, 20);
-          }
-        }
-        draw(frame.frame, frame.x - 62.4, 51.6, 124.8, 124.8);
-        if (step.carry) draw("props/psu", frame.x + 22, 106, 22, 22);
-        // Help has no live touch controls; its touch examples need a graphic of their own.
-        renderPrompt(text, glyph, [], step.prompt, "", reduced, false, null, true);
-        helpAnimation = requestAnimationFrame(animate);
-      }
-      animate();
-    }
-    element("p", help.instructions, menu).className = "menu-summary";
+  function buildHelp(help, parent) {
+    element("h2", `${help.title} · ${help.page} / ${help.count}`, parent);
+    for (const control of help.controls) element("p", control.description, parent);
+    element("p", help.instructions, parent);
   }
   function render(json) {
-    const previousModel = model;
     model = JSON.parse(json);
-    const changingHelpPage = model.screen === "help" &&
-      (previousModel?.screen !== "help" || previousModel.help?.page !== model.help?.page);
-    const playing = model.screen === "level" && !model.paused;
-    document.body.classList.toggle("mobile-playing", playing);
-    controls.hidden = !playing;
-    menu.hidden = playing;
-    rotate.hidden = !(model.screen === "level" && innerHeight > innerWidth);
-    if (playing && innerHeight > innerWidth) {
+    const {portrait, playing} = visibility();
+    if (playing && portrait) {
       suspend();
       return;
     }
     const statusText = model.status || "";
     if (status.textContent !== statusText) status.textContent = statusText;
+    const tasks = model.tasks || "";
+    if (taskList.textContent !== tasks) taskList.textContent = tasks;
+    if (playing) updateActions(model.prompt, !!model.slide_nearby);
     renderPrompt(promptText, promptGraphic, controls.querySelectorAll("[data-action]"),
       playing ? model.prompt : {}, playing ? model.carry : "",
       matchMedia("(prefers-reduced-motion: reduce)").matches, true, promptAnnouncement);
-    if (revision === model.revision) return;
+    if (revision !== model.revision) rebuildTwins();
+    placeTwins();
+  }
+  function rebuildTwins() {
     revision = model.revision;
-    if (helpAnimation) cancelAnimationFrame(helpAnimation);
-    helpAnimation = undefined;
+    taskList.parentElement.open = false;
     releaseAll();
     notice.hidden = true;
     menu.replaceChildren();
-    element("h1", model.screen === "help" ? "How to Play" : model.paused ? "Paused" : "Midcreek Hero", menu);
-    const summary = model.summary.replace("Press any key or button", "Use the touchscreen controls.");
-    if (model.screen === "help") buildHelp(model.help);
+    twins.clear();
+    const text = element("div", "", menu);
+    text.className = "visually-hidden";
+    element("h1", model.screen === "help" ? "How to Play" : model.paused ? "Paused" : "Midcreek Hero", text);
+    if (model.screen === "help") buildHelp(model.help, text);
     else {
-      if (summary && summary !== "Paused") element("p", summary, menu).className = "menu-summary";
-      if (model.paused && model.tasks) element("p", model.tasks, menu).className = "menu-summary";
+      if (model.summary && model.summary !== "Paused") element("p", model.summary, text).className = "menu-summary";
+      if (model.paused && model.tasks) element("p", model.tasks, text).className = "menu-summary";
     }
     for (const item of model.controls) {
+      let twin;
       if (item.kind === "button") {
-        const button = element("button", item.text, menu);
-        button.disabled = item.disabled;
-        if (item.text === "Resume" && innerHeight > innerWidth) button.disabled = true;
-        button.addEventListener("click", () => {
+        twin = element("button", item.text, menu);
+        twin.disabled = item.disabled;
+        twin.addEventListener("click", () => {
           resumeAudio();
           send({type: "menu", revision: model.revision, id: item.id});
         });
       } else {
-        const label = element("label", item.text, menu);
-        const slider = element("input", "", label);
+        twin = element("label", item.text, menu);
+        const slider = element("input", "", twin);
         slider.type = "range";
         for (const key of ["min", "max", "step", "value"]) slider[key] = item[key];
         slider.addEventListener("input", () => {
@@ -371,9 +423,10 @@
           send({type: "menu", revision: model.revision, id: item.id, value: Number(slider.value)});
         });
       }
+      twins.set(item.id, twin);
     }
+    placeTwins();
     menu.querySelector("button:not(:disabled), input")?.focus({preventScroll: true});
-    if (changingHelpPage) menu.scrollTop = 0;
   }
   root.MidcreekTouch = {
     enabled,

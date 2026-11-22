@@ -28,6 +28,8 @@ func run() -> void:
 		check(hud.prompt_model()["graphic"] == {"shape": "button", "label": "X"}, "Gamepad preference resolves the same action to X.")
 		hud.control_display = "touch"
 		check(hud.prompt_model()["description"] == "Hold Repair to repair", "Touch uses an action name rather than keyboard prose replacement.")
+		hud.set_prompt({"action": "move_right", "intent": "hold", "text": "reach the rack", "status": ""})
+		check(visible_prompt_text(hud) == "→", "Touch steering shows its drag direction without a Hold badge.")
 		hud.set_prompt({"action": "", "intent": "", "text": "", "status": "Bring the PSU"})
 		check(hud.prompt_model()["action"] == "" and hud.prompt_model()["description"] == "Bring the PSU", "Status is independent and has no action cue.")
 		check(visible_prompt_text(hud) == "Bring the PSU", "Nonaction status stays visible in the live HUD.")

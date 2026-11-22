@@ -7,8 +7,11 @@ const PAD_LABELS := {
 	JOY_BUTTON_DPAD_UP: "↑", JOY_BUTTON_DPAD_DOWN: "↓", JOY_BUTTON_START: "Menu",
 }
 const TOUCH_LABELS := {
-	"move_left": "Left", "move_right": "Right", "move_up": "Up", "move_down": "Down",
 	"jump": "Jump", "slide": "Slide", "repair": "Repair", "diagnose": "Diagnose", "pause": "Pause",
+}
+# Touch movement comes from the floating joystick, so it is described as a drag direction.
+const TOUCH_MOVES := {
+	"move_left": ["←", "left"], "move_right": ["→", "right"], "move_up": ["↑", "up"], "move_down": ["↓", "down"],
 }
 
 
@@ -31,6 +34,8 @@ static func graphic(action: String, display: String) -> Dictionary:
 	if display == "gamepad":
 		return {"shape": "button", "label": PAD_LABELS[InputSetup.BUTTONS[StringName(action)][0]]}
 	if display == "touch":
+		if TOUCH_MOVES.has(action):
+			return {"shape": "stick", "label": TOUCH_MOVES[action][0]}
 		return {"shape": "touch", "label": TOUCH_LABELS[action]}
 	return {"shape": "keycap", "label": OS.get_keycode_string(InputSetup.KEYS[StringName(action)][0])}
 
@@ -42,7 +47,10 @@ static func render(prompt: Dictionary, display: String) -> Dictionary:
 	result["graphic"] = graphic(result["action"], display)
 	var description: String = result["status"]
 	if not result["action"].is_empty():
-		description = "%s %s to %s" % [String(result["intent"]).capitalize(), result["graphic"]["label"], result["text"]]
+		if display == "touch" and TOUCH_MOVES.has(result["action"]):
+			description = "Drag %s to %s" % [TOUCH_MOVES[result["action"]][1], result["text"]]
+		else:
+			description = "%s %s to %s" % [String(result["intent"]).capitalize(), result["graphic"]["label"], result["text"]]
 		if not result["status"].is_empty():
 			description += ". " + result["status"]
 	elif not result["text"].is_empty():

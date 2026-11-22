@@ -35,6 +35,17 @@ test("live status text announces a changed purpose once even when the compact Ho
   assert.equal(announcement.textWrites, updates, "Held and pulse refreshes must not repeat the announcement.");
 });
 
+test("touch steering has no gameplay caption but retains announcements and carry status", () => {
+  const {renderPrompt} = require(file);
+  const visible = cueNode(), graphic = cueNode(), announcement = cueNode();
+  const model = {action: "move_right", intent: "hold", display: "touch", description: "Drag right to run right"};
+  renderPrompt(visible, graphic, [], model, "", false, true, announcement);
+  assert.equal(visible.textContent, "");
+  assert.equal(announcement.textContent, model.description);
+  renderPrompt(visible, graphic, [], model, "Carrying PSU", false, true, announcement);
+  assert.equal(visible.textContent, "Carrying PSU");
+});
+
 test("live hints show graphics, Hold and status only while retaining full semantic descriptions", () => {
   const {renderPrompt} = require(file);
   const text = cueNode(), graphic = cueNode();
@@ -100,20 +111,6 @@ test("phone prompt honors a chosen keyboard or gamepad graphic without guessing 
   assert.equal(text.textContent, "Bring the PSU. Repair later.");
 });
 
-test("phone task demonstration uses its shared timeline and loops; reduced motion stays static", () => {
-  const {demoFrame} = require(file);
-  assert.equal(typeof demoFrame, "function", "help demonstration renderer is missing");
-  const demo = {steps: [
-    {seconds: 1, clip: "run", from: 20, to: 80},
-    {seconds: 2, clip: "primary", from: 80, to: 80},
-  ], clips: {run: {fps: 4, frames: ["run0", "run1"]}, primary: {fps: 2, frames: ["work0", "work1"]}}};
-  assert.deepEqual(demoFrame(demo, 0), {step: 0, frame: "run0", x: 20});
-  assert.deepEqual(demoFrame(demo, 0.5), {step: 0, frame: "run0", x: 50});
-  assert.deepEqual(demoFrame(demo, 1.5), {step: 1, frame: "work1", x: 80});
-  assert.deepEqual(demoFrame(demo, 3), demoFrame(demo, 0));
-  assert.deepEqual(demoFrame(demo, 1.5, true), demoFrame(demo, 0));
-});
-
 test("phone controls require touch, coarse input and phone screen dimensions", () => {
   assert.ok(fs.existsSync(file), "Mobile browser interface is missing");
   const {isPhone} = require(file);
@@ -143,6 +140,18 @@ test("independent fingers and cancellation preserve other held actions", () => {
   state.release(3);
   state.clear();
   assert.equal(events.length, count);
+});
+
+test("joystick ignores a resting thumb, supports diagonals and clamps the knob on long drags", () => {
+  const {stickVector} = require(file);
+  for (const [dx, dy, horizontal, vertical] of [
+    [3, -4, "", ""], [90, 3, "move_right", ""], [-22, -23, "move_left", "move_up"], [1, 90, "", "move_down"],
+  ]) {
+    const v = stickVector(dx, dy);
+    assert.equal(v.horizontal, horizontal);
+    assert.equal(v.vertical, vertical);
+    assert.ok(Math.hypot(v.x, v.y) <= 28.001);
+  }
 });
 
 test("dragging a finger between pad directions releases the previous action", () => {
