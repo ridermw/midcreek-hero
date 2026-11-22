@@ -11,7 +11,7 @@ func _init() -> void:
 	custom_minimum_size = SIZE
 	size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	accessibility_name = "Touch controls layout"
-	accessibility_description = "Touch the left half of the screen and drag to run or climb. Jump is at the lower right. Slide, Repair and Diagnose appear beside Jump only when needed. The timer and health are at the top left; Full screen and Pause are at the top right."
+	accessibility_description = "Touch the left half of the screen and drag to run or climb, or tap Move to show direction buttons. Jump is at the lower right. Slide, Repair and Diagnose appear beside Jump only when needed. The timer and health are at the top left; Full screen and Pause are at the top right."
 
 
 func _draw() -> void:
@@ -30,6 +30,7 @@ func _draw() -> void:
 	_text(font, Vector2(180, 134), "to run or climb", 20, TEXT)
 	draw_arc(Vector2(180, 196), 40, 0, TAU, 48, Color(TEXT, 0.6), 3.0, true)
 	draw_circle(Vector2(201, 189), 17, Color(TEXT, 0.75))
+	_pill(font, Rect2(16, 204, 92, 40), "Move", false)
 	_pill(font, Rect2(462, 14, 128, 36), "Full screen", false)
 	_pill(font, Rect2(598, 14, 106, 36), "Pause", false)
 	_text(font, Vector2(540, 84), "Slide, Repair and Diagnose", 17, LINE)

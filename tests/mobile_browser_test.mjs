@@ -76,7 +76,7 @@ async function menuButton(text, selector = "#mobile-menu button") {
 async function mirror(text) {
   await wait(`document.querySelector("#mobile-menu")?.textContent.includes(${JSON.stringify(text)})`);
 }
-async function checkMenuLayout(name) {
+async function checkMenuLayout(name, requireOnscreen = false) {
   const layout = await evaluate(`(() => {
     const canvas = document.querySelector("#canvas");
     const r = canvas.getBoundingClientRect();
@@ -85,6 +85,7 @@ async function checkMenuLayout(name) {
     return {game: [r.x, r.y, r.width, r.height], viewport: [innerWidth, innerHeight], visible: getComputedStyle(canvas).visibility,
       mirrorOpacity: getComputedStyle(menu).opacity, twins: twins.length,
       blocked: twins.filter(n => { const b = n.getBoundingClientRect(); return document.elementFromPoint(b.x + b.width / 2, b.y + b.height / 2) !== canvas && b.top >= 0 && b.bottom <= innerHeight; }).map(n => n.textContent),
+      offscreen: twins.filter(n => { const b = n.getBoundingClientRect(); return b.width > 0 && (b.left < 0 || b.top < 0 || b.right > innerWidth || b.bottom > innerHeight); }).map(n => n.textContent),
       pause: !document.querySelector("#mobile-pause")?.hidden,
       fullscreen: !document.fullscreenEnabled || document.querySelector("#mobile-fullscreen")?.getBoundingClientRect().height >= 44};
   })()`);
@@ -93,8 +94,21 @@ async function checkMenuLayout(name) {
   assert.equal(layout.mirrorOpacity, "0", name + " has no visible HTML copy.");
   assert.ok(layout.twins > 0, name + " keeps screen reader controls.");
   assert.deepEqual(layout.blocked, [], name + " passes taps on its controls through to the game.");
+  if (requireOnscreen) assert.deepEqual(layout.offscreen, [], name + " keeps every in-game control on screen.");
   assert.equal(layout.pause, false, "Pause shows only during play.");
   assert.ok(layout.fullscreen, "Full screen stays available on menus.");
+}
+async function checkHelpInstructionBounds() {
+  const bounds = await evaluate(`(() => {
+    const raw = document.querySelector("#mobile-menu").dataset.helpInstructionsRect;
+    if (!raw) return null;
+    const [x, y, width, height] = JSON.parse(raw);
+    const canvas = document.querySelector("#canvas").getBoundingClientRect();
+    const left = canvas.left + x * canvas.width, top = canvas.top + y * canvas.height;
+    const right = left + width * canvas.width, bottom = top + height * canvas.height;
+    return {inside: width > 0 && height > 0 && left >= canvas.left && top >= canvas.top && right <= canvas.right && bottom <= canvas.bottom};
+  })()`);
+  assert.ok(bounds?.inside, "How to Play instructions stay within the canvas on the 480 by 320 viewport.");
 }
 async function checkRotateNotice(paused) {
   const notice = await evaluate(`(() => {
@@ -118,7 +132,8 @@ async function checkPlayLayout() {
     const safe = document.querySelector("#mobile-shell").getBoundingClientRect();
     const zone = document.querySelector(".stick-zone").getBoundingClientRect();
     const jump = document.querySelector('[data-action="jump"]').getBoundingClientRect();
-    const buttons = [...document.querySelectorAll(".play-tools button, .action-pad button:not([hidden])")];
+    const buttons = [...document.querySelectorAll(".play-tools button, .action-pad button:not([hidden]), .movement-alternatives-toggle")]
+      .filter(b => !b.closest("[hidden]"));
     return {
       viewport: [innerWidth, innerHeight], zoom: visualViewport.scale, game: [game.x, game.y, game.width, game.height],
       bufferAspect: canvas.width / canvas.height,
@@ -166,11 +181,33 @@ try {
   await wait('document.querySelector("#mobile-rotate").hidden');
   await gamePoint("#mobile-menu button", "Start");
   await checkMenuLayout("The title");
-  if (!await evaluate('document.querySelector("#mobile-menu").textContent.includes("Tap Start")')) regressions.push("The title still asks touch players for a key.");
   await screenshot("phone-title");
+  await menuButton("Settings");
+  const keyboardChoice = await evaluate('[...document.querySelectorAll("#mobile-menu button")].find(button => button.textContent.startsWith("Keyboard"))?.textContent');
+  assert.ok(keyboardChoice, "Settings exposes a Keyboard control display choice.");
+  await menuButton(keyboardChoice);
+  await mirror("Keyboard (selected)");
+  const touchChoice = await evaluate('[...document.querySelectorAll("#mobile-menu button")].find(button => button.textContent.startsWith("Touch"))?.textContent');
+  assert.ok(touchChoice, "Settings exposes a Touch control display choice.");
+  await menuButton(touchChoice);
+  await mirror("Touch (selected)");
+  await evaluate('[...document.querySelectorAll("#mobile-menu button")].find(button => button.textContent === "Back")?.focus()');
+  await wait('document.querySelector("#mobile-menu button:focus")?.dataset.gameFocused === "true"');
+  await screenshot("phone-menu-keyboard-focus");
+  await menuButton("Back");
+  await mirror("Tap Start");
+  if (!await evaluate('document.querySelector("#mobile-menu").textContent.includes("Tap Start")')) regressions.push("The in-game title did not update after selecting Touch.");
   await menuButton("How to Play");
   await mirror("Touch the left half of the screen");
   await checkMenuLayout("How to Play");
+  await dimensions(480, 320);
+  await checkMenuLayout("How to Play on a small landscape phone", true);
+  await checkHelpInstructionBounds();
+  await screenshot("phone-help-small");
+  await dimensions(844, 390);
+  await wait('document.querySelector("#mobile-rotate").hidden');
+  await delay(250);
+  await mirror("Touch the left half of the screen");
   await screenshot("phone-help-controls");
   await menuButton("Next");
   await mirror("Repair a rack");
@@ -224,6 +261,16 @@ try {
   assert.equal(await evaluate('document.querySelector("#mobile-prompt").textContent.includes("A / D")'), false, "Mobile prompts do not require a keyboard.");
   await checkPlayLayout();
   await screenshot("phone-gameplay");
+  await tap("#mobile-controls .movement-alternatives-toggle");
+  assert.equal(await evaluate('document.querySelector("#mobile-controls .movement-alternatives-toggle").getAttribute("aria-expanded")'), "true", "The movement alternative opens with a normal touch.");
+  await screenshot("phone-move-buttons");
+  const moveRight = await point('#mobile-controls .stick-alternatives [data-action="move_right"]');
+  await cdp("Input.dispatchTouchEvent", {type: "touchStart", touchPoints: [{...moveRight, id: 1}]});
+  assert.equal(await evaluate('document.querySelector(\'[data-action="move_right"]\').getAttribute("aria-pressed")'), "true", "The revealed direction button holds movement on touch.");
+  await evaluate('document.querySelector("#mobile-controls .movement-alternatives-toggle").click()');
+  assert.equal(await evaluate('document.querySelector(\'[data-action="move_right"]\').getAttribute("aria-pressed")'), "false", "Collapsing the D-pad releases a held direction.");
+  assert.equal(await evaluate('document.querySelector("#mobile-controls .stick-alternatives").hidden'), true, "The direction buttons are hidden after collapsing them.");
+  await cdp("Input.dispatchTouchEvent", {type: "touchEnd", touchPoints: []});
   await tap("#mobile-tasks summary");
   await wait('document.querySelector("#mobile-tasks[open]")?.innerText.includes("Repair rack A12")');
   await tap("#mobile-tasks summary");

@@ -65,6 +65,16 @@ func command(data: Dictionary) -> bool:
 			if bool(data.get("down", false)):
 				main.audio.unlock()
 			return input.set_action(StringName(data.get("action", "")), bool(data.get("down", false)))
+		"menu_focus":
+			if data.get("revision", -1) != revision:
+				return false
+			var control = _controls.get(String(data.get("id", "")))
+			if not is_instance_valid(control) or control.focus_mode == Control.FOCUS_NONE:
+				return false
+			if control is Button and control.disabled:
+				return false
+			control.grab_focus()
+			return control.has_focus()
 		"menu":
 			if data.get("revision", -1) != revision:
 				return false
@@ -90,7 +100,11 @@ func menu_model() -> Dictionary:
 	if is_instance_valid(main.help_view):
 		source = main.help_view
 		model["screen"] = "help"
-		model["help"] = main.help_view.browser_model()
+		var help_model: Dictionary = main.help_view.browser_model()
+		var instructions: Label = main.help_view.get("_instructions")
+		if is_instance_valid(instructions):
+			help_model["instructions_rect"] = _rect(instructions)
+		model["help"] = help_model
 	_controls.clear()
 	if not is_instance_valid(source):
 		model["summary"] = main.error_message if not main.error_message.is_empty() else ("Work order unavailable." if model["screen"] == "level" else "")
@@ -119,11 +133,11 @@ func menu_model() -> Dictionary:
 		elif node is Button:
 			var id := str(node.get_instance_id())
 			_controls[id] = node
-			model["controls"].append({"id": id, "kind": "button", "text": node.text, "disabled": node.disabled, "rect": _rect(node)})
+			model["controls"].append({"id": id, "kind": "button", "text": node.text, "disabled": node.disabled, "focused": node.has_focus(), "rect": _rect(node)})
 		elif node is HSlider:
 			var id := str(node.get_instance_id())
 			_controls[id] = node
-			model["controls"].append({"id": id, "kind": "slider", "text": last_label, "value": node.value, "min": node.min_value, "max": node.max_value, "step": node.step, "rect": _rect(node)})
+			model["controls"].append({"id": id, "kind": "slider", "text": last_label, "value": node.value, "min": node.min_value, "max": node.max_value, "step": node.step, "focused": node.has_focus(), "rect": _rect(node)})
 	if main.screen_name == "results":
 		labels.append("%d stars" % main.screen.stars)
 	if main.screen_name == "level_select":

@@ -183,6 +183,8 @@
       }
       const slider = twin.querySelector("input");
       if (slider && Number(slider.value) !== item.value) slider.value = item.value;
+      const focused = String(!!item.focused);
+      if (twin.dataset.gameFocused !== focused) twin.dataset.gameFocused = focused;
     }
   }
   function buildJoystick(parent) {
@@ -223,8 +225,34 @@
       });
     }
     // Movement remains operable without performing a drag.
-    const alternatives = element("div", "", parent);
+    const movement = element("div", "", parent);
+    movement.className = "movement-alternatives";
+    const toggle = element("button", "Move", movement);
+    toggle.type = "button";
+    toggle.className = "movement-alternatives-toggle";
+    toggle.setAttribute("aria-label", "Show movement buttons");
+    toggle.setAttribute("aria-expanded", "false");
+    const alternatives = element("div", "", movement);
     alternatives.className = "stick-alternatives";
+    alternatives.id = "mobile-movement-buttons";
+    alternatives.hidden = true;
+    toggle.setAttribute("aria-controls", alternatives.id);
+    toggle.addEventListener("click", () => {
+      if (!alternatives.hidden) {
+        for (const [id, action] of activeContacts) {
+          if (!action.startsWith("move_")) continue;
+          activeContacts.delete(id);
+          state.release(id);
+        }
+        for (const action of ["move_left", "move_right", "move_up", "move_down"]) {
+          state.release(`assist-${action}`);
+        }
+      }
+      alternatives.hidden = !alternatives.hidden;
+      toggle.setAttribute("aria-expanded", String(!alternatives.hidden));
+      toggle.setAttribute("aria-label", alternatives.hidden ? "Show movement buttons" : "Hide movement buttons");
+      toggle.textContent = alternatives.hidden ? "Move" : "Hide";
+    });
     for (const label of ["Left", "Right", "Up", "Down"]) actionButton("move_" + label.toLowerCase(), label, alternatives);
   }
   function actionButton(action, text, parent) {
@@ -373,6 +401,7 @@
   }
   function render(json) {
     model = JSON.parse(json);
+    if (model.help?.instructions_rect) menu.dataset.helpInstructionsRect = JSON.stringify(model.help.instructions_rect);
     const {portrait, playing} = visibility();
     if (playing && portrait) {
       suspend();
@@ -423,6 +452,7 @@
           send({type: "menu", revision: model.revision, id: item.id, value: Number(slider.value)});
         });
       }
+      twin.addEventListener("focusin", () => send({type: "menu_focus", revision: model.revision, id: item.id}));
       twins.set(item.id, twin);
     }
     placeTwins();

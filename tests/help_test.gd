@@ -40,6 +40,7 @@ func run() -> void:
 		check(main.help_view.find_children("*", "GridContainer", true, false).is_empty(), "Touch help drops the list of removed direction buttons.")
 		var touch_text := "\n".join(main.mobile.menu_model()["help"]["controls"].map(func(c: Dictionary) -> String: return c["description"]))
 		check(touch_text.contains("left half") and touch_text.contains("appears") and not touch_text.contains("Hold Left"), "Touch help teaches the joystick and contextual buttons.")
+		check(touch_text.contains("Move") and touch_text.contains("direction buttons"), "Touch help explains the reachable movement alternative.")
 		check(Prompt.render(Prompt.make("move_right", "hold", "approach the rack"), "touch")["description"] == "Drag right to approach the rack", "Touch demonstrations describe joystick movement.")
 		main.save.settings.erase("control_display")
 		main.help_view._show_page()
@@ -56,6 +57,30 @@ func run() -> void:
 		main.open_help()
 		check(paused and not main.pause_menu.visible and main.screen == level, "Help overlays, rather than replaces or resumes, the paused level.")
 		main.mobile.enabled = true
+		var saved_size := root.size
+		var saved_scale := root.content_scale_factor
+		var saved_aspect := root.content_scale_aspect
+		root.size = Vector2i(480, 320)
+		root.content_scale_aspect = Window.CONTENT_SCALE_ASPECT_EXPAND
+		root.content_scale_factor = 1.25
+		main.save.settings["control_display"] = "touch"
+		main.help_view.page_index = 0
+		main.help_view._show_page()
+		await process_frame
+		var phone_instructions: Array = main.help_view._column.find_children("*", "Label", true, false).filter(
+			func(label: Label) -> bool: return label.text == main.help_view.pages[0]["instructions"]
+		)
+		var fitted_width: float = root.get_visible_rect().size.x
+		check(
+			not phone_instructions.is_empty()
+			and phone_instructions[0].custom_minimum_size.x < 960.0
+			and is_equal_approx(main.help_view.size.x, fitted_width)
+			and is_equal_approx(phone_instructions[0].custom_minimum_size.x, fitted_width),
+			"Touch help instructions use the fitted width on a 480 pixel landscape phone."
+		)
+		root.size = saved_size
+		root.content_scale_factor = saved_scale
+		root.content_scale_aspect = saved_aspect
 		var taught: Array[String] = []
 		for page: int in range(1, main.help_view.page_count()):
 			check(activate(main.mobile, main.mobile.menu_model(), "Next"), "Phone Next navigates the real help view.")

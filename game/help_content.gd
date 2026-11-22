@@ -23,7 +23,7 @@ static func controls(display: String) -> Array:
 static func touch_controls() -> Array:
 	var result: Array = []
 	for entry: Array in [
-		["move_right", "Touch the left half of the screen and drag to run or climb. Lift your thumb to stop."],
+		["move_right", "Touch the left half of the screen and drag to run or climb. Tap Move to use direction buttons instead. Lift your thumb to stop."],
 		["jump", "Jump stays at the lower right. Press it to jump; hold it for a higher jump."],
 		["slide", "Slide appears near low trays and drones. Press it to slide underneath."],
 		["repair", "Repair appears beside Jump at work sites. Hold it for racks and parts; press it for cables and switches."],

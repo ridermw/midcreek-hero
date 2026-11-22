@@ -11,7 +11,7 @@ body.mobile #canvas { position: fixed; inset: 0; max-width: 100vw; max-height: 1
 }
 #mobile-shell :is(button, summary, #mobile-controls, #mobile-tasks, #mobile-rotate, #mobile-error) { pointer-events: auto; }
 #mobile-shell [hidden] { display: none !important; }
-.visually-hidden, .stick-alternatives:not(:focus-within) { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+.visually-hidden { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
 #mobile-shell button { min-height: 48px; border: 2px solid #70939d; border-radius: 8px; background: #182e3b; color: #f1f7fa; font: 600 16px system-ui, sans-serif; touch-action: manipulation; }
 #mobile-shell :is(button, input, summary):focus-visible { outline: 3px solid #c7f36a; outline-offset: 2px; }
 #mobile-shell button:disabled { opacity: .45; }
@@ -35,8 +35,14 @@ body.mobile #canvas { position: fixed; inset: 0; max-width: 100vw; max-height: 1
 .stick-ring, .stick-knob { box-sizing: border-box; border-radius: 50%; pointer-events: none; }
 .stick-ring { position: absolute; width: 86px; height: 86px; transform: translate(-50%, -50%); display: grid; place-items: center; background: var(--glass); border: 1px solid #d9edf4aa; }
 .stick-knob { width: 30px; height: 30px; background: #e0f4ff77; border: 1px solid #fff; }
-.stick-alternatives:focus-within { position: absolute; left: var(--edge); bottom: var(--edge); display: flex; gap: var(--gap); }
-.stick-alternatives button { min-width: 44px; }
+.movement-alternatives { position: absolute; left: var(--edge); bottom: var(--edge); }
+.movement-alternatives-toggle { width: 60px; padding: 0; }
+.stick-alternatives { position: absolute; left: 0; bottom: calc(100% + var(--gap)); display: grid; grid-template: repeat(2, 44px) / repeat(3, 44px); gap: var(--gap); }
+.stick-alternatives button { min-width: 44px; padding: 0; }
+.stick-alternatives [data-action="move_up"] { grid-area: 1 / 2; }
+.stick-alternatives [data-action="move_left"] { grid-area: 2 / 1; }
+.stick-alternatives [data-action="move_down"] { grid-area: 2 / 2; }
+.stick-alternatives [data-action="move_right"] { grid-area: 2 / 3; }
 .action-pad { position: absolute; right: var(--edge); bottom: var(--edge); display: grid; align-items: end; gap: var(--gap); grid-template-columns: var(--action-width) auto; pointer-events: none; }
 .action-pad button { pointer-events: auto; }
 #mobile-controls [data-action] { height: var(--key); padding: 0; touch-action: none; }

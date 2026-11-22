@@ -370,6 +370,8 @@ func _fit_overlays() -> void:
 		control.set_anchors_preset(Control.PRESET_TOP_LEFT)
 		control.position = Vector2.ZERO
 		control.size = view
+		if control == help_view:
+			help_view.call("fit_instructions")
 
 
 func close_help() -> void:

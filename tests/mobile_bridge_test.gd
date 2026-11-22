@@ -38,6 +38,11 @@ func run() -> void:
 	check(is_equal_approx(root.content_scale_factor, 1.25), "Phone menus are enlarged for short landscape screens.")
 	check_rects(model)
 	var slider: Dictionary = model["controls"].filter(func(c: Dictionary) -> bool: return c["kind"] == "slider")[0]
+	var slider_node: HSlider = instance_from_id(int(slider["id"]))
+	check(bridge.command({"type": "menu_focus", "revision": model["revision"], "id": slider["id"]}), "A focused browser twin can focus its in-game slider.")
+	check(slider_node.has_focus(), "The in-game selection follows browser keyboard focus.")
+	check(bridge.menu_model()["controls"].any(func(c: Dictionary) -> bool: return c["id"] == slider["id"] and c.get("focused", false)), "The menu model publishes the in-game focus for browser verification.")
+	check(not bridge.command({"type": "menu_focus", "revision": model["revision"] - 1, "id": slider["id"]}), "A stale focus command cannot change the in-game selection.")
 	check(bridge.command({"type": "menu", "revision": model["revision"], "id": slider["id"], "value": 0.25}), "Touch changes the real volume slider.")
 	check(is_equal_approx(main.save.settings["music_volume"], 0.25), "Touch settings persist through the existing signal.")
 	check(activate(bridge, model, "Back"), "Touch can leave Settings.")
@@ -45,6 +50,9 @@ func run() -> void:
 	await process_frame
 	model = bridge.menu_model()
 	check(model["summary"].contains("Tap Start") and not model["summary"].contains("Press any key"), "The in-game title speaks to touch players.")
+	var start: Dictionary = model["controls"].filter(func(c: Dictionary) -> bool: return c.get("text") == "Start")[0]
+	var start_node: Button = instance_from_id(int(start["id"]))
+	check(bridge.command({"type": "menu_focus", "revision": model["revision"], "id": start["id"]}) and start_node.has_focus(), "A browser keyboard focus selects the matching in-game button.")
 	check(activate(bridge, model, "Start"), "Touch can start character selection.")
 	await process_frame
 	check(activate(bridge, bridge.menu_model(), "Woman"), "Touch can choose a technician.")

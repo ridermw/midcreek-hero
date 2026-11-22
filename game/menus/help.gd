@@ -15,6 +15,7 @@ var touch_layout: Control
 var _column: VBoxContainer
 var _cue: Label
 var _graphic: Label
+var _instructions: Label
 var _last_step := -1
 
 
@@ -86,10 +87,11 @@ func _show_page() -> void:
 		row.add_child(_cue)
 		_column.add_child(row)
 	var instructions := UiKit.label(page["instructions"], 18, UiKit.MUTED_COLOR)
-	# Landscape phones have spare width but little height.
-	instructions.custom_minimum_size.x = 960 if main.mobile.enabled else 760
+	_instructions = instructions
+	instructions.custom_minimum_size.x = 760
 	instructions.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_column.add_child(instructions)
+	fit_instructions()
 	var navigation := HBoxContainer.new()
 	navigation.alignment = BoxContainer.ALIGNMENT_CENTER
 	var buttons: Array = []
@@ -107,6 +109,11 @@ func _show_page() -> void:
 		button.focus_neighbor_right = button.get_path_to(buttons[(i + 1) % buttons.size()])
 	(buttons[0] as Button).grab_focus()
 	main.mobile.revision += 1
+
+
+func fit_instructions() -> void:
+	if main != null and main.mobile.enabled and is_instance_valid(_instructions):
+		_instructions.custom_minimum_size.x = minf(960.0, size.x)
 
 
 func _process(_delta: float) -> void:

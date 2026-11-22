@@ -230,8 +230,9 @@ diagram of the joystick, contextual actions, Jump, tasks and Pause. The task
 pages demonstrate the actions inside the game.
 
 Touch the left half and drag from that spot to run or climb. Lift your thumb
-to stop and hide the joystick. Jump stays at the lower right at 1.5x the
-previous button size. Slide appears near low trays and drones. The work button switches
+to stop and hide the joystick. Tap **Move** at the lower left to show direction
+buttons instead. Jump stays at the lower right at 1.5x the previous button
+size. Slide appears near low trays and drones. The work button switches
 between Diagnose and Repair as the task changes. Hold Repair at a rack.
 Cable sequences show Repair, Diagnose, or Jump. Use Repair at each numbered
 switch in order. Multiple fingers can hold different controls at the same time.
