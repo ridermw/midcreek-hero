@@ -12,13 +12,15 @@ const browser = await connectBrowser(endpoint, url);
 const {cdp, evaluate, errors} = browser;
 const regressions = [];
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
+// Above the 24 px WCAG minimum. Standard menu buttons reach about 43 px on a 390 px tall phone.
+const MIN_GAME_TARGET = 28;
 async function wait(expression) {
   for (let i = 0; i < 100; i++) {
     if (await evaluate(expression)) return;
     await delay(100);
   }
   await screenshot("failure");
-  console.error(await evaluate('JSON.stringify({width:innerWidth,height:innerHeight,body:document.body.innerText,buttons:[...document.querySelectorAll("#mobile-menu button")].map(b=>({text:b.textContent,disabled:b.disabled})),scripts:[...document.scripts].map(s=>s.src)})'));
+  console.error(await evaluate('JSON.stringify({width:innerWidth,height:innerHeight,body:document.body.innerText,buttons:[...document.querySelectorAll("#mobile-menu button")].map(b=>({text:b.textContent,disabled:b.disabled,rect:b.style.cssText})),scripts:[...document.scripts].map(s=>s.src)})'));
   throw new Error("Timed out: " + expression);
 }
 async function dimensions(width, height) {
@@ -43,14 +45,117 @@ async function moveTouches(touchPoints) {
   await cdp("Input.dispatchTouchEvent", {type: "touchMove", touchPoints});
   await wait(`window.touchMoves > ${before}`);
 }
-async function menuButton(text) {
-  const selector = await evaluate(`(() => { const buttons = [...document.querySelectorAll("#mobile-menu button")]; const i = buttons.findIndex(b => b.textContent === ${JSON.stringify(text)}); if(i < 0) return null; buttons[i].scrollIntoView({block:"center"}); return "#mobile-menu button:nth-of-type(" + (i+1) + ")"; })()`);
-  assert.ok(selector, text + " is reachable");
-  await tap(selector);
+// Menus are drawn by the game. Each screen reader twin sits over its in-game control and lets taps reach the canvas.
+async function gamePoint(selector, text) {
+  const expression = `(() => {
+    const node = [...document.querySelectorAll(${JSON.stringify(selector)})].find(n => n.textContent === ${JSON.stringify(text)});
+    if (!node) return null;
+    const r = node.getBoundingClientRect();
+    const x = r.x + r.width / 2, y = r.y + r.height / 2;
+    return {x, y, width: r.width, height: r.height, onCanvas: document.elementFromPoint(x, y) === document.querySelector("#canvas"),
+      inside: r.left >= 0 && r.top >= 0 && r.right <= innerWidth && r.bottom <= innerHeight};
+  })()`;
+  await wait(expression + "?.onCanvas");
+  // The game republishes control positions shortly after a resize or rotation.
+  let box;
+  for (let i = 0; i < 30; i++) {
+    box = await evaluate(expression);
+    if (box?.onCanvas && box.inside && box.width >= MIN_GAME_TARGET && box.height >= MIN_GAME_TARGET) break;
+    await delay(100);
+  }
+  assert.ok(box.inside, text + " is on screen");
+  assert.ok(box.width >= MIN_GAME_TARGET && box.height >= MIN_GAME_TARGET, `${text} is a usable in-game touch target (${box.width} x ${box.height}).`);
+  return {x: box.x, y: box.y, width: box.width, id: 1};
+}
+async function menuButton(text, selector = "#mobile-menu button") {
+  const p = await gamePoint(selector, text);
+  await cdp("Input.dispatchTouchEvent", {type: "touchStart", touchPoints: [p]});
+  await delay(60);
+  await cdp("Input.dispatchTouchEvent", {type: "touchEnd", touchPoints: []});
+}
+async function mirror(text) {
+  await wait(`document.querySelector("#mobile-menu")?.textContent.includes(${JSON.stringify(text)})`);
+}
+async function checkMenuLayout(name, requireOnscreen = false) {
+  const layout = await evaluate(`(() => {
+    const canvas = document.querySelector("#canvas");
+    const r = canvas.getBoundingClientRect();
+    const menu = document.querySelector("#mobile-menu");
+    const twins = [...menu.querySelectorAll("button, label")];
+    return {game: [r.x, r.y, r.width, r.height], viewport: [innerWidth, innerHeight], visible: getComputedStyle(canvas).visibility,
+      mirrorOpacity: getComputedStyle(menu).opacity, twins: twins.length,
+      blocked: twins.filter(n => { const b = n.getBoundingClientRect(); return document.elementFromPoint(b.x + b.width / 2, b.y + b.height / 2) !== canvas && b.top >= 0 && b.bottom <= innerHeight; }).map(n => n.textContent),
+      offscreen: twins.filter(n => { const b = n.getBoundingClientRect(); return b.width > 0 && (b.left < 0 || b.top < 0 || b.right > innerWidth || b.bottom > innerHeight); }).map(n => n.textContent),
+      pause: !document.querySelector("#mobile-pause")?.hidden,
+      fullscreen: !document.fullscreenEnabled || document.querySelector("#mobile-fullscreen")?.getBoundingClientRect().height >= 44};
+  })()`);
+  assert.equal(layout.visible, "visible", name + " is drawn by the game.");
+  assert.deepEqual(layout.game, [0, 0, ...layout.viewport], name + " fills the phone screen.");
+  assert.equal(layout.mirrorOpacity, "0", name + " has no visible HTML copy.");
+  assert.ok(layout.twins > 0, name + " keeps screen reader controls.");
+  assert.deepEqual(layout.blocked, [], name + " passes taps on its controls through to the game.");
+  if (requireOnscreen) assert.deepEqual(layout.offscreen, [], name + " keeps every in-game control on screen.");
+  assert.equal(layout.pause, false, "Pause shows only during play.");
+  assert.ok(layout.fullscreen, "Full screen stays available on menus.");
+}
+async function checkHelpInstructionBounds() {
+  const bounds = await evaluate(`(() => {
+    const raw = document.querySelector("#mobile-menu").dataset.helpInstructionsRect;
+    if (!raw) return null;
+    const [x, y, width, height] = JSON.parse(raw);
+    const canvas = document.querySelector("#canvas").getBoundingClientRect();
+    const left = canvas.left + x * canvas.width, top = canvas.top + y * canvas.height;
+    const right = left + width * canvas.width, bottom = top + height * canvas.height;
+    return {inside: width > 0 && height > 0 && left >= canvas.left && top >= canvas.top && right <= canvas.right && bottom <= canvas.bottom};
+  })()`);
+  assert.ok(bounds?.inside, "How to Play instructions stay within the canvas on the 480 by 320 viewport.");
+}
+async function checkRotateNotice(paused) {
+  const notice = await evaluate(`(() => {
+    const node = document.querySelector("#mobile-rotate");
+    const r = node.getBoundingClientRect();
+    return {covers: !node.hidden && r.width >= innerWidth - 1 && r.height >= innerHeight - 1 && node.contains(document.elementFromPoint(innerWidth / 2, innerHeight / 2)),
+      text: node.textContent, menuHidden: document.querySelector("#mobile-menu").hidden};
+  })()`);
+  assert.ok(notice.covers, "Portrait shows a full screen rotate notice.");
+  assert.equal(notice.text.includes("paused"), paused, "Only gameplay mentions the pause.");
+  assert.ok(notice.menuHidden, "Portrait hides menu controls from screen readers too.");
 }
 async function screenshot(name) {
   const {data} = await cdp("Page.captureScreenshot", {format: "png"});
   await writeFile(`${output}/${name}.png`, Buffer.from(data, "base64"));
+}
+async function checkPlayLayout() {
+  const layout = await evaluate(`(() => {
+    const canvas = document.querySelector("#canvas");
+    const game = canvas.getBoundingClientRect();
+    const safe = document.querySelector("#mobile-shell").getBoundingClientRect();
+    const zone = document.querySelector(".stick-zone").getBoundingClientRect();
+    const jump = document.querySelector('[data-action="jump"]').getBoundingClientRect();
+    const buttons = [...document.querySelectorAll(".play-tools button, .action-pad button:not([hidden]), .movement-alternatives-toggle")]
+      .filter(b => !b.closest("[hidden]"));
+    return {
+      viewport: [innerWidth, innerHeight], zoom: visualViewport.scale, game: [game.x, game.y, game.width, game.height],
+      bufferAspect: canvas.width / canvas.height,
+      edgeGaps: [zone.left - safe.left, safe.right - jump.right, safe.bottom - jump.bottom],
+      jumpRatio: [jump.width / 60, jump.height / Math.min(56, Math.max(44, innerHeight * .12))],
+      unreachable: buttons.filter(b => {
+        const r = b.getBoundingClientRect();
+        return r.width < 44 || r.height < 44 || r.left < safe.left || r.right > safe.right ||
+          r.top < safe.top || r.bottom > safe.bottom ||
+          !b.contains(document.elementFromPoint(r.x + r.width / 2, r.y + r.height / 2));
+      }).map(b => b.outerHTML),
+      translucent: buttons.every(b => getComputedStyle(b).backgroundColor.startsWith("rgba(")),
+    };
+  })()`);
+  const [w, h] = layout.viewport;
+  assert.ok(Math.abs(layout.zoom - 1) < 0.01, `Resizing must not shrink the page and touch targets (scale ${layout.zoom}).`);
+  assert.deepEqual(layout.game, [0, 0, w, h], "Gameplay fills the viewport, including behind safe areas.");
+  assert.ok(Math.abs(layout.bufferAspect - w / h) < 0.01, "The render buffer matches the phone aspect without stretching.");
+  assert.ok(layout.edgeGaps.every(n => n >= 0 && n <= 20), "The stick zone and Jump hug the safe edges.");
+  assert.ok(layout.jumpRatio.every(n => Math.abs(n - 1.5) < .01), "Jump is 1.5 times the old width and height.");
+  assert.deepEqual(layout.unreachable, [], "All controls remain separate, reachable touch targets inside the safe area.");
+  assert.ok(layout.translucent, "The game remains visible through the controls.");
 }
 try {
   await cdp("Page.enable");
@@ -70,43 +175,108 @@ try {
   await cdp("Page.navigate", {url});
   await wait('document.querySelector("#mobile-menu button")?.textContent === "Start"');
   assert.equal(await evaluate("MidcreekTouch.enabled"), true);
+  await checkRotateNotice(false);
+  await screenshot("phone-portrait-title");
+  await dimensions(844, 390);
+  await wait('document.querySelector("#mobile-rotate").hidden');
+  await gamePoint("#mobile-menu button", "Start");
+  await checkMenuLayout("The title");
   await screenshot("phone-title");
   await menuButton("Settings");
+  const keyboardChoice = await evaluate('[...document.querySelectorAll("#mobile-menu button")].find(button => button.textContent.startsWith("Keyboard"))?.textContent');
+  assert.ok(keyboardChoice, "Settings exposes a Keyboard control display choice.");
+  await menuButton(keyboardChoice);
+  await mirror("Keyboard (selected)");
+  const touchChoice = await evaluate('[...document.querySelectorAll("#mobile-menu button")].find(button => button.textContent.startsWith("Touch"))?.textContent');
+  assert.ok(touchChoice, "Settings exposes a Touch control display choice.");
+  await menuButton(touchChoice);
+  await mirror("Touch (selected)");
+  await evaluate('[...document.querySelectorAll("#mobile-menu button")].find(button => button.textContent === "Back")?.focus()');
+  await wait('document.querySelector("#mobile-menu button:focus")?.dataset.gameFocused === "true"');
+  await screenshot("phone-menu-keyboard-focus");
+  await menuButton("Back");
+  await mirror("Tap Start");
+  if (!await evaluate('document.querySelector("#mobile-menu").textContent.includes("Tap Start")')) regressions.push("The in-game title did not update after selecting Touch.");
+  await menuButton("How to Play");
+  await mirror("Touch the left half of the screen");
+  await checkMenuLayout("How to Play");
+  await dimensions(480, 320);
+  await checkMenuLayout("How to Play on a small landscape phone", true);
+  await checkHelpInstructionBounds();
+  await screenshot("phone-help-small");
+  await dimensions(844, 390);
+  await wait('document.querySelector("#mobile-rotate").hidden');
+  await delay(250);
+  await mirror("Touch the left half of the screen");
+  await screenshot("phone-help-controls");
+  await menuButton("Next");
+  await mirror("Repair a rack");
+  await delay(1500);
+  await screenshot("phone-help-demo");
+  await menuButton("Back");
+  await mirror("Tap Start");
+  await menuButton("Settings");
   await wait('document.querySelector("#mobile-menu input") !== null');
+  await checkMenuLayout("Settings");
+  const before = await evaluate('Number(document.querySelector("#mobile-menu input").value)');
+  const {width, ...slider} = await gamePoint("#mobile-menu label", await evaluate('document.querySelector("#mobile-menu label").textContent'));
+  // Saved settings persist between runs, so tap the far side of the current value.
+  const lower = before > 0.5;
+  await cdp("Input.dispatchTouchEvent", {type: "touchStart", touchPoints: [{...slider, x: slider.x + (lower ? -0.4 : 0.4) * width}]});
+  await delay(60);
+  await cdp("Input.dispatchTouchEvent", {type: "touchEnd", touchPoints: []});
+  await wait(`Number(document.querySelector("#mobile-menu input").value) ${lower ? "<" : ">"} ${before}`);
   await wait('window.__audioContexts.length > 0 && window.__audioContexts.every(c => c.state === "running")');
-  await tap("#mobile-menu input");
   await evaluate('window.savedSlider = document.querySelector("#mobile-menu input")');
-  await dimensions(390, 840);
+  await dimensions(844, 386);
   await delay(250);
   if (!await evaluate('window.savedSlider === document.querySelector("#mobile-menu input")')) regressions.push("Minor viewport resize replaces the active settings slider.");
   await evaluate('MidcreekTouch.reportError("Test expired command")');
   if (!await evaluate('[...document.querySelectorAll(\'[role="alert"]\')].some(n => n.getBoundingClientRect().height > 0 && n.textContent.includes("Test expired command"))')) regressions.push("Menu errors are not visible.");
   await screenshot("phone-settings");
+  // The banner overlaps in-game controls, so one tap must clear it.
+  await tap("#mobile-error button");
+  await wait('document.querySelector("#mobile-error").hidden');
   await menuButton("Back");
   await wait('document.querySelector("#mobile-menu button")?.textContent === "Start"');
   await menuButton("Start");
-  await wait('document.querySelector("#mobile-menu")?.textContent.includes("Woman")');
+  await mirror("Woman");
+  await screenshot("phone-characters");
   await menuButton("Woman");
-  await wait('document.querySelector("#mobile-menu")?.textContent.includes("01  Cold Aisle")');
+  await mirror("01  Cold Aisle");
+  await checkMenuLayout("Work orders");
   await screenshot("phone-work-orders");
   await menuButton("01  Cold Aisle Onboarding");
-  await wait('document.querySelector("#mobile-menu")?.textContent.includes("Resume")');
-  assert.equal(await evaluate('document.querySelector("#mobile-menu button").disabled'), true, "Portrait cannot resume gameplay.");
+  await wait('document.body.classList.contains("mobile-playing")');
+  await dimensions(390, 844);
+  await mirror("Resume");
+  await checkRotateNotice(true);
   await screenshot("phone-portrait-pause");
   await dimensions(844, 390);
-  await wait('document.querySelector("#mobile-menu button")?.disabled === false');
+  await wait('document.querySelector("#mobile-rotate").hidden');
+  await checkMenuLayout("Pause");
+  await screenshot("phone-pause");
   await menuButton("Resume");
   await wait('document.body.classList.contains("mobile-playing")');
   assert.equal(await evaluate('document.querySelector("#mobile-prompt").textContent.includes("A / D")'), false, "Mobile prompts do not require a keyboard.");
-  assert.equal(await evaluate(`(() => {
-    const game = document.querySelector("#canvas").getBoundingClientRect();
-    return [...document.querySelectorAll("#mobile-controls button, #mobile-prompt")].every(node => {
-      const r = node.getBoundingClientRect();
-      return r.right <= game.left || r.left >= game.right || r.bottom <= game.top || r.top >= game.bottom;
-    });
-  })()`), true, "Controls and prompt do not cover the game image.");
+  await checkPlayLayout();
   await screenshot("phone-gameplay");
-  await wait('document.querySelector(\'[data-action="move_right"]\')?.classList.contains("guidance-cue") && document.querySelector("#mobile-prompt .hint-visible")?.textContent === "Hold"');
+  await tap("#mobile-controls .movement-alternatives-toggle");
+  assert.equal(await evaluate('document.querySelector("#mobile-controls .movement-alternatives-toggle").getAttribute("aria-expanded")'), "true", "The movement alternative opens with a normal touch.");
+  await screenshot("phone-move-buttons");
+  const moveRight = await point('#mobile-controls .stick-alternatives [data-action="move_right"]');
+  await cdp("Input.dispatchTouchEvent", {type: "touchStart", touchPoints: [{...moveRight, id: 1}]});
+  assert.equal(await evaluate('document.querySelector(\'[data-action="move_right"]\').getAttribute("aria-pressed")'), "true", "The revealed direction button holds movement on touch.");
+  await evaluate('document.querySelector("#mobile-controls .movement-alternatives-toggle").click()');
+  assert.equal(await evaluate('document.querySelector(\'[data-action="move_right"]\').getAttribute("aria-pressed")'), "false", "Collapsing the D-pad releases a held direction.");
+  assert.equal(await evaluate('document.querySelector("#mobile-controls .stick-alternatives").hidden'), true, "The direction buttons are hidden after collapsing them.");
+  await cdp("Input.dispatchTouchEvent", {type: "touchEnd", touchPoints: []});
+  await tap("#mobile-tasks summary");
+  await wait('document.querySelector("#mobile-tasks[open]")?.innerText.includes("Repair rack A12")');
+  await tap("#mobile-tasks summary");
+  await wait('document.querySelector(\'#mobile-prompt [role="status"]\')?.textContent === "Drag right to run right"');
+  assert.equal(await evaluate('document.querySelector("#mobile-prompt .hint-visible").textContent'), "", "Steering does not add a visible caption.");
+  assert.deepEqual(await evaluate('[...document.querySelectorAll(".action-pad button:not([hidden])")].map(b => b.dataset.action)'), ["jump"]);
   const repeatedMutations = await evaluate(`new Promise(resolve => {
     const node = document.querySelector('#mobile-prompt [role="status"]');
     let count = 0;
@@ -114,41 +284,51 @@ try {
     observer.observe(node, {childList: true, characterData: true, subtree: true});
     setTimeout(() => { observer.disconnect(); resolve({count, text: node.textContent}); }, 350);
   })`);
-  assert.equal(repeatedMutations.text, "Hold Right to run right", "The graphical prompt keeps its stable accessible description.");
+  assert.equal(repeatedMutations.text, "Drag right to run right", "The directional alternative keeps its accessible description.");
   if (repeatedMutations.count !== 0) regressions.push("Unchanged live prompt mutates repeatedly.");
-  const right = await point('[data-action="move_right"]');
-  const left = await point('[data-action="move_left"]');
+  const origin = {x: 120, y: 290, id: 1};
+  const right = {...origin, x: origin.x + 45}, left = {...origin, x: origin.x - 45};
   const jump = {...await point('[data-action="jump"]'), id: 2};
   await evaluate('window.touchMoves = 0; document.addEventListener("pointermove", () => { window.touchMoves++; }, true)');
-  await cdp("Input.dispatchTouchEvent", {type: "touchStart", touchPoints: [right]});
-  await delay(150);
+  assert.ok(await evaluate('document.querySelector(".stick-ring").hidden'), "No idle joystick covers the level.");
+  await cdp("Input.dispatchTouchEvent", {type: "touchStart", touchPoints: [origin]});
+  assert.ok(await evaluate('!document.querySelector(".stick-ring").hidden && !document.querySelector(\'[aria-pressed="true"]\')'), "Touch anchors a neutral joystick.");
+  await moveTouches([right]);
   await cdp("Input.dispatchTouchEvent", {type: "touchStart", touchPoints: [right, jump]});
   await delay(150);
   assert.equal(await evaluate('document.querySelectorAll(\'[aria-pressed="true"]\').length'), 2, "Two fingers hold independent actions.");
   await screenshot("phone-move-jump");
-  const gap = {x: (left.x + right.x) / 2, y: right.y, id: 1};
-  assert.equal(await evaluate(`document.elementFromPoint(${gap.x}, ${gap.y})?.dataset.action === undefined`), true, "The measured point lies in the pad gap.");
-  await moveTouches([gap, jump]);
-  assert.equal(await evaluate('document.querySelectorAll(\'[aria-pressed="true"]\').length'), 1, "The gap releases movement but keeps Jump held.");
+  await moveTouches([origin, jump]);
+  assert.equal(await evaluate('document.querySelectorAll(\'[aria-pressed="true"]\').length'), 1, "Returning to center releases movement but keeps Jump held.");
   await moveTouches([left, jump]);
   if (!await evaluate('document.querySelector(\'[data-action="move_left"]\').getAttribute("aria-pressed") === "true"')) {
-    regressions.push("A finger cannot reenter a direction after crossing the pad gap.");
+    regressions.push("A finger cannot reverse the joystick through its center.");
   }
   await cdp("Input.dispatchTouchEvent", {type: "touchCancel", touchPoints: []});
   assert.equal(await evaluate('document.querySelectorAll(\'[aria-pressed="true"]\').length'), 0, "Cancellation releases both actions.");
-  await cdp("Input.dispatchTouchEvent", {type: "touchStart", touchPoints: [right]});
-  await moveTouches([{x: 422, y: 100, id: 1}]);
-  assert.equal(await evaluate('document.querySelectorAll(\'[aria-pressed="true"]\').length'), 0, "Dragging off a control releases it.");
+  assert.ok(await evaluate('document.querySelector(".stick-ring").hidden'), "Cancellation hides the joystick.");
+  await cdp("Input.dispatchTouchEvent", {type: "touchStart", touchPoints: [jump]});
+  await moveTouches([{x: 422, y: 100, id: 2}]);
+  assert.equal(await evaluate('document.querySelectorAll(\'[aria-pressed="true"]\').length'), 0, "Dragging off Jump releases it.");
   await cdp("Input.dispatchTouchEvent", {type: "touchEnd", touchPoints: []});
   await cdp("Input.dispatchTouchEvent", {type: "touchStart", touchPoints: [right]});
   await evaluate("MidcreekTouch.releaseAll()");
   await moveTouches([left]);
   assert.equal(await evaluate('document.querySelectorAll(\'[aria-pressed="true"]\').length'), 0, "A cleared contact cannot resume without another press.");
   await cdp("Input.dispatchTouchEvent", {type: "touchEnd", touchPoints: []});
-  for (const action of ["slide", "move_up", "move_down", "repair", "diagnose"]) await tap(`[data-action="${action}"]`);
-  await evaluate('document.querySelector(\'[data-action="repair"]\').click()');
+  await cdp("Input.dispatchTouchEvent", {type: "touchStart", touchPoints: [origin]});
+  await moveTouches([right]);
+  await wait('document.querySelector(\'.action-pad [data-action="repair"]:not([hidden])\') !== null');
+  const repair = {...await point('[data-action="repair"]'), id: 2};
+  await cdp("Input.dispatchTouchEvent", {type: "touchStart", touchPoints: [right, repair]});
+  await moveTouches([origin, repair]);
+  await wait('document.querySelector("#mobile-tasks").textContent.includes("[x] Repair rack A12")');
+  await wait('document.querySelector(\'[data-action="repair"]\').hidden');
+  assert.equal(await evaluate('document.querySelector(\'[data-action="repair"]\').getAttribute("aria-pressed")'), "false", "Finishing a rack releases its context button even before the finger lifts.");
+  await cdp("Input.dispatchTouchEvent", {type: "touchEnd", touchPoints: []});
+  await evaluate('document.querySelector(\'[data-action="move_up"]\').click()');
   await delay(100);
-  if (!await evaluate('document.querySelector(\'[data-action="repair"]\').getAttribute("aria-pressed") === "true"')) regressions.push("Assistive activation cannot hold Repair.");
+  if (!await evaluate('document.querySelector(\'[data-action="move_up"]\').getAttribute("aria-pressed") === "true"')) regressions.push("Assistive activation cannot hold movement.");
   await evaluate(`window.orientationEvents = 0;
     screen.orientation.addEventListener("change", () => { window.orientationEvents++; });`);
   await cdp("Emulation.setDeviceMetricsOverride", {
@@ -156,27 +336,35 @@ try {
     screenOrientation: {type: "landscapeSecondary", angle: 270},
   });
   await wait("screen.orientation.angle === 270 && window.orientationEvents > 0");
-  if (!await evaluate('document.querySelector(\'[data-action="repair"]\').getAttribute("aria-pressed") === "false"')) regressions.push("A 180 degree landscape rotation retains held Repair.");
+  if (!await evaluate('document.querySelector(\'[data-action="move_up"]\').getAttribute("aria-pressed") === "false"')) regressions.push("A 180 degree landscape rotation retains held movement.");
   await evaluate("MidcreekTouch.releaseAll()");
   assert.equal(await evaluate("scrollX === 0 && scrollY === 0"), true, "Play does not scroll the page.");
   await tap("#mobile-pause");
-  await wait('document.querySelector("#mobile-menu")?.textContent.includes("Restart work order")');
+  await mirror("Restart work order");
   await menuButton("Restart work order");
   await wait('document.body.classList.contains("mobile-playing")');
   await cdp("Emulation.setSafeAreaInsetsOverride", {insets: {left: 44, right: 0, top: 0, bottom: 21}});
   await dimensions(667, 375);
   await delay(200);
-  assert.equal(await evaluate('document.querySelector(".direction-pad").getBoundingClientRect().left >= 44'), true, "The directional pad avoids the notch.");
+  assert.equal(await evaluate('document.querySelector(".stick-zone").getBoundingClientRect().left >= 44'), true, "The joystick avoids the notch.");
+  await checkPlayLayout();
   await screenshot("phone-small-safe-area");
   await cdp("Emulation.setSafeAreaInsetsOverride", {insets: {left: 0, right: 0, top: 0, bottom: 0}});
   await dimensions(568, 320);
   await delay(200);
-  for (const action of ["jump", "slide", "repair", "diagnose", "move_up", "move_down"]) await point(`[data-action="${action}"]`);
+  await checkPlayLayout();
   await screenshot("phone-small-landscape");
+  await tap("#mobile-fullscreen");
+  await wait("document.fullscreenElement === document.documentElement");
+  await checkPlayLayout();
+  await tap("#mobile-fullscreen");
+  await wait("!document.fullscreenElement");
   await dimensions(390, 844);
   await wait('!document.body.classList.contains("mobile-playing")');
+  await checkRotateNotice(true);
+  await dimensions(844, 390);
   await menuButton("Quit to level select");
-  await wait('document.querySelector("#mobile-menu")?.textContent.includes("01  Cold Aisle")');
+  await mirror("01  Cold Aisle");
   if (process.argv.includes("--smoke")) {
     await dimensions(844, 390);
     await cdp("Page.navigate", {url: url + "?route=01"});
@@ -208,12 +396,12 @@ try {
   console.log("UI regressions:", JSON.stringify(regressions));
   await cdp("Network.setBlockedURLs", {urls: ["*mobile.js"]});
   await cdp("Page.navigate", {url});
-  await wait('document.querySelector("#status") === null');
+  await wait('document.querySelector("#status") === null && document.querySelector(\'[role="alert"]\')');
   assert.equal(await evaluate('document.querySelector(\'[role="alert"]\')?.textContent.includes("touch interface")'), true, "Missing touch resources report an error without blocking desktop.");
   await cdp("Network.setBlockedURLs", {urls: []});
   assert.deepEqual(regressions, []);
   assert.deepEqual(errors, [], "No browser script exceptions.");
-  console.log("MOBILE_BROWSER_TEST_COMPLETE: phone menus, settings, orientation, real multitouch, cancellation, all actions and restart passed.");
+  console.log("MOBILE_BROWSER_TEST_COMPLETE: in-game phone menus, touch help, settings, orientation, real multitouch, cancellation, all actions and restart passed.");
 } finally {
   await browser.disconnect();
 }

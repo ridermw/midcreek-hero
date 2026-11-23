@@ -10,7 +10,6 @@ var _controls: Dictionary = {}
 var _callback: JavaScriptObject
 var _browser: JavaScriptObject
 var _publish_after := 0.0
-var _published_help_revision := -1
 
 
 func _ready() -> void:
@@ -66,6 +65,16 @@ func command(data: Dictionary) -> bool:
 			if bool(data.get("down", false)):
 				main.audio.unlock()
 			return input.set_action(StringName(data.get("action", "")), bool(data.get("down", false)))
+		"menu_focus":
+			if data.get("revision", -1) != revision:
+				return false
+			var control = _controls.get(String(data.get("id", "")))
+			if not is_instance_valid(control) or control.focus_mode == Control.FOCUS_NONE:
+				return false
+			if control is Button and control.disabled:
+				return false
+			control.grab_focus()
+			return control.has_focus()
 		"menu":
 			if data.get("revision", -1) != revision:
 				return false
@@ -91,7 +100,11 @@ func menu_model() -> Dictionary:
 	if is_instance_valid(main.help_view):
 		source = main.help_view
 		model["screen"] = "help"
-		model["help"] = main.help_view.browser_model()
+		var help_model: Dictionary = main.help_view.browser_model()
+		var instructions: Label = main.help_view.get("_instructions")
+		if is_instance_valid(instructions):
+			help_model["instructions_rect"] = _rect(instructions)
+		model["help"] = help_model
 	_controls.clear()
 	if not is_instance_valid(source):
 		model["summary"] = main.error_message if not main.error_message.is_empty() else ("Work order unavailable." if model["screen"] == "level" else "")
@@ -103,6 +116,7 @@ func menu_model() -> Dictionary:
 			model["summary"] = main.error_message if not main.error_message.is_empty() else "Work order unavailable."
 			return model
 		model["prompt"] = hud.prompt_model()
+		model["slide_nearby"] = main.screen.slide_nearby() if main.screen.error_message.is_empty() else false
 		model["status"] = "%s | Health %d/5" % [hud.timer_label.text, health.segments]
 		model["tasks"] = "\n".join(hud.task_lines())
 		model["carry"] = hud.carry_label.text
@@ -119,11 +133,11 @@ func menu_model() -> Dictionary:
 		elif node is Button:
 			var id := str(node.get_instance_id())
 			_controls[id] = node
-			model["controls"].append({"id": id, "kind": "button", "text": node.text, "disabled": node.disabled})
+			model["controls"].append({"id": id, "kind": "button", "text": node.text, "disabled": node.disabled, "focused": node.has_focus(), "rect": _rect(node)})
 		elif node is HSlider:
 			var id := str(node.get_instance_id())
 			_controls[id] = node
-			model["controls"].append({"id": id, "kind": "slider", "text": last_label, "value": node.value, "min": node.min_value, "max": node.max_value, "step": node.step})
+			model["controls"].append({"id": id, "kind": "slider", "text": last_label, "value": node.value, "min": node.min_value, "max": node.max_value, "step": node.step, "focused": node.has_focus(), "rect": _rect(node)})
 	if main.screen_name == "results":
 		labels.append("%d stars" % main.screen.stars)
 	if main.screen_name == "level_select":
@@ -133,6 +147,14 @@ func menu_model() -> Dictionary:
 	return model
 
 
+# Fractions of the game view, so the browser can place each screen reader control over its in-game twin.
+func _rect(control: Control) -> Array:
+	var view := get_viewport().get_visible_rect().size
+	var rect := control.get_global_transform_with_canvas() * Rect2(Vector2.ZERO, control.size)
+	return [snappedf(rect.position.x / view.x, 0.0001), snappedf(rect.position.y / view.y, 0.0001),
+		snappedf(rect.size.x / view.x, 0.0001), snappedf(rect.size.y / view.y, 0.0001)]
+
+
 func _physics_process(_delta: float) -> void:
 	input.advance()
 
@@ -140,12 +162,8 @@ func _physics_process(_delta: float) -> void:
 func _process(delta: float) -> void:
 	if not enabled or _browser == null:
 		return
-	if main.help_view != null and _published_help_revision == revision:
-		return
 	_publish_after -= delta
 	if _publish_after > 0.0:
 		return
 	_publish_after = 0.1
-	var model := menu_model()
-	_browser.render(JSON.stringify(model))
-	_published_help_revision = revision if main.help_view != null else -1
+	_browser.render(JSON.stringify(menu_model()))

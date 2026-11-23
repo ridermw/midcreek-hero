@@ -6,13 +6,16 @@ const Demo = preload("res://game/help_demo.gd")
 const Graphic = preload("res://game/control_graphic.gd")
 const Prompt = preload("res://game/control_prompt.gd")
 const WorkSchema = preload("res://game/tasks/work_schema.gd")
+const TouchLayout = preload("res://game/menus/touch_layout.gd")
 var main: Node
 var page_index := 0
 var pages := Content.pages()
 var demo: Control
+var touch_layout: Control
 var _column: VBoxContainer
 var _cue: Label
 var _graphic: Label
+var _instructions: Label
 var _last_step := -1
 
 
@@ -41,6 +44,7 @@ func _show_page() -> void:
 		remove_child(child)
 		child.queue_free()
 	demo = null
+	touch_layout = null
 	_last_step = -1
 	_column = UiKit.column(self)
 	_column.add_theme_constant_override("separation", 8)
@@ -51,7 +55,10 @@ func _show_page() -> void:
 		if not main.art.load_group("work"):
 			_column.add_child(UiKit.label(main.art.error_message, 18))
 			return
-	if page["id"] == "controls":
+	if page["id"] == "controls" and main.control_display() == "touch":
+		touch_layout = TouchLayout.new()
+		_column.add_child(touch_layout)
+	elif page["id"] == "controls":
 		var grid := GridContainer.new()
 		grid.columns = 2
 		grid.add_theme_constant_override("h_separation", 18)
@@ -80,9 +87,11 @@ func _show_page() -> void:
 		row.add_child(_cue)
 		_column.add_child(row)
 	var instructions := UiKit.label(page["instructions"], 18, UiKit.MUTED_COLOR)
+	_instructions = instructions
 	instructions.custom_minimum_size.x = 760
 	instructions.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_column.add_child(instructions)
+	fit_instructions()
 	var navigation := HBoxContainer.new()
 	navigation.alignment = BoxContainer.ALIGNMENT_CENTER
 	var buttons: Array = []
@@ -100,6 +109,11 @@ func _show_page() -> void:
 		button.focus_neighbor_right = button.get_path_to(buttons[(i + 1) % buttons.size()])
 	(buttons[0] as Button).grab_focus()
 	main.mobile.revision += 1
+
+
+func fit_instructions() -> void:
+	if main != null and main.mobile.enabled and is_instance_valid(_instructions):
+		_instructions.custom_minimum_size.x = minf(960.0, size.x)
 
 
 func _process(_delta: float) -> void:
@@ -121,5 +135,4 @@ func browser_model() -> Dictionary:
 		"id": page["id"], "title": page["title"], "page": page_index + 1, "count": pages.size(),
 		"instructions": page["instructions"],
 		"controls": Content.controls(main.control_display()) if page["id"] == "controls" else [],
-		"demo": demo.browser_model() if demo != null else {},
 	}

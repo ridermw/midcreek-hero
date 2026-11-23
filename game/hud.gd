@@ -186,7 +186,7 @@ func prompt_model() -> Dictionary:
 func _refresh_prompt() -> void:
 	var model := prompt_model()
 	prompt_graphic.show_model(model)
-	hold_label.visible = not model["action"].is_empty() and model["intent"] == "hold"
+	hold_label.visible = not model["action"].is_empty() and model["intent"] == "hold" and model["graphic"].get("shape") != "stick"
 	if model["description"] != _prompt_description:
 		_prompt_description = model["description"]
 		prompt_label.text = model["status"]

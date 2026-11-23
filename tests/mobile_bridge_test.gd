@@ -25,6 +25,7 @@ func run() -> void:
 	var bridge = main.mobile
 	check(not bridge.enabled, "Desktop does not enable the mobile interface.")
 	bridge.enabled = true
+	root.size = Vector2i(844, 390)
 	main.audio.unlocked = false
 	bridge.command({"type": "clear"})
 	check(not main.audio.unlocked, "Lifecycle cleanup does not unlock audio without user input.")
@@ -33,13 +34,26 @@ func run() -> void:
 	check(activate(bridge, model, "Settings"), "Settings is reachable from touch.")
 	await process_frame
 	model = bridge.menu_model()
+	check(root.content_scale_aspect == Window.CONTENT_SCALE_ASPECT_EXPAND, "Phone menus fill the screen instead of letterboxing the 4:3 layout.")
+	check(is_equal_approx(root.content_scale_factor, 1.25), "Phone menus are enlarged for short landscape screens.")
+	check_rects(model)
 	var slider: Dictionary = model["controls"].filter(func(c: Dictionary) -> bool: return c["kind"] == "slider")[0]
+	var slider_node: HSlider = instance_from_id(int(slider["id"]))
+	check(bridge.command({"type": "menu_focus", "revision": model["revision"], "id": slider["id"]}), "A focused browser twin can focus its in-game slider.")
+	check(slider_node.has_focus(), "The in-game selection follows browser keyboard focus.")
+	check(bridge.menu_model()["controls"].any(func(c: Dictionary) -> bool: return c["id"] == slider["id"] and c.get("focused", false)), "The menu model publishes the in-game focus for browser verification.")
+	check(not bridge.command({"type": "menu_focus", "revision": model["revision"] - 1, "id": slider["id"]}), "A stale focus command cannot change the in-game selection.")
 	check(bridge.command({"type": "menu", "revision": model["revision"], "id": slider["id"], "value": 0.25}), "Touch changes the real volume slider.")
 	check(is_equal_approx(main.save.settings["music_volume"], 0.25), "Touch settings persist through the existing signal.")
 	check(activate(bridge, model, "Back"), "Touch can leave Settings.")
 	check(not activate(bridge, model, "Back"), "A stale menu command cannot activate the next screen.")
 	await process_frame
-	check(activate(bridge, bridge.menu_model(), "Start"), "Touch can start character selection.")
+	model = bridge.menu_model()
+	check(model["summary"].contains("Tap Start") and not model["summary"].contains("Press any key"), "The in-game title speaks to touch players.")
+	var start: Dictionary = model["controls"].filter(func(c: Dictionary) -> bool: return c.get("text") == "Start")[0]
+	var start_node: Button = instance_from_id(int(start["id"]))
+	check(bridge.command({"type": "menu_focus", "revision": model["revision"], "id": start["id"]}) and start_node.has_focus(), "A browser keyboard focus selects the matching in-game button.")
+	check(activate(bridge, model, "Start"), "Touch can start character selection.")
 	await process_frame
 	check(activate(bridge, bridge.menu_model(), "Woman"), "Touch can choose a technician.")
 	await process_frame
@@ -49,7 +63,10 @@ func run() -> void:
 	await process_frame
 	main.screen.set_physics_process(false)
 	main.screen.player.set_physics_process(false)
-	check(not main.screen.hud.prompt_label.visible, "Mobile uses the readable browser prompt instead of a duplicate keyboard prompt.")
+	check(root.content_scale_aspect == Window.CONTENT_SCALE_ASPECT_EXPAND, "The phone camera expands instead of letterboxing the 4:3 view.")
+	check(is_equal_approx(root.content_scale_factor, 1.0), "Gameplay keeps its full view while menus are enlarged.")
+	check(not main.screen.hud.visible, "Mobile uses one safe area HUD instead of drawing a duplicate behind its overlay.")
+	check(bridge.menu_model().get("slide_nearby") == false, "The open starting aisle does not need Slide.")
 	main.screen.hud.set_prompt({"action": "repair", "intent": "hold", "text": "repair", "status": ""})
 	var guidance: Dictionary = bridge.menu_model().get("prompt", {})
 	check(guidance.get("action") == "repair" and guidance.get("description") == "Hold Repair to repair", "Bridge publishes one structured action and description.")
@@ -74,6 +91,17 @@ func run() -> void:
 	bridge.command({"type": "pause"})
 	check(paused and not bridge.input.held(&"move_up"), "Pause releases movement.")
 	check(bridge.menu_model().get("prompt", {}).get("action") == "", "Pause clears the published cue.")
+	await process_frame
+	model = bridge.menu_model()
+	var resume: Dictionary = model["controls"].filter(func(c: Dictionary) -> bool: return c.get("text") == "Resume")[0]
+	check(resume["rect"][3] > 0.1 and model["controls"].all(func(c: Dictionary) -> bool: return c["rect"][1] >= 0.0 and c["rect"][1] + c["rect"][3] <= 1.0), "The pause menu above a level is enlarged like other phone menus and stays on screen.")
+	tap_twin(model, "How to Play")
+	await process_frame
+	check(main.help_view != null, "A tap on a pause menu twin reaches the enlarged in-game button.")
+	if main.help_view != null:
+		tap_twin(bridge.menu_model(), "Back")
+		await process_frame
+		check(main.help_view == null and main.pause_menu.visible, "A tap on a help twin above a level reaches the in-game button.")
 	model = bridge.menu_model()
 	check(activate(bridge, model, "Restart work order"), "Touch can restart from pause.")
 	await process_frame
@@ -132,6 +160,11 @@ func exercise_tasks(main: Node, bridge: Node) -> void:
 	var level: Node = main.screen
 	level.set_physics_process(false)
 	level.player.set_physics_process(false)
+	level.level["solids"][Vector2i(5, 3)] = "tray"
+	level.player.position = Vector2(3 * 32, 5 * 32)
+	check(bridge.menu_model().get("slide_nearby") == true, "Slide is available on approach to a low tray without a tutorial prompt.")
+	level.player.position.y -= 3 * 32
+	check(bridge.menu_model().get("slide_nearby") == false, "A tray on another floor does not offer Slide.")
 	var port: Node = level.entities["ports"][0]
 	level.player.position = port.position
 	touch_step(bridge, level, &"repair")
@@ -152,9 +185,13 @@ func exercise_tasks(main: Node, bridge: Node) -> void:
 	for rack: Node in level.entities["racks"]:
 		level.player.position = rack.position
 		if rack.kind == "diagnose_repair":
+			level.step(1.0 / 60.0)
+			check(bridge.menu_model()["prompt"]["action"] == "diagnose", "A marked rack requests Diagnose, not Repair.")
 			touch_step(bridge, level, &"diagnose")
 			level.step(0.9)
+			level.step(1.0 / 60.0)
 			check(rack.diagnosed, "Touch Diagnose prepares the rack.")
+			check(bridge.menu_model()["prompt"]["action"] == "repair", "Finishing diagnosis switches the work control to Repair.")
 		bridge.command({"type": "action", "action": "repair", "down": true})
 		for i: int in range(150):
 			bridge.input.advance()
@@ -180,6 +217,33 @@ func touch_step(bridge: Node, level: Node, action: StringName) -> void:
 	level.step(1.0 / 60.0)
 	bridge.input.advance()
 	level.step(1.0 / 60.0)
+
+
+# Taps the in-game control where the browser places its screen reader twin.
+func tap_twin(model: Dictionary, text: String) -> void:
+	var r: Array = model["controls"].filter(func(c: Dictionary) -> bool: return c.get("text") == text)[0]["rect"]
+	var at := Vector2(r[0] + r[2] / 2, r[1] + r[3] / 2) * Vector2(root.size)
+	for pressed: bool in [true, false]:
+		var event := InputEventMouseButton.new()
+		event.button_index = MOUSE_BUTTON_LEFT
+		event.pressed = pressed
+		event.position = at
+		event.global_position = at
+		root.push_input(event)
+
+
+func check_rects(model: Dictionary) -> void:
+	var view: Vector2 = root.get_visible_rect().size
+	for control: Dictionary in model["controls"]:
+		var node: Control = instance_from_id(int(control["id"]))
+		var expected: Rect2 = node.get_global_rect()
+		var rect: Array = control.get("rect", [])
+		var matches: bool = rect.size() == 4 and expected.size.x > 0.0 and expected.size.y > 0.0
+		if matches:
+			for i: int in range(4):
+				var target: float = [expected.position.x / view.x, expected.position.y / view.y, expected.size.x / view.x, expected.size.y / view.y][i]
+				matches = matches and absf(float(rect[i]) - target) < 0.0001
+		check(matches, "%s publishes where it appears in the game so the screen reader copy can sit over it." % control["text"])
 
 
 func activate(bridge: Node, model: Dictionary, text: String) -> bool:

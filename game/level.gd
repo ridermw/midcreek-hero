@@ -667,8 +667,34 @@ func _level_prompt(feet: Vector2) -> Dictionary:
 						switched = true
 				if switched:
 					continue
-			return ControlPrompt.make(prompt["action"], prompt["intent"], prompt["text"], prompt["status"], _action_held(StringName(prompt["action"])) if not prompt["action"].is_empty() else false)
+			var hint := ControlPrompt.make(prompt["action"], prompt["intent"], prompt["text"], prompt["status"], _action_held(StringName(prompt["action"])) if not prompt["action"].is_empty() else false)
+			# Tutorial columns extend beyond interaction range.
+			if prompt["action"] in ["repair", "diagnose"]:
+				hint["approach"] = true
+			return hint
 	return ControlPrompt.make()
+
+
+func slide_nearby() -> bool:
+	if player.dead or player.locked:
+		return false
+	if player.sliding:
+		return true
+	var feet := player.position
+	var tile := LevelBuilder.TILE
+	var col := floori(feet.x / tile)
+	var reach := 4 # tiles of warning in either direction
+	for y: int in range(floori((feet.y - Player.BODY_SIZE.y) / tile), floori((feet.y - Player.SLIDE_HEIGHT) / tile) + 1):
+		var clearance := feet.y - (y + 0.5) * tile
+		if clearance < Player.SLIDE_HEIGHT or clearance >= Player.BODY_SIZE.y:
+			continue
+		for x: int in range(col - reach, col + reach + 1):
+			if level["solids"].get(Vector2i(x, y)) == "tray":
+				return true
+	for hazard in entities["hazards"]:
+		if hazard is LevelBuilder.Drone and hazard.active and absf(hazard.position.x - feet.x) <= reach * tile and absf(hazard.position.y - feet.y) < tile / 2.0:
+			return true
+	return false
 
 
 func _complete_if_all_racks_done(task_id: String) -> void:

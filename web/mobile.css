@@ -1,26 +1,55 @@
 body.mobile { touch-action: auto; font: 16px system-ui, sans-serif; background: #0d1720; }
-body.mobile #canvas { position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%); visibility: hidden; image-rendering: pixelated; }
-body.mobile-playing #canvas { visibility: visible; }
-#mobile-shell { position: fixed; inset: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left); }
+/* The engine's last inline size must not widen the page during a rotation. */
+body.mobile #canvas { position: fixed; inset: 0; max-width: 100vw; max-height: 100dvh; image-rendering: pixelated; touch-action: none; }
+/* Taps fall through to the game canvas except on the touch controls themselves. */
+#mobile-shell {
+  --edge: 10px;
+  --gap: 5px;
+  --glass: rgba(9, 22, 33, .38);
+  position: fixed; inset: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  pointer-events: none;
+}
+#mobile-shell :is(button, summary, #mobile-controls, #mobile-tasks, #mobile-rotate, #mobile-error) { pointer-events: auto; }
 #mobile-shell [hidden] { display: none !important; }
 .visually-hidden { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
 #mobile-shell button { min-height: 48px; border: 2px solid #70939d; border-radius: 8px; background: #182e3b; color: #f1f7fa; font: 600 16px system-ui, sans-serif; touch-action: manipulation; }
-#mobile-shell button:focus-visible, #mobile-shell input:focus-visible { outline: 3px solid #c7f36a; outline-offset: 2px; }
+#mobile-shell :is(button, input, summary):focus-visible { outline: 3px solid #c7f36a; outline-offset: 2px; }
 #mobile-shell button:disabled { opacity: .45; }
-#mobile-menu { box-sizing: border-box; height: 100%; overflow-y: auto; overscroll-behavior: contain; touch-action: pan-y; padding: 16px 24px; max-width: 560px; margin: auto; }
-#mobile-menu h1 { font-size: 24px; margin: 0 0 12px; }
-#mobile-menu button, #mobile-menu label { display: block; width: 100%; margin: 12px 0; }
-#mobile-menu input { display: block; width: 100%; height: 48px; accent-color: #c7f36a; }
-.menu-summary { white-space: pre-line; line-height: 1.5; }
-.help-demo { width: 100%; max-width: 520px; height: auto; border: 1px solid #526773; border-radius: 10px; }
-#mobile-controls { position: absolute; inset: 0; touch-action: none; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; }
-.direction-pad, .action-pad { position: absolute; width: 120px; bottom: 54px; display: grid; gap: 6px; grid-template-columns: 1fr 1fr; }
-.direction-pad { left: 6px; }
-.action-pad { right: 6px; }
-.direction-pad button, .action-pad button { min-width: 54px; height: 54px; padding: 0; touch-action: none !important; font-size: 12px !important; }
-[data-action="move_up"] { grid-column: 1 / 3; }
-[data-action="move_down"] { grid-column: 1 / 3; }
-#mobile-controls button[aria-pressed="true"] { background: #45632c; border-color: #d0fc7e; }
+/* Screen reader twins sit exactly over the game's own menu controls, in fractions of the full canvas. */
+#mobile-menu { position: fixed; inset: 0; overflow: hidden; opacity: 0; }
+#mobile-menu, #mobile-menu * { pointer-events: none !important; }
+#mobile-menu :is(button, label) { position: absolute; box-sizing: border-box; min-height: 0; margin: 0; padding: 0; }
+#mobile-menu input { display: block; width: 100%; height: 100%; margin: 0; }
+.menu-summary { white-space: pre-line; }
+#mobile-controls {
+  --key: clamp(44px, 12vmin, 56px);
+  --action-width: 60px;
+  position: absolute; inset: 0; touch-action: none; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none;
+  text-shadow: 0 1px 3px #000;
+}
+#mobile-controls button, #mobile-shell .play-tools button, #mobile-tasks {
+  box-sizing: border-box; min-height: 44px; border: 1px solid rgba(233, 250, 255, .65); border-radius: 14px;
+  background: var(--glass); color: white; text-shadow: inherit; font: 650 13px system-ui, sans-serif;
+}
+.stick-zone { position: absolute; inset: 0 50% 0 0; overflow: hidden; touch-action: none; }
+.stick-ring, .stick-knob { box-sizing: border-box; border-radius: 50%; pointer-events: none; }
+.stick-ring { position: absolute; width: 86px; height: 86px; transform: translate(-50%, -50%); display: grid; place-items: center; background: var(--glass); border: 1px solid #d9edf4aa; }
+.stick-knob { width: 30px; height: 30px; background: #e0f4ff77; border: 1px solid #fff; }
+.movement-alternatives { position: absolute; left: var(--edge); bottom: var(--edge); }
+.movement-alternatives-toggle { width: 60px; padding: 0; }
+.stick-alternatives { position: absolute; left: 0; bottom: calc(100% + var(--gap)); display: grid; grid-template: repeat(2, 44px) / repeat(3, 44px); gap: var(--gap); }
+.stick-alternatives button { min-width: 44px; padding: 0; }
+.stick-alternatives [data-action="move_up"] { grid-area: 1 / 2; }
+.stick-alternatives [data-action="move_left"] { grid-area: 2 / 1; }
+.stick-alternatives [data-action="move_down"] { grid-area: 2 / 2; }
+.stick-alternatives [data-action="move_right"] { grid-area: 2 / 3; }
+.action-pad { position: absolute; right: var(--edge); bottom: var(--edge); display: grid; align-items: end; gap: var(--gap); grid-template-columns: var(--action-width) auto; pointer-events: none; }
+.action-pad button { pointer-events: auto; }
+#mobile-controls [data-action] { height: var(--key); padding: 0; touch-action: none; }
+#mobile-controls [data-action="jump"] { grid-area: 1 / 2 / 3 / 3; border-radius: 50%; width: calc(1.5 * var(--action-width)); height: calc(1.5 * var(--key)); font-size: 17px; }
+.action-pad [data-action="slide"] { grid-area: 1 / 1; }
+.action-pad :is([data-action="repair"], [data-action="diagnose"]) { grid-area: 2 / 1; }
+#mobile-controls button[aria-pressed="true"] { background: rgba(70, 108, 40, .65); border-color: #d0fc7e; }
 #mobile-controls button.guidance-cue { outline: 3px solid #c7f36a; outline-offset: 2px; }
 .control-graphic { display: inline-flex; align-items: center; justify-content: center; min-width: 36px; min-height: 32px; margin-right: 10px; padding: 0 8px; border: 2px solid #c7f36a; border-radius: 6px; background: #182e3b; font-weight: 700; }
 .control-graphic[data-shape="button"] { border-radius: 50%; }
@@ -29,9 +58,19 @@ body.mobile-playing #canvas { visibility: visible; }
 #mobile-controls button.guidance-pulse[aria-pressed="true"] { animation: none; }
 @keyframes guidance-pulse { 50% { outline-color: #6c853e; border-color: #6c853e; } }
 @media (prefers-reduced-motion: reduce) { .guidance-pulse { animation: none !important; } }
-#mobile-pause { position: absolute; right: 6px; top: 4px; min-width: 80px; }
-#mobile-status { position: absolute; left: 6px; top: 4px; font-size: 14px; pointer-events: none; }
-#mobile-prompt { position: absolute; bottom: 4px; left: 6px; right: 6px; min-height: 40px; text-align: center; font-size: 15px; pointer-events: none; }
-#mobile-rotate { background: #293e1d; padding: 12px; margin: 0; position: absolute; bottom: 0; left: 0; right: 0; }
-#mobile-shell.portrait #mobile-menu { padding-bottom: 100px; }
-#mobile-error { position: absolute; bottom: 0; left: 8px; right: 8px; padding: 12px; background: #5b3943; color: white; z-index: 20; }
+.play-tools { position: absolute; top: var(--edge); right: var(--edge); display: flex; gap: var(--gap); text-shadow: 0 1px 3px #000; }
+.play-tools button { padding: 0 12px; }
+#mobile-tasks { position: absolute; left: var(--edge); top: var(--edge); max-width: 48%; }
+#mobile-tasks summary { box-sizing: border-box; min-height: 44px; padding: 12px; cursor: pointer; }
+#mobile-tasks > div { max-height: 30dvh; overflow: auto; touch-action: pan-y; padding: 0 12px 8px; white-space: pre-line; }
+#mobile-prompt {
+  position: absolute; bottom: var(--edge); left: var(--edge);
+  right: calc(var(--edge) + 2.5 * var(--action-width) + 2 * var(--gap)); text-align: center; font-size: 14px; pointer-events: none;
+}
+#mobile-prompt .hint-visible:not(:empty) { padding: 2px 8px; border-radius: 8px; background: rgba(9, 22, 33, .65); box-decoration-break: clone; }
+#mobile-rotate {
+  position: fixed; inset: 0; z-index: 10; display: grid; place-items: center; margin: 0; padding: 32px;
+  background: #0d1720; color: #f1f7fa; font: 600 20px/1.4 system-ui, sans-serif; text-align: center; touch-action: none;
+}
+#mobile-error { position: absolute; bottom: 0; left: 8px; right: 8px; display: flex; align-items: center; gap: 12px; padding: 4px 4px 4px 12px; background: #5b3943; color: white; z-index: 20; }
+#mobile-error p { flex: 1; margin: 0; }

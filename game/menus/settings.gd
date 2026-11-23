@@ -19,7 +19,7 @@ func build(owner_main: Node) -> void:
 		slider.max_value = 1.0
 		slider.step = 0.05
 		slider.value = float(main.save.settings[entry[1]])
-		slider.custom_minimum_size = Vector2(320, 32)
+		slider.custom_minimum_size = Vector2(320, 44)
 		slider.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 		slider.focus_mode = Control.FOCUS_ALL
 		var key: String = entry[1]

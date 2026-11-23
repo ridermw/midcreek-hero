@@ -10,6 +10,8 @@ const RouteRunner = preload("res://game/route_runner.gd")
 const MobileBridge = preload("res://game/mobile_bridge.gd")
 const LEVEL_SCENE := preload("res://game/level.tscn")
 const LEVEL_DIR := "res://levels/"
+# Landscape phones are short, so menus are drawn larger there; gameplay keeps its full view.
+const PHONE_MENU_SCALE := 1.25
 const SCREENS := {
 	"title": preload("res://game/menus/title.gd"),
 	"character_select": preload("res://game/menus/character_select.gd"),
@@ -72,6 +74,7 @@ func _ready() -> void:
 	mobile.main = self
 	add_child(mobile)
 	get_viewport().gui_focus_changed.connect(func(_control: Control) -> void: play_sfx("menu_move"))
+	get_viewport().size_changed.connect(_fit_overlays)
 	if not art.load_all() or not animations.load_manifest():
 		error_message = art.error_message if not art.error_message.is_empty() else animations.error_message
 		add_child(UiKit.label(error_message, 20))
@@ -256,6 +259,10 @@ func next_playable(level_id: String) -> String:
 func go_to(target: String, data: Dictionary = {}) -> void:
 	_discard_help()
 	mobile.invalidate()
+	if mobile.enabled:
+		get_window().content_scale_aspect = Window.CONTENT_SCALE_ASPECT_EXPAND
+		get_window().content_scale_factor = 1.0 if target == "level" else PHONE_MENU_SCALE
+		_fit_overlays()
 	if target != "level":
 		_end_smoke()
 	get_tree().paused = false
@@ -286,8 +293,8 @@ func go_to(target: String, data: Dictionary = {}) -> void:
 	elif target == "level":
 		if screen.error_message.is_empty():
 			screen.hud.control_display = control_display()
-			screen.hud.prompt_row.visible = not mobile.enabled
-			screen.hud.prompt_label.visible = not mobile.enabled
+			if mobile.enabled:
+				screen.hud.hide()
 			audio.play_music(String(screen.level["header"]["music"]))
 	else:
 		screen.build(self)
@@ -346,6 +353,25 @@ func open_help() -> void:
 	help_view = preload("res://game/menus/help.gd").new()
 	help_menu.add_child(help_view)
 	help_view.build(self)
+	_fit_overlays()
+
+
+# Menu screens use the window scale. Overlays above a level scale only their own layer.
+func _fit_overlays() -> void:
+	if mobile == null or not mobile.enabled:
+		return
+	var factor := PHONE_MENU_SCALE / get_window().content_scale_factor
+	var view := get_viewport().get_visible_rect().size / factor
+	for overlay: Array in [[pause_menu, pause_menu.get_node_or_null("Menu") if pause_menu != null else null], [help_menu, help_view]]:
+		var control: Control = overlay[1]
+		if not is_instance_valid(overlay[0]) or control == null:
+			continue
+		(overlay[0] as CanvasLayer).scale = Vector2(factor, factor)
+		control.set_anchors_preset(Control.PRESET_TOP_LEFT)
+		control.position = Vector2.ZERO
+		control.size = view
+		if control == help_view:
+			help_view.call("fit_instructions")
 
 
 func close_help() -> void:

@@ -219,19 +219,35 @@ screen edge must be at most 600 CSS pixels. The long edge must be at most
 1000 CSS pixels. Desktop windows and touch laptops keep the existing interface.
 Detection runs at page load.
 
-Menus and volume sliders work in either orientation. Rotate the phone to
-landscape for gameplay. Use Left and Right to run, Up and Down to climb, and
-Jump and Slide for movement. Hold Repair at a rack. Use Diagnose when prompted.
+Menus are drawn inside the game, with a 1.25x menu scale for short phone
+screens. Taps reach the game buttons and volume sliders directly. An invisible
+browser mirror keeps those controls available to screen readers. Rotate to
+landscape for both menus and gameplay; portrait shows a notice over the whole
+screen.
+
+How to Play follows the control display selected in Settings. Touch shows a
+diagram of the joystick, contextual actions, Jump, tasks and Pause. The task
+pages demonstrate the actions inside the game.
+
+Touch the left half and drag from that spot to run or climb. Lift your thumb
+to stop and hide the joystick. Tap **Move** at the lower left to show direction
+buttons instead. Jump stays at the lower right at 1.5x the previous button
+size. Slide appears near low trays and drones. The work button switches
+between Diagnose and Repair as the task changes. Hold Repair at a rack.
 Cable sequences show Repair, Diagnose, or Jump. Use Repair at each numbered
 switch in order. Multiple fingers can hold different controls at the same time.
 
-Controls stay outside the game image and inside the screen safe area.
-Pause shows the work order list, Resume, Restart work order, and Quit to level
-select. Portrait rotation and loss of browser focus pause gameplay. Resume
+In landscape the game fills the browser viewport without stretching the art.
+The translucent controls stay clear of notches and the home indicator.
+Tap the timer and health display to see your work order tasks. Where the
+browser supports it, tap **Full screen** to hide the browser bars; this is
+available on menus too. Pause opens Resume, How to Play, Restart work order,
+and Quit to level select. Portrait rotation and loss of browser focus pause gameplay. Resume
 explicitly after returning to landscape. Cancellation and screen changes clear
 touch input without releasing physical keyboard input.
-Screen reader activation toggles held movement and Repair. Activate the same
-control again to release it. Other actions remain single presses.
+Screen reader users can activate direction buttons instead of dragging.
+Activating movement or a work action that calls for a hold toggles it on;
+activate it again to release it. Other actions remain single presses.
 
 Run the touch regression tests:
 
@@ -243,22 +259,13 @@ tools/godot_test.sh tests/mobile_bridge_test.gd MOBILE_BRIDGE_TEST
 
 Loading screen checks run with `node --test tests/loading_shell_test.cjs`.
 
-The help navigation browser regression requires Microsoft Edge and an installed
-Playwright package. Pass the absolute path to that package:
-
-```sh
-node tests/mobile_help_browser_test.mjs /absolute/path/to/node_modules/playwright
-```
-
-This check opens an isolated emulated phone browser. It verifies that changing
-help pages resets scroll position, while repeated updates preserve scroll and
-focus. It does not run in the default Node test command.
-
 For rendered browser checks, open the local export in a dedicated
 `agent-browser` session. Get that session's endpoint with
 `agent-browser get cdp-url`. The test uses Chrome DevTools Protocol (CDP) to
-send touch events through that same browser. It also checks desktop detection
-and captures desktop keyboard gameplay. Supply an evidence directory:
+tap the actual game menus and sliders through the canvas, navigate How to
+Play, and exercise the gameplay controls. It also checks rotation, fullscreen,
+safe areas and desktop detection, and captures desktop keyboard gameplay.
+Supply an evidence directory:
 
 ```sh
 node tests/mobile_browser_test.mjs <cdp-websocket-url> http://127.0.0.1:18765/ <evidence-directory>
